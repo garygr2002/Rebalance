@@ -1,0 +1,138 @@
+package com.garygregg.rebalance.hierarchy;
+
+import com.garygregg.rebalance.AccountKey;
+import com.garygregg.rebalance.MessageLogger;
+import com.garygregg.rebalance.countable.MutableCurrency;
+import com.garygregg.rebalance.distinguished.DistinguishedAccountLibrary;
+import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.logging.Level;
+
+public class HouseSalesCosts extends Synthesizer {
+
+    // Value by 'considered'
+    private final static Valuator byConsidered = new ValueByConsidered();
+
+    // Value by 'not considered'
+    private final static Valuator byNotConsidered = new ValueByNotConsidered();
+
+    /**
+     * Sums the value of a collection of queryables.
+     *
+     * @param queryables A collection of queryables
+     * @param valuator   A valuator for queryables
+     * @return The sum of the values in the collection
+     */
+    private static double sum(@NotNull Collection<Queryable<?, ?>> queryables,
+                              @NotNull Valuator valuator) {
+
+        // Declare and initialize the sum. Are there any queryables?
+        double value = 0.;
+        if (!queryables.isEmpty()) {
+
+            /*
+             * There are queryables. Declare and initialize mutable currency
+             * initialized with the empty sum. Cycle for each queryable.
+             */
+            final MutableCurrency currency = new MutableCurrency(value);
+            for (Queryable<?, ?> queryable : queryables) {
+
+                // Subtract the value of the first/next queryable from the sum.
+                currency.subtract(valuator.getValue(queryable));
+            }
+
+            // Get the summed value, and divide by the number of queryables.
+            value = currency.getValue() / queryables.size();
+        }
+
+        // Return the sum.
+        return value;
+    }
+
+    @Override
+    public @NotNull DistinguishedAccounts getAccount() {
+        return DistinguishedAccounts.HOUSE_SALES_COSTS;
+    }
+
+    @Override
+    public boolean synthesize(@NotNull Account account) {
+
+        // Call the superclass method. Was this successful?
+        boolean result = super.synthesize(account);
+        if (result) {
+
+            /*
+             * Calling the superclass method was successful. Get the
+             * distinguished account library.
+             */
+            final DistinguishedAccountLibrary library =
+                    DistinguishedAccountLibrary.getInstance();
+
+            /*
+             * Get the known estimate account keys from the distinguished
+             * account library.
+             */
+            final AccountKey[] estimateKeys = {
+                    library.getValue(DistinguishedAccounts.HOUSE_ESTIMATE_1),
+                    library.getValue(DistinguishedAccounts.HOUSE_ESTIMATE_2)
+            };
+
+            /*
+             * Declare a variable to receive an estimate. Get a hierarchy
+             * instance and the message logger.
+             */
+            Account estimate;
+            final Hierarchy hierarchy = Hierarchy.getInstance();
+            final MessageLogger logger = getLogger();
+
+            /*
+             * Declare a list to receive house price estimates. Cycle for each
+             * estimate account key.
+             */
+            final List<Queryable<?, ?>> estimateList = new ArrayList<>();
+            for (AccountKey estimateKey : estimateKeys) {
+
+                /*
+                 * Get the estimate for the first/next key. Is the estimate
+                 * null?
+                 */
+                estimate = hierarchy.getAccount(estimateKey);
+                if (null == estimate) {
+
+                    // The estimate is null. Log a warning.
+                    logger.logMessage(Level.WARNING, String.format("Unable " +
+                            "to retrieve house estimate with key '%s'; its " +
+                            "account is missing.", estimateKey));
+                }
+
+                // The estimate is not null. Add it to the account list.
+                else {
+                    estimateList.add(estimate);
+                }
+            }
+
+            /*
+             * Set the 'considered' and 'not considered' values in the target
+             * account by average the estimates. Re-initialize the result.
+             */
+            account.setConsidered(sum(estimateList, byConsidered));
+            account.setNotConsidered(sum(estimateList, byNotConsidered));
+            result = !logger.hadProblem();
+        }
+
+        /*
+         * TODO:
+         *
+         * Take into account capital gains tax by subtracting the house basis
+         * account value from the valuation calculation (above), and applying
+         * a suitable capital gains tax rate.
+         */
+
+        // Return the result.
+        return result;
+    }
+}
