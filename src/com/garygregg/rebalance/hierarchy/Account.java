@@ -41,8 +41,28 @@ public class Account extends
     }
 
     @Override
+    protected void accumulateTaxType() {
+        getTaxTypeManager().add(getTaxType(), this);
+    }
+
+    @Override
     public @NotNull HoldingLineType getLineType() {
         return HoldingLineType.ACCOUNT;
+    }
+
+    /**
+     * Gets the tax type from the account description.
+     *
+     * @return The tax type from the account description
+     */
+    public TaxType getTaxType() {
+
+        /*
+         * Get the account description. Return null if the description is null,
+         * otherwise return the single tax type.
+         */
+        final AccountDescription description = getDescription();
+        return (null == description) ? null : description.getType();
     }
 
     @Override
@@ -53,22 +73,12 @@ public class Account extends
     @Override
     public boolean hasTaxType(@NotNull TaxType type) {
 
-        // The account description cannot be null for a 'true' result.
-        final AccountDescription description = getDescription();
-        boolean result = (null != description);
-        if (result) {
-
-            /*
-             * The account description is not null. Return true if the tax
-             * type matches the given type.
-             */
-            final TaxType descriptionType = description.getType();
-            result = (null != descriptionType) &&
-                    descriptionType.equals(type);
-        }
-
-        // Return the result.
-        return result;
+        /*
+         * Get the tax type in the account description. Return true if the tax
+         * type is not null, and equal the given type.
+         */
+        final TaxType descriptionType = getTaxType();
+        return (null != descriptionType) && descriptionType.equals(type);
     }
 
     /**

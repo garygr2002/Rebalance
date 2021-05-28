@@ -18,6 +18,20 @@ public class Portfolio extends Aggregate<String, Institution, PortfolioDescripti
     }
 
     @Override
+    public void breakdown() {
+
+        // Made public here, that is all.
+        super.breakdown();
+    }
+
+    @Override
+    public void clear() {
+
+        // Made public here, that is all.
+        super.clear();
+    }
+
+    @Override
     public @NotNull HoldingLineType getLineType() {
         return HoldingLineType.PORTFOLIO;
     }
@@ -30,5 +44,19 @@ public class Portfolio extends Aggregate<String, Institution, PortfolioDescripti
     @Override
     public boolean hasTaxType(@NotNull TaxType type) {
         return type.equals(TaxType.NOT_AN_ACCOUNT);
+    }
+
+    @Override
+    public void setCurrent() {
+
+        // Made public here, that is all.
+        super.setCurrent();
+    }
+
+    @Override
+    public void setProposed() {
+
+        // Made public here, that is all.
+        super.setProposed();
     }
 }

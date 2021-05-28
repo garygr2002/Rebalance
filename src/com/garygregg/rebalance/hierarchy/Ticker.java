@@ -1,8 +1,6 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.FundType;
-import com.garygregg.rebalance.HoldingLineType;
-import com.garygregg.rebalance.TaxType;
+import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Purse;
 import com.garygregg.rebalance.countable.Shares;
@@ -10,9 +8,14 @@ import com.garygregg.rebalance.ticker.TickerDescription;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Ticker extends
         Common<String, Queryable<?, ?>, TickerDescription> {
+
+    // The map of weight type to activities
+    private final Map<WeightType, Activity> associationMap = new HashMap<>();
 
     // The considered value of the ticker
     private final Purse considered = new Purse();
@@ -23,6 +26,141 @@ public class Ticker extends
     // The proposed value of the ticker
     private final Purse proposed = new Purse();
 
+    {
+        /*
+         * This common initialization block builds the association map of
+         * weight type to activities.
+         */
+
+        // Level 0: Bond, cash, real-estate or stock.
+        WeightType type;
+        associationMap.put(type = WeightType.ALL, new Activity(type, null,
+                new Association(FundType.BOND, WeightType.BOND),
+                new Association(FundType.CASH, WeightType.CASH),
+                new Association(FundType.REAL_ESTATE, WeightType.REAL_ESTATE),
+                new Association(FundType.STOCK, WeightType.STOCK)));
+
+        /*
+         * Level 1 (Bond): Uncategorized, corporate, foreign, short, treasury,
+         * high-yield, inflation or mortgage.
+         *
+         * (Let 'short' go before 'government'; see WeightType.)
+         */
+        associationMap.put(type = WeightType.BOND, new Activity(type,
+                WeightType.BOND_UNCATEGORIZED,
+                new Association(FundType.CORPORATE, WeightType.BOND_CORPORATE),
+                new Association(FundType.FOREIGN, WeightType.BOND_FOREIGN),
+                new Association(FundType.SHORT, WeightType.BOND_SHORT),
+                new Association(FundType.TREASURY, WeightType.BOND_GOVERNMENT),
+                new Association(FundType.HIGH, WeightType.BOND_HIGH),
+                new Association(FundType.INFLATION, WeightType.BOND_INFLATION),
+                new Association(FundType.MORTGAGE, WeightType.BOND_MORTGAGE)));
+
+        // Level 2 (Bond subtypes).
+        associationMap.put(type = WeightType.BOND_CORPORATE,
+                new Activity(type, null));
+        associationMap.put(type = WeightType.BOND_FOREIGN,
+                new Activity(type, null));
+        associationMap.put(type = WeightType.BOND_SHORT,
+                new Activity(type, null));
+        associationMap.put(type = WeightType.BOND_GOVERNMENT,
+                new Activity(type, null));
+        associationMap.put(type = WeightType.BOND_HIGH,
+                new Activity(type, null));
+        associationMap.put(type = WeightType.BOND_INFLATION,
+                new Activity(type, null));
+        associationMap.put(type = WeightType.BOND_MORTGAGE,
+                new Activity(type, null));
+        associationMap.put(type = WeightType.BOND_UNCATEGORIZED,
+                new Activity(type, null));
+
+        // Level 1 (Cash): Uncategorized or treasury.
+        associationMap.put(type = WeightType.CASH,
+                new Activity(type, WeightType.CASH_UNCATEGORIZED,
+                        new Association(FundType.TREASURY, WeightType.CASH_GOVERNMENT)));
+
+        // Level 2 (Cash subtypes).
+        associationMap.put(type = WeightType.CASH_GOVERNMENT,
+                new Activity(type, null));
+        associationMap.put(type = WeightType.CASH_UNCATEGORIZED,
+                new Activity(type, null));
+
+        // Level 1 (Real-estate).
+        associationMap.put(type = WeightType.REAL_ESTATE,
+                new Activity(type, null));
+
+        // Level 1 (Stock): Domestic or foreign.
+        associationMap.put(type = WeightType.STOCK, new Activity(type, null,
+                new Association(FundType.DOMESTIC, WeightType.STOCK_DOMESTIC),
+                new Association(FundType.FOREIGN, WeightType.STOCK_FOREIGN)));
+
+        /*
+         * Level 2 (Stock subtype - Domestic stock): Large, not-large, medium
+         * or small.
+         */
+        associationMap.put(type = WeightType.STOCK_DOMESTIC,
+                new Activity(type, null,
+                        new Association(FundType.LARGE, WeightType.STOCK_LARGE),
+                        new Association(FundType.NOT_LARGE,
+                                WeightType.STOCK_NOT_LARGE),
+                        new Association(FundType.MEDIUM, WeightType.STOCK_NOT_LARGE),
+                        new Association(FundType.SMALL, WeightType.STOCK_NOT_LARGE)));
+
+        /*
+         * Level 2 (Stock subtype - Foreign stock): Large, not-large, medium
+         * or small.
+         */
+        associationMap.put(type = WeightType.STOCK_FOREIGN,
+                new Activity(type, null,
+                        new Association(FundType.LARGE, WeightType.STOCK_LARGE),
+                        new Association(FundType.NOT_LARGE,
+                                WeightType.STOCK_NOT_LARGE),
+                        new Association(FundType.MEDIUM, WeightType.STOCK_NOT_LARGE),
+                        new Association(FundType.SMALL, WeightType.STOCK_NOT_LARGE)));
+
+        /*
+         * Level 3 (Domestic or foreign stock subtype - Large stocks): Growth
+         * or value.
+         */
+        associationMap.put(type = WeightType.STOCK_LARGE,
+                new Activity(type, null,
+                        new Association(FundType.GROWTH, WeightType.STOCK_GROWTH),
+                        new Association(FundType.VALUE, WeightType.STOCK_VALUE)));
+
+        /*
+         * Level 3 (Domestic or foreign stock subtype - Not-large stocks):
+         * Growth or value.
+         */
+        associationMap.put(type = WeightType.STOCK_NOT_LARGE,
+                new Activity(type, null,
+                        new Association(FundType.GROWTH, WeightType.STOCK_GROWTH),
+                        new Association(FundType.VALUE, WeightType.STOCK_VALUE)));
+
+        /*
+         * Level 3 (Domestic or foreign stock subtype - Medium stocks): Growth
+         * or value.
+         */
+        associationMap.put(type = WeightType.STOCK_MEDIUM,
+                new Activity(type, null,
+                        new Association(FundType.GROWTH, WeightType.STOCK_GROWTH),
+                        new Association(FundType.VALUE, WeightType.STOCK_VALUE)));
+
+        /*
+         * Level 3 (Domestic or foreign stock subtype - Small stocks): Growth
+         * or value.
+         */
+        associationMap.put(type = WeightType.STOCK_SMALL,
+                new Activity(type, null,
+                        new Association(FundType.GROWTH, WeightType.STOCK_GROWTH),
+                        new Association(FundType.VALUE, WeightType.STOCK_VALUE)));
+
+        // Level 4 (Large, not-large, medium or small stock subtypes)
+        associationMap.put(type = WeightType.STOCK_GROWTH,
+                new Activity(type, null));
+        associationMap.put(type = WeightType.STOCK_VALUE,
+                new Activity(type, null));
+    }
+
     /**
      * Creates the ticker hierarchy object.
      *
@@ -30,6 +168,11 @@ public class Ticker extends
      */
     Ticker(@NotNull String ticker) {
         super(ticker);
+    }
+
+    @Override
+    void breakdown() {
+        performActivity(WeightType.ALL);
     }
 
     /**
@@ -106,6 +249,15 @@ public class Ticker extends
         return type.equals(TaxType.NOT_AN_ACCOUNT);
     }
 
+    /**
+     * Performs an activity for a weight type.
+     *
+     * @param type The given weight type
+     */
+    private void performActivity(@NotNull WeightType type) {
+        associationMap.get(type).perform();
+    }
+
     @Override
     void setConsidered(double value) {
         considered.setValueAdjustShares(value);
@@ -166,5 +318,132 @@ public class Ticker extends
      */
     public void setProposedShares(double shares) {
         proposed.setShares(shares);
+    }
+
+    private static class Association extends Pair<FundType, WeightType> {
+
+        /**
+         * Constructs an association of fund type to weight type.
+         *
+         * @param fundType   The fund type
+         * @param weightType The weight type
+         */
+        public Association(@NotNull FundType fundType,
+                           @NotNull WeightType weightType) {
+            super(fundType, weightType);
+        }
+    }
+
+    private class Activity {
+
+        // Associations of contained fund types to weight types
+        private final Association[] associations;
+
+        // The default child weight type if there are no fund type matches
+        private final WeightType defaultChild;
+
+        // The weight type associated with the activity
+        private final WeightType weightType;
+
+        /**
+         * Constructs the activity.
+         *
+         * @param weightType   The weight type associated with the activity
+         * @param defaultChild The child weight type if there are no fund type
+         *                     matches
+         * @param association  Associations of contained fund type to weight
+         *                     types
+         */
+        public Activity(WeightType weightType,
+                        WeightType defaultChild,
+                        @NotNull Association... association) {
+
+            // Assign the member variables.
+            this.associations = association;
+            this.defaultChild = defaultChild;
+            this.weightType = weightType;
+        }
+
+        /**
+         * Gets the associations of contained fund types to weight types.
+         *
+         * @return The associations of contained fund types to weight types
+         */
+        public Association[] getAssociations() {
+            return associations;
+        }
+
+        /**
+         * Gets the default child weight type if there are no fund type
+         * matches.
+         *
+         * @return The default child weight type if there are no fund type
+         * matches
+         */
+        public WeightType getDefaultChild() {
+            return defaultChild;
+        }
+
+        /**
+         * Gets the weight type associated with the activity.
+         *
+         * @return The weight type associated with the activity
+         */
+        public WeightType getWeightType() {
+            return weightType;
+        }
+
+        /**
+         * Performs the activity.
+         */
+        public void perform() {
+
+            /*
+             * Declare a variable to hold an association. Get the variable
+             * length array of associations of fund type to weight types.
+             * Determine the length of this array.
+             */
+            Association association;
+            final Association[] associations = getAssociations();
+            final int associationsLength = associations.length;
+
+            /*
+             * Cycle until we locate a child weight type, or until the possible
+             * matches of children are exhausted.
+             */
+            WeightType child = null;
+            for (int i = 0; (i < associationsLength) && (null == child); ++i) {
+
+                /*
+                 * Get the first/next association. Does this ticker have the
+                 * indicated fund type?
+                 */
+                association = associations[i];
+                if (hasFundType(association.getFirst())) {
+
+                    /*
+                     * The ticker has the associated fund type. Set the child
+                     * weight type.
+                     */
+                    child = association.getSecond();
+                }
+            }
+
+            /*
+             * Set the child weight type to the default child if the child
+             * weight type is null.
+             */
+            if (null == child) {
+                child = getDefaultChild();
+            }
+
+            // Perform an activity for the child weight type if it is not null.
+            if (null != child) {
+                performActivity(child);
+            }
+
+            // Add value for the weight type.
+            getWeightTypeManager().add(getWeightType(), Ticker.this);
+        }
     }
 }
