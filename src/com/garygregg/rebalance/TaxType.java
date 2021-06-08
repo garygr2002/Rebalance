@@ -2,6 +2,9 @@ package com.garygregg.rebalance;
 
 public enum TaxType {
 
+    // All types
+    ALL,
+
     // A credit (loan, or credit card balance)
     CREDIT,
 
