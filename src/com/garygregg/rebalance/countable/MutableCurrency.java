@@ -5,7 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import java.text.NumberFormat;
 import java.util.Objects;
 
-public class MutableCurrency extends MutableCountable {
+public class MutableCurrency extends MutableCountable
+        implements Factory<Currency> {
 
     // A class comparable to this one
     private static final Class<Currency> comparableClass = Currency.class;
@@ -16,6 +17,9 @@ public class MutableCurrency extends MutableCountable {
     // Our number formatter
     private static final NumberFormat formatter =
             ICountable.createFormat(precision);
+
+    // A container for immutable currency
+    private final Container<Currency> container = new Container<>(this);
 
     /**
      * Constructs currency.
@@ -86,6 +90,18 @@ public class MutableCurrency extends MutableCountable {
         return !ICountable.areEqual(value, getValue(), getPrecision());
     }
 
+    @Override
+    protected void clear() {
+
+        /*
+         * There is a null check here because initialization of the container
+         * might not have occurred when this method is called.
+         */
+        if (null != container) {
+            container.clear();
+        }
+    }
+
     /**
      * Divides a currency value.
      *
@@ -127,6 +143,15 @@ public class MutableCurrency extends MutableCountable {
     public boolean equals(Object object) {
         return ICountable.areEqual(this, object, this.getClass(),
                 comparableClass, getPrecision());
+    }
+
+    /**
+     * Gets an immutable equivalent of this object.
+     *
+     * @return An immutable equivalent of this object
+     */
+    public @NotNull Currency getImmutable() {
+        return container.get();
     }
 
     @Override
@@ -179,6 +204,11 @@ public class MutableCurrency extends MutableCountable {
         // Multiply the value, and return the result.
         set(getValue() * currency.getValue());
         return getValue();
+    }
+
+    @Override
+    public @NotNull Currency produce() {
+        return new Currency(this);
     }
 
     /**

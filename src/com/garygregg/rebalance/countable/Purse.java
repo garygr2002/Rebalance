@@ -104,7 +104,7 @@ public class Purse {
      * @return The price
      */
     public Currency getPrice() {
-        return (null == price) ? null : new Currency(price);
+        return (null == price) ? null : price.getImmutable();
     }
 
     /**
@@ -113,7 +113,7 @@ public class Purse {
      * @return The shares
      */
     public Shares getShares() {
-        return (null == shares) ? null : new Shares(shares);
+        return (null == shares) ? null : shares.getImmutable();
     }
 
     /**
@@ -122,7 +122,7 @@ public class Purse {
      * @return The value
      */
     public Currency getValue() {
-        return (null == value) ? null : new Currency(value);
+        return (null == value) ? null : value.getImmutable();
     }
 
     /**

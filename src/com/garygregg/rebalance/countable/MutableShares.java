@@ -5,7 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import java.text.NumberFormat;
 import java.util.Objects;
 
-public class MutableShares extends MutableCountable {
+public class MutableShares extends MutableCountable
+        implements Factory<Shares> {
 
     // A class comparable to this one
     private static final Class<Shares> comparableClass = Shares.class;
@@ -16,6 +17,9 @@ public class MutableShares extends MutableCountable {
     // Our number formatter
     private static final NumberFormat formatter =
             ICountable.createFormat(precision);
+
+    // A container for immutable currency
+    private final Container<Shares> container = new Container<>(this);
 
     /**
      * Constructs shares.
@@ -35,6 +39,18 @@ public class MutableShares extends MutableCountable {
      */
     public MutableShares(double value) {
         super(value);
+    }
+
+    @Override
+    protected void clear() {
+
+        /*
+         * There is a null check here because initialization of the container
+         * might not have occurred when this method is called.
+         */
+        if (null != container) {
+            container.clear();
+        }
     }
 
     /**
@@ -93,6 +109,15 @@ public class MutableShares extends MutableCountable {
                 comparableClass, getPrecision());
     }
 
+    /**
+     * Gets an immutable equivalent of this object.
+     *
+     * @return An immutable equivalent of this object
+     */
+    public @NotNull Shares getImmutable() {
+        return container.get();
+    }
+
     @Override
     public int getPrecision() {
         return precision;
@@ -117,6 +142,11 @@ public class MutableShares extends MutableCountable {
     @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     public boolean isOne() {
         return equals(Shares.getOne());
+    }
+
+    @Override
+    public @NotNull Shares produce() {
+        return new Shares(this);
     }
 
     /**
