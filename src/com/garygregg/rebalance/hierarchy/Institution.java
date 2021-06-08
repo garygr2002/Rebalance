@@ -6,7 +6,7 @@ import com.garygregg.rebalance.HoldingLineType;
 import com.garygregg.rebalance.TaxType;
 import org.jetbrains.annotations.NotNull;
 
-public class Institution extends Aggregate<
+public class Institution extends SuperAggregate<
         String,
         Account,
         Description<String>> {

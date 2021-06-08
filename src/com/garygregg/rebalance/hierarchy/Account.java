@@ -23,7 +23,7 @@ public class Account extends
         Synthesizer synthesizer = new HouseSalesCosts();
         synthesizerMap.put(synthesizer.getKey(), synthesizer);
 
-        // Put a my pension synthesizer in the map.
+        // Put a 'my pension' synthesizer in the map.
         synthesizer = new MyPension();
         synthesizerMap.put(synthesizer.getKey(), synthesizer);
     }
@@ -38,11 +38,6 @@ public class Account extends
      */
     Account(@NotNull AccountKey key) {
         super(key);
-    }
-
-    @Override
-    protected void accumulateTaxType() {
-        getTaxTypeManager().add(getTaxType(), this);
     }
 
     @Override

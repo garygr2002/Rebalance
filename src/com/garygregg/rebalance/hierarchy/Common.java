@@ -7,16 +7,12 @@ import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
 
 abstract class Common<KeyType,
-        ChildType extends Queryable<?, ?>,
+        ChildType extends Common<?, ?, ?>,
         DescriptionType extends Description<? extends KeyType>>
         implements Queryable<KeyType, ChildType> {
 
     // The key of this common hierarchy object
     private final KeyType key;
-
-    // Our breakdown manager for the weight type
-    private final BreakdownManager<WeightType> weightTypeManager =
-            new BreakdownManager<>();
 
     // The description of this hierarchy object
     private DescriptionType description;
@@ -31,16 +27,14 @@ abstract class Common<KeyType,
     }
 
     /**
-     * Causes the breakdown managers to perform their calculations.
+     * Breaks down the hierarchy object valuation by category.
      */
     abstract void breakdown();
 
     /**
-     * Clears the breakdown managers.
+     * Clears breakdown values in the hierarchy object.
      */
-    void clear() {
-        getWeightTypeManager().clear();
-    }
+    abstract void clear();
 
     /**
      * Gets the value of the hierarchy object that can be considered for
@@ -50,9 +44,7 @@ abstract class Common<KeyType,
      * @return The value of the hierarchy object that can be considered for
      * rebalance, specific to the given weight type
      */
-    public @NotNull Currency getConsidered(@NotNull WeightType type) {
-        return getWeightTypeManager().getConsidered(type);
-    }
+    public abstract @NotNull Currency getConsidered(@NotNull WeightType type);
 
     /**
      * Gets the description of the hierarchy object.
@@ -83,9 +75,7 @@ abstract class Common<KeyType,
      * @return The value of the hierarchy object that cannot be considered for
      * rebalance, specific to the given weight type
      */
-    public @NotNull Currency getNotConsidered(@NotNull WeightType type) {
-        return getWeightTypeManager().getNotConsidered(type);
-    }
+    public abstract @NotNull Currency getNotConsidered(@NotNull WeightType type);
 
     /**
      * Gets the proposed value of the hierarchy object specific to the given
@@ -96,18 +86,7 @@ abstract class Common<KeyType,
      * value in the hierarchy object that is considered for rebalance and
      * specific to the given weight type
      */
-    public @NotNull Currency getProposed(@NotNull WeightType type) {
-        return getWeightTypeManager().getProposed(type);
-    }
-
-    /**
-     * Gets the breakdown manager for the weight type.
-     *
-     * @return The breakdown manager for the weight type
-     */
-    protected @NotNull BreakdownManager<WeightType> getWeightTypeManager() {
-        return weightTypeManager;
-    }
+    public abstract @NotNull Currency getProposed(@NotNull WeightType type);
 
     /**
      * Sets the value of the hierarchy object that is available for
@@ -120,9 +99,7 @@ abstract class Common<KeyType,
     /**
      * Sets the breakdown managers to work with current values.
      */
-    void setCurrent() {
-        getWeightTypeManager().setCurrent();
-    }
+    abstract void setCurrent();
 
     /**
      * Sets the description of the hierarchy object.
@@ -144,9 +121,7 @@ abstract class Common<KeyType,
     /**
      * Sets the breakdown managers to work with proposed values.
      */
-    void setProposed() {
-        getWeightTypeManager().setProposed();
-    }
+    abstract void setProposed();
 
     @Override
     public String toString() {

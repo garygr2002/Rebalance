@@ -6,7 +6,8 @@ import com.garygregg.rebalance.TaxType;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
 
-public class Portfolio extends Aggregate<String, Institution, PortfolioDescription> {
+public class Portfolio
+        extends SuperAggregate<String, Institution, PortfolioDescription> {
 
     /**
      * Constructs the portfolio hierarchy object.

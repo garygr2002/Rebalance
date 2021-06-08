@@ -3,66 +3,59 @@ package com.garygregg.rebalance.hierarchy;
 import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
-class BreakdownManager<T extends Enum<T>> implements IBreakdown<T> {
+abstract class BreakdownManager<EnumType extends Enum<EnumType>,
+        HierarchyType extends Common<?, ?, ?>>
+        implements IBreakdown<EnumType, HierarchyType> {
 
     // Our operation to add value to a breakdown
     private final AddOperation addOperation = new AddOperation();
 
-    // Our breakdown list for current values
-    private final List<Breakdown<T>> breakdownCurrent;
-
     // Our list of breakdown lists
-    private final List<List<Breakdown<T>>> breakdownLists;
-
-    // Our breakdown list for proposed values
-    private final List<Breakdown<T>> breakdownProposed;
+    private final List<List<IBreakdown<EnumType, HierarchyType>>> breakdownLists =
+            new ArrayList<>();
 
     // Our operation to clear a breakdown
-    private final Operation<T> clearOperation = Breakdown::clear;
+    private final Operation<EnumType, HierarchyType> clearOperation = IBreakdown::clear;
 
-    // Our breakdown for 'considered' value
-    private final Breakdown<T> considered;
+    // A breakdown for 'considered' values
+    private final Breakdown<EnumType, HierarchyType> considered;
 
-    // Our breakdown for 'not considered' value
-    private final Breakdown<T> notConsidered;
+    // A breakdown for 'not considered' values
+    private final Breakdown<EnumType, HierarchyType> notConsidered;
 
-    // Our breakdown for proposed values
-    private final Breakdown<T> proposed;
+    // A breakdown for proposed values
+    private final Breakdown<EnumType, HierarchyType> proposed;
 
     // The index of the active breakdown list
     private int index = getBreakdownIndex(BreakdownType.CURRENT);
 
-    /**
-     * Constructs a breakdown manager with default valuators.
-     */
-    public BreakdownManager() {
-        this(new ValueByConsidered(),
-                new ValueByNotConsidered(),
-                new ValueByProposed());
-    }
+    {
 
-    /**
-     * Constructs a breakdown manager.
-     *
-     * @param consideredValuator    The valuator for 'considered' values
-     * @param notConsideredValuator The valuator for 'not considered' values
-     * @param proposedValuator      The valuator for proposed values
-     */
-    public BreakdownManager(@NotNull Valuator consideredValuator,
-                            @NotNull Valuator notConsideredValuator,
-                            @NotNull Valuator proposedValuator) {
+        /*
+         * Create a list to receive current values, and add the 'considered'
+         * values breakdown.
+         */
+        List<IBreakdown<EnumType, HierarchyType>> list = new ArrayList<>();
+        list.add(considered = createByConsidered());
 
-        // Create breakdowns for each valuator.
-        considered = new Breakdown<>(consideredValuator);
-        notConsidered = new Breakdown<>(notConsideredValuator);
-        proposed = new Breakdown<>(proposedValuator);
+        /*
+         * Add the 'not considered' values breakdown to the list, and add the
+         * list to the breakdown lists for the current breakdown type.
+         */
+        list.add(notConsidered = createByNotConsidered());
+        breakdownLists.add(getBreakdownIndex(BreakdownType.CURRENT), list);
 
-        // Create the lists.
-        breakdownCurrent = List.of(considered, notConsidered);
-        breakdownProposed = List.of(proposed);
-        breakdownLists = List.of(breakdownCurrent, breakdownProposed);
+        /*
+         * Create a new list to receive the proposed values, and the proposed
+         * values breakdown. Add the list to the breakdown lists for the
+         * proposed breakdown type.
+         */
+        list = new ArrayList<>();
+        list.add(proposed = createByProposed());
+        breakdownLists.add(getBreakdownIndex(BreakdownType.PROPOSED), list);
     }
 
     /**
@@ -76,13 +69,13 @@ class BreakdownManager<T extends Enum<T>> implements IBreakdown<T> {
     }
 
     @Override
-    public void add(T type, @NotNull Queryable<?, ?> queryable) {
+    public void add(EnumType type, @NotNull HierarchyType hierarchyObject) {
 
         /*
-         * Set the queryable and type in the 'add' operation, and perform the
-         * operation for each active breakdown.
+         * Set the hierarchy object and type in the 'add' operation, and perform
+         * the operation for each active breakdown.
          */
-        addOperation.setQueryable(queryable);
+        addOperation.setHierarchyObject(hierarchyObject);
         addOperation.setType(type);
         doOperation(addOperation);
     }
@@ -93,18 +86,41 @@ class BreakdownManager<T extends Enum<T>> implements IBreakdown<T> {
     }
 
     /**
+     * Creates the breakdown for 'considered' values.
+     *
+     * @return The breakdown for 'considered' values
+     */
+    protected abstract @NotNull Breakdown<EnumType, HierarchyType> createByConsidered();
+
+    /**
+     * Creates the breakdown for 'not considered' values.
+     *
+     * @return The breakdown for 'not considered' values
+     */
+    protected abstract @NotNull Breakdown<EnumType, HierarchyType> createByNotConsidered();
+
+    /**
+     * Creates the breakdown for proposed values.
+     *
+     * @return The breakdown for proposed values
+     */
+    protected abstract @NotNull Breakdown<EnumType, HierarchyType> createByProposed();
+
+    /**
      * Perform an operation for each active breakdown.
      *
      * @param operation The operation to perform
      */
-    private void doOperation(@NotNull Operation<T> operation) {
+    private void doOperation(@NotNull Operation<EnumType,
+            @NotNull HierarchyType> operation) {
 
         /*
          * Get the list of active breakdowns. Cycle for each breakdown in the
          * list.
          */
-        final List<Breakdown<T>> breakdownList = breakdownLists.get(index);
-        for (Breakdown<T> breakdown : breakdownList) {
+        final List<IBreakdown<EnumType, HierarchyType>> breakdownList =
+                breakdownLists.get(index);
+        for (IBreakdown<EnumType, HierarchyType> breakdown : breakdownList) {
 
             // Perform the indicated operation on the first/next breakdown.
             operation.perform(breakdown);
@@ -117,7 +133,7 @@ class BreakdownManager<T extends Enum<T>> implements IBreakdown<T> {
      * @param type A type
      * @return The 'considered' value for the given type
      */
-    public @NotNull Currency getConsidered(T type) {
+    public @NotNull Currency getConsidered(EnumType type) {
         return considered.get(type);
     }
 
@@ -127,7 +143,7 @@ class BreakdownManager<T extends Enum<T>> implements IBreakdown<T> {
      * @param type A type
      * @return The 'considered' value for the given type
      */
-    public @NotNull Currency getNotConsidered(T type) {
+    public @NotNull Currency getNotConsidered(EnumType type) {
         return notConsidered.get(type);
     }
 
@@ -137,7 +153,7 @@ class BreakdownManager<T extends Enum<T>> implements IBreakdown<T> {
      * @param type A type
      * @return The 'considered' value for the given type
      */
-    public @NotNull Currency getProposed(T type) {
+    public @NotNull Currency getProposed(EnumType type) {
         return proposed.get(type);
     }
 
@@ -164,40 +180,40 @@ class BreakdownManager<T extends Enum<T>> implements IBreakdown<T> {
         PROPOSED
     }
 
-    private interface Operation<S extends Enum<S>> {
+    private interface Operation<S extends Enum<S>, T extends Common<?, ?, ?>> {
 
         /**
          * Performs an operation on a breakdown.
          *
          * @param breakdown The breakdown on which to perform the operation
          */
-        void perform(@NotNull Breakdown<S> breakdown);
+        void perform(@NotNull IBreakdown<S, T> breakdown);
     }
 
-    private class AddOperation implements Operation<T> {
+    private class AddOperation implements Operation<EnumType, HierarchyType> {
 
-        // A queryable
-        private Queryable<?, ?> queryable;
+        // A hierarchy object
+        private HierarchyType hierarchyObject;
 
-        // A type value
-        private T type;
+        // An enumerated type value
+        private EnumType type;
 
         @Override
-        public void perform(@NotNull Breakdown<T> breakdown) {
+        public void perform(@NotNull IBreakdown<EnumType, HierarchyType> breakdown) {
 
-            // Perform the operation if the queryable is not null.
-            if (null != queryable) {
-                breakdown.add(type, queryable);
+            // Perform the operation if the hierarchy object is not null.
+            if (null != hierarchyObject) {
+                breakdown.add(type, hierarchyObject);
             }
         }
 
         /**
-         * Sets the queryable.
+         * Sets the hierarchy object.
          *
-         * @param queryable The queryable to set
+         * @param hierarchyObject The hierarchy object to set
          */
-        public void setQueryable(Queryable<?, ?> queryable) {
-            this.queryable = queryable;
+        public void setHierarchyObject(HierarchyType hierarchyObject) {
+            this.hierarchyObject = hierarchyObject;
         }
 
         /**
@@ -205,7 +221,7 @@ class BreakdownManager<T extends Enum<T>> implements IBreakdown<T> {
          *
          * @param type The type value to set
          */
-        public void setType(T type) {
+        public void setType(EnumType type) {
             this.type = type;
         }
     }

@@ -26,7 +26,7 @@ abstract class Aggregate<KeyType,
         }
     };
 
-    // Clears breakdown values in each child
+    // Clears values in each child
     private final Operation doClear = new Operation() {
 
         @Override
@@ -35,42 +35,9 @@ abstract class Aggregate<KeyType,
         }
     };
 
-    // Sets breakdown managers in a child to work with current values
-    private final Operation setCurrent = new Operation() {
-
-        @Override
-        public void perform(@NotNull ChildType child) {
-            child.setCurrent();
-        }
-    };
-
-    // Sets breakdown managers in a child to work with proposed values
-    private final Operation setProposed = new Operation() {
-
-        @Override
-        public void perform(@NotNull ChildType child) {
-            child.setProposed();
-        }
-    };
-
-    // Our breakdown manager for the tax type
-    private final BreakdownManager<TaxType> taxTypeManager =
-            new BreakdownManager<>();
-
-    // Accumulates values by tax type in each child
-    private final Operation taxTypeAccumulate = new Operation() {
-
-        @Override
-        public void perform(@NotNull ChildType child) {
-
-            final BreakdownManager<TaxType> taxTypeManager =
-                    getTaxTypeManager();
-
-            for (TaxType type : TaxType.values()) {
-                taxTypeManager.add(type, child);
-            }
-        }
-    };
+    // Our breakdown manager for the weight type
+    private final WeightBreakdownManager<ChildType> weightTypeManager =
+            new WeightBreakdownManager<>();
 
     // Accumulates values by weight type in each child
     private final Operation weightTypeAccumulate = new Operation() {
@@ -78,7 +45,7 @@ abstract class Aggregate<KeyType,
         @Override
         public void perform(@NotNull ChildType child) {
 
-            final BreakdownManager<WeightType> weightTypeManager =
+            final WeightBreakdownManager<ChildType> weightTypeManager =
                     getWeightTypeManager();
 
             for (WeightType type : WeightType.values()) {
@@ -90,13 +57,13 @@ abstract class Aggregate<KeyType,
     // A collection of child hierarchy objects
     private Collection<ChildType> collection;
 
-    // The considered value of the hierarchy object
+    // The 'considered' value of the hierarchy object
     private MutableCurrency considered;
 
     // A map of child keys to child hierarchy objects
     private Map<Object, ChildType> map = createModifiableMap();
 
-    // The "not considered" value of the hierarchy object
+    // The 'not considered' value of the hierarchy object
     private MutableCurrency notConsidered;
 
     /**
@@ -109,18 +76,6 @@ abstract class Aggregate<KeyType,
         // Call the superclass method, and make sure the children are unlocked.
         super(key);
         unlockChildren();
-    }
-
-    /**
-     * Accumulates values by tax type in each child.
-     */
-    protected void accumulateTaxType() {
-
-        /*
-         * Note: This method must be overridden in the Account class to add
-         * only the single tax type.
-         */
-        doOperation(taxTypeAccumulate);
     }
 
     /**
@@ -148,13 +103,9 @@ abstract class Aggregate<KeyType,
     @Override
     void breakdown() {
 
-        /*
-         * Do the following for each child: Break down values; accumulate
-         * values by weight type; accumulate values by tax type.
-         */
+        // Break down child values, then accumulate values by weight type.
         breakdownChildren();
         accumulateWeightType();
-        accumulateTaxType();
     }
 
     /**
@@ -167,13 +118,16 @@ abstract class Aggregate<KeyType,
     @Override
     void clear() {
 
-        /*
-         * Do the operation for each child. Clear breakdown values in the tax
-         * type manager, then call the superclass method.
-         */
+        // Clear children, then clear the weight type manager.
+        clearChildren();
+        getWeightTypeManager().clear();
+    }
+
+    /**
+     * Clears values in each child.
+     */
+    protected void clearChildren() {
         doOperation(doClear);
-        getTaxTypeManager().clear();
-        super.clear();
     }
 
     /**
@@ -190,7 +144,7 @@ abstract class Aggregate<KeyType,
      *
      * @param operation An operation to perform on each child
      */
-    private void doOperation(@NotNull Operation operation) {
+    protected void doOperation(@NotNull Operation operation) {
 
         // Cycle for each child, and perform the indicated operation.
         for (ChildType child : getChildren()) {
@@ -206,6 +160,11 @@ abstract class Aggregate<KeyType,
         return collection;
     }
 
+    @Override
+    public Currency getConsidered() {
+        return (null == considered) ? null : considered.getImmutable();
+    }
+
     /**
      * Gets the value of the hierarchy object that can be considered for
      * rebalance specific to the given tax type.
@@ -215,12 +174,18 @@ abstract class Aggregate<KeyType,
      * rebalance, specific to the given tax type
      */
     public @NotNull Currency getConsidered(@NotNull TaxType type) {
-        return getTaxTypeManager().getConsidered(type);
+        return TaxType.ALL.equals(type) || hasTaxType(type) ?
+                getConsidered() : Currency.getZero();
     }
 
     @Override
-    public Currency getConsidered() {
-        return (null == considered) ? null : new Currency(considered);
+    public @NotNull Currency getConsidered(@NotNull WeightType type) {
+        return getWeightTypeManager().getConsidered(type);
+    }
+
+    @Override
+    public Currency getNotConsidered() {
+        return (null == notConsidered) ? null : notConsidered.getImmutable();
     }
 
     /**
@@ -232,12 +197,18 @@ abstract class Aggregate<KeyType,
      * rebalance, specific to the given tax type
      */
     public @NotNull Currency getNotConsidered(@NotNull TaxType type) {
-        return getTaxTypeManager().getNotConsidered(type);
+        return TaxType.ALL.equals(type) || hasTaxType(type) ?
+                getNotConsidered() : Currency.getZero();
     }
 
     @Override
-    public Currency getNotConsidered() {
-        return (null == notConsidered) ? null : new Currency(notConsidered);
+    public @NotNull Currency getNotConsidered(@NotNull WeightType type) {
+        return getWeightTypeManager().getNotConsidered(type);
+    }
+
+    @Override
+    public Currency getProposed() {
+        return getConsidered();
     }
 
     /**
@@ -250,21 +221,23 @@ abstract class Aggregate<KeyType,
      * to the given tax type
      */
     public @NotNull Currency getProposed(@NotNull TaxType type) {
-        return getTaxTypeManager().getProposed(type);
+        return TaxType.ALL.equals(type) || hasTaxType(type) ?
+                getProposed() : Currency.getZero();
     }
 
     @Override
-    public Currency getProposed() {
-        return getConsidered();
+    public @NotNull Currency getProposed(@NotNull WeightType type) {
+        return getWeightTypeManager().getProposed(type);
     }
 
     /**
-     * Gets the breakdown manager for the tax type.
+     * Gets the breakdown manager for the weight type.
      *
-     * @return The breakdown manager for the tax type
+     * @return The breakdown manager for the weight type
      */
-    protected @NotNull BreakdownManager<TaxType> getTaxTypeManager() {
-        return taxTypeManager;
+    protected @NotNull WeightBreakdownManager<ChildType>
+    getWeightTypeManager() {
+        return weightTypeManager;
     }
 
     /**
@@ -321,18 +294,9 @@ abstract class Aggregate<KeyType,
         }
     }
 
-    /**
-     * Sets the breakdown managers to work with current values.
-     */
+    @Override
     void setCurrent() {
-
-        /*
-         * Do the operation for each child. Set the tax type manager to work
-         * with current values, then call the superclass method.
-         */
-        doOperation(setCurrent);
-        getTaxTypeManager().setCurrent();
-        super.setCurrent();
+        getWeightTypeManager().setCurrent();
     }
 
     @Override
@@ -352,18 +316,9 @@ abstract class Aggregate<KeyType,
         }
     }
 
-    /**
-     * Sets the breakdown managers to work with proposed values.
-     */
+    @Override
     void setProposed() {
-
-        /*
-         * Do the operation for each child. Set the tax type manager to work
-         * with proposed values, then call the superclass method.
-         */
-        doOperation(setProposed);
-        getTaxTypeManager().setProposed();
-        super.setProposed();
+        getWeightTypeManager().setProposed();
     }
 
     /**
@@ -395,7 +350,7 @@ abstract class Aggregate<KeyType,
         }
     }
 
-    private abstract class Operation {
+    protected abstract class Operation {
 
         /**
          * Performs an operation on a child.

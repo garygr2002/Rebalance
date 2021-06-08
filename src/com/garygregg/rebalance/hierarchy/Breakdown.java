@@ -7,51 +7,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-class Breakdown<T extends Enum<T>> implements IBreakdown<T> {
-
-    // Zero currency, a default
-    private static final Currency zero = Currency.getZero();
+abstract class Breakdown<EnumType extends Enum<EnumType>,
+        HierarchyType extends Common<?, ?, ?>>
+        implements IBreakdown<EnumType, HierarchyType> {
 
     // A breakdown of value by type
-    private final Map<T, MutableCurrency> breakdown = new HashMap<>();
-
-    // A valuator for queryables
-    private final Valuator valuator;
-
-    /**
-     * Constructs the breakdown.
-     *
-     * @param valuator A valuator for queryables
-     */
-    public Breakdown(@NotNull Valuator valuator) {
-        this.valuator = valuator;
-    }
-
-    /**
-     * Adds value by type.
-     *
-     * @param type   The type for which to add value
-     * @param addend The value to add
-     */
-    private void add(T type, Currency addend) {
-
-        // Only add value if the addend is not null. Is the addend not null?
-        if (null != addend) {
-
-            /*
-             * The addend is not null. Get any existing value for the type, and
-             * add the given addend. Put the result into the breakdown map.
-             */
-            final MutableCurrency value = getMutable(type);
-            value.add(addend);
-            breakdown.put(type, value);
-        }
-    }
-
-    @Override
-    public void add(T type, @NotNull Queryable<?, ?> queryable) {
-        add(type, valuator.getValue(queryable));
-    }
+    private final Map<EnumType, MutableCurrency> breakdown = new HashMap<>();
 
     @Override
     public void clear() {
@@ -59,28 +20,50 @@ class Breakdown<T extends Enum<T>> implements IBreakdown<T> {
     }
 
     /**
-     * Gets value from the breakdown map for a type.
+     * Gets a value from the breakdown map for a type.
      *
      * @param type The given type
      * @return The existing value for the type
      */
-    public @NotNull Currency get(T type) {
-        return new Currency(getMutable(type));
+    public @NotNull Currency get(EnumType type) {
+        return getMutable(type).getImmutable();
     }
 
     /**
-     * Gets mutable value from the breakdown map for a type.
+     * Gets a value from the breakdown map for a type.
      *
      * @param type The given type
-     * @return The existing value for the type
+     * @return A value from the breakdown map for the type
      */
-    private @NotNull MutableCurrency getMutable(T type) {
+    protected @NotNull MutableCurrency getMutable(EnumType type) {
 
         /*
-         * Get any existing value for the indicated type. Return a default if
-         * there is no existing value, otherwise return the value itself.
+         * Get the current mutable value from the breakdown map for the type.
+         * Is the current value null?
          */
-        final MutableCurrency value = breakdown.get(type);
-        return (null == value) ? new MutableCurrency(zero) : value;
+        MutableCurrency currency = breakdown.get(type);
+        if (null == currency) {
+
+            /*
+             * The current value is null. Add a new, zero value to the map for
+             * the type.
+             */
+            put(type, currency = new MutableCurrency(Currency.getZero()));
+        }
+
+        // Return the value.
+        return currency;
+    }
+
+    /**
+     * Puts a value in the breakdown map.
+     *
+     * @param type     The key value
+     * @param currency The value to insert into the map
+     * @return Any previous value that was previously mapped using the same key
+     */
+    protected MutableCurrency put(EnumType type,
+                                  @NotNull MutableCurrency currency) {
+        return breakdown.put(type, currency);
     }
 }

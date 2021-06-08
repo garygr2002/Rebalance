@@ -25,8 +25,152 @@ import java.util.logging.Logger;
 
 public class Hierarchy {
 
+    // A function that returns 'considered' value
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> allConsidered =
+            new OneParameterFunction<>() {
+
+                @Override
+                public @NotNull String getDescription() {
+                    return "all considered";
+                }
+
+                @Override
+                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+
+                    // Return zero if the valuation is null.
+                    final Currency result = aggregate.getConsidered();
+                    return (null == result) ? Currency.getZero() : result;
+                }
+            };
+
+    // A function that returns 'not considered' value
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> allNotConsidered =
+            new OneParameterFunction<>() {
+
+                @Override
+                public @NotNull String getDescription() {
+                    return "all not-considered";
+                }
+
+                @Override
+                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+
+                    // Return zero if the valuation is null.
+                    final Currency result = aggregate.getNotConsidered();
+                    return (null == result) ? Currency.getZero() : result;
+                }
+            };
+
+    // A function that returns proposed value
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> allProposed =
+            new OneParameterFunction<>() {
+
+                @Override
+                public @NotNull String getDescription() {
+                    return "all proposed";
+                }
+
+                @Override
+                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+
+                    // Return zero if the valuation is null.
+                    final Currency result = aggregate.getProposed();
+                    return (null == result) ? Currency.getZero() : result;
+                }
+            };
+
     // The singleton hierarchy
     private static final Hierarchy instance = new Hierarchy();
+
+    // A function that returns 'considered' value for all tax types
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> taxConsidered =
+            new OneParameterFunction<>() {
+
+                @Override
+                public @NotNull String getDescription() {
+                    return "tax type considered";
+                }
+
+                @Override
+                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                    return aggregate.getConsidered(TaxType.ALL);
+                }
+            };
+
+    // A function that returns 'not considered' value for all tax types
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> taxNotConsidered =
+            new OneParameterFunction<>() {
+
+                @Override
+                public @NotNull String getDescription() {
+                    return "tax type not-considered";
+                }
+
+                @Override
+                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                    return aggregate.getNotConsidered(TaxType.ALL);
+                }
+            };
+
+    // A function that returns proposed value for all tax types
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> taxProposed =
+            new OneParameterFunction<>() {
+
+                @Override
+                public @NotNull String getDescription() {
+                    return "tax type proposed";
+                }
+
+                @Override
+                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                    return aggregate.getProposed(TaxType.ALL);
+                }
+            };
+
+    // A function that returns 'considered' value for all weight types
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> weightConsidered =
+            new OneParameterFunction<>() {
+
+                @Override
+                public @NotNull String getDescription() {
+                    return "weight type considered";
+                }
+
+                @Override
+                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                    return aggregate.getConsidered(WeightType.ALL);
+                }
+            };
+
+    // A function that returns 'not considered' value for all weight types
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> weightNotConsidered =
+            new OneParameterFunction<>() {
+
+                @Override
+                public @NotNull String getDescription() {
+                    return "weight type not-considered";
+                }
+
+                @Override
+                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                    return aggregate.getNotConsidered(WeightType.ALL);
+                }
+            };
+
+    // A function that returns proposed value for all weight types
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> weightProposed =
+            new OneParameterFunction<>() {
+
+                @Override
+                public @NotNull String getDescription() {
+                    return "weight type proposed";
+                }
+
+                @Override
+                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                    return aggregate.getProposed(WeightType.ALL);
+                }
+            };
 
     // An account map
     private final Map<AccountKey, Account> accounts = new HashMap<>();
@@ -120,6 +264,45 @@ public class Hierarchy {
         if (null != addend) {
             sum.add(addend);
         }
+    }
+
+    /**
+     * Checks whether two functions that take an aggregate as an argument
+     * return the same currency value.
+     *
+     * @param first     The first function
+     * @param second    The second function
+     * @param aggregate The aggregate argument
+     * @return True if the functions return the same value, false otherwise
+     */
+    private static boolean check(@NotNull OneParameterFunction<Currency, Aggregate<?, ?, ?>> first,
+                                 @NotNull OneParameterFunction<Currency, Aggregate<?, ?, ?>> second,
+                                 @NotNull Aggregate<?, ?, ?> aggregate) {
+        return first.invoke(aggregate).equals(second.invoke(aggregate));
+    }
+
+    /**
+     * Checks whether the proposed value of an aggregate matches the sum of
+     * value by tax type.
+     *
+     * @param aggregate The aggregate in question
+     * @return True if the proposed value of an aggregate matches the sum of
+     * value by tax type, false otherwise
+     */
+    public static boolean checkTaxType(@NotNull Aggregate<?, ?, ?> aggregate) {
+        return check(allProposed, weightProposed, aggregate);
+    }
+
+    /**
+     * Checks whether the proposed value of an aggregate matches the sum of
+     * value by weight type.
+     *
+     * @param aggregate The aggregate in question
+     * @return True if the proposed value of an aggregate matches the sum of
+     * value by weight type, false otherwise
+     */
+    public static boolean checkWeightType(@NotNull Aggregate<?, ?, ?> aggregate) {
+        return check(allProposed, weightProposed, aggregate);
     }
 
     /**
@@ -323,7 +506,7 @@ public class Hierarchy {
         }
 
         // Return the result.
-        return (null == result) ? null : new Currency(result);
+        return (null == result) ? null : result.getImmutable();
     }
 
     /**
@@ -718,6 +901,47 @@ public class Hierarchy {
     }
 
     /**
+     * Checks whether two functions that take an aggregate as an argument
+     * return the same currency value, and reports if they do not
+     *
+     * @param first     The first function
+     * @param second    The second function
+     * @param aggregate The aggregate argument
+     */
+    private void checkAndReport(@NotNull OneParameterFunction<Currency, Aggregate<?, ?, ?>> first,
+                                @NotNull OneParameterFunction<Currency, Aggregate<?, ?, ?>> second,
+                                @NotNull Aggregate<?, ?, ?> aggregate) {
+
+        // Does the check fail?
+        if (!check(first, second, aggregate)) {
+
+            // The check fails. Log a warning with specifics.
+            logMessage(Level.WARNING, String.format("Mismatch in value: %s " +
+                            "for '%s' and %s for '%s' in aggregate with key '%s'.",
+                    first.invoke(aggregate), first.getDescription(),
+                    second.invoke(aggregate), second.getDescription(),
+                    aggregate.getKey()));
+        }
+    }
+
+    /**
+     * Checks weather an aggregate has consistent current valuations for all
+     * tax types and weight types.
+     *
+     * @param aggregate The aggregate
+     */
+    private void checkAndReport(@NotNull Aggregate<?, ?, ?> aggregate) {
+
+        // Check and report on the tax type.
+        checkAndReport(allConsidered, taxConsidered, aggregate);
+        checkAndReport(allNotConsidered, taxNotConsidered, aggregate);
+
+        // Check and report on the weight type.
+        checkAndReport(allConsidered, weightConsidered, aggregate);
+        checkAndReport(allNotConsidered, weightNotConsidered, aggregate);
+    }
+
+    /**
      * Clears the hierarchy.
      */
     public void clearHierarchy() {
@@ -1036,8 +1260,28 @@ public class Hierarchy {
     @SuppressWarnings({"UnusedReturnValue"})
     private <T extends Common<?, ?, ?>>
     boolean sumIfChildren(@NotNull Aggregate<?, T, ?> aggregate) {
-        return aggregate.synthesizeIf() &&
+
+        /*
+         * Synthesize this aggregate, as necessary, and receive a status of
+         * that activity. Sum the aggregate if it has children.
+         * aggregate a portfolio?
+         */
+        final boolean result = aggregate.synthesizeIf() &&
                 (aggregate.getChildren().isEmpty() || sum(aggregate));
+        if (HoldingLineType.PORTFOLIO.equals(aggregate.getLineType())) {
+
+            /*
+             * The aggregate is a portfolio. Set the aggregate to work with
+             * current values, then breakdown the holdings by category: weight
+             * type and tax type. Check on the resulting valuations.
+             */
+            aggregate.setCurrent();
+            aggregate.breakdown();
+            checkAndReport(aggregate);
+        }
+
+        // Return the result.
+        return result;
     }
 
     private interface OneParameterAction<T> {
@@ -1048,6 +1292,24 @@ public class Hierarchy {
          * @param argument The argument for the action
          */
         void perform(@NotNull T argument);
+    }
+
+    private interface OneParameterFunction<S, T> {
+
+        /**
+         * Gets a description of the function.
+         *
+         * @return A description of the function
+         */
+        @NotNull String getDescription();
+
+        /**
+         * Invokes a function.
+         *
+         * @param argument The argument for the function
+         * @return The result of the function
+         */
+        @NotNull S invoke(@NotNull T argument);
     }
 
     private interface TwoParameterAction<S, T> {

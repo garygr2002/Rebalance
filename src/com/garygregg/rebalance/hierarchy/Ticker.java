@@ -12,13 +12,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Ticker extends
-        Common<String, Queryable<?, ?>, TickerDescription> {
+        Common<String, Common<?, ?, ?>, TickerDescription> {
 
     // The map of weight type to activities
     private final Map<WeightType, Activity> associationMap = new HashMap<>();
 
     // The considered value of the ticker
     private final Purse considered = new Purse();
+
+    // Our breakdown manager for the weight type
+    private final FullValueBreakdownManager<Ticker> fullValueManager =
+            new FullValueBreakdownManager<>();
 
     // The "not considered" value of the ticker
     private final Purse notConsidered = new Purse();
@@ -52,13 +56,14 @@ public class Ticker extends
                 new Association(FundType.FOREIGN, WeightType.BOND_FOREIGN),
                 new Association(FundType.SHORT, WeightType.BOND_SHORT),
                 new Association(FundType.TREASURY, WeightType.BOND_GOVERNMENT),
-                new Association(FundType.HIGH, WeightType.BOND_HIGH),
+//              new Association(FundType.HIGH, WeightType.BOND_HIGH),
                 new Association(FundType.INFLATION, WeightType.BOND_INFLATION),
                 new Association(FundType.MORTGAGE, WeightType.BOND_MORTGAGE)));
 
         // Level 2 (Bond subtypes).
         associationMap.put(type = WeightType.BOND_CORPORATE,
-                new Activity(type, null));
+                new Activity(type, null,
+                        new Association(FundType.HIGH, WeightType.BOND_HIGH)));
         associationMap.put(type = WeightType.BOND_FOREIGN,
                 new Activity(type, null));
         associationMap.put(type = WeightType.BOND_SHORT,
@@ -175,6 +180,11 @@ public class Ticker extends
         performActivity(WeightType.ALL);
     }
 
+    @Override
+    void clear() {
+        getFullValueManager().clear();
+    }
+
     /**
      * Gets the preferred balance rounding.
      *
@@ -193,8 +203,13 @@ public class Ticker extends
     }
 
     @Override
-    public Collection<Queryable<?, ?>> getChildren() {
+    public Collection<Common<?, ?, ?>> getChildren() {
         return null;
+    }
+
+    @Override
+    public @NotNull Currency getConsidered(@NotNull WeightType type) {
+        return getFullValueManager().getConsidered(type);
     }
 
     @Override
@@ -206,9 +221,24 @@ public class Ticker extends
         return considered.getShares();
     }
 
+    /**
+     * Gets the breakdown manager.
+     *
+     * @return The breakdown manager
+     */
+    private @NotNull FullValueBreakdownManager<Ticker>
+    getFullValueManager() {
+        return fullValueManager;
+    }
+
     @Override
     public @NotNull HoldingLineType getLineType() {
         return HoldingLineType.TICKER;
+    }
+
+    @Override
+    public @NotNull Currency getNotConsidered(@NotNull WeightType type) {
+        return getFullValueManager().getNotConsidered(type);
     }
 
     @Override
@@ -222,6 +252,11 @@ public class Ticker extends
 
     public @NotNull Currency getPrice() {
         return considered.getPrice();
+    }
+
+    @Override
+    public @NotNull Currency getProposed(@NotNull WeightType type) {
+        return getFullValueManager().getProposed(type);
     }
 
     @Override
@@ -250,6 +285,44 @@ public class Ticker extends
     }
 
     /**
+     * Determines if the ticker has the indicated weight type.
+     *
+     * @param type The indicated weight type
+     * @return True if the ticker has the indicated weight type, false
+     * otherwise
+     */
+    public boolean hasWeightType(@NotNull WeightType type) {
+
+        /*
+         * Declare and initialize the result. Get the activity corresponding
+         * to the indicated weight type. Is there such an activity?
+         */
+        boolean result = false;
+        final Activity activity = associationMap.get(type);
+        if (null != activity) {
+
+            /*
+             * There is an activity associated with the indicated weight type.
+             * Get the associations for the weight type. Cycle for each
+             * association, or until a fund type match has been found.
+             */
+            final Association[] associations = activity.getAssociations();
+            final int length = associations.length;
+            for (int i = 0; (i < length) && (!result); ++i) {
+
+                /*
+                 * The result becomes true if the ticker has the fund type
+                 * of the first/next association. If so, we stop.
+                 */
+                result = hasFundType(associations[i].getFirst());
+            }
+        }
+
+        // Return the result.
+        return result;
+    }
+
+    /**
      * Performs an activity for a weight type.
      *
      * @param type The given weight type
@@ -272,6 +345,11 @@ public class Ticker extends
      */
     void setConsideredShares(double shares) {
         considered.setShares(shares);
+    }
+
+    @Override
+    void setCurrent() {
+        getFullValueManager().setCurrent();
     }
 
     @Override
@@ -301,6 +379,11 @@ public class Ticker extends
         considered.setPrice(price);
         notConsidered.setPrice(price);
         proposed.setPrice(price);
+    }
+
+    @Override
+    void setProposed() {
+        getFullValueManager().setProposed();
     }
 
     /**
@@ -369,7 +452,7 @@ public class Ticker extends
          *
          * @return The associations of contained fund types to weight types
          */
-        public Association[] getAssociations() {
+        public @NotNull Association[] getAssociations() {
             return associations;
         }
 
@@ -443,7 +526,7 @@ public class Ticker extends
             }
 
             // Add value for the weight type.
-            getWeightTypeManager().add(getWeightType(), Ticker.this);
+            getFullValueManager().add(getWeightType(), Ticker.this);
         }
     }
 }
