@@ -32,7 +32,7 @@ public class PortfoliosBuilder extends ElementProcessor {
 
                 @Override
                 public void processField(@NotNull String field, int lineNumber) {
-                    getTarget().setName(preprocessField(processName(field)));
+                    getTarget().setName(processName(preprocessField(field)));
                 }
             };
 
@@ -180,7 +180,8 @@ public class PortfoliosBuilder extends ElementProcessor {
 
         // Create a new portfolio description with the index.
         final PortfolioDescription description = new PortfolioDescription(
-                processMnemonic(elements[PortfolioFields.MNEMONIC.getPosition()]));
+                processMnemonic(preprocessField(
+                        elements[PortfolioFields.MNEMONIC.getPosition()])));
 
         /*
          * Check the key of the description against the default key in the
