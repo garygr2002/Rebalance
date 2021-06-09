@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DetailedsBuilder extends ElementProcessor {
+public class DetailedsBuilder extends ElementReader {
 
     // The detailed library instance
     private final DetailedLibrary library = DetailedLibrary.getInstance();
@@ -64,7 +64,7 @@ public class DetailedsBuilder extends ElementProcessor {
         try {
 
             // Create an element processor. Read lines from the file object.
-            final ElementProcessor processor = new DetailedsBuilder();
+            final ElementReader processor = new DetailedsBuilder();
             processor.readLines();
 
             // The detailed library should now be populated. Print its date.

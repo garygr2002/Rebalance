@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DistinguishedsBuilder extends ElementProcessor {
+public class DistinguishedsBuilder extends ElementReader {
 
     // The distinguished account library instance
     private final DistinguishedAccountLibrary accountLibrary =

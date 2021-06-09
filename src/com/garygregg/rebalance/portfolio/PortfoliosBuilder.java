@@ -1,7 +1,7 @@
 package com.garygregg.rebalance.portfolio;
 
 import com.garygregg.rebalance.DateUtilities;
-import com.garygregg.rebalance.ElementProcessor;
+import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.WeightType;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PortfoliosBuilder extends ElementProcessor {
+public class PortfoliosBuilder extends ElementReader {
 
     // The allocation processors
     private final PortfoliosBuilder.MyAllocationProcessor[]
@@ -82,7 +82,7 @@ public class PortfoliosBuilder extends ElementProcessor {
         try {
 
             // Create an element processor. Read lines from the file object.
-            final ElementProcessor processor = new PortfoliosBuilder();
+            final ElementReader processor = new PortfoliosBuilder();
             processor.readLines(new Date());
 
             // The holding library should now be populated. Print its date.

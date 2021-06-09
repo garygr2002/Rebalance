@@ -1,7 +1,7 @@
 package com.garygregg.rebalance.ticker;
 
 import com.garygregg.rebalance.DateUtilities;
-import com.garygregg.rebalance.ElementProcessor;
+import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.FundType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Shares;
@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TickersBuilder extends ElementProcessor {
+public class TickersBuilder extends ElementReader {
 
     // A ticker must contain exactly one of these base types
     private static final FundType[] base = {FundType.BOND, FundType.CASH,
@@ -307,7 +307,7 @@ public class TickersBuilder extends ElementProcessor {
         try {
 
             // Create an element processor. Read lines from the file object.
-            final ElementProcessor processor = new TickersBuilder();
+            final ElementReader processor = new TickersBuilder();
             processor.readLines();
 
             // The ticker library should now be populated. Print its date.

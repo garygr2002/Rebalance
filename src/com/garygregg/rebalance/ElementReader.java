@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class ElementProcessor {
+public abstract class ElementReader {
 
     // Our date utilities object
     private final DateUtilities dateUtilities =
@@ -34,7 +34,7 @@ public abstract class ElementProcessor {
          * Set the logger, then push it onto the logger stack. Initialize the
          * problem flag.
          */
-        setLogger(Logger.getLogger(ElementProcessor.class.getCanonicalName()));
+        setLogger(Logger.getLogger(ElementReader.class.getCanonicalName()));
         push(getMessageLogger());
         resetProblem();
     }

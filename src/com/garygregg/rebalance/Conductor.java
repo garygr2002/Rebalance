@@ -409,7 +409,7 @@ public class Conductor {
      * @return True if the build had no warnings or errors, false otherwise
      * @throws IOException Indicates an I/O exception occurred
      */
-    private boolean buildLibrary(@NotNull ElementProcessor processor, Date floor,
+    private boolean buildLibrary(@NotNull ElementReader processor, Date floor,
                                  @NotNull Factory factory) throws IOException {
 
         /*

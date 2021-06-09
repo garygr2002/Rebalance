@@ -1,7 +1,7 @@
 package com.garygregg.rebalance.code;
 
 import com.garygregg.rebalance.DateUtilities;
-import com.garygregg.rebalance.ElementProcessor;
+import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.FundType;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class CodesBuilder extends ElementProcessor {
+public class CodesBuilder extends ElementReader {
 
     // The description processor
     private final FieldProcessor<CodeDescription> descriptionProcessor =
@@ -86,7 +86,7 @@ public class CodesBuilder extends ElementProcessor {
         try {
 
             // Create an element processor. Read lines from the file object.
-            final ElementProcessor processor = new CodesBuilder();
+            final ElementReader processor = new CodesBuilder();
             processor.readLines();
 
             // The code library should now be populated. Print its date.

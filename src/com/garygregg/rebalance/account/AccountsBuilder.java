@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class AccountsBuilder extends ElementProcessor {
+public class AccountsBuilder extends ElementReader {
 
     // The account library instance
     private final AccountLibrary library = AccountLibrary.getInstance();
@@ -43,7 +43,7 @@ public class AccountsBuilder extends ElementProcessor {
         try {
 
             // Create an element processor. Read lines from the file object.
-            final ElementProcessor processor = new AccountsBuilder();
+            final ElementReader processor = new AccountsBuilder();
             processor.readLines();
 
             // The account library should now be populated. Print its date.

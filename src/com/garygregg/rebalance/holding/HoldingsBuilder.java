@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HoldingsBuilder extends ElementProcessor {
+public class HoldingsBuilder extends ElementReader {
 
     // The holding library instance
     private final HoldingLibrary library = HoldingLibrary.getInstance();
@@ -131,7 +131,7 @@ public class HoldingsBuilder extends ElementProcessor {
         try {
 
             // Create an element processor. Read lines from the file object.
-            final ElementProcessor processor = new HoldingsBuilder();
+            final ElementReader processor = new HoldingsBuilder();
             processor.readLines();
 
             // The holding library should now be populated. Print its date.
