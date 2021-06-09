@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DistinguishedsBuilder extends ElementProcessor {
 
@@ -342,6 +343,10 @@ public class DistinguishedsBuilder extends ElementProcessor {
     private final ParentTracker tracker = new ParentTracker();
 
     {
+
+        // Assign the logger based on class canonical name.
+        setLogger(Logger.getLogger(
+                DistinguishedsBuilder.class.getCanonicalName()));
 
         // Build out the processor map.
         processorMap.put(HoldingLineType.ACCOUNT, accountProcessor);
