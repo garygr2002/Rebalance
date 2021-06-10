@@ -9,17 +9,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class ElementReader {
-
-    // Our date utilities object
-    private final DateUtilities dateUtilities =
-            new DateUtilities(getPrefix(), getFileType());
-
-    // The logger stack
-    private final Stack<Logger> loggers = new Stack<>();
-
-    // Our message logger
-    private final MessageLogger messageLogger = new MessageLogger();
+public abstract class ElementReader extends ElementProcessor {
 
     // A map of element indices to field processors
     private final Map<Integer, FieldProcessor<?>> processorMap =
@@ -30,22 +20,8 @@ public abstract class ElementReader {
 
     {
 
-        /*
-         * Set the logger, then push it onto the logger stack. Initialize the
-         * problem flag.
-         */
+        // Assign the logger based on the class canonical name.
         setLogger(Logger.getLogger(ElementReader.class.getCanonicalName()));
-        push(getMessageLogger());
-        resetProblem();
-    }
-
-    /**
-     * Gets the file type.
-     *
-     * @return The file type
-     */
-    private static String getFileType() {
-        return "csv";
     }
 
     /**
@@ -190,21 +166,12 @@ public abstract class ElementReader {
     }
 
     /**
-     * Gets the logging level for extraordinary, non-warning activity.
+     * Gets the file type.
      *
-     * @return The logging level for extraordinary, non-warning activity
+     * @return The file type
      */
-    protected @NotNull Level getExtraordinary() {
-        return Level.INFO;
-    }
-
-    /**
-     * Get the specific class/subclass logger.
-     *
-     * @return The specific class/subclass logger
-     */
-    private Logger getMessageLogger() {
-        return messageLogger.getLogger();
+    protected String getFileType() {
+        return "csv";
     }
 
     /**
@@ -224,14 +191,17 @@ public abstract class ElementReader {
      */
     private FileReader getMostRecentReader(@NotNull File directory, Date date) {
 
-        /*
-         * Declare and initialize the result. List files in the given
-         * directory that match a regular expression of named files that this
-         * element processor can use. Are there any extant files like this?
-         */
+        // Get the date utilities object. Declare and initialize the result.
+        final DateUtilities utilities = getDateUtilities();
         FileReader result = null;
+
+        /*
+         * List files in the given directory that match a regular expression
+         * of named files that this element processor can use. Are there any
+         * extant files like this?
+         */
         final File[] files = directory.listFiles((dir1, name) ->
-                name.matches(dateUtilities.constructFilename(
+                name.matches(utilities.constructFilename(
                         DateUtilities.getDateRegex())));
         if ((null != files) && (0 < files.length)) {
 
@@ -256,7 +226,7 @@ public abstract class ElementReader {
                  * date.
                  */
                 final Path path = Paths.get(directory.getPath(),
-                        dateUtilities.constructFilename(date));
+                        utilities.constructFilename(date));
 
                 /*
                  * Do a binary search for the qualifying file. If we do not
@@ -331,37 +301,6 @@ public abstract class ElementReader {
     protected abstract @NotNull String getPrefix();
 
     /**
-     * Returns whether there was a problem processing lines.
-     *
-     * @return True if there was a problem processing lines, false otherwise
-     */
-    public boolean hadProblem() {
-        return messageLogger.hadProblem();
-    }
-
-    /**
-     * Logs a message with a logger from the top of the logger stack.
-     *
-     * @param level   The level for the message
-     * @param message The message to log
-     * @return True if the level for this message flags it as a problem
-     */
-    protected boolean logMessage(@NotNull Level level,
-                                 @NotNull String message) {
-        return messageLogger.logMessage(level, message);
-    }
-
-    /**
-     * Pops a logger.
-     *
-     * @return The formerly current logger
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    protected Logger pop() {
-        return loggers.isEmpty() ? null : loggers.pop();
-    }
-
-    /**
      * Processes line elements.
      *
      * @param elements   The line elements
@@ -390,17 +329,6 @@ public abstract class ElementReader {
     }
 
     /**
-     * Pushes a logger.
-     *
-     * @param logger A logger to push
-     * @return The argument
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    protected @NotNull Logger push(@NotNull Logger logger) {
-        return loggers.push(logger);
-    }
-
-    /**
      * Reads lines from a configuration file with a date flag that occurs on,
      * or before a given date.
      *
@@ -420,7 +348,7 @@ public abstract class ElementReader {
          */
         resetProblem();
         final FileReader reader = getMostRecentReader(
-                dateUtilities.getTypeDirectory(), date);
+                getDateUtilities().getTypeDirectory(), date);
 
         // Is the reader not null?
         boolean result = (null != reader);
@@ -548,13 +476,6 @@ public abstract class ElementReader {
     }
 
     /**
-     * Resets the problem flag.
-     */
-    private void resetProblem() {
-        messageLogger.resetProblem();
-    }
-
-    /**
      * Sets a date in the library.
      *
      * @param library The library in which to set a date.
@@ -597,19 +518,11 @@ public abstract class ElementReader {
     }
 
     /**
-     * Sets the specific class/subclass logger.
-     *
-     * @param logger The specific class/subclass logger
-     */
-    protected void setLogger(Logger logger) {
-        messageLogger.setLogger(logger);
-    }
-
-    /**
      * Notifies a derived class that element processing is about to start.
      */
     protected void startProcessing() {
-        push(getMessageLogger());
+
+        // Currently nothing to do here.
     }
 
     /**
@@ -617,9 +530,8 @@ public abstract class ElementReader {
      */
     protected void stopProcessing() {
 
-        // Clear the dates parsed, and pop the logger stack.
+        // Clear the dates parsed.
         setDatesParsed(null);
-        pop();
     }
 
     /**
