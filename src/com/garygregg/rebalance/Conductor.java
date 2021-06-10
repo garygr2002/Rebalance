@@ -13,6 +13,7 @@ import com.garygregg.rebalance.holding.HoldingLibrary;
 import com.garygregg.rebalance.holding.HoldingsBuilder;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
 import com.garygregg.rebalance.portfolio.PortfoliosBuilder;
+import com.garygregg.rebalance.report.ReportsBuilder;
 import com.garygregg.rebalance.ticker.TickerLibrary;
 import com.garygregg.rebalance.ticker.TickersBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -321,6 +322,22 @@ public class Conductor {
              */
             conductor.logMessage(Level.INFO, "I am canceling my work " +
                     "because I could not successfully build the hierarchy...");
+            return;
+        }
+
+        try {
+
+            // Try to write a report for each portfolio in the hiearchy.
+            new ReportsBuilder().writeLines(hierarchy, null);
+        }
+
+        // Oops, I/O exception while trying to write the reports.
+        catch (IOException exception) {
+
+            // Log some information about the exception, and return.
+            conductor.logMessage(Level.INFO, String.format("I received an " +
+                    "I/O exception with message '%s' while attempting to " +
+                    "write my reports, sorry.", exception.getMessage()));
             return;
         }
 

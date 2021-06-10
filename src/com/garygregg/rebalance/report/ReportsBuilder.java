@@ -20,6 +20,27 @@ public class ReportsBuilder extends ElementProcessor {
         setLogger(Logger.getLogger(ReportsBuilder.class.getCanonicalName()));
     }
 
+    /***
+     * Creates a path to a file.
+     * @param file The file for which to create a path.
+     * @throws IOException Indicates the path could not be created
+     */
+    private static void createPath(@NotNull File file)
+            throws IOException {
+
+        /*
+         * Get the parent directory. Try to create the parent and all paths to
+         * the parent if the parent does not exist.
+         */
+        final File parent = file.getParentFile();
+        if (!(parent.exists() || parent.mkdirs())) {
+
+            // Throw an I/O exception if any of this could not be accomplished.
+            throw new IOException(String.format("Could not create required " +
+                    "directory '%s'", parent));
+        }
+    }
+
     /**
      * Recursively deletes a directory.
      *
@@ -54,6 +75,17 @@ public class ReportsBuilder extends ElementProcessor {
      * Returns a non-null date, either the argument to the method or a default
      * if the argument is null.
      *
+     * @param date Any date
+     * @return The argument, or a default if the date is null
+     */
+    private static @NotNull Date getNonNullDate(Date date) {
+        return getNonNullDate(date, new Date());
+    }
+
+    /**
+     * Returns a non-null date, either the argument to the method or a default
+     * if the argument is null.
+     *
      * @param date        Any date
      * @param defaultDate A non-null default date to use
      * @return The argument, or a default if the date is null
@@ -61,17 +93,6 @@ public class ReportsBuilder extends ElementProcessor {
     private static @NotNull Date getNonNullDate(Date date,
                                                 @NotNull Date defaultDate) {
         return (null == date) ? defaultDate : date;
-    }
-
-    /**
-     * Returns a non-null date, either the argument to the method or a default
-     * if the argument is null.
-     *
-     * @param date Any date
-     * @return The argument, or a default if the date is null
-     */
-    private static @NotNull Date getNonNullDate(Date date) {
-        return getNonNullDate(date, new Date());
     }
 
     @Override
@@ -103,10 +124,12 @@ public class ReportsBuilder extends ElementProcessor {
                 getDateUtilities().constructFilename(
                         getNonNullDate(date))).toString());
 
+
         /*
-         * Delete the file if it is a directory, and create a writer to a new
-         * file.
+         * Create a path to the file. Delete the file if it is a directory,
+         * and create a writer to a new file.
          */
+        createPath(file);
         deleteDirectory(file);
         return new FileWriter(file);
     }
@@ -180,6 +203,8 @@ public class ReportsBuilder extends ElementProcessor {
                 portfolio.getKey(), date);
 
         // TODO: Write the report.
+        writer.write("This is a test.\n");
+        writer.close();
         return false;
     }
 }
