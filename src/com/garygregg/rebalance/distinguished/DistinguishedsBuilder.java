@@ -40,8 +40,8 @@ public class DistinguishedsBuilder extends ElementReader {
                          * distinguished account. Log this as an error.
                          */
                         logMessage(Level.SEVERE, String.format("The account " +
-                                "key '%s' named at line %d does not " +
-                                "represent any known, distinguished account.",
+                                        "key '%s' named at line %d does not " +
+                                        "represent any known, distinguished account.",
                                 keyString, lineNumber));
 
                     } else {
@@ -344,10 +344,6 @@ public class DistinguishedsBuilder extends ElementReader {
 
     {
 
-        // Assign the logger based on class canonical name.
-        setLogger(Logger.getLogger(
-                DistinguishedsBuilder.class.getCanonicalName()));
-
         // Build out the processor map.
         processorMap.put(HoldingLineType.ACCOUNT, accountProcessor);
         processorMap.put(HoldingLineType.INSTITUTION, institutionProcessor);
@@ -520,6 +516,12 @@ public class DistinguishedsBuilder extends ElementReader {
                         holdingLineType, lineNumber));
             }
         }
+    }
+
+    @Override
+    protected @NotNull Logger getReadingLogger() {
+        return Logger.getLogger(
+                DistinguishedsBuilder.class.getCanonicalName());
     }
 
     @Override

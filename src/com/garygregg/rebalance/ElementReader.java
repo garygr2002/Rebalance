@@ -175,6 +175,13 @@ public abstract class ElementReader extends ElementProcessor {
     }
 
     /**
+     * Gets the specific class/subclass reading logger.
+     *
+     * @return The specific class/subclass reading logger
+     */
+    protected abstract @NotNull Logger getReadingLogger();
+
+    /**
      * Gets the minimum number of fields a line must contain.
      *
      * @return The minimum number of fields a line must contain
@@ -290,7 +297,7 @@ public abstract class ElementReader extends ElementProcessor {
      * @return The logging level for ordinary, non-warning activity
      */
     protected @NotNull Level getOrdinary() {
-        return Level.FINEST;
+        return Level.FINE;
     }
 
     /**
@@ -521,8 +528,7 @@ public abstract class ElementReader extends ElementProcessor {
      * Notifies a derived class that element processing is about to start.
      */
     protected void startProcessing() {
-
-        // Currently nothing to do here.
+        setLogger(getReadingLogger());
     }
 
     /**
@@ -530,8 +536,9 @@ public abstract class ElementReader extends ElementProcessor {
      */
     protected void stopProcessing() {
 
-        // Clear the dates parsed.
+        // Clear the dates parsed and restore the last logger, if any.
         setDatesParsed(null);
+        restoreLogger();
     }
 
     /**

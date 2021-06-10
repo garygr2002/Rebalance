@@ -19,9 +19,6 @@ public class AccountsBuilder extends ElementReader {
 
     {
 
-        // Assign the logger based on class canonical name.
-        setLogger(Logger.getLogger(AccountsBuilder.class.getCanonicalName()));
-
         // Cycle for each account field.
         for (AccountFields field : AccountFields.values()) {
 
@@ -96,6 +93,11 @@ public class AccountsBuilder extends ElementReader {
      */
     private static String processName(@NotNull String name) {
         return name;
+    }
+
+    @Override
+    protected @NotNull Logger getReadingLogger() {
+        return Logger.getLogger(AccountsBuilder.class.getCanonicalName());
     }
 
     @Override

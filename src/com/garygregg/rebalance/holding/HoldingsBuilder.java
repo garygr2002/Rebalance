@@ -78,10 +78,6 @@ public class HoldingsBuilder extends ElementReader {
 
     {
 
-        // Assign the logger based on class canonical name.
-        setLogger(Logger.getLogger(
-                HoldingsBuilder.class.getCanonicalName()));
-
         // Initialize a field index. Add the name and shares processors.
         int fieldIndex = HoldingFields.KEY.getPosition();
         addFieldProcessor(++fieldIndex, nameProcessor);
@@ -201,6 +197,11 @@ public class HoldingsBuilder extends ElementReader {
 
         // Currently we just return the argument.
         return name;
+    }
+
+    @Override
+    protected @NotNull Logger getReadingLogger() {
+        return Logger.getLogger(HoldingsBuilder.class.getCanonicalName());
     }
 
     @Override

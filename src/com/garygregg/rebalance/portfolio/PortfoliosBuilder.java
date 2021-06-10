@@ -41,10 +41,6 @@ public class PortfoliosBuilder extends ElementReader {
 
     {
 
-        // Assign the logger based on class canonical name.
-        setLogger(Logger.getLogger(
-                PortfoliosBuilder.class.getCanonicalName()));
-
         // Cycle for each portfolio field.
         for (PortfolioFields field : PortfolioFields.values()) {
 
@@ -131,6 +127,11 @@ public class PortfoliosBuilder extends ElementReader {
      */
     private static String processName(@NotNull String name) {
         return name;
+    }
+
+    @Override
+    protected @NotNull Logger getReadingLogger() {
+        return Logger.getLogger(PortfoliosBuilder.class.getCanonicalName());
     }
 
     @Override
@@ -244,8 +245,8 @@ public class PortfoliosBuilder extends ElementReader {
 
         // Log some information and return the result.
         logMessage(getOrdinary(), String.format("Successfully loaded " +
-                        "metadata for portfolio with mnemonic '%s' at line " +
-                        "%d.", description.getKey(), lineNumber));
+                "metadata for portfolio with mnemonic '%s' at line " +
+                "%d.", description.getKey(), lineNumber));
         return true;
     }
 

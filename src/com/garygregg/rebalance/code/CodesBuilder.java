@@ -45,9 +45,6 @@ public class CodesBuilder extends ElementReader {
 
     {
 
-        // Assign the logger based on class canonical name.
-        setLogger(Logger.getLogger(CodesBuilder.class.getCanonicalName()));
-
         // Initialize a field index, and add the code name processor.
         int fieldIndex = 0;
         addFieldProcessor(++fieldIndex, nameProcessor);
@@ -150,6 +147,11 @@ public class CodesBuilder extends ElementReader {
      */
     private static String processName(@NotNull String name) {
         return name;
+    }
+
+    @Override
+    protected @NotNull Logger getReadingLogger() {
+        return Logger.getLogger(CodesBuilder.class.getCanonicalName());
     }
 
     @Override

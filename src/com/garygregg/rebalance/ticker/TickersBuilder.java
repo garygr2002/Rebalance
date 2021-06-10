@@ -241,9 +241,6 @@ public class TickersBuilder extends ElementReader {
         factoryMap.put(TickerLibrary.getStockCode(), stockFactory);
         factoryMap.put(TickerLibrary.getETFCode(), etfFactory);
 
-        // Assign the logger based on class canonical name.
-        setLogger(Logger.getLogger(TickersBuilder.class.getCanonicalName()));
-
         // Cycle for each subcode field.
         for (int i = TickerFields.SUBCODE_1.getPosition();
              i <= TickerFields.SUBCODE_4.getPosition();
@@ -785,6 +782,11 @@ public class TickersBuilder extends ElementReader {
 
         // Check for no bond subtypes, and return the result.
         return checkNoBond(description, target) && result;
+    }
+
+    @Override
+    protected @NotNull Logger getReadingLogger() {
+        return Logger.getLogger(TickersBuilder.class.getCanonicalName());
     }
 
     @Override

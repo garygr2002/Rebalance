@@ -125,7 +125,7 @@ public abstract class ElementProcessor {
              * There is an existing logger in the message logger. Push it onto
              * the loggers stack.
              */
-            loggers.push(logger);
+            loggers.push(existing);
         }
 
         // Set the logger in the message logger.
