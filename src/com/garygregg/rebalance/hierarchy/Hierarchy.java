@@ -230,6 +230,9 @@ public class Hierarchy {
     private final OneParameterAction<HoldingDescription> addTickerAction =
             this::addTicker;
 
+    // The date of the hierarchy
+    private Date date;
+
     {
 
         // Build up the 'add' map.
@@ -946,8 +949,11 @@ public class Hierarchy {
      */
     public void clearHierarchy() {
 
-        // Clear portfolios and accounts. Reset the problem flag.
+        // Clear the date and the portfolios.
+        setDate(null);
         portfolios.clear();
+
+        // Clear the accounts and reset the problem flag.
         accounts.clear();
         resetProblem();
     }
@@ -1010,6 +1016,9 @@ public class Hierarchy {
                 }
             }
         }
+
+        // Reflect the date of the holdings library in the hierarchy.
+        setDate(library.getDate());
     }
 
     /**
@@ -1037,6 +1046,26 @@ public class Hierarchy {
     }
 
     /**
+     * Gets a collection of accounts in the hierarchy.
+     *
+     * @return A collection of accounts in the hierarchy.
+     */
+    public @NotNull Collection<Account> getAccounts() {
+        return accounts.values();
+    }
+
+    /**
+     * Gets the date of the hierarchy (based on the contents of the holding
+     * library).
+     *
+     * @return The date of the library (based on the contents of the holding
+     * library).
+     */
+    public Date getDate() {
+        return date;
+    }
+
+    /**
      * Gets the highest expected holding line type (portfolio is lowest;
      * ticker, highest).
      *
@@ -1055,6 +1084,15 @@ public class Hierarchy {
      */
     public Portfolio getPortfolio(@NotNull String portfolioMnemonic) {
         return portfolios.get(portfolioMnemonic);
+    }
+
+    /**
+     * Gets a collection of portfolios in the hierarchy.
+     *
+     * @return A collection of portfolios in the hierarchy.
+     */
+    public @NotNull Collection<Portfolio> getPortfolios() {
+        return portfolios.values();
     }
 
     /**
@@ -1138,6 +1176,15 @@ public class Hierarchy {
         set(setConsideredShares, ticker, holdingDescription.getShares());
         set(setPrice, ticker, holdingDescription.getPrice());
         set(setConsidered, ticker, holdingDescription.getValue());
+    }
+
+    /**
+     * Sets the date of the hierarchy.
+     *
+     * @param date The new date of the hierarchy
+     */
+    private void setDate(Date date) {
+        this.date = date;
     }
 
     /**
