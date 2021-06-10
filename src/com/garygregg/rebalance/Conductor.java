@@ -108,22 +108,42 @@ public class Conductor {
         final FileHandler handler = new FileHandler(path.toString());
         handler.setFormatter(new SimpleFormatter() {
 
+            // Our logging format
             private static final String format =
-                    "[%1$tF %1$tT] [%2$-7s] %3$s %n";
+                    "[%1$tF %1$tT] [%2$s: %3$s]%n%4$s%n";
 
             @Override
-            public synchronized String format(LogRecord lr) {
+            public synchronized String format(@NotNull LogRecord logRecord) {
+
+                /*
+                 * Split the logger name into elements and get the number of
+                 * elements.
+                 */
+                final String[] nameElements =
+                        logRecord.getLoggerName().split("\\.");
+                final int elementNumber = nameElements.length;
+
+                /*
+                 * Format and return the logging string using the last element
+                 * from the logger name.
+                 */
                 return String.format(format,
-                        new Date(lr.getMillis()),
-                        lr.getLevel().getLocalizedName(),
-                        lr.getMessage()
-                );
+                        new Date(logRecord.getMillis()),
+                        (0 < elementNumber) ?
+                                nameElements[elementNumber - 1] : "",
+                        logRecord.getLevel().getLocalizedName(),
+                        logRecord.getMessage());
             }
         });
 
-        // Set the level of the file handler, and set it in the root logger.
-        handler.setLevel(getLevel());
-        getRootLogger().addHandler(handler);
+        // Get the desired logging level, and set it in the handler.
+        final Level level = getLevel();
+        handler.setLevel(level);
+
+        // Get the root logger. Add the handler, and set the logging level.
+        final Logger root = getRootLogger();
+        root.addHandler(handler);
+        root.setLevel(level);
     }
 
     /**
@@ -451,6 +471,7 @@ public class Conductor {
      * @param level   The level of the message
      * @param message The message to log
      */
+    @SuppressWarnings("SameParameterValue")
     private void logMessage(@NotNull Level level, @NotNull String message) {
 
         // Set the message to system 'out' if its level is less than severe...
