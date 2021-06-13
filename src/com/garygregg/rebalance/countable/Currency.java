@@ -11,6 +11,9 @@ public class Currency extends Countable {
     private static final Class<MutableCurrency> comparableClass =
             MutableCurrency.class;
 
+    // A known one
+    private static final Currency one = new Currency(1.);
+
     // The precision of currency
     private static final int precision = ICountable.getCurrencyPrecision();
 
@@ -22,9 +25,6 @@ public class Currency extends Countable {
     private static final Currency cent =
             new Currency(1. / ICountable.calculateFactor(precision));
 
-    // A known one
-    private static final Currency one = new Currency(1.);
-
     // A known zero
     private static final Currency zero = new Currency(0.);
 
@@ -34,7 +34,7 @@ public class Currency extends Countable {
      * @param value    The value of the currency
      * @param truncate True if the value should be truncated, false if rounded
      */
-    public Currency(double value, boolean truncate) {
+    Currency(double value, boolean truncate) {
         super(value, precision, truncate);
     }
 
@@ -52,7 +52,7 @@ public class Currency extends Countable {
      *
      * @param currency Other currency
      */
-    public Currency(@NotNull Currency currency) {
+    Currency(@NotNull Currency currency) {
         super(currency.getValue(), precision);
     }
 
@@ -61,7 +61,7 @@ public class Currency extends Countable {
      *
      * @param currency Mutable currency
      */
-    public Currency(@NotNull MutableCurrency currency) {
+    Currency(@NotNull MutableCurrency currency) {
         super(currency.getValue(), precision);
     }
 
@@ -93,6 +93,11 @@ public class Currency extends Countable {
     }
 
     @Override
+    public boolean areNotEqual(double value) {
+        return !ICountable.areEqual(value, getValue(), getPrecision());
+    }
+
+    @Override
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object object) {
         return ICountable.areEqual(this, object, this.getClass(),
@@ -116,11 +121,6 @@ public class Currency extends Countable {
      */
     public boolean isCent() {
         return equals(getCent());
-    }
-
-    @Override
-    public boolean areNotEqual(double value) {
-        return !ICountable.areEqual(value, getValue(), getPrecision());
     }
 
     @Override

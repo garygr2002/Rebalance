@@ -28,7 +28,7 @@ public class MutableCurrency extends MutableCountable
      * @param truncate True if the value should be truncated, false if rounded
      */
     @SuppressWarnings("unused")
-    public MutableCurrency(double value, boolean truncate) {
+    MutableCurrency(double value, boolean truncate) {
         super(value, truncate);
     }
 

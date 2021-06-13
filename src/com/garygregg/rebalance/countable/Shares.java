@@ -34,7 +34,7 @@ public class Shares extends Countable {
      * @param value    The value of the shares
      * @param truncate True if the value should be truncated, false if rounded
      */
-    public Shares(double value, boolean truncate) {
+    Shares(double value, boolean truncate) {
         super(value, precision, truncate);
     }
 
@@ -52,7 +52,7 @@ public class Shares extends Countable {
      *
      * @param shares Other shares
      */
-    public Shares(@NotNull Shares shares) {
+    Shares(@NotNull Shares shares) {
         super(shares.getValue(), precision);
     }
 
@@ -61,7 +61,7 @@ public class Shares extends Countable {
      *
      * @param shares Mutable shares
      */
-    public Shares(@NotNull MutableShares shares) {
+    Shares(@NotNull MutableShares shares) {
         super(shares.getValue(), precision);
     }
 
@@ -123,6 +123,11 @@ public class Shares extends Countable {
         return Objects.hash(getValue());
     }
 
+    @Override
+    public boolean isNotZero() {
+        return !equals(getZero());
+    }
+
     /**
      * Returns true if the shares are one, false otherwise
      *
@@ -130,11 +135,6 @@ public class Shares extends Countable {
      */
     public boolean isOne() {
         return equals(getOne());
-    }
-
-    @Override
-    public boolean isNotZero() {
-        return !equals(getZero());
     }
 
     @Override

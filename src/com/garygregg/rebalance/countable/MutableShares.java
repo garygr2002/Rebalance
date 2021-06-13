@@ -28,7 +28,7 @@ public class MutableShares extends MutableCountable
      * @param truncate True if the value should be truncated, false if rounded
      */
     @SuppressWarnings("unused")
-    public MutableShares(double value, boolean truncate) {
+    MutableShares(double value, boolean truncate) {
         super(value, truncate);
     }
 
@@ -37,20 +37,8 @@ public class MutableShares extends MutableCountable
      *
      * @param value The value of the shares
      */
-    public MutableShares(double value) {
+    MutableShares(double value) {
         super(value);
-    }
-
-    @Override
-    protected void clear() {
-
-        /*
-         * There is a null check here because initialization of the container
-         * might not have occurred when this method is called.
-         */
-        if (null != container) {
-            container.clear();
-        }
     }
 
     /**
@@ -58,7 +46,7 @@ public class MutableShares extends MutableCountable
      *
      * @param shares Other mutable shares
      */
-    public MutableShares(@NotNull MutableShares shares) {
+    MutableShares(@NotNull MutableShares shares) {
         super(shares.getValue());
     }
 
@@ -67,7 +55,7 @@ public class MutableShares extends MutableCountable
      *
      * @param shares Immutable shares
      */
-    public MutableShares(@NotNull Shares shares) {
+    MutableShares(@NotNull Shares shares) {
         super(shares.getValue());
     }
 
@@ -100,6 +88,18 @@ public class MutableShares extends MutableCountable
     @Override
     public boolean areNotEqual(double value) {
         return !ICountable.areEqual(value, getValue(), getPrecision());
+    }
+
+    @Override
+    protected void clear() {
+
+        /*
+         * There is a null check here because initialization of the container
+         * might not have occurred when this method is called.
+         */
+        if (null != container) {
+            container.clear();
+        }
     }
 
     @Override

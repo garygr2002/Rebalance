@@ -11,7 +11,7 @@ public abstract class MutableCountable implements IMutableCountable {
      * @param value    The value of the countable
      * @param truncate True if the value should be truncated, false if rounded
      */
-    public MutableCountable(double value, boolean truncate) {
+    MutableCountable(double value, boolean truncate) {
         set(value, truncate);
     }
 
@@ -20,7 +20,7 @@ public abstract class MutableCountable implements IMutableCountable {
      *
      * @param value The value of the countable
      */
-    public MutableCountable(double value) {
+    MutableCountable(double value) {
         set(value);
     }
 
