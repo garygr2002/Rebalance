@@ -21,32 +21,39 @@ public class HouseSalesCosts extends Synthesizer {
     private final static Valuator byNotConsidered = new ValueByNotConsidered();
 
     /**
-     * Sums the value of a collection of queryables.
+     * Sums the value of a collection of hierarchy objects.
      *
-     * @param queryables A collection of queryables
-     * @param valuator   A valuator for queryables
+     * @param hierarchyObjects A collection of hierarchy objects
+     * @param valuator         A valuator for hierarchy objects
      * @return The sum of the values in the collection
      */
-    private static double sum(@NotNull Collection<Queryable<?, ?>> queryables,
+    private static double sum(@NotNull Collection<Common<?, ?, ?>> hierarchyObjects,
                               @NotNull Valuator valuator) {
 
-        // Declare and initialize the sum. Are there any queryables?
+        // Declare and initialize the sum. Are there any hierarchy objects?
         double value = 0.;
-        if (!queryables.isEmpty()) {
+        if (!hierarchyObjects.isEmpty()) {
 
             /*
-             * There are queryables. Declare and initialize mutable currency
-             * initialized with the empty sum. Cycle for each queryable.
+             * There are hierarchy objects. Declare and initialize mutable
+             * currency initialized with the empty sum. Cycle for each
+             * hierarchy object.
              */
             final MutableCurrency currency = new MutableCurrency(value);
-            for (Queryable<?, ?> queryable : queryables) {
+            for (Common<?, ?, ?> hierarchyObject : hierarchyObjects) {
 
-                // Subtract the value of the first/next queryable from the sum.
-                currency.subtract(valuator.getValue(queryable));
+                /*
+                 * Subtract the value of the first/next hierarchy object from
+                 * the sum.
+                 */
+                currency.subtract(valuator.getValue(hierarchyObject));
             }
 
-            // Get the summed value, and divide by the number of queryables.
-            value = currency.getValue() / queryables.size();
+            /*
+             * Get the summed value, and divide by the number of hierarchy
+             * objects.
+             */
+            value = currency.getValue() / hierarchyObjects.size();
         }
 
         // Return the sum.
@@ -93,7 +100,7 @@ public class HouseSalesCosts extends Synthesizer {
              * Declare a list to receive house price estimates. Cycle for each
              * estimate account key.
              */
-            final List<Queryable<?, ?>> estimateList = new ArrayList<>();
+            final List<Common<?, ?, ?>> estimateList = new ArrayList<>();
             for (AccountKey estimateKey : estimateKeys) {
 
                 /*
