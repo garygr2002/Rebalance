@@ -40,7 +40,7 @@ abstract class Common<KeyType,
      * Gets the value of the hierarchy object that can be considered for
      * rebalance specific to the given weight type.
      *
-     * @param type A weight type (null for all types)
+     * @param type A weight type
      * @return The value of the hierarchy object that can be considered for
      * rebalance, specific to the given weight type
      */
@@ -71,7 +71,7 @@ abstract class Common<KeyType,
      * Gets the value of the hierarchy object that cannot be considered for
      * rebalance specific to the given weight type.
      *
-     * @param type A weight type (null for all types)
+     * @param type A weight type
      * @return The value of the hierarchy object that cannot be considered for
      * rebalance, specific to the given weight type
      */
@@ -81,7 +81,7 @@ abstract class Common<KeyType,
      * Gets the proposed value of the hierarchy object specific to the given
      * weight type.
      *
-     * @param type A weight type (null for all types)
+     * @param type A weight type
      * @return The proposed value of the hierarchy object, relative to the
      * value in the hierarchy object that is considered for rebalance and
      * specific to the given weight type

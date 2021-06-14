@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.hierarchy;
 
+import com.garygregg.rebalance.CategoryType;
 import com.garygregg.rebalance.Description;
 import com.garygregg.rebalance.TaxType;
 import com.garygregg.rebalance.WeightType;
@@ -167,9 +168,22 @@ abstract class Aggregate<KeyType,
 
     /**
      * Gets the value of the hierarchy object that can be considered for
+     * rebalance specific to the given category type.
+     *
+     * @param type A category type
+     * @return The value of the hierarchy object that can be considered for
+     * rebalance, specific to the given category type
+     */
+    public @NotNull Currency getConsidered(@NotNull CategoryType type) {
+        return CategoryType.ALL.equals(type) || hasCategoryType(type) ?
+                getConsidered() : Currency.getZero();
+    }
+
+    /**
+     * Gets the value of the hierarchy object that can be considered for
      * rebalance specific to the given tax type.
      *
-     * @param type A tax type (null for all types)
+     * @param type A tax type
      * @return The value of the hierarchy object that can be considered for
      * rebalance, specific to the given tax type
      */
@@ -190,9 +204,22 @@ abstract class Aggregate<KeyType,
 
     /**
      * Gets the value of the hierarchy object that cannot be considered for
+     * rebalance specific to the given category type.
+     *
+     * @param type A category type
+     * @return The value of the hierarchy object that cannot be considered for
+     * rebalance, specific to the given category type
+     */
+    public @NotNull Currency getNotConsidered(@NotNull CategoryType type) {
+        return CategoryType.ALL.equals(type) || hasCategoryType(type) ?
+                getNotConsidered() : Currency.getZero();
+    }
+
+    /**
+     * Gets the value of the hierarchy object that cannot be considered for
      * rebalance specific to the given tax type.
      *
-     * @param type A tax type (null for all types)
+     * @param type A tax type
      * @return The value of the hierarchy object that cannot be considered for
      * rebalance, specific to the given tax type
      */
@@ -206,6 +233,20 @@ abstract class Aggregate<KeyType,
         return getWeightTypeManager().getNotConsidered(type);
     }
 
+    /**
+     * Gets the proposed value of the hierarchy object specific to the given
+     * category type.
+     *
+     * @param type A category type
+     * @return The proposed value of the hierarchy object, relative to the
+     * value in the hierarchy object that is considered for rebalance and specific
+     * to the given category type
+     */
+    public @NotNull Currency getProposed(@NotNull CategoryType type) {
+        return CategoryType.ALL.equals(type) || hasCategoryType(type) ?
+                getProposed() : Currency.getZero();
+    }
+
     @Override
     public Currency getProposed() {
         return getConsidered();
@@ -215,7 +256,7 @@ abstract class Aggregate<KeyType,
      * Gets the proposed value of the hierarchy object specific to the given
      * tax type.
      *
-     * @param type A tax type (null for all types)
+     * @param type A tax type
      * @return The proposed value of the hierarchy object, relative to the
      * value in the hierarchy object that is considered for rebalance and specific
      * to the given tax type

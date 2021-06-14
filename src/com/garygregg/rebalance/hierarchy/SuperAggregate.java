@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.hierarchy;
 
+import com.garygregg.rebalance.CategoryType;
 import com.garygregg.rebalance.Description;
 import com.garygregg.rebalance.TaxType;
 import com.garygregg.rebalance.countable.Currency;
@@ -9,6 +10,30 @@ abstract class SuperAggregate<KeyType,
         ChildType extends Aggregate<?, ?, ?>,
         DescriptionType extends Description<? extends KeyType>>
         extends Aggregate<KeyType, ChildType, DescriptionType> {
+
+    // Our breakdown manager for the category type
+    private final CategoryBreakdownManager<ChildType> categoryTypeManager =
+            new CategoryBreakdownManager<>();
+
+    // Accumulates values by category type in each child
+    private final Operation categoryTypeAccumulate = new Operation() {
+
+        @Override
+        public void perform(@NotNull ChildType child) {
+
+            // The breakdown manager for the category type
+            final CategoryBreakdownManager<ChildType> categoryTypeManager =
+                    getCategoryTypeManager();
+
+            /*
+             * Cycle for each category type, and add the value specified for
+             * the child for that category type.
+             */
+            for (CategoryType type : CategoryType.values()) {
+                getCategoryTypeManager().add(type, child);
+            }
+        }
+    };
 
     // Our breakdown manager for the tax type
     private final TaxBreakdownManager<ChildType> taxTypeManager =
@@ -20,9 +45,14 @@ abstract class SuperAggregate<KeyType,
         @Override
         public void perform(@NotNull ChildType child) {
 
+            // The breakdown manager for the tax type
             final TaxBreakdownManager<ChildType> taxTypeManager =
                     getTaxTypeManager();
 
+            /*
+             * Cycle for each tax type, and add the value specified for the
+             * child for that tax type.
+             */
             for (TaxType type : TaxType.values()) {
                 taxTypeManager.add(type, child);
             }
@@ -39,38 +69,70 @@ abstract class SuperAggregate<KeyType,
     }
 
     /**
+     * Accumulates values by category type in each child.
+     */
+    protected void accumulateCategoryType() {
+        doOperation(categoryTypeAccumulate);
+    }
+
+    /**
      * Accumulates values by tax type in each child.
      */
     protected void accumulateTaxType() {
-
-        /*
-         * Note: This method must be overridden in the Account class to add
-         * only the single tax type.
-         */
         doOperation(taxTypeAccumulate);
     }
 
     @Override
     void breakdown() {
 
-        // Call the superclass method, then accumulate values by tax type.
+        /*
+         * Call the superclass method, then accumulate values by tax type and
+         * category type.
+         */
         super.breakdown();
         accumulateTaxType();
+        accumulateCategoryType();
     }
 
     @Override
     void clear() {
 
-        // Call the superclass method, then clear the tax type manager.
+        /*
+         * Call the superclass method, then clear both the category and tax
+         * type managers.
+         */
         super.clear();
+        getCategoryTypeManager().clear();
         getTaxTypeManager().clear();
+    }
+
+    /**
+     * Gets the breakdown manager for the category type.
+     *
+     * @return The breakdown manager for the category type
+     */
+    protected @NotNull CategoryBreakdownManager<ChildType>
+    getCategoryTypeManager() {
+        return categoryTypeManager;
+    }
+
+    /**
+     * Gets the value of the hierarchy object that can be considered for
+     * rebalance specific to the given category type.
+     *
+     * @param type A category type
+     * @return The value of the hierarchy object that can be considered for
+     * rebalance, specific to the given category type
+     */
+    public @NotNull Currency getConsidered(@NotNull CategoryType type) {
+        return getCategoryTypeManager().getConsidered(type);
     }
 
     /**
      * Gets the value of the hierarchy object that can be considered for
      * rebalance specific to the given tax type.
      *
-     * @param type A tax type (null for all types)
+     * @param type A tax type
      * @return The value of the hierarchy object that can be considered for
      * rebalance, specific to the given tax type
      */
@@ -80,9 +142,21 @@ abstract class SuperAggregate<KeyType,
 
     /**
      * Gets the value of the hierarchy object that cannot be considered for
+     * rebalance specific to the given category type.
+     *
+     * @param type A category type
+     * @return The value of the hierarchy object that cannot be considered for
+     * rebalance, specific to the given category type
+     */
+    public @NotNull Currency getNotConsidered(@NotNull CategoryType type) {
+        return getCategoryTypeManager().getNotConsidered(type);
+    }
+
+    /**
+     * Gets the value of the hierarchy object that cannot be considered for
      * rebalance specific to the given tax type.
      *
-     * @param type A tax type (null for all types)
+     * @param type A tax type
      * @return The value of the hierarchy object that cannot be considered for
      * rebalance, specific to the given tax type
      */
@@ -92,9 +166,22 @@ abstract class SuperAggregate<KeyType,
 
     /**
      * Gets the proposed value of the hierarchy object specific to the given
+     * category type.
+     *
+     * @param type A category type
+     * @return The proposed value of the hierarchy object, relative to the
+     * value in the hierarchy object that is considered for rebalance and specific
+     * to the given category type
+     */
+    public @NotNull Currency getProposed(@NotNull CategoryType type) {
+        return getCategoryTypeManager().getProposed(type);
+    }
+
+    /**
+     * Gets the proposed value of the hierarchy object specific to the given
      * tax type.
      *
-     * @param type A tax type (null for all types)
+     * @param type A tax type
      * @return The proposed value of the hierarchy object, relative to the
      * value in the hierarchy object that is considered for rebalance and specific
      * to the given tax type
@@ -110,6 +197,16 @@ abstract class SuperAggregate<KeyType,
      */
     protected @NotNull TaxBreakdownManager<ChildType> getTaxTypeManager() {
         return taxTypeManager;
+    }
+
+    @Override
+    public boolean hasCategoryType(@NotNull CategoryType type) {
+        return type.equals(CategoryType.NOT_AN_ACCOUNT);
+    }
+
+    @Override
+    public boolean hasTaxType(@NotNull TaxType type) {
+        return type.equals(TaxType.NOT_AN_ACCOUNT);
     }
 
     /**

@@ -269,6 +269,11 @@ public class Ticker extends
     }
 
     @Override
+    public boolean hasCategoryType(@NotNull CategoryType type) {
+        return type.equals(CategoryType.NOT_AN_ACCOUNT);
+    }
+
+    @Override
     public boolean hasFundType(@NotNull FundType type) {
 
         /*

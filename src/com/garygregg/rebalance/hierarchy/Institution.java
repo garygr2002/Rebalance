@@ -1,9 +1,6 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.Description;
-import com.garygregg.rebalance.FundType;
-import com.garygregg.rebalance.HoldingLineType;
-import com.garygregg.rebalance.TaxType;
+import com.garygregg.rebalance.*;
 import org.jetbrains.annotations.NotNull;
 
 public class Institution extends SuperAggregate<
@@ -28,11 +25,6 @@ public class Institution extends SuperAggregate<
     @Override
     public boolean hasFundType(@NotNull FundType type) {
         return type.equals(FundType.NOT_A_FUND);
-    }
-
-    @Override
-    public boolean hasTaxType(@NotNull TaxType type) {
-        return type.equals(TaxType.NOT_AN_ACCOUNT);
     }
 
     @Override

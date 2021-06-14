@@ -1,9 +1,6 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.AccountKey;
-import com.garygregg.rebalance.FundType;
-import com.garygregg.rebalance.HoldingLineType;
-import com.garygregg.rebalance.TaxType;
+import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountDescription;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,6 +37,21 @@ public class Account extends
         super(key);
     }
 
+    /**
+     * Gets the category type.
+     *
+     * @return The category type
+     */
+    public CategoryType getCategoryType() {
+
+        /*
+         * Get the tax type. Return 'unknown' category type if the tax type is
+         * null, otherwise return the category type indicated by the tax type.
+         */
+        final TaxType type = getTaxType();
+        return (null == type) ? null : type.getCategory();
+    }
+
     @Override
     public @NotNull HoldingLineType getLineType() {
         return HoldingLineType.ACCOUNT;
@@ -61,6 +73,17 @@ public class Account extends
     }
 
     @Override
+    public boolean hasCategoryType(@NotNull CategoryType type) {
+
+        /*
+         * Get the category type in the account description. Return true if the
+         * category type is not null, and equal to the given type.
+         */
+        final CategoryType descriptionType = getCategoryType();
+        return (null != descriptionType) && descriptionType.equals(type);
+    }
+
+    @Override
     public boolean hasFundType(@NotNull FundType type) {
         return type.equals(FundType.NOT_A_FUND);
     }
@@ -70,7 +93,7 @@ public class Account extends
 
         /*
          * Get the tax type in the account description. Return true if the tax
-         * type is not null, and equal the given type.
+         * type is not null, and equal to the given type.
          */
         final TaxType descriptionType = getTaxType();
         return (null != descriptionType) && descriptionType.equals(type);

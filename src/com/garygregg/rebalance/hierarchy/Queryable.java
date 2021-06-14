@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.hierarchy;
 
+import com.garygregg.rebalance.CategoryType;
 import com.garygregg.rebalance.FundType;
 import com.garygregg.rebalance.TaxType;
 import com.garygregg.rebalance.countable.Currency;
@@ -46,6 +47,15 @@ public interface Queryable<KeyType, ChildType extends Queryable<?, ?>> {
      * the queryable that is considered for rebalance
      */
     Currency getProposed();
+
+    /**
+     * Determines if the queryable contains the indicated category type.
+     *
+     * @param type The indicated category type
+     * @return True if the queryable contains the indicated category type,
+     * false otherwise
+     */
+    boolean hasCategoryType(@NotNull CategoryType type);
 
     /**
      * Determines if the queryable contains the indicated fund type.
