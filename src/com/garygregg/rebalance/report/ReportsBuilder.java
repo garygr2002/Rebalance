@@ -1,8 +1,18 @@
 package com.garygregg.rebalance.report;
 
+import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementProcessor;
+import com.garygregg.rebalance.Library;
+import com.garygregg.rebalance.account.AccountLibrary;
+import com.garygregg.rebalance.code.CodeLibrary;
+import com.garygregg.rebalance.detailed.DetailedLibrary;
 import com.garygregg.rebalance.hierarchy.Hierarchy;
 import com.garygregg.rebalance.hierarchy.Portfolio;
+import com.garygregg.rebalance.hierarchy.Valuator;
+import com.garygregg.rebalance.hierarchy.ValueByNotConsidered;
+import com.garygregg.rebalance.holding.HoldingLibrary;
+import com.garygregg.rebalance.portfolio.PortfolioLibrary;
+import com.garygregg.rebalance.ticker.TickerLibrary;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -12,12 +22,64 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.logging.Logger;
 
-public class ReportsBuilder extends ElementProcessor {
+class ReportsBuilder extends ElementProcessor {
+
+    // The valuator for 'not considered' values
+    private final Valuator valuatorForNotConsidered
+            = new ValueByNotConsidered();
+
+    // The valuator for considered values ('considered' or proposed)
+    private Valuator valuatorForConsidered;
 
     {
 
         // Assign the logger based on class canonical name.
         setLogger(Logger.getLogger(ReportsBuilder.class.getCanonicalName()));
+    }
+
+    /**
+     * Constructs the reports builder.
+     *
+     * @param valuatorForConsidered The valuator to be used for writing reports
+     */
+    ReportsBuilder(@NotNull Valuator valuatorForConsidered) {
+        setConsidered(valuatorForConsidered);
+    }
+
+    /**
+     * Checks that the date of a hierarchy - if provided - matches that in the
+     * holdings library.
+     *
+     * @param writer        A write to receive message
+     * @param hierarchyDate The date of a hierarchy
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private static void checkDate(@NotNull FileWriter writer,
+                                  Date hierarchyDate) throws IOException {
+
+        // Is the provided hierarchy date not null?
+        if (null != hierarchyDate) {
+
+            /*
+             * The hierarchy date is not null. Get the date from the holdings
+             * library. Is the date from the holdings library not null, and is
+             * this non-null date not equal to the provided hierarchy date?
+             */
+            final Date holdingDate = HoldingLibrary.getInstance().getDate();
+            if (!((null == holdingDate) ||
+                    holdingDate.equals(hierarchyDate))) {
+
+                /*
+                 * The dates are both not null, and do not match. Write a
+                 * message to the writer.
+                 */
+                writer.write(String.format("\nWarning: The date %s of the " +
+                                "holdings does not equal that of the " +
+                                "hierarchy, %s!\n",
+                        DateUtilities.format(holdingDate),
+                        DateUtilities.format(hierarchyDate)));
+            }
+        }
     }
 
     /***
@@ -75,6 +137,19 @@ public class ReportsBuilder extends ElementProcessor {
      * Returns a non-null date, either the argument to the method or a default
      * if the argument is null.
      *
+     * @param date        Any date
+     * @param defaultDate A non-null default date to use
+     * @return The argument, or a default if the date is null
+     */
+    private static @NotNull Date getNonNullDate(Date date,
+                                                @NotNull Date defaultDate) {
+        return (null == date) ? defaultDate : date;
+    }
+
+    /**
+     * Returns a non-null date, either the argument to the method or a default
+     * if the argument is null.
+     *
      * @param date Any date
      * @return The argument, or a default if the date is null
      */
@@ -83,16 +158,48 @@ public class ReportsBuilder extends ElementProcessor {
     }
 
     /**
-     * Returns a non-null date, either the argument to the method or a default
-     * if the argument is null.
+     * Write the date of a library to a file writer.
      *
-     * @param date        Any date
-     * @param defaultDate A non-null default date to use
-     * @return The argument, or a default if the date is null
+     * @param writer      The file writer to receive a message
+     * @param library     The library from which to extract a date
+     * @param description A description of the library
+     * @throws IOException Indicates an I/O exception occurred
      */
-    private static @NotNull Date getNonNullDate(Date date,
-                                                @NotNull Date defaultDate) {
-        return (null == date) ? defaultDate : date;
+    private static void writeDate(@NotNull FileWriter writer,
+                                  @NotNull Library<?, ?> library,
+                                  @NotNull String description) throws IOException {
+        writeDate(writer, library.getDate(), String.format("%s %s",
+                description, "library"));
+    }
+
+    /**
+     * Writes a date to a file writer.
+     *
+     * @param writer      The file writer to receive a message
+     * @param date        The date to write to the writer
+     * @param description A description of the date
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private static void writeDate(@NotNull FileWriter writer,
+                                  @NotNull Date date,
+                                  @NotNull String description) throws IOException {
+
+        /*
+         * Format the description in a tag of fixed length, then write the
+         * tag to the writer along with the date.
+         */
+        final String tag = String.format("The date of the %s is:", description);
+        writer.write(String.format("%-37s %s.\n", tag,
+                DateUtilities.format(date)));
+    }
+
+    /**
+     * Gets the valuator for 'considered' values ('considered' or proposed)
+     *
+     * @return The valuator for 'considered' values ('considered' or proposed)
+     */
+    public @NotNull Valuator getConsidered() {
+        return valuatorForConsidered;
     }
 
     @Override
@@ -103,6 +210,15 @@ public class ReportsBuilder extends ElementProcessor {
     @Override
     protected @NotNull String getPrefix() {
         return "report";
+    }
+
+    /**
+     * Gets the valuator for 'not considered' values
+     *
+     * @return The valuator for 'not considered' values
+     */
+    public Valuator getValuatorForNotConsidered() {
+        return valuatorForNotConsidered;
     }
 
     /**
@@ -124,7 +240,6 @@ public class ReportsBuilder extends ElementProcessor {
                 getDateUtilities().constructFilename(
                         getNonNullDate(date))).toString());
 
-
         /*
          * Create a path to the file. Delete the file if it is a directory,
          * and create a writer to a new file.
@@ -132,6 +247,33 @@ public class ReportsBuilder extends ElementProcessor {
         createPath(file);
         deleteDirectory(file);
         return new FileWriter(file);
+    }
+
+    /**
+     * Sets the valuator for considered values ('considered' or proposed)
+     *
+     * @param valuator The new valuator for considered values ('considered' or
+     *                 proposed)
+     */
+    void setConsidered(@NotNull Valuator valuator) {
+        this.valuatorForConsidered = valuator;
+    }
+
+    /**
+     * Writes dates for each known element reader.
+     *
+     * @param writer The file writer to receive the dates
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private void writeDates(@NotNull FileWriter writer) throws IOException {
+
+        // Write the dates of each element reader.
+        writeDate(writer, HoldingLibrary.getInstance(), "holding");
+        writeDate(writer, AccountLibrary.getInstance(), "account");
+        writeDate(writer, CodeLibrary.getInstance(), "code");
+        writeDate(writer, DetailedLibrary.getInstance(), "detailed");
+        writeDate(writer, PortfolioLibrary.getInstance(), "portfolio");
+        writeDate(writer, TickerLibrary.getInstance(), "ticker");
     }
 
     /**
@@ -202,8 +344,12 @@ public class ReportsBuilder extends ElementProcessor {
                 getDateUtilities().getTypeDirectory(),
                 portfolio.getKey(), date);
 
-        // TODO: Write the report.
-        writer.write("This is a test.\n");
+        // Write about dates.
+        writeDate(writer, date, "hierarchy");
+        writeDates(writer);
+        checkDate(writer, date);
+
+        // TODO: Write the rest of the report.
         writer.close();
         return false;
     }

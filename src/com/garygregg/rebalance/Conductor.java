@@ -13,7 +13,7 @@ import com.garygregg.rebalance.holding.HoldingLibrary;
 import com.garygregg.rebalance.holding.HoldingsBuilder;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
 import com.garygregg.rebalance.portfolio.PortfoliosBuilder;
-import com.garygregg.rebalance.report.ReportsBuilder;
+import com.garygregg.rebalance.report.CurrentReportsBuilder;
 import com.garygregg.rebalance.ticker.TickerLibrary;
 import com.garygregg.rebalance.ticker.TickersBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -348,7 +348,7 @@ public class Conductor {
         try {
 
             // Try to write a report for each portfolio in the hiearchy.
-            new ReportsBuilder().writeLines(hierarchy, null);
+            new CurrentReportsBuilder().writeLines(hierarchy, null);
         }
 
         // Oops, I/O exception while trying to write the reports.
