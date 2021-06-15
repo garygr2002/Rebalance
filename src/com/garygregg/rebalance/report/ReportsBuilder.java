@@ -1,18 +1,10 @@
 package com.garygregg.rebalance.report;
 
-import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementProcessor;
-import com.garygregg.rebalance.Library;
-import com.garygregg.rebalance.account.AccountLibrary;
-import com.garygregg.rebalance.code.CodeLibrary;
-import com.garygregg.rebalance.detailed.DetailedLibrary;
 import com.garygregg.rebalance.hierarchy.Hierarchy;
 import com.garygregg.rebalance.hierarchy.Portfolio;
 import com.garygregg.rebalance.hierarchy.Valuator;
 import com.garygregg.rebalance.hierarchy.ValueByNotConsidered;
-import com.garygregg.rebalance.holding.HoldingLibrary;
-import com.garygregg.rebalance.portfolio.PortfolioLibrary;
-import com.garygregg.rebalance.ticker.TickerLibrary;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -44,42 +36,6 @@ class ReportsBuilder extends ElementProcessor {
      */
     ReportsBuilder(@NotNull Valuator valuatorForConsidered) {
         setConsidered(valuatorForConsidered);
-    }
-
-    /**
-     * Checks that the date of a hierarchy - if provided - matches that in the
-     * holdings library.
-     *
-     * @param writer        A write to receive message
-     * @param hierarchyDate The date of a hierarchy
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private static void checkDate(@NotNull FileWriter writer,
-                                  Date hierarchyDate) throws IOException {
-
-        // Is the provided hierarchy date not null?
-        if (null != hierarchyDate) {
-
-            /*
-             * The hierarchy date is not null. Get the date from the holdings
-             * library. Is the date from the holdings library not null, and is
-             * this non-null date not equal to the provided hierarchy date?
-             */
-            final Date holdingDate = HoldingLibrary.getInstance().getDate();
-            if (!((null == holdingDate) ||
-                    holdingDate.equals(hierarchyDate))) {
-
-                /*
-                 * The dates are both not null, and do not match. Write a
-                 * message to the writer.
-                 */
-                writer.write(String.format("\nWarning: The date %s of the " +
-                                "holdings does not equal that of the " +
-                                "hierarchy, %s!\n",
-                        DateUtilities.format(holdingDate),
-                        DateUtilities.format(hierarchyDate)));
-            }
-        }
     }
 
     /***
@@ -158,42 +114,6 @@ class ReportsBuilder extends ElementProcessor {
     }
 
     /**
-     * Write the date of a library to a file writer.
-     *
-     * @param writer      The file writer to receive a message
-     * @param library     The library from which to extract a date
-     * @param description A description of the library
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private static void writeDate(@NotNull FileWriter writer,
-                                  @NotNull Library<?, ?> library,
-                                  @NotNull String description) throws IOException {
-        writeDate(writer, library.getDate(), String.format("%s %s",
-                description, "library"));
-    }
-
-    /**
-     * Writes a date to a file writer.
-     *
-     * @param writer      The file writer to receive a message
-     * @param date        The date to write to the writer
-     * @param description A description of the date
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private static void writeDate(@NotNull FileWriter writer,
-                                  @NotNull Date date,
-                                  @NotNull String description) throws IOException {
-
-        /*
-         * Format the description in a tag of fixed length, then write the
-         * tag to the writer along with the date.
-         */
-        final String tag = String.format("The date of the %s is:", description);
-        writer.write(String.format("%-37s %s.\n", tag,
-                DateUtilities.format(date)));
-    }
-
-    /**
      * Gets the valuator for 'considered' values ('considered' or proposed)
      *
      * @return The valuator for 'considered' values ('considered' or proposed)
@@ -207,18 +127,18 @@ class ReportsBuilder extends ElementProcessor {
         return "txt";
     }
 
-    @Override
-    protected @NotNull String getPrefix() {
-        return "report";
-    }
-
     /**
      * Gets the valuator for 'not considered' values
      *
      * @return The valuator for 'not considered' values
      */
-    public Valuator getValuatorForNotConsidered() {
+    public @NotNull Valuator getNotConsidered() {
         return valuatorForNotConsidered;
+    }
+
+    @Override
+    protected @NotNull String getPrefix() {
+        return "report";
     }
 
     /**
@@ -257,23 +177,6 @@ class ReportsBuilder extends ElementProcessor {
      */
     void setConsidered(@NotNull Valuator valuator) {
         this.valuatorForConsidered = valuator;
-    }
-
-    /**
-     * Writes dates for each known element reader.
-     *
-     * @param writer The file writer to receive the dates
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private void writeDates(@NotNull FileWriter writer) throws IOException {
-
-        // Write the dates of each element reader.
-        writeDate(writer, HoldingLibrary.getInstance(), "holding");
-        writeDate(writer, AccountLibrary.getInstance(), "account");
-        writeDate(writer, CodeLibrary.getInstance(), "code");
-        writeDate(writer, DetailedLibrary.getInstance(), "detailed");
-        writeDate(writer, PortfolioLibrary.getInstance(), "portfolio");
-        writeDate(writer, TickerLibrary.getInstance(), "ticker");
     }
 
     /**
@@ -340,17 +243,21 @@ class ReportsBuilder extends ElementProcessor {
          * Create a file writer tailored to the portfolio key and the given
          * date.
          */
-        final FileWriter writer = getWriter(
+        final FileWriter fileWriter = getWriter(
                 getDateUtilities().getTypeDirectory(),
                 portfolio.getKey(), date);
 
-        // Write about dates.
-        writeDate(writer, date, "hierarchy");
-        writeDates(writer);
-        checkDate(writer, date);
+        /*
+         * Create a portfolio writer with the file writer and our hierarchy
+         * object valuators. Write a summary of the portfolio using the
+         * portfolio writer, receiving a result.
+         */
+        final PortfolioWriter portfolioWriter = new PortfolioWriter(fileWriter,
+                getConsidered(), getNotConsidered());
+        final boolean result = portfolioWriter.writeSummary(portfolio, date);
 
-        // TODO: Write the rest of the report.
-        writer.close();
-        return false;
+        // Close the file writer and return status from the portfolio writer.
+        fileWriter.close();
+        return result;
     }
 }
