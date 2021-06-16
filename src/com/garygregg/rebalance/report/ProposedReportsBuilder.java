@@ -8,6 +8,6 @@ public class ProposedReportsBuilder extends ReportsBuilder {
      * Constructs the proposed reports builder.
      */
     public ProposedReportsBuilder() {
-        super(new ValueByProposed());
+        super(ValueByProposed.getInstance());
     }
 }

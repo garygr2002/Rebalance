@@ -8,6 +8,6 @@ public class CurrentReportsBuilder extends ReportsBuilder {
      * Constructs the current reports builder.
      */
     public CurrentReportsBuilder() {
-        super(new ValueByConsidered());
+        super(ValueByConsidered.getInstance());
     }
 }

@@ -1,10 +1,7 @@
 package com.garygregg.rebalance.report;
 
 import com.garygregg.rebalance.ElementProcessor;
-import com.garygregg.rebalance.hierarchy.Hierarchy;
-import com.garygregg.rebalance.hierarchy.Portfolio;
-import com.garygregg.rebalance.hierarchy.Valuator;
-import com.garygregg.rebalance.hierarchy.ValueByNotConsidered;
+import com.garygregg.rebalance.hierarchy.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -17,8 +14,8 @@ import java.util.logging.Logger;
 class ReportsBuilder extends ElementProcessor {
 
     // The valuator for 'not considered' values
-    private final Valuator valuatorForNotConsidered
-            = new ValueByNotConsidered();
+    private final Valuator valuatorForNotConsidered =
+            ValueByNotConsidered.getInstance();
 
     // The valuator for considered values ('considered' or proposed)
     private Valuator valuatorForConsidered;

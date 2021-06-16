@@ -15,10 +15,12 @@ import java.util.logging.Level;
 public class HouseSalesCosts extends Synthesizer {
 
     // Value by 'considered'
-    private final static Valuator byConsidered = new ValueByConsidered();
+    private final static Valuator byConsidered =
+            ValueByConsidered.getInstance();
 
     // Value by 'not considered'
-    private final static Valuator byNotConsidered = new ValueByNotConsidered();
+    private final static Valuator byNotConsidered =
+            ValueByNotConsidered.getInstance();
 
     /**
      * Sums the value of a collection of hierarchy objects.

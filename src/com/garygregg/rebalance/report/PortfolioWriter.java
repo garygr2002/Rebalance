@@ -49,8 +49,10 @@ class PortfolioWriter {
 
     // The valuator for 'considered' values ('considered' or proposed)
     private final Valuator valuatorForConsidered;
+
     // The valuator for 'not considered' values
     private final Valuator valuatorForNotConsidered;
+
     // The recipient for writer output
     private final FileWriter writer;
 
@@ -321,25 +323,26 @@ class PortfolioWriter {
         });
 
         Institution institution;
+        final Valuator valuator = getValuatorForConsidered();
         final double zero = Currency.getZero().getValue();
 
         final Iterator<Institution> iterator = institutions.iterator();
-        while (iterator.hasNext() && (zero < valuatorForConsidered.getValue(
+        while (iterator.hasNext() && (zero < valuator.getValue(
                 institution = iterator.next()).getValue())) {
 
             writer.write(String.format(numberFormat, institution.getKey(),
-                    institution.getConsidered(CategoryType.TAXABLE),
-                    institution.getConsidered(CategoryType.TAX_DEFERRED),
-                    institution.getConsidered(CategoryType.TAX_PAID),
-                    institution.getConsidered()));
+                    valuator.getValue(institution, CategoryType.TAXABLE),
+                    valuator.getValue(institution, CategoryType.TAX_DEFERRED),
+                    valuator.getValue(institution, CategoryType.TAX_PAID),
+                    valuator.getValue(institution)));
         }
 
         writer.write(delimiterLine);
         writer.write(String.format(numberFormat, portfolio.getKey(),
-                portfolio.getConsidered(CategoryType.TAXABLE),
-                portfolio.getConsidered(CategoryType.TAX_DEFERRED),
-                portfolio.getConsidered(CategoryType.TAX_PAID),
-                portfolio.getConsidered()));
+                valuator.getValue(portfolio, CategoryType.TAXABLE),
+                valuator.getValue(portfolio, CategoryType.TAX_DEFERRED),
+                valuator.getValue(portfolio, CategoryType.TAX_PAID),
+                valuator.getValue(portfolio)));
 
         writer.write(newLine);
         WeightType type;
@@ -349,19 +352,19 @@ class PortfolioWriter {
 
         writer.write(String.format(summaryFormat,
                 String.format(format, type = WeightType.STOCK, separator),
-                portfolio.getConsidered(type)));
+                valuator.getValue(portfolio, type)));
 
         writer.write(String.format(summaryFormat,
                 String.format(format, type = WeightType.BOND, separator),
-                portfolio.getConsidered(type)));
+                valuator.getValue(portfolio, type)));
 
         writer.write(String.format(summaryFormat,
                 String.format(format, type = WeightType.CASH, separator),
-                portfolio.getConsidered(type)));
+                valuator.getValue(portfolio, type)));
 
         writer.write(String.format(summaryFormat,
                 String.format(format, type = WeightType.REAL_ESTATE,
-                        separator), portfolio.getConsidered(type)));
+                        separator), valuator.getValue(portfolio, type)));
 
         // TODO:
         return true;
