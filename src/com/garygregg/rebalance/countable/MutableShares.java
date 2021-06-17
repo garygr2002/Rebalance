@@ -28,7 +28,7 @@ public class MutableShares extends MutableCountable
      * @param truncate True if the value should be truncated, false if rounded
      */
     @SuppressWarnings("unused")
-    MutableShares(double value, boolean truncate) {
+    public MutableShares(double value, boolean truncate) {
         super(value, truncate);
     }
 
@@ -37,7 +37,7 @@ public class MutableShares extends MutableCountable
      *
      * @param value The value of the shares
      */
-    MutableShares(double value) {
+    public MutableShares(double value) {
         super(value);
     }
 
@@ -46,7 +46,7 @@ public class MutableShares extends MutableCountable
      *
      * @param shares Other mutable shares
      */
-    MutableShares(@NotNull MutableShares shares) {
+    public MutableShares(@NotNull MutableShares shares) {
         super(shares.getValue());
     }
 
