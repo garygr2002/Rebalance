@@ -1,12 +1,10 @@
 package com.garygregg.rebalance.report;
 
-import com.garygregg.rebalance.CategoryType;
-import com.garygregg.rebalance.DateUtilities;
-import com.garygregg.rebalance.Library;
-import com.garygregg.rebalance.WeightType;
+import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountLibrary;
 import com.garygregg.rebalance.code.CodeLibrary;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.countable.MutablePercent;
 import com.garygregg.rebalance.detailed.DetailedLibrary;
 import com.garygregg.rebalance.hierarchy.Institution;
 import com.garygregg.rebalance.hierarchy.Portfolio;
@@ -45,7 +43,7 @@ class PortfolioWriter {
         final int valueColumns = getValueColumns();
         headingFormat = constructFormat(false, valueColumns);
         numberFormat = constructFormat(true, valueColumns);
-        summaryFormat = constructFormat(true, 1);
+        summaryFormat = constructFormat(true, 2);
     }
 
     // The valuator for balance-able values ('considered' or proposed)
@@ -346,24 +344,56 @@ class PortfolioWriter {
         writer.write(newLine);
         WeightType type;
 
-        final String separator = ":";
+        final String summaryNameSeparator = ":";
+        final String summaryPercentDesignation = "%";
         final String format = "%s%s";
 
-        writer.write(String.format(summaryFormat,
-                String.format(format, type = WeightType.STOCK, separator),
-                valuator.getValue(portfolio, type)));
+        final List<Double> weights = List.of(
+                valuator.getValue(portfolio, WeightType.STOCK).getValue(),
+                valuator.getValue(portfolio, WeightType.BOND).getValue(),
+                valuator.getValue(portfolio, WeightType.CASH).getValue(),
+                valuator.getValue(portfolio, WeightType.REAL_ESTATE).getValue()
+        );
+
+        final Reallocator reallocator = new Reallocator(weights);
+        final List<MutablePercent> percentages = new ArrayList<>();
+
+        final int weightSize = weights.size();
+        for (int i = 0; i < weightSize; ++i) {
+
+            percentages.add(new MutablePercent(0.));
+        }
+
+        percentages.get(0).set(100.);
+        reallocator.reallocate(percentages);
 
         writer.write(String.format(summaryFormat,
-                String.format(format, type = WeightType.BOND, separator),
-                valuator.getValue(portfolio, type)));
+                String.format(format, type = WeightType.STOCK,
+                        summaryNameSeparator),
+                valuator.getValue(portfolio, type),
+                String.format(format, percentages.get(0).getValue(),
+                        summaryPercentDesignation)));
 
         writer.write(String.format(summaryFormat,
-                String.format(format, type = WeightType.CASH, separator),
-                valuator.getValue(portfolio, type)));
+                String.format(format, type = WeightType.BOND,
+                        summaryNameSeparator),
+                valuator.getValue(portfolio, type),
+                String.format(format, percentages.get(1).getValue(),
+                        summaryPercentDesignation)));
+
+        writer.write(String.format(summaryFormat,
+                String.format(format, type = WeightType.CASH,
+                        summaryNameSeparator),
+                valuator.getValue(portfolio, type),
+                String.format(format, percentages.get(2).getValue(),
+                        summaryPercentDesignation)));
 
         writer.write(String.format(summaryFormat,
                 String.format(format, type = WeightType.REAL_ESTATE,
-                        separator), valuator.getValue(portfolio, type)));
+                        summaryNameSeparator),
+                valuator.getValue(portfolio, type),
+                String.format(format, percentages.get(3).getValue(),
+                        summaryPercentDesignation)));
 
         // TODO:
         return true;
