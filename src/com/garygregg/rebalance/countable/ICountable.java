@@ -158,6 +158,15 @@ public interface ICountable {
     }
 
     /**
+     * Returns the common percent precision.
+     *
+     * @return The common percent precision
+     */
+    static int getPercentPrecision() {
+        return 3;
+    }
+
+    /**
      * Returns the common shares precision.
      *
      * @return The common shares precision
