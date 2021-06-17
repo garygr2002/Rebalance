@@ -250,7 +250,7 @@ class ReportsBuilder extends ElementProcessor {
          * portfolio writer, receiving a result.
          */
         final PortfolioWriter portfolioWriter = new PortfolioWriter(fileWriter,
-                getConsidered(), getNotConsidered());
+                getConsidered());
         final boolean result = portfolioWriter.writeSummary(portfolio, date);
 
         // Close the file writer and return status from the portfolio writer.

@@ -11,6 +11,7 @@ import com.garygregg.rebalance.detailed.DetailedLibrary;
 import com.garygregg.rebalance.hierarchy.Institution;
 import com.garygregg.rebalance.hierarchy.Portfolio;
 import com.garygregg.rebalance.hierarchy.Valuator;
+import com.garygregg.rebalance.hierarchy.ValueByNotConsidered;
 import com.garygregg.rebalance.holding.HoldingLibrary;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
@@ -47,11 +48,12 @@ class PortfolioWriter {
         summaryFormat = constructFormat(true, 1);
     }
 
-    // The valuator for 'considered' values ('considered' or proposed)
-    private final Valuator valuatorForConsidered;
+    // The valuator for balance-able values ('considered' or proposed)
+    private final Valuator valuatorForBalanceable;
 
     // The valuator for 'not considered' values
-    private final Valuator valuatorForNotConsidered;
+    private final Valuator valuatorForNotConsidered =
+            ValueByNotConsidered.getInstance();
 
     // The recipient for writer output
     private final FileWriter writer;
@@ -59,19 +61,16 @@ class PortfolioWriter {
     /**
      * Constructs the portfolio writer.
      *
-     * @param writer                   The recipient for writer output
-     * @param valuatorForConsidered    The valuator for considered values
-     *                                 ('considered' or proposed)
-     * @param valuatorForNotConsidered The valuator for 'not considered' values
+     * @param writer                 The recipient for writer output
+     * @param valuatorForBalanceable The valuator for balance-able values
+     *                               ('considered' or proposed)
      */
     public PortfolioWriter(@NotNull FileWriter writer,
-                           @NotNull Valuator valuatorForConsidered,
-                           @NotNull Valuator valuatorForNotConsidered) {
+                           @NotNull Valuator valuatorForBalanceable) {
 
         // Set all the member variables.
         this.writer = writer;
-        this.valuatorForConsidered = valuatorForConsidered;
-        this.valuatorForNotConsidered = valuatorForNotConsidered;
+        this.valuatorForBalanceable = valuatorForBalanceable;
     }
 
     /**
@@ -209,12 +208,12 @@ class PortfolioWriter {
     }
 
     /**
-     * Gets the valuator for 'considered' values ('considered' or proposed)
+     * Gets the valuator for balance-able values ('considered' or proposed)
      *
-     * @return The valuator for 'considered' values ('considered' or proposed)
+     * @return The valuator for balance-able values ('considered' or proposed)
      */
-    private @NotNull Valuator getValuatorForConsidered() {
-        return valuatorForConsidered;
+    private @NotNull Valuator getValuatorForBalanceable() {
+        return valuatorForBalanceable;
     }
 
     /**
@@ -295,7 +294,7 @@ class PortfolioWriter {
         institutions.sort(new Comparator<>() {
 
             // We use 'considered' values for this sort.
-            final Valuator valuator = getValuatorForConsidered();
+            final Valuator valuator = getValuatorForBalanceable();
 
             @Override
             public int compare(@NotNull Institution first,
@@ -323,7 +322,7 @@ class PortfolioWriter {
         });
 
         Institution institution;
-        final Valuator valuator = getValuatorForConsidered();
+        final Valuator valuator = getValuatorForBalanceable();
         final double zero = Currency.getZero().getValue();
 
         final Iterator<Institution> iterator = institutions.iterator();
