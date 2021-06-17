@@ -29,6 +29,15 @@ public abstract class MutableCountable implements IMutableCountable {
      */
     protected abstract void clear();
 
+    /**
+     * Gets the factor of the countable.
+     *
+     * @return The factor of the countable
+     */
+    public double getFactor() {
+        return ICountable.calculateFactor(getPrecision());
+    }
+
     @Override
     public double getValue() {
         return value;
