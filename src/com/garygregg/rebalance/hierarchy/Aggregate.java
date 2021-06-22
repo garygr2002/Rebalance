@@ -154,7 +154,7 @@ abstract class Aggregate<KeyType,
     }
 
     @Override
-    public Collection<ChildType> getChildren() {
+    public @NotNull Collection<ChildType> getChildren() {
 
         // Lock the children, and return the child collection.
         lockChildren();
