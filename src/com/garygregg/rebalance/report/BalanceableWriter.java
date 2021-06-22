@@ -1,23 +1,16 @@
 package com.garygregg.rebalance.report;
 
 import com.garygregg.rebalance.*;
-import com.garygregg.rebalance.account.AccountLibrary;
-import com.garygregg.rebalance.code.CodeLibrary;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutablePercent;
-import com.garygregg.rebalance.detailed.DetailedLibrary;
 import com.garygregg.rebalance.hierarchy.*;
-import com.garygregg.rebalance.holding.HoldingLibrary;
-import com.garygregg.rebalance.portfolio.PortfolioDescription;
-import com.garygregg.rebalance.portfolio.PortfolioLibrary;
-import com.garygregg.rebalance.ticker.TickerLibrary;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-class PortfolioWriter {
+class BalanceableWriter {
 
     // The length of a table field
     private static final int fieldLength = 15;
@@ -44,11 +37,7 @@ class PortfolioWriter {
     }
 
     // The valuator for balance-able values ('considered' or proposed)
-    private final Valuator valuatorForBalanceable;
-
-    // The valuator for 'not considered' values
-    private final Valuator valuatorForNotConsidered =
-            ValueByNotConsidered.getInstance();
+    private final Valuator valuator;
 
     // The recipient for writer output
     private final FileWriter writer;
@@ -56,52 +45,16 @@ class PortfolioWriter {
     /**
      * Constructs the portfolio writer.
      *
-     * @param writer                 The recipient for writer output
-     * @param valuatorForBalanceable The valuator for balance-able values
-     *                               ('considered' or proposed)
+     * @param writer   The recipient for writer output
+     * @param valuator The valuator for balance-able values('considered' or
+     *                 proposed)
      */
-    public PortfolioWriter(@NotNull FileWriter writer,
-                           @NotNull Valuator valuatorForBalanceable) {
+    public BalanceableWriter(@NotNull FileWriter writer,
+                             @NotNull Valuator valuator) {
 
-        // Set all the member variables.
+        // Set the member variables.
         this.writer = writer;
-        this.valuatorForBalanceable = valuatorForBalanceable;
-    }
-
-    /**
-     * Checks that the date of a hierarchy - if provided - matches that in the
-     * holdings library.
-     *
-     * @param writer        A write to receive message
-     * @param hierarchyDate The date of a hierarchy
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private static void checkDate(@NotNull FileWriter writer,
-                                  Date hierarchyDate) throws IOException {
-
-        // Is the provided hierarchy date not null?
-        if (null != hierarchyDate) {
-
-            /*
-             * The hierarchy date is not null. Get the date from the holdings
-             * library. Is the date from the holdings library not null, and is
-             * this non-null date not equal to the provided hierarchy date?
-             */
-            final Date holdingDate = HoldingLibrary.getInstance().getDate();
-            if (!((null == holdingDate) ||
-                    holdingDate.equals(hierarchyDate))) {
-
-                /*
-                 * The dates are both not null, and do not match. Write a
-                 * message to the writer.
-                 */
-                writer.write(String.format("\nWarning: The date %s of the " +
-                                "holdings does not equal that of the " +
-                                "hierarchy, %s!\n",
-                        DateUtilities.format(holdingDate),
-                        DateUtilities.format(hierarchyDate)));
-            }
-        }
+        this.valuator = valuator;
     }
 
     /**
@@ -117,7 +70,7 @@ class PortfolioWriter {
         return String.format("%%-%ds", getFieldLength()) +
                 String.valueOf(String.format(" %%%s%ds",
                         rightJustify ? "" : "-",
-                        fieldLength)).repeat(Math.max(0, valueColumns)) +
+                        getFieldLength())).repeat(Math.max(0, valueColumns)) +
                 "%n";
     }
 
@@ -149,42 +102,6 @@ class PortfolioWriter {
     }
 
     /**
-     * Writes a date to a file writer.
-     *
-     * @param writer      The file writer to receive a message
-     * @param date        The date to write to the writer
-     * @param description A description of the date
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private static void writeDate(@NotNull FileWriter writer,
-                                  @NotNull Date date,
-                                  @NotNull String description) throws IOException {
-
-        /*
-         * Format the description in a tag of fixed length, then write the
-         * tag to the writer along with the date.
-         */
-        final String tag = String.format("The date of the %s is:", description);
-        writer.write(String.format("%-37s %s.\n", tag,
-                DateUtilities.format(date)));
-    }
-
-    /**
-     * Write the date of a library to a file writer.
-     *
-     * @param writer      The file writer to receive a message
-     * @param library     The library from which to extract a date
-     * @param description A description of the library
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private static void writeDate(@NotNull FileWriter writer,
-                                  @NotNull Library<?, ?> library,
-                                  @NotNull String description) throws IOException {
-        writeDate(writer, library.getDate(), String.format("%s %s",
-                description, "library"));
-    }
-
-    /**
      * Gets the format for a heading line.
      *
      * @return The format for a heading line
@@ -194,90 +111,22 @@ class PortfolioWriter {
     }
 
     /**
-     * Gets the format for a number line.
-     *
-     * @return The format for a number line
+     * Creates a list of institutions included in a portfolio, sorts them by
+     * descending balanceable value, and returns the list.
      */
-    private String getNumberFormat() {
-        return numberFormat;
-    }
+    private @NotNull List<Institution> getInstitutions(@NotNull Portfolio portfolio) {
 
-    /**
-     * Gets the valuator for balance-able values ('considered' or proposed)
-     *
-     * @return The valuator for balance-able values ('considered' or proposed)
-     */
-    private @NotNull Valuator getValuatorForBalanceable() {
-        return valuatorForBalanceable;
-    }
-
-    /**
-     * Gets the valuator for 'not considered' values
-     *
-     * @return The valuator for 'not considered'
-     */
-    private @NotNull Valuator getValuatorForNotConsidered() {
-        return valuatorForNotConsidered;
-    }
-
-    /**
-     * Gets the recipient for writer output.
-     *
-     * @return The recipient for writer output
-     */
-    private @NotNull FileWriter getWriter() {
-        return writer;
-    }
-
-    /**
-     * Writes dates for each known element reader.
-     *
-     * @param writer The file writer to receive the dates
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private void writeDates(@NotNull FileWriter writer) throws IOException {
-
-        // Write the dates of each element reader.
-        writeDate(writer, HoldingLibrary.getInstance(), "holding");
-        writeDate(writer, AccountLibrary.getInstance(), "account");
-        writeDate(writer, CodeLibrary.getInstance(), "code");
-        writeDate(writer, DetailedLibrary.getInstance(), "detailed");
-        writeDate(writer, PortfolioLibrary.getInstance(), "portfolio");
-        writeDate(writer, TickerLibrary.getInstance(), "ticker");
-    }
-
-    /**
-     * Writes a portfolio summary.
-     *
-     * @param portfolio A portfolio that is the subject of the summary
-     * @param date      The date to use for the summary
-     * @return True if the summary was successfully written; false otherwise
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    public boolean writeSummary(@NotNull Portfolio portfolio,
-                                Date date) throws IOException {
-
-        final String headingFormat = getHeadingFormat();
-        final String numberFormat = getNumberFormat();
-        final String summaryFormat = getSummaryFormat();
-
-        final String newLine = "\n";
-        writer.write(String.format("%s%s%s",
-                "Holdings that can be rebalanced:", newLine, newLine));
-
-        writer.write(String.format(headingFormat, "Institution", "Taxable",
-                "Tax Deferred", "Tax Paid", "Total"));
-
-        final String delimiter = "-".repeat(getFieldLength());
-        final String delimiterLine = String.format(headingFormat, delimiter,
-                delimiter, delimiter, delimiter, delimiter);
-
-        writer.write(delimiterLine);
-        final List<Institution> institutions = new ArrayList<>(portfolio.getChildren());
+        /*
+         * Create a list of the children of the portfolio. These will be
+         * institutions. Sort them in order of their value using the
+         * balanceable valuator.
+         */
+        final List<Institution> institutions =
+                new ArrayList<>(portfolio.getChildren());
         institutions.sort(new Comparator<>() {
 
-            // We use 'considered' values for this sort.
-            final Valuator valuator = getValuatorForBalanceable();
+            // We use the balanceable valuator for this sort
+            final Valuator valuator = getValuator();
 
             @Override
             public int compare(@NotNull Institution first,
@@ -304,33 +153,235 @@ class PortfolioWriter {
             }
         });
 
-        final List<Pair<String, Account>> accountsList = new ArrayList<>();
-        Collection<Account> accountsCollection;
+        // Return the list of sorted institutions.
+        return institutions;
+    }
 
+    /**
+     * Gets the format for a number line.
+     *
+     * @return The format for a number line
+     */
+    private String getNumberFormat() {
+        return numberFormat;
+    }
+
+    /**
+     * Breaks down a portfolio into percentages based on the highest level
+     * weight type values.
+     *
+     * @param portfolio A portfolio
+     * @return A map of the highest level weight type values mapped to their
+     * percentages in the portfolio
+     */
+    private @NotNull Map<WeightType, MutablePercent> getPercentages(
+            @NotNull Portfolio portfolio) {
+
+        /*
+         * Declare and initialize an array of the highest level weight types,
+         * and an array index.
+         */
+        final WeightType[] types = {WeightType.STOCK, WeightType.BOND,
+                WeightType.CASH, WeightType.REAL_ESTATE};
+        int i = 0;
+
+        /*
+         * Get our valuator. Use it to create a list of portfolio weights using
+         * the highest level weight types.
+         */
+        final Valuator valuator = getValuator();
+        final List<Double> weights = List.of(
+                valuator.getValue(portfolio, types[i++]).getValue(),
+                valuator.getValue(portfolio, types[i++]).getValue(),
+                valuator.getValue(portfolio, types[i++]).getValue(),
+                valuator.getValue(portfolio, types[i]).getValue()
+        );
+
+        /*
+         * Create a reallocator around the weights list. Declare and initialize
+         * a new list of percentages.
+         */
+        final Reallocator reallocator = new Reallocator(weights);
+        final List<MutablePercent> percentages = new ArrayList<>();
+
+        // Get the size of the weights list. Cycle for each index in the list.
+        final int weightSize = weights.size();
+        for (i = 0; i < weightSize; ++i) {
+
+            // Initialize the first/next percentage to zero.
+            percentages.add(new MutablePercent(0.));
+        }
+
+        /*
+         * Reset the first percentage to one hundred, and reallocate the
+         * percentages using the reallocator.
+         */
+        percentages.get(0).set(100.);
+        reallocator.reallocate(percentages);
+
+        /*
+         * Create a map of weights to percentages. Cycle for each highest level
+         * weight type.
+         */
+        final Map<WeightType, MutablePercent> map = new HashMap<>();
+        final int typesLength = types.length;
+        for (i = 0; i < typesLength; ++i) {
+
+            /*
+             * Put the first/next weight type and its corresponding percentage
+             * in the map.
+             */
+            map.put(types[i], percentages.get(i));
+        }
+
+        // Return the map.
+        return map;
+    }
+
+    /**
+     * Gets the valuator.
+     *
+     * @return The valuator
+     */
+    private @NotNull Valuator getValuator() {
+        return valuator;
+    }
+
+    /**
+     * Gets the recipient for writer output.
+     *
+     * @return The recipient for writer output
+     */
+    private FileWriter getWriter() {
+        return writer;
+    }
+
+    /**
+     * Writes a portfolio description line by a highest-level weight type.
+     *
+     * @param portfolio The portfolio for which to write a description line
+     * @param map       A map of weight types to percentages
+     * @param type      The specific weight type to describe
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private void writePercentage(@NotNull Portfolio portfolio,
+                                 @NotNull Map<WeightType, MutablePercent> map,
+                                 @NotNull WeightType type) throws IOException {
+
+        // Declare and initialize the format, and write the description line.
+        final String format = "%s%s";
+        getWriter().write(String.format(getSummaryFormat(),
+                String.format(format, type.getSoftName(), ":"),
+                getValuator().getValue(portfolio, type),
+                String.format(format, map.get(type).getValue(), "%")));
+    }
+
+    /**
+     * Writes the portfolio breakdown percentages.
+     *
+     * @param portfolio The portfolio for which to breakdown percentages
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private void writePercentages(@NotNull Portfolio portfolio) throws IOException {
+
+        /*
+         * Get the percentage breakdown of the portfolio by highest-level
+         * weight type.
+         */
+        final Map<WeightType, MutablePercent> percentages =
+                getPercentages(portfolio);
+
+        // Write the percentages for each of the highest-level weight types.
+        writePercentage(portfolio, percentages, WeightType.STOCK);
+        writePercentage(portfolio, percentages, WeightType.BOND);
+        writePercentage(portfolio, percentages, WeightType.CASH);
+        writePercentage(portfolio, percentages, WeightType.REAL_ESTATE);
+    }
+
+    /**
+     * Writes a portfolio summary.
+     *
+     * @param portfolio A portfolio that is the subject of the summary
+     * @return True if the summary was successfully written; false otherwise
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    public boolean writeSummary(@NotNull Portfolio portfolio)
+            throws IOException {
+
+        // Write the institution table followed by a newline.
+        writeTable(portfolio);
+        getWriter().write("\n");
+
+        // Write the portfolio breakdown percentages, and return to caller.
+        writePercentages(portfolio);
+        return true;
+    }
+
+    /**
+     * Writes a table breakdown of institutions in a portfolio to include
+     * taxable holdings, tax deferred holdings, tax paid holdings, and totals.
+     *
+     * @param portfolio The portfolio for which to describe contained
+     *                  institutions
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private void writeTable(@NotNull Portfolio portfolio) throws IOException {
+
+        // Get the heading and number formats.
+        final String headingFormat = getHeadingFormat();
+        final String numberFormat = getNumberFormat();
+
+        // Write a descriptive message about the table we are about to write.
+        final FileWriter writer = getWriter();
+        writer.write("Holdings that can be rebalanced:\n\n");
+
+        // Write the header for the table.
+        writer.write(String.format(headingFormat, "Institution", "Taxable",
+                "Tax Deferred", "Tax Paid", "Total"));
+
+        /*
+         * Create a delimiter for use between the table header and table data
+         * lines, and between the table data lines and table summary.
+         */
+        final String delimiter = "-".repeat(getFieldLength());
+        final String delimiterLine = String.format(headingFormat, delimiter,
+                delimiter, delimiter, delimiter, delimiter);
+
+        /*
+         * Write the delimiter, as we have already written the table header.
+         * Get a sorted list of institutions from the portfolio.
+         */
+        writer.write(delimiterLine);
+        final List<Institution> institutions = getInstitutions(portfolio);
+
+        /*
+         * Declare and initialize more local variables used to write the table
+         * data lines.
+         */
         Institution institution;
-        String key;
-
-        Valuator valuator = getValuatorForBalanceable();
+        final Valuator valuator = getValuator();
         final double zero = Currency.getZero().getValue();
 
+        /*
+         * Get an iterator for the institutions list. Cycle while institutions
+         * exist, and while their balanceable value is greater than zero.
+         */
         final Iterator<Institution> iterator = institutions.iterator();
         while (iterator.hasNext() && (zero < valuator.getValue(
                 institution = iterator.next()).getValue())) {
 
-            key = institution.getKey();
-            accountsCollection = institution.getChildren();
-            for (Account account : accountsCollection) {
-
-                accountsList.add(new Pair<>(key, account));
-            }
-
-            writer.write(String.format(numberFormat, key,
+            // Write a data line for the first/next institution.
+            writer.write(String.format(numberFormat, institution.getKey(),
                     valuator.getValue(institution, CategoryType.TAXABLE),
                     valuator.getValue(institution, CategoryType.TAX_DEFERRED),
                     valuator.getValue(institution, CategoryType.TAX_PAID),
                     valuator.getValue(institution)));
         }
 
+        /*
+         * Write another delimiter, followed by a summary line for the whole
+         * portfolio.
+         */
         writer.write(delimiterLine);
         writer.write(String.format(numberFormat, portfolio.getKey(),
                 valuator.getValue(portfolio, CategoryType.TAXABLE),
@@ -338,90 +389,34 @@ class PortfolioWriter {
                 valuator.getValue(portfolio, CategoryType.TAX_PAID),
                 valuator.getValue(portfolio)));
 
-        while (iterator.hasNext() && (zero <= valuator.getValue(
-                (institution = iterator.next())).getValue())) {
+        /*
+         * Continue iterating and doing nothing with institutions that have
+         * zero balanceable value.
+         */
+        //noinspection StatementWithEmptyBody
+        while (iterator.hasNext() && (zero <= valuator.
+                getValue(iterator.next()).getValue())) ;
 
-            key = institution.getKey();
-            accountsCollection = institution.getChildren();
-            for (Account account : accountsCollection) {
-
-                accountsList.add(new Pair<>(key, account));
-            }
-        }
-
+        /*
+         * The remainder of the institutions, if any, have negative balances.
+         * This seems wrong. Only debts are negative, and debts are not
+         * balanceable.
+         */
         if (iterator.hasNext()) {
 
-            writer.write(newLine);
+            // Write a newline for starters.
+            writer.write("\n");
             do {
 
+                /*
+                 * Get the first/next institution (we know there is at least
+                 * one at this point), and warn about its negative balance.
+                 */
                 institution = iterator.next();
-                key = institution.getKey();
-                accountsCollection = institution.getChildren();
-                for (Account account : accountsCollection) {
-
-                    accountsList.add(new Pair<>(key, account));
-                }
-
                 writer.write(String.format("Warning! Institution '%s' has " +
-                        "balance of %s!%n", institution.getKey(),
+                                "balance of %s!%n", institution.getKey(),
                         valuator.getValue(institution).getValue()));
             } while (iterator.hasNext());
         }
-
-        writer.write(newLine);
-        WeightType type;
-
-        final String summaryNameSeparator = ":";
-        final String summaryPercentDesignation = "%";
-        final String format = "%s%s";
-
-        final List<Double> weights = List.of(
-                valuator.getValue(portfolio, WeightType.STOCK).getValue(),
-                valuator.getValue(portfolio, WeightType.BOND).getValue(),
-                valuator.getValue(portfolio, WeightType.CASH).getValue(),
-                valuator.getValue(portfolio, WeightType.REAL_ESTATE).getValue()
-        );
-
-        final Reallocator reallocator = new Reallocator(weights);
-        final List<MutablePercent> percentages = new ArrayList<>();
-
-        final int weightSize = weights.size();
-        for (int i = 0; i < weightSize; ++i) {
-
-            percentages.add(new MutablePercent(0.));
-        }
-
-        percentages.get(0).set(100.);
-        reallocator.reallocate(percentages);
-
-        writer.write(String.format(summaryFormat,
-                String.format(format, (type = WeightType.STOCK).getSoftName(),
-                        summaryNameSeparator),
-                valuator.getValue(portfolio, type),
-                String.format(format, percentages.get(0).getValue(),
-                        summaryPercentDesignation)));
-
-        writer.write(String.format(summaryFormat,
-                String.format(format, (type = WeightType.BOND).getSoftName(),
-                        summaryNameSeparator),
-                valuator.getValue(portfolio, type),
-                String.format(format, percentages.get(1).getValue(),
-                        summaryPercentDesignation)));
-
-        writer.write(String.format(summaryFormat,
-                String.format(format, (type = WeightType.CASH).getSoftName(),
-                        summaryNameSeparator),
-                valuator.getValue(portfolio, type),
-                String.format(format, percentages.get(2).getValue(),
-                        summaryPercentDesignation)));
-
-        writer.write(String.format(summaryFormat,
-                String.format(format,
-                        (type = WeightType.REAL_ESTATE).getSoftName(),
-                        summaryNameSeparator),
-                valuator.getValue(portfolio, type),
-                String.format(format, percentages.get(3).getValue(),
-                        summaryPercentDesignation)));
-        return true;
     }
 }
