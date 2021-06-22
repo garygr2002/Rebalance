@@ -6,10 +6,7 @@ import com.garygregg.rebalance.code.CodeLibrary;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutablePercent;
 import com.garygregg.rebalance.detailed.DetailedLibrary;
-import com.garygregg.rebalance.hierarchy.Institution;
-import com.garygregg.rebalance.hierarchy.Portfolio;
-import com.garygregg.rebalance.hierarchy.Valuator;
-import com.garygregg.rebalance.hierarchy.ValueByNotConsidered;
+import com.garygregg.rebalance.hierarchy.*;
 import com.garygregg.rebalance.holding.HoldingLibrary;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
@@ -260,25 +257,13 @@ class PortfolioWriter {
     public boolean writeSummary(@NotNull Portfolio portfolio,
                                 Date date) throws IOException {
 
-        final PortfolioDescription description = portfolio.getDescription();
-        final String name = (null == description) ? "<name not available>" :
-                description.getName();
-
-        final FileWriter writer = getWriter();
-        writer.write(String.format("Portfolio summary for: %s%n", name));
-
-        final String newLine = "\n";
-        writer.write(newLine);
-
-        writeDate(writer, date, "hierarchy");
-        writeDates(writer);
-
-        checkDate(writer, date);
-        writer.write(newLine);
-
         final String headingFormat = getHeadingFormat();
         final String numberFormat = getNumberFormat();
         final String summaryFormat = getSummaryFormat();
+
+        final String newLine = "\n";
+        writer.write(String.format("%s%s%s",
+                "Holdings that can be rebalanced:", newLine, newLine));
 
         writer.write(String.format(headingFormat, "Institution", "Taxable",
                 "Tax Deferred", "Tax Paid", "Total"));
@@ -319,15 +304,27 @@ class PortfolioWriter {
             }
         });
 
+        final List<Pair<String, Account>> accountsList = new ArrayList<>();
+        Collection<Account> accountsCollection;
+
         Institution institution;
-        final Valuator valuator = getValuatorForBalanceable();
+        String key;
+
+        Valuator valuator = getValuatorForBalanceable();
         final double zero = Currency.getZero().getValue();
 
         final Iterator<Institution> iterator = institutions.iterator();
         while (iterator.hasNext() && (zero < valuator.getValue(
                 institution = iterator.next()).getValue())) {
 
-            writer.write(String.format(numberFormat, institution.getKey(),
+            key = institution.getKey();
+            accountsCollection = institution.getChildren();
+            for (Account account : accountsCollection) {
+
+                accountsList.add(new Pair<>(key, account));
+            }
+
+            writer.write(String.format(numberFormat, key,
                     valuator.getValue(institution, CategoryType.TAXABLE),
                     valuator.getValue(institution, CategoryType.TAX_DEFERRED),
                     valuator.getValue(institution, CategoryType.TAX_PAID),
@@ -340,6 +337,36 @@ class PortfolioWriter {
                 valuator.getValue(portfolio, CategoryType.TAX_DEFERRED),
                 valuator.getValue(portfolio, CategoryType.TAX_PAID),
                 valuator.getValue(portfolio)));
+
+        while (iterator.hasNext() && (zero <= valuator.getValue(
+                (institution = iterator.next())).getValue())) {
+
+            key = institution.getKey();
+            accountsCollection = institution.getChildren();
+            for (Account account : accountsCollection) {
+
+                accountsList.add(new Pair<>(key, account));
+            }
+        }
+
+        if (iterator.hasNext()) {
+
+            writer.write(newLine);
+            do {
+
+                institution = iterator.next();
+                key = institution.getKey();
+                accountsCollection = institution.getChildren();
+                for (Account account : accountsCollection) {
+
+                    accountsList.add(new Pair<>(key, account));
+                }
+
+                writer.write(String.format("Warning! Institution '%s' has " +
+                        "balance of %s!%n", institution.getKey(),
+                        valuator.getValue(institution).getValue()));
+            } while (iterator.hasNext());
+        }
 
         writer.write(newLine);
         WeightType type;
@@ -368,34 +395,33 @@ class PortfolioWriter {
         reallocator.reallocate(percentages);
 
         writer.write(String.format(summaryFormat,
-                String.format(format, type = WeightType.STOCK,
+                String.format(format, (type = WeightType.STOCK).getSoftName(),
                         summaryNameSeparator),
                 valuator.getValue(portfolio, type),
                 String.format(format, percentages.get(0).getValue(),
                         summaryPercentDesignation)));
 
         writer.write(String.format(summaryFormat,
-                String.format(format, type = WeightType.BOND,
+                String.format(format, (type = WeightType.BOND).getSoftName(),
                         summaryNameSeparator),
                 valuator.getValue(portfolio, type),
                 String.format(format, percentages.get(1).getValue(),
                         summaryPercentDesignation)));
 
         writer.write(String.format(summaryFormat,
-                String.format(format, type = WeightType.CASH,
+                String.format(format, (type = WeightType.CASH).getSoftName(),
                         summaryNameSeparator),
                 valuator.getValue(portfolio, type),
                 String.format(format, percentages.get(2).getValue(),
                         summaryPercentDesignation)));
 
         writer.write(String.format(summaryFormat,
-                String.format(format, type = WeightType.REAL_ESTATE,
+                String.format(format,
+                        (type = WeightType.REAL_ESTATE).getSoftName(),
                         summaryNameSeparator),
                 valuator.getValue(portfolio, type),
                 String.format(format, percentages.get(3).getValue(),
                         summaryPercentDesignation)));
-
-        // TODO:
         return true;
     }
 }
