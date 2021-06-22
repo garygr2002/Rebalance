@@ -44,6 +44,11 @@ public class StockDescription extends TickerDescription {
     }
 
     @Override
+    public boolean isConsidered() {
+        return false;
+    }
+
+    @Override
     public boolean isMoneyFund() {
 
         // Stocks are not money funds.
