@@ -43,7 +43,7 @@ class BalanceableWriter {
     private final FileWriter writer;
 
     /**
-     * Constructs the portfolio writer.
+     * Constructs the balance-able writer.
      *
      * @param writer   The recipient for writer output
      * @param valuator The valuator for balance-able values('considered' or
@@ -88,7 +88,7 @@ class BalanceableWriter {
      *
      * @return The format for a summary line
      */
-    public static String getSummaryFormat() {
+    private static String getSummaryFormat() {
         return summaryFormat;
     }
 

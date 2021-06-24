@@ -2,12 +2,12 @@ package com.garygregg.rebalance.report;
 
 import com.garygregg.rebalance.hierarchy.ValueByConsidered;
 
-public class CurrentReportsBuilder extends ReportsBuilder {
+public class CurrentReportWriter extends ReportWriter {
 
     /**
-     * Constructs the current reports builder.
+     * Constructs the current reports writer.
      */
-    public CurrentReportsBuilder() {
+    public CurrentReportWriter() {
         super(ValueByConsidered.getInstance());
     }
 }

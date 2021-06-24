@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.logging.Logger;
 
-class ReportsBuilder extends ElementProcessor {
+class ReportWriter extends ElementProcessor {
 
     // The valuator for not balanceable assets
     private final Valuator notBalanceable = ValueByNotConsidered.getInstance();
@@ -31,15 +31,15 @@ class ReportsBuilder extends ElementProcessor {
     {
 
         // Assign the logger based on class canonical name.
-        setLogger(Logger.getLogger(ReportsBuilder.class.getCanonicalName()));
+        setLogger(Logger.getLogger(ReportWriter.class.getCanonicalName()));
     }
 
     /**
-     * Constructs the reports builder.
+     * Constructs the reports writer.
      *
      * @param balanceable The valuator to for balanceable assets
      */
-    ReportsBuilder(@NotNull Valuator balanceable) {
+    ReportWriter(@NotNull Valuator balanceable) {
         setBalanceable(balanceable);
     }
 
@@ -380,23 +380,32 @@ class ReportsBuilder extends ElementProcessor {
 
         /*
          * Write a portfolio header using the file writer. Create a
-         * balanceable writer with the file writer and the valuator for
-         * balanceable assets.
+         * balance-able writer with the file writer and the valuator for
+         * balance-able assets.
          */
         writeHeader(fileWriter, portfolio, date);
         final BalanceableWriter balanceableWriter =
                 new BalanceableWriter(fileWriter, getBalanceable());
 
         /*
-         * Write a summary of the portfolio using the balanceable writer,
-         * receiving a result. Close the file writer and return status received
-         * from the balanceable writer.
-         *
-         * TODO:
-         *
-         * Create a not-balanceable writer, and write its own summary.
+         * Write a summary of the portfolio using the balance-able writer,
+         * receiving a result. Create an unbalance-able writer with the file
+         * writer. For this writer, the valuator is well known and does need to
+         * be supplied.
          */
-        final boolean result = balanceableWriter.writeSummary(portfolio);
+        boolean result = balanceableWriter.writeSummary(portfolio);
+        final UnbalanceableWriter unbalanceableWriter =
+                new UnbalanceableWriter(fileWriter);
+
+        /*
+         * Write a newline, followed by a summary of the portfolio using the
+         * un-balanceable writer. Receive a result, and-ing it with the
+         * previous result.
+         */
+        fileWriter.write("\n");
+        result = unbalanceableWriter.writeSummary(portfolio) && result;
+
+        // Close the file writer and return the result to our caller.
         fileWriter.close();
         return result;
     }

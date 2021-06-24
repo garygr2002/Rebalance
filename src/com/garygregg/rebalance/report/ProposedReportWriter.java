@@ -2,12 +2,12 @@ package com.garygregg.rebalance.report;
 
 import com.garygregg.rebalance.hierarchy.ValueByProposed;
 
-public class ProposedReportsBuilder extends ReportsBuilder {
+public class ProposedReportWriter extends ReportWriter {
 
     /**
-     * Constructs the proposed reports builder.
+     * Constructs the proposed reports writer.
      */
-    public ProposedReportsBuilder() {
+    public ProposedReportWriter() {
         super(ValueByProposed.getInstance());
     }
 }
