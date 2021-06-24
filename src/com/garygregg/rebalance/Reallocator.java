@@ -1,6 +1,8 @@
 package com.garygregg.rebalance;
 
+import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCountable;
+import com.garygregg.rebalance.countable.MutableCurrency;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -20,6 +22,7 @@ public class Reallocator {
 
     /**
      * Constructs the reallocator.
+     *
      * @param weights A list of weights to apply to any reallocation operation;
      *                this list may be modified by the caller before any subsequent reallocation
      */
@@ -27,11 +30,156 @@ public class Reallocator {
         this.weights = weights;
     }
 
+    /***
+     * Checks a certain number of currency values from an iterator against a
+     * target.
+     *
+     * @param iterator The currency iterator
+     * @param target The target value for currency
+     * @param count The count of values to test
+     * @return True if the number of values matches the target, false otherwise
+     */
+    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+    private static boolean check(@NotNull Iterator<MutableCurrency> iterator,
+                                 @NotNull Currency target,
+                                 int count) {
+
+        /*
+         * Declare and initialize the result. Cycle for the given count, or
+         * until we hit a false result.
+         */
+        boolean result = true;
+        for (int i = 0; result && (i < count); ++i) {
+
+            // Compare the first/next currency value.
+            result = iterator.hasNext() && iterator.next().equals(target);
+        }
+
+        // Return the result to our caller.
+        return result;
+    }
+
+    /***
+     * Performs a test of the reallocator.
+     *
+     * @param zerosFirst True if zeros should go first in the test; false if
+     *                   they should go last
+     * @return True if the test was successful; false otherwise
+     */
+    public static boolean doATest(boolean zerosFirst) {
+
+        // Get a currency cent and a currency zero.
+        final Currency cent = Currency.getCent();
+        final Currency zero = Currency.getZero();
+
+        // What is ten? What is one one-hundredth of a cent?
+        final double ten = 10.;
+        final double hundredth = Currency.getCent().getValue() /
+                Math.pow(ten, 2.);
+
+        /*
+         * What is one tenth of a cent? What is half a cent? Initialize a
+         * weight value variable based on the zeros-first flag.
+         */
+        final double tenth = hundredth * ten;
+        final double half = tenth * 5.;
+        double value = zerosFirst ? half : half - hundredth;
+
+        // Declare and initialize a weight list. Declare an index.
+        final List<Double> weights = new ArrayList<>();
+        int i;
+
+        /*
+         * Cycle for some arbitrary weight count (note the '<=' used here as
+         * well as the variable name).
+         */
+        final int oneLessThanWeightCount = 7;
+        for (i = 0; i <= oneLessThanWeightCount; ++i) {
+
+            /*
+             * Add a new value to the weight list, then update the value for
+             * the next iteration.
+             */
+            weights.add(value);
+            value += zerosFirst ? hundredth : -hundredth;
+        }
+
+        /*
+         * Declare a new re-allocator with the calculated weight list. Declare
+         * and initialize a currency list. Cycle for one less than the weight
+         * count (note '<' used here).
+         */
+        final Reallocator reallocator = new Reallocator(weights);
+        final List<MutableCurrency> currencies = new ArrayList<>();
+        for (i = 0; i < oneLessThanWeightCount; ++i) {
+
+            // Add a new mutable currency to the list using zero.
+            currencies.add(new MutableCurrency(zero));
+        }
+
+        /*
+         * There is one more mutable currency to add to the list. Do that, but
+         * initialize it to a value which will leave only a certain number of
+         * zeros and a certain number of cents when the list is reallocated.
+         * Add that last currency.
+         */
+        final int zeros = 2;
+        final int cents = oneLessThanWeightCount + 1 - zeros;
+        currencies.add(new MutableCurrency(cents * half * 2.));
+
+        /*
+         * Reallocate the currencies, and get an iterator for the currency
+         * list.
+         */
+        reallocator.reallocate(currencies);
+        final Iterator<MutableCurrency> iterator = currencies.iterator();
+
+        // Declare a boolean to receive the test result. Should zeros go first?
+        boolean looksGood;
+        if (zerosFirst) {
+
+            // Zeros should go first. Check for them, then check for cents.
+            looksGood = check(iterator, zero, zeros);
+            looksGood = check(iterator, cent, cents) && looksGood;
+        }
+
+        // Zeros should go last.
+        else {
+
+            // Check for cents first, then check for zeros.
+            looksGood = check(iterator, cent, cents);
+            looksGood = check(iterator, zero, zeros) && looksGood;
+        }
+
+        // Return the test result to our caller.
+        return looksGood;
+    }
+
+    /**
+     * Tests the reallocator.
+     *
+     * @param arguments Command line arguments
+     */
+    public static void main(@NotNull String[] arguments) {
+
+        // Do a test with zeros first. Did it succeed?
+        boolean looksGood = doATest(true);
+        if (looksGood) {
+
+            // The test succeeded. Do a test with zeros last.
+            looksGood = doATest(false);
+        }
+
+        // Print the result of the test(s).
+        System.out.printf("Things %slook good.\n", looksGood ? "" : "don't ");
+    }
+
     /**
      * Sums a collection given the collection an a value extractor.
+     *
      * @param collection The collection
-     * @param extractor A value extractor
-     * @param <T> Any type from which value can be extracted
+     * @param extractor  A value extractor
+     * @param <T>        Any type from which value can be extracted
      * @return The sum of value in the given collection
      */
     private static <T> double sum(@NotNull Collection<? extends T> collection,
