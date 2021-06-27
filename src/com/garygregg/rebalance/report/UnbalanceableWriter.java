@@ -40,12 +40,13 @@ class UnbalanceableWriter {
             throws IOException {
 
         /*
-         * Write a temporary message, and return to caller.
-         *
-         * TODO: Fill in this method some more.
+         * Get the file writer. Write a descriptive message about the table we
+         * are about to write.
          */
-        getWriter().write("You need to code the unbalance-able writer, " +
-                "okay?\n");
+        final FileWriter writer = getWriter();
+        writer.write("Holdings that cannot be rebalanced:\n\n");
+
+        // TODO: Write the table.
         return true;
     }
 }
