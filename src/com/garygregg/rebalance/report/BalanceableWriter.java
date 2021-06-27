@@ -6,7 +6,6 @@ import com.garygregg.rebalance.countable.MutablePercent;
 import com.garygregg.rebalance.hierarchy.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -68,10 +67,13 @@ class BalanceableWriter {
      */
     private static String constructFormat(boolean rightJustify,
                                           int valueColumns) {
-        return String.format("%%-%ds", getFieldLength()) +
+
+        // Get the field length and construct the format string.
+        final int fieldLength = getFieldLength();
+        return String.format("%%-%ds", fieldLength) +
                 String.valueOf(String.format(" %%%s%ds",
                         rightJustify ? "" : "-",
-                        getFieldLength())).repeat(Math.max(0, valueColumns)) +
+                        fieldLength)).repeat(Math.max(0, valueColumns)) +
                 "%n";
     }
 
