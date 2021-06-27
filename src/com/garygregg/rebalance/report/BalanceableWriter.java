@@ -6,6 +6,7 @@ import com.garygregg.rebalance.countable.MutablePercent;
 import com.garygregg.rebalance.hierarchy.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -308,9 +309,16 @@ class BalanceableWriter {
     public boolean writeSummary(@NotNull Portfolio portfolio)
             throws IOException {
 
+        /*
+         * Get the file writer. Write a descriptive message about the table we
+         * are about to write.
+         */
+        final FileWriter writer = getWriter();
+        writer.write("Holdings that can be rebalanced:\n\n");
+
         // Write the institution table followed by a newline.
         writeTable(portfolio);
-        getWriter().write("\n");
+        writer.write("\n");
 
         // Write the portfolio breakdown percentages, and return to caller.
         writePercentages(portfolio);
@@ -331,11 +339,8 @@ class BalanceableWriter {
         final String headingFormat = getHeadingFormat();
         final String numberFormat = getNumberFormat();
 
-        // Write a descriptive message about the table we are about to write.
+        // Get the file writer, and write the header for the table.
         final FileWriter writer = getWriter();
-        writer.write("Holdings that can be rebalanced:\n\n");
-
-        // Write the header for the table.
         writer.write(String.format(headingFormat, "Institution", "Taxable",
                 "Tax Deferred", "Tax Paid", "Total"));
 
