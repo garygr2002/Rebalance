@@ -1,6 +1,5 @@
 package com.garygregg.rebalance.query;
 
-import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import org.jetbrains.annotations.NotNull;
 
