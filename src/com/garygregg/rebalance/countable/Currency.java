@@ -70,7 +70,7 @@ public class Currency extends Countable {
      *
      * @return A known cent
      */
-    public static Currency getCent() {
+    public static @NotNull Currency getCent() {
         return cent;
     }
 
@@ -79,7 +79,7 @@ public class Currency extends Countable {
      *
      * @return A known one
      */
-    public static Currency getOne() {
+    public static @NotNull Currency getOne() {
         return one;
     }
 
@@ -88,7 +88,7 @@ public class Currency extends Countable {
      *
      * @return A known zero
      */
-    public static Currency getZero() {
+    public static @NotNull Currency getZero() {
         return zero;
     }
 
