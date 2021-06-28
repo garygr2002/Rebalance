@@ -70,7 +70,7 @@ public class Shares extends Countable {
      *
      * @return A known minimum
      */
-    public static Shares getMinimum() {
+    public static @NotNull Shares getMinimum() {
         return minimum;
     }
 
@@ -79,7 +79,7 @@ public class Shares extends Countable {
      *
      * @return A known one
      */
-    public static Shares getOne() {
+    public static @NotNull Shares getOne() {
         return one;
     }
 
@@ -88,7 +88,7 @@ public class Shares extends Countable {
      *
      * @return A known zero
      */
-    public static Shares getZero() {
+    public static @NotNull Shares getZero() {
         return zero;
     }
 
