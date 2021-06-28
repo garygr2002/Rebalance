@@ -70,7 +70,7 @@ public class Percent extends Countable {
      *
      * @return A known minimum
      */
-    public static Percent getMinimum() {
+    public static @NotNull Percent getMinimum() {
         return minimum;
     }
 
@@ -79,7 +79,7 @@ public class Percent extends Countable {
      *
      * @return A known one hundred
      */
-    public static Percent getOneHundred() {
+    public static @NotNull Percent getOneHundred() {
         return oneHundred;
     }
 
@@ -88,7 +88,7 @@ public class Percent extends Countable {
      *
      * @return A known zero
      */
-    public static Percent getZero() {
+    public static @NotNull Percent getZero() {
         return zero;
     }
 
