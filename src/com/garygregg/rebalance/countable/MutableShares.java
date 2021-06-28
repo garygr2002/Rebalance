@@ -55,8 +55,15 @@ public class MutableShares extends MutableCountable
      *
      * @param shares Immutable shares
      */
-    MutableShares(@NotNull Shares shares) {
+    public MutableShares(@NotNull Shares shares) {
         super(shares.getValue());
+    }
+
+    /**
+     * Constructs shares with zero initial value.
+     */
+    public MutableShares() {
+        this(Shares.getZero());
     }
 
     /**

@@ -1232,17 +1232,12 @@ public class Hierarchy {
 
         /*
          * Declare and initialize a variable to receive the 'considered'
-         * values of the children of the aggregate.
+         * values of the children of the aggregate. Declare and initialize a
+         * variable to receive the 'not considered' values of the children of
+         * the aggregate.
          */
-        final MutableCurrency considered =
-                new MutableCurrency(Currency.getZero());
-
-        /*
-         * Declare and initialize a variable to receive the 'not considered'
-         * values of the children of the aggregate.
-         */
-        final MutableCurrency notConsidered =
-                new MutableCurrency(Currency.getZero());
+        final MutableCurrency considered = new MutableCurrency();
+        final MutableCurrency notConsidered = new MutableCurrency();
 
         // Get the children of the aggregate, and cycle for each.
         final Collection<T> children = aggregate.getChildren();

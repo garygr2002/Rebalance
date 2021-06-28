@@ -60,6 +60,13 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
+     * Constructs currency with zero initial value.
+     */
+    public MutableCurrency() {
+        this(Currency.getZero());
+    }
+
+    /**
      * Adds a currency value.
      *
      * @param currency Another currency value

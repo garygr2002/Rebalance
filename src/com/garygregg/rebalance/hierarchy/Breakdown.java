@@ -48,7 +48,7 @@ abstract class Breakdown<EnumType extends Enum<EnumType>,
              * The current value is null. Add a new, zero value to the map for
              * the type.
              */
-            put(type, currency = new MutableCurrency(Currency.getZero()));
+            put(type, currency = new MutableCurrency());
         }
 
         // Return the value.

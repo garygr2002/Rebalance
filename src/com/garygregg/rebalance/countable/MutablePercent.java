@@ -60,6 +60,13 @@ public class MutablePercent extends MutableCountable
     }
 
     /**
+     * Constructs percent with zero initial value.
+     */
+    public MutablePercent() {
+        this(Percent.getZero());
+    }
+
+    /**
      * Adds a percent value.
      *
      * @param percent Another percent value

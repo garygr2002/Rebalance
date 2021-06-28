@@ -316,16 +316,12 @@ class UnbalanceableWriter {
 
         /*
          * Declare and initialize a variable to hold the total of the holding
-         * items.
+         * items. Declare a variable hold a value/name pair for the holdings.
          */
-        final MutableCurrency total =
-                new MutableCurrency(Currency.getZero());
-
-        /*
-         * Declare a variable to hold a value/name pair for the holdings. Get
-         * an iterator for the holdings, and cycle while holdings exist.
-         */
+        final MutableCurrency total = new MutableCurrency();
         Pair<Currency, String> holdingPair;
+
+        // Get an iterator for the holdings, and cycle while holdings exist.
         final Iterator<Pair<Currency, String>> iterator = getHoldings();
         while (iterator.hasNext()) {
 

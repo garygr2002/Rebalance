@@ -13,6 +13,6 @@ public class StartAtZeroQuery extends CurrencyQuery {
      */
     public StartAtZeroQuery(@NotNull Accumulator<MutableCurrency>
                                     accumulator) {
-        super(accumulator, new MutableCurrency(Currency.getZero()));
+        super(accumulator, new MutableCurrency());
     }
 }
