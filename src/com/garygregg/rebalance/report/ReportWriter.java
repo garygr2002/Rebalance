@@ -5,6 +5,7 @@ import com.garygregg.rebalance.ElementProcessor;
 import com.garygregg.rebalance.Library;
 import com.garygregg.rebalance.account.AccountLibrary;
 import com.garygregg.rebalance.code.CodeLibrary;
+import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.detailed.DetailedLibrary;
 import com.garygregg.rebalance.hierarchy.*;
 import com.garygregg.rebalance.holding.HoldingLibrary;
@@ -131,14 +132,21 @@ class ReportWriter extends ElementProcessor {
     }
 
     /**
-     * Returns a non-null date, either the argument to the method or a default
-     * if the argument is null.
+     * Gets the name from a portfolio.
      *
-     * @param date Any date
-     * @return The argument, or a default if the date is null
+     * @param portfolio A portfolio from which to get a name
+     * @return The name of the portfolio, or a default if none is available
      */
-    private static @NotNull Date getNonNullDate(Date date) {
-        return getNonNullDate(date, new Date());
+    private static @NotNull String getName(@NotNull Portfolio portfolio) {
+
+        /*
+         * Get the description of the portfolio, and the name of the portfolio
+         * from its description. Use the key of the portfolio if its description
+         * is null.
+         */
+        final PortfolioDescription description = portfolio.getDescription();
+        return (null == description) ? portfolio.getKey() :
+                description.getName();
     }
 
     /**
@@ -155,18 +163,14 @@ class ReportWriter extends ElementProcessor {
     }
 
     /**
-     * Write the date of a library to a file writer.
+     * Returns a non-null date, either the argument to the method or a default
+     * if the argument is null.
      *
-     * @param writer      The file writer to receive a message
-     * @param library     The library from which to extract a date
-     * @param description A description of the library
-     * @throws IOException Indicates an I/O exception occurred
+     * @param date Any date
+     * @return The argument, or a default if the date is null
      */
-    private static void writeDate(@NotNull FileWriter writer,
-                                  @NotNull Library<?, ?> library,
-                                  @NotNull String description) throws IOException {
-        writeDate(writer, library.getDate(), String.format("%s %s",
-                description, "library"));
+    private static @NotNull Date getNonNullDate(Date date) {
+        return getNonNullDate(date, new Date());
     }
 
     /**
@@ -188,6 +192,21 @@ class ReportWriter extends ElementProcessor {
         final String tag = String.format("The date of the %s is:", description);
         writer.write(String.format("%-37s %s.\n", tag,
                 DateUtilities.format(date)));
+    }
+
+    /**
+     * Write the date of a library to a file writer.
+     *
+     * @param writer      The file writer to receive a message
+     * @param library     The library from which to extract a date
+     * @param description A description of the library
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private static void writeDate(@NotNull FileWriter writer,
+                                  @NotNull Library<?, ?> library,
+                                  @NotNull String description) throws IOException {
+        writeDate(writer, library.getDate(), String.format("%s %s",
+                description, "library"));
     }
 
     /**
@@ -285,19 +304,14 @@ class ReportWriter extends ElementProcessor {
                              @NotNull Portfolio portfolio,
                              Date date) throws IOException {
 
-        /*
-         * Get the description of the portfolio, and the name of the portfolio
-         * from its description.
-         */
-        final PortfolioDescription description = portfolio.getDescription();
-        final String name = (null == description) ? "<name not available>" :
-                description.getName();
+        // Describe the portfolio by name.
+        writer.write(String.format("Portfolio summary for: %s%n%n",
+                getName(portfolio)));
 
         /*
-         * Describe the portfolio by name. Describe the date of the hierarchy,
-         * followed by the dates of the libraries.
+         * Describe the date of the hierarchy, followed by the dates of the
+         * libraries.
          */
-        writer.write(String.format("Portfolio summary for: %s%n%n", name));
         writeDate(writer, date, "hierarchy");
         writeDates(writer);
 
@@ -406,7 +420,29 @@ class ReportWriter extends ElementProcessor {
         result = unbalanceableWriter.writeSummary(portfolio) && result;
 
         // Close the file writer and return the result to our caller.
+        writeTrailer(fileWriter, portfolio);
         fileWriter.close();
         return result;
+    }
+
+    /**
+     * Writes a portfolio-specific trailer to a file writer.
+     *
+     * @param writer    The file writer to receive the header
+     * @param portfolio The portfolio to use
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private void writeTrailer(@NotNull FileWriter writer,
+                              @NotNull Portfolio portfolio)
+            throws IOException {
+
+        // Calculate the total value of the portfolio.
+        final MutableCurrency total = new MutableCurrency();
+        total.add(getBalanceable().getValue(portfolio));
+        total.add(getNotBalanceable().getValue(portfolio));
+
+        // Report the value just calculated.
+        writer.write(String.format("%nTotal portfolio value for %s is: %s.%n",
+                getName(portfolio), total));
     }
 }
