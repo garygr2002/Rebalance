@@ -175,8 +175,17 @@ abstract class Aggregate<KeyType,
      * rebalance, specific to the given category type
      */
     public @NotNull Currency getConsidered(@NotNull CategoryType type) {
-        return CategoryType.ALL.equals(type) || hasCategoryType(type) ?
-                getConsidered() : Currency.getZero();
+
+        /*
+         * Get what zero is. Use zero if the the category type is 'ALL' or if
+         * this aggregate has the given category type. Otherwise use the full
+         * 'considered' value if this aggregate. The full value of the
+         * aggregate may be null, so check for that (and return zero) if it is.
+         */
+        final Currency zero = Currency.getZero();
+        final Currency result = CategoryType.ALL.equals(type) || hasCategoryType(type) ?
+                getConsidered() : zero;
+        return (null == result) ? zero : result;
     }
 
     /**
@@ -188,8 +197,17 @@ abstract class Aggregate<KeyType,
      * rebalance, specific to the given tax type
      */
     public @NotNull Currency getConsidered(@NotNull TaxType type) {
-        return TaxType.ALL.equals(type) || hasTaxType(type) ?
-                getConsidered() : Currency.getZero();
+
+        /*
+         * Get what zero is. Use zero if the the tax type is 'ALL' or if this
+         * aggregate has the given tax type. Otherwise use the full
+         * 'considered' value if this aggregate. The full value of the
+         * aggregate may be null, so check for that (and return zero) if it is.
+         */
+        final Currency zero = Currency.getZero();
+        final Currency result = TaxType.ALL.equals(type) || hasTaxType(type) ?
+                getConsidered() : zero;
+        return (null == result) ? zero : result;
     }
 
     @Override
