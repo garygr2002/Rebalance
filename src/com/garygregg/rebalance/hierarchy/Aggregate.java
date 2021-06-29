@@ -175,17 +175,8 @@ abstract class Aggregate<KeyType,
      * rebalance, specific to the given category type
      */
     public @NotNull Currency getConsidered(@NotNull CategoryType type) {
-
-        /*
-         * Get what zero is. Use zero if the the category type is 'ALL' or if
-         * this aggregate has the given category type. Otherwise use the full
-         * 'considered' value if this aggregate. The full value of the
-         * aggregate may be null, so check for that (and return zero) if it is.
-         */
-        final Currency zero = Currency.getZero();
-        final Currency result = CategoryType.ALL.equals(type) || hasCategoryType(type) ?
-                getConsidered() : zero;
-        return (null == result) ? zero : result;
+        return CategoryType.ALL.equals(type) || hasCategoryType(type) ?
+                getValue(ValueByConsidered.getInstance()) : Currency.getZero();
     }
 
     /**
@@ -197,17 +188,8 @@ abstract class Aggregate<KeyType,
      * rebalance, specific to the given tax type
      */
     public @NotNull Currency getConsidered(@NotNull TaxType type) {
-
-        /*
-         * Get what zero is. Use zero if the the tax type is 'ALL' or if this
-         * aggregate has the given tax type. Otherwise use the full
-         * 'considered' value if this aggregate. The full value of the
-         * aggregate may be null, so check for that (and return zero) if it is.
-         */
-        final Currency zero = Currency.getZero();
-        final Currency result = TaxType.ALL.equals(type) || hasTaxType(type) ?
-                getConsidered() : zero;
-        return (null == result) ? zero : result;
+        return TaxType.ALL.equals(type) || hasTaxType(type) ?
+                getValue(ValueByConsidered.getInstance()) : Currency.getZero();
     }
 
     @Override
@@ -230,7 +212,8 @@ abstract class Aggregate<KeyType,
      */
     public @NotNull Currency getNotConsidered(@NotNull CategoryType type) {
         return CategoryType.ALL.equals(type) || hasCategoryType(type) ?
-                getNotConsidered() : Currency.getZero();
+                getValue(ValueByNotConsidered.getInstance()) :
+                Currency.getZero();
     }
 
     /**
@@ -243,7 +226,8 @@ abstract class Aggregate<KeyType,
      */
     public @NotNull Currency getNotConsidered(@NotNull TaxType type) {
         return TaxType.ALL.equals(type) || hasTaxType(type) ?
-                getNotConsidered() : Currency.getZero();
+                getValue(ValueByNotConsidered.getInstance()) :
+                Currency.getZero();
     }
 
     @Override
@@ -262,7 +246,7 @@ abstract class Aggregate<KeyType,
      */
     public @NotNull Currency getProposed(@NotNull CategoryType type) {
         return CategoryType.ALL.equals(type) || hasCategoryType(type) ?
-                getProposed() : Currency.getZero();
+                getValue(ValueByProposed.getInstance()) : Currency.getZero();
     }
 
     @Override
@@ -281,12 +265,28 @@ abstract class Aggregate<KeyType,
      */
     public @NotNull Currency getProposed(@NotNull TaxType type) {
         return TaxType.ALL.equals(type) || hasTaxType(type) ?
-                getProposed() : Currency.getZero();
+                getValue(ValueByProposed.getInstance()) : Currency.getZero();
     }
 
     @Override
     public @NotNull Currency getProposed(@NotNull WeightType type) {
         return getWeightTypeManager().getProposed(type);
+    }
+
+    /**
+     * Gets the value of this aggregate using a given valuator.
+     *
+     * @param valuator The given valuator
+     * @return The value of this aggregate
+     */
+    private @NotNull Currency getValue(@NotNull Valuator valuator) {
+
+        /*
+         * Get the value of this aggregate. Return zero if the value is null,
+         * otherwise return the value itself.
+         */
+        final Currency currency = valuator.getValue(this);
+        return (null == currency) ? Currency.getZero() : currency;
     }
 
     /**
