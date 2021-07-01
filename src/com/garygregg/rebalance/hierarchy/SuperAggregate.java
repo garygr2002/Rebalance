@@ -30,7 +30,7 @@ abstract class SuperAggregate<KeyType,
              * the child for that category type.
              */
             for (CategoryType type : CategoryType.values()) {
-                getCategoryTypeManager().add(type, child);
+                categoryTypeManager.add(type, child);
             }
         }
     };
