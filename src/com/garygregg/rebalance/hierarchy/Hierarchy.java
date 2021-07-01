@@ -905,7 +905,7 @@ public class Hierarchy {
 
     /**
      * Checks whether two functions that take an aggregate as an argument
-     * return the same currency value, and reports if they do not
+     * return the same currency value, and reports if they do not.
      *
      * @param first     The first function
      * @param second    The second function
