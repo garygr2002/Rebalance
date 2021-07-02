@@ -23,6 +23,15 @@ public abstract class AccountKeyLibrary<ContainerType> extends
         return AccountKey.format(number);
     }
 
+    /**
+     * Gets the default account number.
+     *
+     * @return The default account number
+     */
+    public static @NotNull Long getDefaultAccountNumber() {
+        return defaultAccountNumber;
+    }
+
     @Override
     public boolean areKeyElementsOkay(String... elements) {
 
@@ -37,15 +46,6 @@ public abstract class AccountKeyLibrary<ContainerType> extends
                 (null != (element = AccountKey.parseLong(elements[index--])) &&
                         (!element.equals(getDefaultAccountNumber())) &&
                         super.areKeyElementsOkay(elements[index]));
-    }
-
-    /**
-     * Gets the default account number.
-     *
-     * @return The default account number
-     */
-    private @NotNull Long getDefaultAccountNumber() {
-        return defaultAccountNumber;
     }
 
     @Override
