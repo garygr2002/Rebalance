@@ -27,6 +27,10 @@ class BalanceableWriter {
     // The number of value columns in a table
     private static final int valueColumns = 4;
 
+    // The highest level weight types
+    private static final WeightType[] weightTypes = {WeightType.STOCK,
+            WeightType.BOND, WeightType.CASH, WeightType.REAL_ESTATE};
+
     static {
 
         // Construct the formats.
@@ -102,6 +106,15 @@ class BalanceableWriter {
      */
     private static int getValueColumns() {
         return valueColumns;
+    }
+
+    /**
+     * Gets the highest level weight types.
+     *
+     * @return The highest level weight types
+     */
+    private static @NotNull WeightType[] getWeightTypes() {
+        return weightTypes;
     }
 
     /**
@@ -184,8 +197,7 @@ class BalanceableWriter {
          * Declare and initialize an array of the highest level weight types,
          * and an array index.
          */
-        final WeightType[] types = {WeightType.STOCK, WeightType.BOND,
-                WeightType.CASH, WeightType.REAL_ESTATE};
+        final WeightType[] types = getWeightTypes();
         int i = 0;
 
         /*
