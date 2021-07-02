@@ -14,7 +14,7 @@ interface IBreakdown<EnumType extends Enum<EnumType>,
     void add(EnumType type, @NotNull HierarchyType hierarchyObject);
 
     /**
-     * Clears the breakdown map.
+     * Clears a breakdown map.
      */
     void clear();
 }
