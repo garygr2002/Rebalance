@@ -27,6 +27,24 @@ abstract class Common<KeyType,
     }
 
     /**
+     * Gets the value from currency.
+     *
+     * @param currency The currency from which to get value
+     * @return The value of the currency object, or a default if the currency
+     * object is null
+     */
+    private static double getValue(Currency currency) {
+
+        // Set the currency object to zero if it is null.
+        if (null == currency) {
+            currency = Currency.getZero();
+        }
+
+        // Return the value of the currency object.
+        return currency.getValue();
+    }
+
+    /**
      * Breaks down the hierarchy object valuation by category.
      */
     abstract void breakdown();
@@ -126,5 +144,20 @@ abstract class Common<KeyType,
     @Override
     public String toString() {
         return getKey().toString();
+    }
+
+    /**
+     * Transfers value from a passed queryable to this object.
+     *
+     * @param queryable The queryable from which to obtain value
+     */
+    void transferValue(@NotNull Queryable<?, ?> queryable) {
+
+        /*
+         * Set the considered and not considered values to the same values as
+         * those contained in the passed hierarchy object.
+         */
+        setConsidered(getValue(queryable.getConsidered()));
+        setNotConsidered(getValue(queryable.getNotConsidered()));
     }
 }
