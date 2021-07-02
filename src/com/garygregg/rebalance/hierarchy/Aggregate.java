@@ -68,6 +68,9 @@ abstract class Aggregate<KeyType,
     // A known zero that we will use repeatedly
     private final Currency zero = Currency.getZero();
 
+    // The cached artificial child
+    private ChildType artificialChild;
+
     // A collection of child hierarchy objects
     private Collection<ChildType> collection;
 
@@ -160,10 +163,47 @@ abstract class Aggregate<KeyType,
      */
     protected void doOperation(@NotNull Operation operation) {
 
-        // Cycle for each child, and perform the indicated operation.
-        for (ChildType child : getChildren()) {
-            operation.perform(child);
+        // Get the collection of children. Is the collection empty?
+        final Collection<ChildType> children = getChildren();
+        if (children.isEmpty()) {
+
+            /*
+             * The collection is empty. Get the cached, artificial child,
+             * transfer value from this queryable to the artificial child,
+             * and perform the indicated operation on the artificial child.
+             */
+            final ChildType artificialChild = getArtificialChild();
+            artificialChild.transferValue(this);
+            operation.perform(artificialChild);
         }
+
+        // There are one or more children.
+        else {
+
+            // Cycle for each child, and perform the indicated operation.
+            for (ChildType child : getChildren()) {
+                operation.perform(child);
+            }
+        }
+    }
+
+    /**
+     * Gets an artificial child.
+     *
+     * @return An artificial child
+     */
+    @NotNull ChildType getArtificialChild() {
+
+        /*
+         * Create a new artificial child and cache it if the current artificial
+         * child is null. We only need one, forever.
+         */
+        if (null == artificialChild) {
+            artificialChild = getNewArtificialChild();
+        }
+
+        // Return the cached artificial child.
+        return artificialChild;
     }
 
     @Override
@@ -209,6 +249,13 @@ abstract class Aggregate<KeyType,
     public @NotNull Currency getConsidered(@NotNull WeightType type) {
         return getWeightTypeManager().getConsidered(type);
     }
+
+    /***
+     * Gets a new artificial child; only use this if you want a new artificial
+     * child every time, otherwise use <code>getCachedArtificialChild</code>.
+     * @return A new artificial child
+     */
+    protected abstract @NotNull ChildType getNewArtificialChild();
 
     @Override
     public Currency getNotConsidered() {

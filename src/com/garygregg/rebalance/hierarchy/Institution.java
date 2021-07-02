@@ -18,6 +18,12 @@ public class Institution extends SuperAggregate<
     }
 
     @Override
+    protected @NotNull Account getNewArtificialChild() {
+        return new Account(new AccountKey(Library.getDefaultStringKey(),
+                AccountKeyLibrary.getDefaultAccountNumber()));
+    }
+
+    @Override
     public @NotNull HoldingLineType getLineType() {
         return HoldingLineType.INSTITUTION;
     }

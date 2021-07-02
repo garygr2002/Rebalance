@@ -37,6 +37,11 @@ public class Account extends
         super(key);
     }
 
+    @Override
+    protected @NotNull Ticker getNewArtificialChild() {
+        return new Ticker(Library.getDefaultStringKey());
+    }
+
     /**
      * Gets the category type.
      *
