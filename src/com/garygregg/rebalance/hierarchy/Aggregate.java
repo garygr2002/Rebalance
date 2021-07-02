@@ -18,6 +18,16 @@ abstract class Aggregate<KeyType,
         DescriptionType extends Description<? extends KeyType>>
         extends Common<KeyType, ChildType, DescriptionType> {
 
+    // The 'considered' valuator
+    private final Valuator byConsidered = ValueByConsidered.getInstance();
+
+    // The 'not considered' valuator
+    private final Valuator byNotConsidered =
+            ValueByNotConsidered.getInstance();
+
+    // The 'proposed' valuator
+    private final Valuator byProposed = ValueByProposed.getInstance();
+
     // Breaks down values in each child
     private final Operation doBreakdown = new Operation() {
 
@@ -54,6 +64,9 @@ abstract class Aggregate<KeyType,
             }
         }
     };
+
+    // A known zero that we will use repeatedly
+    private final Currency zero = Currency.getZero();
 
     // A collection of child hierarchy objects
     private Collection<ChildType> collection;
@@ -176,7 +189,7 @@ abstract class Aggregate<KeyType,
      */
     public @NotNull Currency getConsidered(@NotNull CategoryType type) {
         return CategoryType.ALL.equals(type) || hasCategoryType(type) ?
-                getValue(ValueByConsidered.getInstance()) : Currency.getZero();
+                getValue(byConsidered) : zero;
     }
 
     /**
@@ -189,7 +202,7 @@ abstract class Aggregate<KeyType,
      */
     public @NotNull Currency getConsidered(@NotNull TaxType type) {
         return TaxType.ALL.equals(type) || hasTaxType(type) ?
-                getValue(ValueByConsidered.getInstance()) : Currency.getZero();
+                getValue(byConsidered) : zero;
     }
 
     @Override
@@ -212,8 +225,7 @@ abstract class Aggregate<KeyType,
      */
     public @NotNull Currency getNotConsidered(@NotNull CategoryType type) {
         return CategoryType.ALL.equals(type) || hasCategoryType(type) ?
-                getValue(ValueByNotConsidered.getInstance()) :
-                Currency.getZero();
+                getValue(byNotConsidered) : zero;
     }
 
     /**
@@ -226,8 +238,7 @@ abstract class Aggregate<KeyType,
      */
     public @NotNull Currency getNotConsidered(@NotNull TaxType type) {
         return TaxType.ALL.equals(type) || hasTaxType(type) ?
-                getValue(ValueByNotConsidered.getInstance()) :
-                Currency.getZero();
+                getValue(byNotConsidered) : zero;
     }
 
     @Override
@@ -246,7 +257,7 @@ abstract class Aggregate<KeyType,
      */
     public @NotNull Currency getProposed(@NotNull CategoryType type) {
         return CategoryType.ALL.equals(type) || hasCategoryType(type) ?
-                getValue(ValueByProposed.getInstance()) : Currency.getZero();
+                getValue(byProposed) : zero;
     }
 
     @Override
@@ -265,7 +276,7 @@ abstract class Aggregate<KeyType,
      */
     public @NotNull Currency getProposed(@NotNull TaxType type) {
         return TaxType.ALL.equals(type) || hasTaxType(type) ?
-                getValue(ValueByProposed.getInstance()) : Currency.getZero();
+                getValue(byProposed) : zero;
     }
 
     @Override
@@ -286,7 +297,7 @@ abstract class Aggregate<KeyType,
          * otherwise return the value itself.
          */
         final Currency currency = valuator.getValue(this);
-        return (null == currency) ? Currency.getZero() : currency;
+        return (null == currency) ? zero : currency;
     }
 
     /**
