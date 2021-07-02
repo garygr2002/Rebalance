@@ -277,8 +277,28 @@ public class Conductor {
          * TODO:
          *
          * Put in a way to manage preferences, plus other activities unrelated
-         * to generating portfolio reports and rebalancing portfolios. Do this
+         * to generating portfolio reports and re-balancing portfolios. Do this
          * by parsing the command line arguments.
+         *
+         * Ideas:
+         *
+         * rebalance -e PREFERENCE=VALUE
+         *
+         * In this case, PREFERENCE can be 'LoggingLevel' and values can be
+         * SEVERE, WARNING, INFO, CONFIG, FINE, FINER or FINEST.  Or it can
+         * be 'Data', and the value can be a path to the data directory.
+         * Unknown preference strings, or unusable values for any preference
+         * generate an error.
+         *
+         * rebalance -c DESTINATION
+         *
+         * In this case, DESTINATION is the place where the data directory
+         * identified in the 'Data' preference will be copied. Unusable
+         * destinations generate an error.
+         *
+         * Unknown command line arguments generate an error. If no command
+         * line arguments, then the re-balancer completes the re-balance, and
+         * produces expected products.
          */
         workWithPortfolios();
     }
@@ -364,14 +384,11 @@ public class Conductor {
         /*
          * TODO:
          *
-         * 1. Create a report based on 'considered' and 'not considered'
-         * portfolio values.
+         * 1. Rebalance portfolio(s).
          *
-         * 2. Rebalance portfolio(s).
+         * 2. Create a differences file between actual and proposed values.
          *
-         * 3. Create a differences file between actual and proposed values.
-         *
-         * 4. Create a report based on 'proposed' and 'not considered'
+         * 3. Create a report based on 'proposed' and 'not considered'
          * portfolio values.
          */
 
