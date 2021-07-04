@@ -10,6 +10,12 @@ import java.util.Map;
 public class Account extends
         Aggregate<AccountKey, Ticker, AccountDescription> {
 
+    // A factory for producing artificial accounts
+    private static final Factory<Account> factory = Account::getNewArtificial;
+
+    // A lazy boy for an artificial account
+    private static final LazyBoy<Account> lazyBoy = new LazyBoy<>(factory);
+
     // A map of account synthesizers.
     private static final Map<AccountKey, Synthesizer> synthesizerMap =
             new HashMap<>();
@@ -37,9 +43,28 @@ public class Account extends
         super(key);
     }
 
+    /**
+     * Gets an artificial account.
+     *
+     * @return An artificial account
+     */
+    public static @NotNull Account getArtificial() {
+        return lazyBoy.getLazily();
+    }
+
+    /**
+     * Gets a new artificial account.
+     *
+     * @return A new artificial account
+     */
+    private static @NotNull Account getNewArtificial() {
+        return new Account(new AccountKey(Library.getDefaultStringKey(),
+                AccountKeyLibrary.getDefaultAccountNumber()));
+    }
+
     @Override
-    protected @NotNull Ticker getNewArtificialChild() {
-        return new Ticker(Library.getDefaultStringKey());
+    protected @NotNull Ticker getArtificialChild() {
+        return Ticker.getArtificial();
     }
 
     /**

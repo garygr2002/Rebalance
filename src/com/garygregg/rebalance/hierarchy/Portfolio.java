@@ -1,8 +1,6 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.FundType;
-import com.garygregg.rebalance.HoldingLineType;
-import com.garygregg.rebalance.Library;
+import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,8 +31,8 @@ public class Portfolio
     }
 
     @Override
-    protected @NotNull Institution getNewArtificialChild() {
-        return new Institution(Library.getDefaultStringKey());
+    protected @NotNull Institution getArtificialChild() {
+        return Institution.getArtificial();
     }
 
     @Override

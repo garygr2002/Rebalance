@@ -8,6 +8,13 @@ public class Institution extends SuperAggregate<
         Account,
         Description<String>> {
 
+    // A factory for producing artificial institutions
+    private static final Factory<Institution> factory =
+            Institution::getNewArtificial;
+
+    // A lazy boy for an artificial institution
+    private static final LazyBoy<Institution> lazyBoy = new LazyBoy<>(factory);
+
     /**
      * Constructs the institution hierarchy object.
      *
@@ -17,10 +24,27 @@ public class Institution extends SuperAggregate<
         super(mnemonic);
     }
 
+    /**
+     * Gets an artificial institution.
+     *
+     * @return An artificial institution
+     */
+    public static @NotNull Institution getArtificial() {
+        return lazyBoy.getLazily();
+    }
+
+    /**
+     * Gets a new artificial institution.
+     *
+     * @return A new artificial institution
+     */
+    private static @NotNull Institution getNewArtificial() {
+        return new Institution(Library.getDefaultStringKey());
+    }
+
     @Override
-    protected @NotNull Account getNewArtificialChild() {
-        return new Account(new AccountKey(Library.getDefaultStringKey(),
-                AccountKeyLibrary.getDefaultAccountNumber()));
+    protected @NotNull Account getArtificialChild() {
+        return Account.getArtificial();
     }
 
     @Override

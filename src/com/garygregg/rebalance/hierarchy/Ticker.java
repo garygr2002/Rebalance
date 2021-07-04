@@ -14,6 +14,12 @@ import java.util.Map;
 public class Ticker extends
         Common<String, Common<?, ?, ?>, TickerDescription> {
 
+    // A factory for producing artificial tickers
+    private static final Factory<Ticker> factory = Ticker::getNewArtificial;
+
+    // A lazy boy for an artificial ticker
+    private static final LazyBoy<Ticker> lazyBoy = new LazyBoy<>(factory);
+
     // The map of weight type to activities
     private final Map<WeightType, Activity> associationMap = new HashMap<>();
 
@@ -173,6 +179,24 @@ public class Ticker extends
      */
     Ticker(@NotNull String ticker) {
         super(ticker);
+    }
+
+    /**
+     * Gets an artificial ticker.
+     *
+     * @return An artificial ticker
+     */
+    public static @NotNull Ticker getArtificial() {
+        return lazyBoy.getLazily();
+    }
+
+    /**
+     * Gets a new artificial ticker.
+     *
+     * @return A new artificial ticker
+     */
+    private static @NotNull Ticker getNewArtificial() {
+        return new Ticker(Library.getDefaultStringKey());
     }
 
     @Override

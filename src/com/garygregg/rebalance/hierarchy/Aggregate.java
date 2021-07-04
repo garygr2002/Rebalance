@@ -68,9 +68,6 @@ abstract class Aggregate<KeyType,
     // A known zero that we will use repeatedly
     private final Currency zero = Currency.getZero();
 
-    // The cached artificial child
-    private ChildType artificialChild;
-
     // A collection of child hierarchy objects
     private Collection<ChildType> collection;
 
@@ -192,19 +189,7 @@ abstract class Aggregate<KeyType,
      *
      * @return An artificial child
      */
-    @NotNull ChildType getArtificialChild() {
-
-        /*
-         * Create a new artificial child and cache it if the current artificial
-         * child is null. We only need one, forever.
-         */
-        if (null == artificialChild) {
-            artificialChild = getNewArtificialChild();
-        }
-
-        // Return the cached artificial child.
-        return artificialChild;
-    }
+    protected abstract @NotNull ChildType getArtificialChild();
 
     @Override
     public @NotNull Collection<ChildType> getChildren() {
@@ -249,13 +234,6 @@ abstract class Aggregate<KeyType,
     public @NotNull Currency getConsidered(@NotNull WeightType type) {
         return getWeightTypeManager().getConsidered(type);
     }
-
-    /***
-     * Gets a new artificial child; only use this if you want a new artificial
-     * child every time, otherwise use <code>getCachedArtificialChild</code>.
-     * @return A new artificial child
-     */
-    protected abstract @NotNull ChildType getNewArtificialChild();
 
     @Override
     public Currency getNotConsidered() {
