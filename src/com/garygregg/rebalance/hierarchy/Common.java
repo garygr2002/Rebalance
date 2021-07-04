@@ -31,7 +31,7 @@ abstract class Common<KeyType,
      * @return The value of the currency object, or a default if the currency
      * object is null
      */
-    private static double getValue(Currency currency) {
+    protected static double getValue(Currency currency) {
 
         // Set the currency object to zero if it is null.
         if (null == currency) {
@@ -149,11 +149,11 @@ abstract class Common<KeyType,
      *
      * @param queryable The queryable from which to obtain value
      */
-    void transferValue(@NotNull Queryable<?, ?> queryable) {
+    protected void transferValue(@NotNull Queryable<?, ?> queryable) {
 
         /*
-         * Set the considered and not considered values to the same values as
-         * those contained in the passed hierarchy object.
+         * Set the 'considered' and 'not considered' values to the same values
+         * as those contained in the passed queryable.
          */
         setConsidered(getValue(queryable.getConsidered()));
         setNotConsidered(getValue(queryable.getNotConsidered()));

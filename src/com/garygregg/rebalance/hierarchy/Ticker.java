@@ -558,4 +558,19 @@ public class Ticker extends
             getFullValueManager().add(getWeightType(), Ticker.this);
         }
     }
+
+    /**
+     * Transfers value from a passed queryable to this object.
+     *
+     * @param queryable The queryable from which to obtain value
+     */
+    protected void transferValue(@NotNull Queryable<?, ?> queryable) {
+
+        /*
+         * Call the superclass method, then set the proposed value to the same
+         * value as that contained in the passed queryable.
+         */
+        super.transferValue(queryable);
+        setProposed(getValue(queryable.getProposed()));
+    }
 }
