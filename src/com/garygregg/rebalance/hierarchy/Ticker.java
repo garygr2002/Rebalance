@@ -37,6 +37,7 @@ public class Ticker extends
     private final Purse proposed = new Purse();
 
     {
+
         /*
          * This common initialization block builds the association map of
          * weight type to activities.
