@@ -1,7 +1,5 @@
 package com.garygregg.rebalance.cla;
 
-import org.jetbrains.annotations.NotNull;
-
 class Token<T extends Enum<T>> {
 
     // The ID of the token
@@ -16,7 +14,7 @@ class Token<T extends Enum<T>> {
      * @param id    The ID of the token
      * @param value The value of the token
      */
-    public Token(T id, @NotNull String value) {
+    public Token(T id, String value) {
 
         // Set the member variables.
         this.id = id;
@@ -37,7 +35,7 @@ class Token<T extends Enum<T>> {
      *
      * @return The value of the token
      */
-    public @NotNull String getValue() {
+    public String getValue() {
         return value;
     }
 }

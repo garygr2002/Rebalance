@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.cla;
 
+import com.garygregg.rebalance.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -7,11 +8,9 @@ import java.util.logging.Level;
 
 public class CommandLineArguments<TokenType extends Enum<TokenType>> {
 
-    // A map of token types to their matching dispatch actions
-    private final Map<TokenType, Dispatch> dispatchMap;
-
-    // A distinguished token type for ordinary command line tokens
-    private final TokenType distinguished;
+    // A map of token types to a list of matching dispatch actions
+    private final Map<TokenType, List<Dispatch<TokenType>>> dispatchMap =
+            new HashMap<>();
 
     // The name of this class
     private final String name = CommandLineArguments.class.getSimpleName();
@@ -20,11 +19,11 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      * A dispatch action to take when there are no command line options;
      * null for no action
      */
-    private final Dispatch onNone;
+    private final Dispatch<TokenType> onNone;
 
     /*
      * A lookup of string representations to their matching enumerated token
-     * type
+     * types
      */
     private final Map<String, TokenType> optionLookup = new HashMap<>();
 
@@ -34,30 +33,34 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
     /**
      * Constructs the command line arguments parser.
      *
-     * @param dispatchMap   A map of token types to their matching dispatch
-     *                      actions
-     * @param distinguished A distinguished token type for ordinary command
-     *                      line tokens
-     * @param onNone        A dispatch action to take when there are no command line
-     *                      options (null for no action)
+     * @param dispatchList A list of dispatch actions
+     * @param onNone       A dispatch action to take when there are no command line
+     *                     options (null for no action)
      */
-    public CommandLineArguments(@NotNull Map<TokenType, Dispatch> dispatchMap,
-                                @NotNull TokenType distinguished,
-                                Dispatch onNone) {
+    public CommandLineArguments(@NotNull List<Dispatch<TokenType>> dispatchList,
+                                Dispatch<TokenType> onNone) {
 
-        // Set the dispatch map, and cycle for each key in the map.
-        this.dispatchMap = dispatchMap;
-        for (TokenType key : dispatchMap.keySet()) {
+        /*
+         * Declare a variable to hold a token type, and cycle for each dispatch
+         * action in the given dispatch list.
+         */
+        TokenType type;
+        for (Dispatch<TokenType> dispatch : dispatchList) {
 
             /*
-             * Add an option lookup to consist of the string representation of
-             * the first/next key mapped to the key itself.
+             * Add the dispatch action to the list for its type. Add an option
+             * lookup to consist of the lowercase string representation of the
+             * type mapped to the type itself.
              */
-            optionLookup.put(key.toString().toLowerCase(), key);
+            dispatchMap.computeIfAbsent(type = dispatch.getType(),
+                    k -> new ArrayList<>()).add(dispatch);
+            optionLookup.put(type.toString().toLowerCase(), type);
         }
 
-        // Set the remaining member variables.
-        this.distinguished = distinguished;
+        /*
+         * Set the dispatch option to take when there are no command line
+         * options.
+         */
         this.onNone = onNone;
     }
 
@@ -68,63 +71,84 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      */
     public static void main(@NotNull String[] arguments) {
 
-        /*
-         * Declare a message format, and an 'on destination' dispatch
-         * action.
-         */
-        final String format = "Processing %s with argument of '%s'.%n";
-        final Dispatch onDestination =
-                argument -> System.out.printf(format, "destination", argument);
+        // Declare an 'on destination' dispatch action.
+        final Dispatch<TokenId> onDestination = new DispatchTest<>() {
+
+            @Override
+            public @NotNull TokenId getType() {
+                return TokenId.DESTINATION;
+            }
+        };
 
         // Declare an 'on inflation' dispatch action.
-        final Dispatch onInflation =
-                argument -> System.out.printf(format, "inflation", argument);
+        final Dispatch<TokenId> onInflation = new DispatchTest<>() {
+
+            @Override
+            public @NotNull TokenId getType() {
+                return TokenId.INFLATION;
+            }
+        };
 
         // Declare an 'on level' dispatch action.
-        final Dispatch onLevel = argument -> {
+        final Dispatch<TokenId> onLevel = new DispatchTest<>() {
 
-            // Print the entry message. Declare a logging level variable.
-            System.out.printf(format, "level", argument);
-            Level level;
-            try {
+            @Override
+            public void dispatch(String argument) throws CLAException {
 
-                // Try to parse the logging level variable.
-                level = Level.parse(argument.toUpperCase());
-                System.out.printf("Successfully parsed level " +
-                        "type as '%s'.%n", level);
+                super.dispatch(argument);
+                Level level;
+                try {
+
+                    // Try to parse the logging level variable.
+                    level = Level.parse(argument.toUpperCase());
+                    System.out.printf("Successfully parsed level " +
+                            "type as '%s'.%n", level);
+                }
+
+                // Oops. Bad, or null logging level.
+                catch (@NotNull IllegalArgumentException |
+                        @NotNull NullPointerException exception) {
+                    throw new CLAException(exception);
+                }
             }
 
-            // Oops. Bad logging level.
-            catch (IllegalArgumentException exception) {
-                throw new CLAException(exception);
+            @Override
+            public @NotNull TokenId getType() {
+                return TokenId.LEVEL;
             }
         };
 
         // Declare an 'on none' dispatch action.
-        final Dispatch onNone =
-                argument -> System.out.printf(format, "none", argument);
+        final Dispatch<TokenId> onNone = new DispatchTest<>() {
+
+            @Override
+            public @NotNull TokenId getType() {
+                return TokenId.OTHER;
+            }
+        };
 
         // Declare an 'on path' dispatch action.
-        final Dispatch onPath =
-                argument -> System.out.printf(format, "path", argument);
+        final Dispatch<TokenId> onPath = new DispatchTest<>() {
+
+            @Override
+            public @NotNull TokenId getType() {
+                return TokenId.PATH;
+            }
+        };
 
         /*
-         * Declare and initialize a dispatch map for token IDs, then add a
+         * Declare and initialize a dispatch list for token IDs, then add a
          * dispatch action for four types.
          */
-        final Map<TokenId, Dispatch> dispatchMap = new HashMap<>();
-        dispatchMap.put(TokenId.DESTINATION, onDestination);
-        dispatchMap.put(TokenId.INFLATION, onInflation);
-        dispatchMap.put(TokenId.LEVEL, onLevel);
-        dispatchMap.put(TokenId.PATH, onPath);
+        final List<Dispatch<TokenId>> dispatchList = new ArrayList<>();
+        dispatchList.add(onDestination);
+        dispatchList.add(onInflation);
+        dispatchList.add(onLevel);
+        dispatchList.add(onPath);
 
-        /*
-         * Create a command line argument processor using a distinguished type
-         * that has no dispatch action. Use an 'on none' action for this
-         * purpose.
-         */
+        // Create a command line argument processor using the 'on none' action.
         final CommandLineArguments<TokenId> cla =
-                new CommandLineArguments<>(dispatchMap, TokenId.OTHER, onNone);
+                new CommandLineArguments<>(dispatchList, onNone);
         try {
 
             // Process the command line arguments.
@@ -173,8 +197,8 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      *
      * @return The distinguished token type for ordinary command line tokens
      */
-    public @NotNull TokenType getDistinguished() {
-        return distinguished;
+    public TokenType getDistinguished() {
+        return (null == onNone) ? null : onNone.getType();
     }
 
     /**
@@ -215,26 +239,26 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      */
     public void process(@NotNull String[] arguments) throws CLAException {
 
-        // Declare local variables, and initialize them where necessary.
-        int optionsCount = 0;
+        // Declare local variables.
+        String argument;
+        List<Dispatch<TokenType>> dispatchList;
         Token<TokenType> token;
-        Dispatch dispatch;
 
-        /*
-         * Tokenize the arguments, and get an iterator for the tokens. Cycle
-         * while tokens exist.
-         */
+        // Declare and initialize the call list. Tokenize the arguments.
+        final List<Pair<Dispatch<TokenType>, String>> calls =
+                new ArrayList<>();
         final List<Token<TokenType>> tokens = tokenize(arguments);
+
+        // Get an iterator for the tokens. Cycle while tokens exist.
         final Iterator<Token<TokenType>> iterator = tokens.iterator();
         while (iterator.hasNext()) {
 
             /*
-             * Increment the options count, and try to get a dispatch action
-             * for the first/next token. Is there no available action?
+             * Try to get a dispatch action list for the first/next token. Are
+             * there no available actions?
              */
-            ++optionsCount;
-            dispatch = dispatchMap.get((token = iterator.next()).getId());
-            if (null == dispatch) {
+            dispatchList = dispatchMap.get((token = iterator.next()).getId());
+            if (null == dispatchList) {
 
                 /*
                  * There is no available action; this is an unrecognized
@@ -249,18 +273,41 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
                     ((token = iterator.next()).getId()).
                             equals(TokenId.OTHER))) {
 
-                // The option has no argument.
-                throw new CLAException(String.format("%s: Option '%s' " +
-                        "has no argument", name, token.getValue()));
+                // The option has no argument. Give it a default argument.
+                token = new Token<>(getDistinguished(), null);
             }
 
-            // Dispatch the option with its argument.
-            dispatch.dispatch(token.getValue());
+            /*
+             * Get the dispatch action argument from the token. Cycle for each
+             * dispatch action in the current dispatch list.
+             */
+            argument = token.getValue();
+            for (Dispatch<TokenType> dispatch : dispatchList) {
+
+                /*
+                 * Add the dispatch action to the call list along with the
+                 * argument.
+                 */
+                calls.add(new Pair<>(dispatch, argument));
+            }
         }
 
-        // Dispatch the 'on none' action if there were no options.
-        if (!((null == onNone) || (0 < optionsCount))) {
-            onNone.dispatch("");
+        // Dispatch the 'on none' action if there were no options...
+        if ((null != onNone) && (calls.isEmpty())) {
+            calls.add(new Pair<>(onNone, ""));
+        }
+
+        // ...there were options.
+        else {
+
+            // Sort the calls of the options.
+            calls.sort(Comparator.comparing(dispatchStringPair ->
+                    dispatchStringPair.getFirst().getType()));
+        }
+
+        // Call the sorted dispatchers.
+        for (Pair<Dispatch<TokenType>, String> pair : calls) {
+            pair.getFirst().dispatch(pair.getSecond());
         }
     }
 
@@ -389,5 +436,22 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
 
         // Return the token list.
         return tokens;
+    }
+
+    private static abstract class DispatchTest<T extends Enum<T>>
+            implements Dispatch<T> {
+
+        @Override
+        public void dispatch(String argument) throws CLAException {
+
+            /*
+             * Get the type of the dispatch, then output a description of the
+             * undertaken dispatch.
+             */
+            final T type = getType();
+            System.out.printf("Processing %s with argument of '%s'.%n",
+                    (null == type) ? null : getType().toString().toLowerCase(),
+                    argument);
+        }
     }
 }

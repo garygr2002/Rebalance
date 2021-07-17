@@ -1,8 +1,6 @@
 package com.garygregg.rebalance.cla;
 
-import org.jetbrains.annotations.NotNull;
-
-public interface Dispatch {
+public interface Dispatch<T extends Enum<T>> {
 
     /**
      * Dispatches a command line option.
@@ -11,5 +9,11 @@ public interface Dispatch {
      * @throws CLAException Indicates that there is something wrong with the
      *                      command line argument
      */
-    void dispatch(@NotNull String argument) throws CLAException;
+    void dispatch(String argument) throws CLAException;
+
+    /***
+     * Gets the type that this dispatcher is meant to handle.
+     * @return The type that this dispatcher is meant to handle
+     */
+    T getType();
 }

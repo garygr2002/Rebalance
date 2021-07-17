@@ -2,24 +2,29 @@ package com.garygregg.rebalance.cla;
 
 public enum TokenId {
 
-    // Current S&P 500 value (double, 2 decimal precision)
-    CURRENT,
-
-    // Destination for data directory backup (string path)
-    DESTINATION,
-
-    // High S&P 500 value (double, 2 decimal precision)
-    HIGH,
-
-    // The annual expected inflation (double, highest precision)
-    INFLATION,
+    /*
+     * Note: values are ordered according to how they will be acted upon from
+     * the command line.
+     */
 
     // The logging level (valid Level values)
     LEVEL,
 
-    // Presumed to be an option argument (string)
-    OTHER,
+    // The annual expected inflation (double, highest precision)
+    INFLATION,
+
+    // High S&P 500 value (double, 2 decimal precision)
+    HIGH,
+
+    // Current S&P 500 value (double, 2 decimal precision)
+    CURRENT,
 
     // The path for the data directory (string path)
-    PATH
+    PATH,
+
+    // Destination for data directory backup (string path)
+    DESTINATION,
+
+    // Presumed to be an option argument (string)
+    OTHER
 }
