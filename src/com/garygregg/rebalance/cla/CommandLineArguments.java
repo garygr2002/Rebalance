@@ -69,10 +69,32 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      *
      * @param arguments Command line arguments to test
      */
-    public static void main(@NotNull String[] arguments) {
+    private static void doTest(@NotNull String[] arguments) {
+
+        // Declare an 'on current' dispatch action.
+        final Dispatch<TokenId> onCurrent = new FloatingDispatch<>() {
+
+            @Override
+            public void dispatch(@NotNull Double argument) {
+                receive(getType(), argument);
+            }
+
+            @Override
+            public @NotNull TokenId getType() {
+                return TokenId.CURRENT;
+            }
+        };
 
         // Declare an 'on destination' dispatch action.
-        final Dispatch<TokenId> onDestination = new DispatchTest<>() {
+        final Dispatch<TokenId> onDestination = new NonNullDispatch<>() {
+
+            @Override
+            public void dispatch(String argument) throws CLAException {
+
+                // Call the superclass method, and receive the argument.
+                super.dispatch(argument);
+                receive(getType(), argument);
+            }
 
             @Override
             public @NotNull TokenId getType() {
@@ -80,8 +102,27 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
             }
         };
 
+        // Declare an 'on high' dispatch action.
+        final Dispatch<TokenId> onHigh = new FloatingDispatch<>() {
+
+            @Override
+            public void dispatch(@NotNull Double argument) {
+                receive(getType(), argument);
+            }
+
+            @Override
+            public @NotNull TokenId getType() {
+                return TokenId.HIGH;
+            }
+        };
+
         // Declare an 'on inflation' dispatch action.
-        final Dispatch<TokenId> onInflation = new DispatchTest<>() {
+        final Dispatch<TokenId> onInflation = new FloatingDispatch<>() {
+
+            @Override
+            public void dispatch(@NotNull Double argument) {
+                receive(getType(), argument);
+            }
 
             @Override
             public @NotNull TokenId getType() {
@@ -90,26 +131,11 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         };
 
         // Declare an 'on level' dispatch action.
-        final Dispatch<TokenId> onLevel = new DispatchTest<>() {
+        final Dispatch<TokenId> onLevel = new LoggingLevelDispatch<>() {
 
             @Override
-            public void dispatch(String argument) throws CLAException {
-
-                super.dispatch(argument);
-                Level level;
-                try {
-
-                    // Try to parse the logging level variable.
-                    level = Level.parse(argument.toUpperCase());
-                    System.out.printf("Successfully parsed level " +
-                            "type as '%s'.%n", level);
-                }
-
-                // Oops. Bad, or null logging level.
-                catch (@NotNull IllegalArgumentException |
-                        @NotNull NullPointerException exception) {
-                    throw new CLAException(exception);
-                }
+            public void dispatch(@NotNull Level argument) {
+                receive(getType(), argument);
             }
 
             @Override
@@ -119,7 +145,12 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         };
 
         // Declare an 'on none' dispatch action.
-        final Dispatch<TokenId> onNone = new DispatchTest<>() {
+        final Dispatch<TokenId> onNone = new Dispatch<>() {
+
+            @Override
+            public void dispatch(String argument) {
+                receive(getType(), argument);
+            }
 
             @Override
             public @NotNull TokenId getType() {
@@ -128,7 +159,15 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         };
 
         // Declare an 'on path' dispatch action.
-        final Dispatch<TokenId> onPath = new DispatchTest<>() {
+        final Dispatch<TokenId> onPath = new NonNullDispatch<>() {
+
+            @Override
+            public void dispatch(String argument) throws CLAException {
+
+                // Call the superclass method, and receive the argument.
+                super.dispatch(argument);
+                receive(getType(), argument);
+            }
 
             @Override
             public @NotNull TokenId getType() {
@@ -138,11 +177,17 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
 
         /*
          * Declare and initialize a dispatch list for token IDs, then add a
-         * dispatch action for four types.
+         * dispatch action for 'on current' and 'on destination' arguments.
          */
         final List<Dispatch<TokenId>> dispatchList = new ArrayList<>();
+        dispatchList.add(onCurrent);
         dispatchList.add(onDestination);
+
+        // Add dispatch actions for 'on high' and 'on inflation' arguments.
+        dispatchList.add(onHigh);
         dispatchList.add(onInflation);
+
+        // Add dispatch actions for 'on level' and 'on path' arguments.
         dispatchList.add(onLevel);
         dispatchList.add(onPath);
 
@@ -159,6 +204,39 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         catch (CLAException exception) {
             System.err.println(exception.getMessage());
         }
+    }
+
+    /**
+     * Tests the command line arguments parser.
+     *
+     * @param arguments Command line arguments to test
+     */
+    public static void main(@NotNull String[] arguments) {
+
+        // Declare tests.
+        final String[][] tests = {
+                {},
+                {"--p=/my_path"},
+                {"-path", "/my_path"},
+                {"--d=/my_destination", "--p=/my_path", "--c=4327.16",
+                        "--h=4393.68", "--i=1.01", "--l=warning"},
+                {"-l", "bad_level"}
+        };
+
+        // Declare a test counter, and perform the tests.
+        int i = 0;
+        for (String[] test : tests) {
+
+            // Describe the test, perform it, then print a newline.
+            System.out.printf("Performing test %d...%n", i++);
+            doTest(test);
+            System.out.println();
+        }
+
+        // Perform the last test with the command line arguments.
+        System.out.printf("Performing last test, %d, with command line " +
+                "arguments...%n", i);
+        doTest(arguments);
     }
 
     /**
@@ -190,6 +268,12 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
 
         // Return the result.
         return result;
+    }
+
+    private static <T, U> void receive(T type, @NotNull U argument) {
+        System.out.printf("Processing %s with argument of '%s'.%n",
+                (null == type) ? null : type.toString().toLowerCase(),
+                argument);
     }
 
     /**
@@ -239,25 +323,29 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      */
     public void process(@NotNull String[] arguments) throws CLAException {
 
-        // Declare local variables.
+        // Declare argument and dispatch list.
         String argument;
         List<Dispatch<TokenType>> dispatchList;
+
+        // Declare token and token type.
         Token<TokenType> token;
+        TokenType type;
 
         // Declare and initialize the call list. Tokenize the arguments.
         final List<Pair<Dispatch<TokenType>, String>> calls =
                 new ArrayList<>();
         final List<Token<TokenType>> tokens = tokenize(arguments);
 
-        // Get an iterator for the tokens. Cycle while tokens exist.
-        final Iterator<Token<TokenType>> iterator = tokens.iterator();
-        while (iterator.hasNext()) {
+        // Get the size of the token list, and cycle while tokens exist.
+        final int size = tokens.size();
+        for (int i = 0; i < size; ) {
 
             /*
              * Try to get a dispatch action list for the first/next token. Are
              * there no available actions?
              */
-            dispatchList = dispatchMap.get((token = iterator.next()).getId());
+            dispatchList = dispatchMap.get(type = (token =
+                    tokens.get(i++)).getId());
             if (null == dispatchList) {
 
                 /*
@@ -269,12 +357,19 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
             }
 
             // The option exists, but does it have an argument?
-            else if (!(iterator.hasNext() &&
-                    ((token = iterator.next()).getId()).
-                            equals(TokenId.OTHER))) {
+            else if ((i < size &&
+                    ((token = tokens.get(i)).getId()).equals(TokenId.OTHER))) {
 
-                // The option has no argument. Give it a default argument.
-                token = new Token<>(getDistinguished(), null);
+                /*
+                 * The option has an argument. Increment the index to point to
+                 * the next option.
+                 */
+                ++i;
+            }
+
+            // The option has no argument. Give it a default null argument.
+            else {
+                token = new Token<>(type, null);
             }
 
             /*
@@ -390,7 +485,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
              * Split the first/next command line argument around any hyphen.
              * How many hyphens are there?
              */
-            split = string.split("(?<=-)");
+            split = string.trim().split("(?<=-)");
             switch (splitLength = split.length) {
 
                 case 0:
@@ -436,22 +531,5 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
 
         // Return the token list.
         return tokens;
-    }
-
-    private static abstract class DispatchTest<T extends Enum<T>>
-            implements Dispatch<T> {
-
-        @Override
-        public void dispatch(String argument) throws CLAException {
-
-            /*
-             * Get the type of the dispatch, then output a description of the
-             * undertaken dispatch.
-             */
-            final T type = getType();
-            System.out.printf("Processing %s with argument of '%s'.%n",
-                    (null == type) ? null : getType().toString().toLowerCase(),
-                    argument);
-        }
     }
 }
