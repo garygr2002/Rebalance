@@ -2,8 +2,6 @@ package com.garygregg.rebalance.cla;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.logging.Level;
-
 public abstract class FloatingDispatch<T extends Enum<T>>
         extends ParseableDispatch<T, Double> {
 
