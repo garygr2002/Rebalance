@@ -2,8 +2,7 @@ package com.garygregg.rebalance.cla;
 
 import org.jetbrains.annotations.NotNull;
 
-abstract class ParseableDispatch<T extends Enum<T>, U>
-        extends NonNullDispatch<T> {
+abstract class ParseableDispatch<T extends Enum<T>, U> implements Dispatch<T> {
 
     /**
      * Dispatches a command line option.
@@ -12,17 +11,11 @@ abstract class ParseableDispatch<T extends Enum<T>, U>
      * @throws CLAException Indicates that there is something wrong with the
      *                      command line argument
      */
-    public abstract void dispatch(@NotNull U argument) throws CLAException;
+    public abstract void dispatch(U argument) throws CLAException;
 
     @Override
     public void dispatch(String argument) throws CLAException {
-
-        /*
-         * Call the superclass method. Parse the string argument, and dispatch
-         * the non-null result.
-         */
-        super.dispatch(argument);
-        dispatch(parse(argument));
+        dispatch((null == argument) ? null : parse(argument));
     }
 
     /**
