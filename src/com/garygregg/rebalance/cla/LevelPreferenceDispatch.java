@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.cla;
 
+import com.garygregg.rebalance.TokenId;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
