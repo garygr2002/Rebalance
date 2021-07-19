@@ -1,6 +1,6 @@
 package com.garygregg.rebalance;
 
-public enum TokenId {
+public enum PreferenceId {
 
     /*
      * Note: values are ordered according to how they will be acted upon from

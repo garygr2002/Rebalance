@@ -1,7 +1,7 @@
 package com.garygregg.rebalance.cla;
 
 import com.garygregg.rebalance.Pair;
-import com.garygregg.rebalance.TokenId;
+import com.garygregg.rebalance.PreferenceId;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -79,32 +79,32 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
                         CommandLineArguments.class.getName());
 
         // Declare an 'on current' dispatch action.
-        final Dispatch<TokenId> onCurrent =
-                new DoublePreferenceDispatch<>(TokenId.CURRENT, preferences,
+        final Dispatch<PreferenceId> onCurrent =
+                new DoublePreferenceDispatch<>(PreferenceId.CURRENT, preferences,
                         System.out, 0.);
 
         // Declare an 'on destination' dispatch action.
-        final Dispatch<TokenId> onDestination =
-                new PathPreferenceDispatch<>(TokenId.DESTINATION, preferences,
+        final Dispatch<PreferenceId> onDestination =
+                new PathPreferenceDispatch<>(PreferenceId.DESTINATION, preferences,
                         System.out, ".");
 
         // Declare an 'on high' dispatch action.
-        final Dispatch<TokenId> onHigh =
-                new DoublePreferenceDispatch<>(TokenId.HIGH, preferences,
+        final Dispatch<PreferenceId> onHigh =
+                new DoublePreferenceDispatch<>(PreferenceId.HIGH, preferences,
                         System.out, 0.);
 
         // Declare an 'on inflation' dispatch action.
-        final Dispatch<TokenId> onInflation =
-                new DoublePreferenceDispatch<>(TokenId.INFLATION, preferences,
+        final Dispatch<PreferenceId> onInflation =
+                new DoublePreferenceDispatch<>(PreferenceId.INFLATION, preferences,
                         System.out, 1.);
 
         // Declare an 'on level' dispatch action.
-        final Dispatch<TokenId> onLevel =
-                new LevelPreferenceDispatch<>(TokenId.LEVEL, preferences,
+        final Dispatch<PreferenceId> onLevel =
+                new LevelPreferenceDispatch<>(PreferenceId.LEVEL, preferences,
                         System.out, Level.ALL);
 
         // Declare an 'on none' dispatch action.
-        final Dispatch<TokenId> onNone = new Dispatch<>() {
+        final Dispatch<PreferenceId> onNone = new Dispatch<>() {
 
             @Override
             public void dispatch(String argument) {
@@ -112,21 +112,21 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
             }
 
             @Override
-            public @NotNull TokenId getKey() {
-                return TokenId.OTHER;
+            public @NotNull PreferenceId getKey() {
+                return PreferenceId.OTHER;
             }
         };
 
         // Declare an 'on path' dispatch action.
-        final Dispatch<TokenId> onPath =
-                new PathPreferenceDispatch<>(TokenId.PATH, preferences,
+        final Dispatch<PreferenceId> onPath =
+                new PathPreferenceDispatch<>(PreferenceId.PATH, preferences,
                         System.out, ".");
 
         /*
          * Declare and initialize a dispatch list for token IDs, then add a
          * dispatch action for 'on current' and 'on destination' arguments.
          */
-        final List<Dispatch<TokenId>> dispatchList = new ArrayList<>();
+        final List<Dispatch<PreferenceId>> dispatchList = new ArrayList<>();
         dispatchList.add(onCurrent);
         dispatchList.add(onDestination);
 
@@ -139,7 +139,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         dispatchList.add(onPath);
 
         // Create a command line argument processor using the 'on none' action.
-        final CommandLineArguments<TokenId> cla =
+        final CommandLineArguments<PreferenceId> cla =
                 new CommandLineArguments<>(dispatchList, onNone);
         try {
 
@@ -316,7 +316,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
 
             // The option exists, but does it have an argument?
             else if ((i < size &&
-                    ((token = tokens.get(i)).getId()).equals(TokenId.OTHER))) {
+                    ((token = tokens.get(i)).getId()).equals(PreferenceId.OTHER))) {
 
                 /*
                  * The option has an argument. Increment the index to point to
