@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.logging.Level;
+import java.util.prefs.Preferences;
 
 public class CommandLineArguments<TokenType extends Enum<TokenType>> {
 
@@ -52,7 +53,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
              * lookup to consist of the lowercase string representation of the
              * type mapped to the type itself.
              */
-            dispatchMap.computeIfAbsent(type = dispatch.getType(),
+            dispatchMap.computeIfAbsent(type = dispatch.getKey(),
                     k -> new ArrayList<>()).add(dispatch);
             optionLookup.put(type.toString().toLowerCase(), type);
         }
@@ -71,109 +72,54 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      */
     private static void doTest(@NotNull String[] arguments) {
 
+        // Declare and initialize a preferences object for this class.
+        final Preferences preferences =
+                Preferences.userRoot().node(
+                        CommandLineArguments.class.getName());
+
         // Declare an 'on current' dispatch action.
-        final Dispatch<TokenId> onCurrent = new FloatingDispatch<>() {
-
-            @Override
-            public void dispatch(@NotNull Double argument) {
-                receive(getType(), argument);
-            }
-
-            @Override
-            public @NotNull TokenId getType() {
-                return TokenId.CURRENT;
-            }
-        };
+        final Dispatch<TokenId> onCurrent =
+                new DoublePreferenceDispatch<>(TokenId.CURRENT, preferences,
+                        System.out, 0.);
 
         // Declare an 'on destination' dispatch action.
-        final Dispatch<TokenId> onDestination = new NonNullDispatch<>() {
-
-            @Override
-            public void dispatch(String argument) throws CLAException {
-
-                // Call the superclass method, and receive the argument.
-                super.dispatch(argument);
-                receive(getType(), argument);
-            }
-
-            @Override
-            public @NotNull TokenId getType() {
-                return TokenId.DESTINATION;
-            }
-        };
+        final Dispatch<TokenId> onDestination =
+                new PathPreferenceDispatch<>(TokenId.DESTINATION, preferences,
+                        System.out, ".");
 
         // Declare an 'on high' dispatch action.
-        final Dispatch<TokenId> onHigh = new FloatingDispatch<>() {
-
-            @Override
-            public void dispatch(@NotNull Double argument) {
-                receive(getType(), argument);
-            }
-
-            @Override
-            public @NotNull TokenId getType() {
-                return TokenId.HIGH;
-            }
-        };
+        final Dispatch<TokenId> onHigh =
+                new DoublePreferenceDispatch<>(TokenId.HIGH, preferences,
+                        System.out, 0.);
 
         // Declare an 'on inflation' dispatch action.
-        final Dispatch<TokenId> onInflation = new FloatingDispatch<>() {
-
-            @Override
-            public void dispatch(@NotNull Double argument) {
-                receive(getType(), argument);
-            }
-
-            @Override
-            public @NotNull TokenId getType() {
-                return TokenId.INFLATION;
-            }
-        };
+        final Dispatch<TokenId> onInflation =
+                new DoublePreferenceDispatch<>(TokenId.INFLATION, preferences,
+                        System.out, 1.);
 
         // Declare an 'on level' dispatch action.
-        final Dispatch<TokenId> onLevel = new LoggingLevelDispatch<>() {
-
-            @Override
-            public void dispatch(@NotNull Level argument) {
-                receive(getType(), argument);
-            }
-
-            @Override
-            public @NotNull TokenId getType() {
-                return TokenId.LEVEL;
-            }
-        };
+        final Dispatch<TokenId> onLevel =
+                new LevelPreferenceDispatch<>(TokenId.LEVEL, preferences,
+                        System.out, Level.ALL);
 
         // Declare an 'on none' dispatch action.
         final Dispatch<TokenId> onNone = new Dispatch<>() {
 
             @Override
             public void dispatch(String argument) {
-                receive(getType(), argument);
+                receive(getKey(), argument);
             }
 
             @Override
-            public @NotNull TokenId getType() {
+            public @NotNull TokenId getKey() {
                 return TokenId.OTHER;
             }
         };
 
         // Declare an 'on path' dispatch action.
-        final Dispatch<TokenId> onPath = new NonNullDispatch<>() {
-
-            @Override
-            public void dispatch(String argument) throws CLAException {
-
-                // Call the superclass method, and receive the argument.
-                super.dispatch(argument);
-                receive(getType(), argument);
-            }
-
-            @Override
-            public @NotNull TokenId getType() {
-                return TokenId.PATH;
-            }
-        };
+        final Dispatch<TokenId> onPath =
+                new PathPreferenceDispatch<>(TokenId.PATH, preferences,
+                        System.out, ".");
 
         /*
          * Declare and initialize a dispatch list for token IDs, then add a
@@ -216,10 +162,11 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         // Declare tests.
         final String[][] tests = {
                 {},
-                {"--p=/my_path"},
-                {"-path", "/my_path"},
-                {"--d=/my_destination", "--p=/my_path", "--c=4327.16",
-                        "--h=4393.68", "--i=1.01", "--l=warning"},
+                {"--p=/my_path_1", "--p"},
+                {"-path", "/my_path_2", "-p"},
+                {"--d=/my_destination", "--p=/my_path_3", "--c=4327.16",
+                        "--h=4393.68", "--i=1.01", "--l=warning", "-c"},
+                {"--p=/my_p\0ath_4", "--p"},
                 {"-l", "bad_level"}
         };
 
@@ -270,9 +217,19 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         return result;
     }
 
-    private static <T, U> void receive(T type, @NotNull U argument) {
+    /**
+     * Receives an argument associated with a key.
+     *
+     * @param key      The key
+     * @param argument The argument associated with the key
+     * @param <T>      The type of the key
+     * @param <U>      The type of the argument
+     */
+    private static <T, U> void receive(T key, @NotNull U argument) {
+
+        // TODO: Delete this method.
         System.out.printf("Processing %s with argument of '%s'.%n",
-                (null == type) ? null : type.toString().toLowerCase(),
+                (null == key) ? null : key.toString().toLowerCase(),
                 argument);
     }
 
@@ -282,7 +239,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      * @return The distinguished token type for ordinary command line tokens
      */
     public TokenType getDistinguished() {
-        return (null == onNone) ? null : onNone.getType();
+        return (null == onNone) ? null : onNone.getKey();
     }
 
     /**
@@ -397,7 +354,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
 
             // Sort the calls of the options.
             calls.sort(Comparator.comparing(dispatchStringPair ->
-                    dispatchStringPair.getFirst().getType()));
+                    dispatchStringPair.getFirst().getKey()));
         }
 
         // Call the sorted dispatchers.

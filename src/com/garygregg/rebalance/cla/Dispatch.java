@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.cla;
 
-public interface Dispatch<T extends Enum<T>> {
+public interface Dispatch<KeyType extends Enum<KeyType>> {
 
     /**
      * Dispatches a command line option.
@@ -12,8 +12,8 @@ public interface Dispatch<T extends Enum<T>> {
     void dispatch(String argument) throws CLAException;
 
     /***
-     * Gets the type that this dispatcher is meant to handle.
-     * @return The type that this dispatcher is meant to handle
+     * Gets the key that this dispatcher is meant to handle.
+     * @return The key that this dispatcher is meant to handle
      */
-    T getType();
+    KeyType getKey();
 }
