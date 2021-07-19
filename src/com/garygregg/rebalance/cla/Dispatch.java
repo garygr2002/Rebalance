@@ -1,5 +1,7 @@
 package com.garygregg.rebalance.cla;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface Dispatch<KeyType extends Enum<KeyType>> {
 
     /**
@@ -15,5 +17,5 @@ public interface Dispatch<KeyType extends Enum<KeyType>> {
      * Gets the key that this dispatcher is meant to handle.
      * @return The key that this dispatcher is meant to handle
      */
-    KeyType getKey();
+    @NotNull KeyType getKey();
 }

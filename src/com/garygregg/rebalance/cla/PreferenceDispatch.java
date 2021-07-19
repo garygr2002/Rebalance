@@ -80,7 +80,7 @@ public class PreferenceDispatch<KeyType extends Enum<KeyType>>
     }
 
     @Override
-    public KeyType getKey() {
+    public @NotNull KeyType getKey() {
         return key;
     }
 

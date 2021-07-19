@@ -117,9 +117,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
             }
 
             @Override
-            public @NotNull PreferenceId getKey() {
-                return PreferenceId.OTHER;
-            }
+            public @NotNull PreferenceId getKey() { return PreferenceId.OTHER; }
         };
 
         // Declare an 'on path' dispatch action.

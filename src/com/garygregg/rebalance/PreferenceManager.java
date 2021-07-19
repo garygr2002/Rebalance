@@ -16,7 +16,6 @@ public class PreferenceManager {
 
     // A map of integer values to the levels with which they correspond
     private final Map<Integer, Level> levelMap = new HashMap<>();
-
     // A preferences object for this manager
     private final Preferences preferences =
             Preferences.userRoot().node(
@@ -213,6 +212,15 @@ public class PreferenceManager {
     private @NotNull Path getPath(@NotNull PreferenceId id,
                                   @NotNull String defaultValue) {
         return Paths.get(preferences.get(id.name(), defaultValue));
+    }
+
+    /**
+     * Gets the preferences object used by the preference manager.
+     *
+     * @return The preferences object used by the preference manager
+     */
+    public @NotNull Preferences getPreferences() {
+        return preferences;
     }
 
     /**

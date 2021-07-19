@@ -2,6 +2,7 @@ package com.garygregg.rebalance;
 
 import com.garygregg.rebalance.account.AccountLibrary;
 import com.garygregg.rebalance.account.AccountsBuilder;
+import com.garygregg.rebalance.cla.*;
 import com.garygregg.rebalance.code.CodeLibrary;
 import com.garygregg.rebalance.code.CodesBuilder;
 import com.garygregg.rebalance.detailed.DetailedLibrary;
@@ -19,22 +20,31 @@ import com.garygregg.rebalance.ticker.TickersBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.*;
 import java.util.prefs.Preferences;
 
-public class Conductor {
+public class Conductor implements Dispatch<PreferenceId> {
 
     // The format for reporting the date of a library
     private final static String dateMessageFormat =
             "The date of the %s library/libraries is/are: %s.";
 
-    // The preferences for this class
-    private static final Preferences preferences =
-            Preferences.userRoot().node(Conductor.class.getName());
+    // The error stream we will use
+    private static final PrintStream errorStream = System.err;
+
+    // The output stream we will use
+    private static final PrintStream outputStream = System.out;
+
+    // A preference manager instance
+    private static final PreferenceManager preferenceManager =
+            PreferenceManager.getInstance();
 
     // The root logger
     private static final Logger rootLogger = Logger.getLogger("");
@@ -137,7 +147,7 @@ public class Conductor {
         });
 
         // Get the desired logging level, and set it in the handler.
-        final Level level = getLevel();
+        final Level level = preferenceManager.getLevel();
         handler.setLevel(level);
 
         // Get the root logger. Add the handler, and set the logging level.
@@ -175,8 +185,8 @@ public class Conductor {
         catch (@NotNull IOException exception) {
 
             // Print a descriptive error message to system error.
-            System.err.printf("This exception occurred while trying to add " +
-                    "a file handler for logging: '%s'.%n", exception);
+            getErrorStream().printf("This exception occurred while trying to " +
+                    "add a file handler for logging: '%s'.%n", exception);
         }
 
         // Return the result.
@@ -184,77 +194,21 @@ public class Conductor {
     }
 
     /**
-     * Gets the logging level for a given key.
+     * The error stream we will use.
      *
-     * @param key The logging key
-     * @return The logging level for the given key
+     * @return The error stream we will use
      */
-    private static @NotNull String getLevel(@SuppressWarnings("SameParameterValue") @NotNull String key) {
-
-        /*
-         * Declare and initialize the result. Are we reading preferences to
-         * produce the result?
-         */
-        String result = Level.INFO.getName();
-        final boolean readPreference = true;
-        //noinspection ConstantConditions
-        if (readPreference) {
-
-            // We are reading preferences to produce the result. So do it.
-            result = preferences.get(key, result);
-        }
-
-        /*
-         * We are not reading preferences for the result. Instead, write
-         * the hardcoded result as the preference.
-         */
-        else {
-            preferences.put(key, result);
-        }
-
-        // Return the result.
-        return result;
+    private static @NotNull PrintStream getErrorStream() {
+        return errorStream;
     }
 
     /**
-     * Gets the logging level.
+     * Gets the output stream we will use.
      *
-     * @return The logging level
+     * @return The output stream we will use
      */
-    private static Level getLevel() {
-
-        /*
-         * Declare and initialize the result. Declare and initialize the
-         * default value of the logging level, and its key.
-         */
-        Level result = Level.INFO;
-        final String defaultValue = result.getName();
-        final String key = "LoggingLevel";
-
-        // Get the logging level preference.
-        final String value = getLevel(key);
-        try {
-
-            // Try to parse the logging level preference.
-            result = Level.parse(value);
-        }
-
-        // Catch any illegal argument exception.
-        catch (IllegalArgumentException exception) {
-
-            /*
-             * The logging level value is un-parseable. Write the default value
-             * as the new preference, and tell about what happened.
-             */
-            preferences.put(key, defaultValue);
-            System.out.printf("The preference value for the key '%s' " +
-                    "contains the un-parseable logging level '%s'; I am " +
-                    "using the default '%s', and have saved the same for " +
-                    "future use.%n", key, value, defaultValue);
-        }
-
-        // Return the result.
-        return result;
+    private static @NotNull PrintStream getOutputStream() {
+        return outputStream;
     }
 
     /**
@@ -273,34 +227,60 @@ public class Conductor {
      */
     public static void main(@NotNull String[] arguments) {
 
+        // Declare local and initialize local variables.
+        final List<Dispatch<PreferenceId>> dispatchList = new ArrayList<>();
+        final Preferences preferences = preferenceManager.getPreferences();
+        final PrintStream outputStream = getOutputStream();
+
+        // Add a preference dispatch for the S&P 500 current value.
+        dispatchList.add(new DoublePreferenceDispatch<>(PreferenceId.CURRENT,
+                preferences, outputStream,
+                PreferenceManager.getCurrentDefault()));
+
+        // Add a preference dispatch for the data backup path.
+        dispatchList.add(new PathPreferenceDispatch<>(PreferenceId.DESTINATION,
+                preferences, outputStream,
+                PreferenceManager.getDestinationNameDefault()));
+
+        // Add a preference dispatch for the S&P 500 high value.
+        dispatchList.add(new DoublePreferenceDispatch<>(PreferenceId.HIGH,
+                preferences, outputStream,
+                PreferenceManager.getHighDefault()));
+
+        // Add a preference dispatch for the expected annual inflation.
+        dispatchList.add(new DoublePreferenceDispatch<>(PreferenceId.INFLATION,
+                preferences, outputStream,
+                PreferenceManager.getInflationDefault()));
+
+        // Add a preference dispatch for the desired logging level.
+        dispatchList.add(new LevelPreferenceDispatch<>(PreferenceId.LEVEL,
+                preferences, outputStream,
+                PreferenceManager.getLevelDefault()));
+
+        // Add a preference dispatch for the data location path.
+        dispatchList.add(new PathPreferenceDispatch<>(PreferenceId.PATH,
+                preferences, outputStream,
+                PreferenceManager.getPathNameDefault()));
+
         /*
-         * TODO:
-         *
-         * Put in a way to manage preferences, plus other activities unrelated
-         * to generating portfolio reports and re-balancing portfolios. Do this
-         * by parsing the command line arguments.
-         *
-         * Ideas:
-         *
-         * rebalance -e PREFERENCE=VALUE
-         *
-         * In this case, PREFERENCE can be 'LoggingLevel' and values can be
-         * SEVERE, WARNING, INFO, CONFIG, FINE, FINER or FINEST.  Or it can
-         * be 'Data', and the value can be a path to the data directory.
-         * Unknown preference strings, or unusable values for any preference
-         * generate an error.
-         *
-         * rebalance -c DESTINATION
-         *
-         * In this case, DESTINATION is the place where the data directory
-         * identified in the 'Data' preference will be copied. Unusable
-         * destinations generate an error.
-         *
-         * Unknown command line arguments generate an error. If no command
-         * line arguments, then the re-balancer completes the re-balance, and
-         * produces expected products.
+         * Create a command line arguments object with a new instance of the
+         * conductor.
          */
-        workWithPortfolios();
+        final CommandLineArguments<PreferenceId> cla =
+                new CommandLineArguments<>(dispatchList, new Conductor());
+        try {
+
+            // Try to process the command line arguments, if any.
+            cla.process(arguments);
+        }
+
+        /*
+         * Catch any command line exception, and print the exception message
+         * to the error stream.
+         */
+        catch (@NotNull CLAException exception) {
+            getErrorStream().println(exception.getMessage());
+        }
     }
 
     /**
@@ -326,8 +306,8 @@ public class Conductor {
     private static void workWithPortfolios() {
 
         // Configure logging.
-        System.out.println("I am configuring logging (this message will not " +
-                "appear in the log file)...");
+        getOutputStream().println("I am configuring logging (this message " +
+                "will not appear in the log file)...");
         configureLogging();
 
         /*
@@ -391,7 +371,6 @@ public class Conductor {
          * 3. Create a report based on 'proposed' and 'not considered'
          * portfolio values.
          */
-
         conductor.logMessage(Level.INFO, "Congratulations; it seems I " +
                 "have completed my work correctly!");
     }
@@ -445,8 +424,9 @@ public class Conductor {
              * Print a descriptive error message to system error. Clear the
              * return value.
              */
-            System.err.printf("This exception occurred while trying to " +
-                    "build the libraries and hierarchy: '%s'.%n", exception);
+            getErrorStream().printf("This exception occurred while trying " +
+                            "to build the libraries and hierarchy: '%s'.%n",
+                    exception);
             result = false;
         }
 
@@ -482,6 +462,16 @@ public class Conductor {
         return result;
     }
 
+    @Override
+    public void dispatch(String argument) {
+        workWithPortfolios();
+    }
+
+    @Override
+    public @NotNull PreferenceId getKey() {
+        return PreferenceId.OTHER;
+    }
+
     /**
      * Logs a message.
      *
@@ -491,17 +481,13 @@ public class Conductor {
     @SuppressWarnings("SameParameterValue")
     private void logMessage(@NotNull Level level, @NotNull String message) {
 
-        // Set the message to system 'out' if its level is less than severe...
-        if (level.intValue() < Level.SEVERE.intValue()) {
-            System.out.println(message);
-        }
+        // Identify the proper print stream for the message.
+        final PrintStream printStream = (level.intValue() <
+                Level.SEVERE.intValue()) ? getOutputStream() :
+                getErrorStream();
 
-        // ...otherwise send the message to system 'err'.
-        else {
-            System.err.println(message);
-        }
-
-        // Log the message.
+        // Print the message to the print stream, then log the message.
+        printStream.println(message);
         messageLogger.logMessage(level, message);
     }
 
