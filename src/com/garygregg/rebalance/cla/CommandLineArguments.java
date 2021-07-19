@@ -73,7 +73,11 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      */
     private static void doTest(@NotNull String[] arguments) {
 
-        // Declare and initialize a preferences object for this class.
+        /*
+         * TODO : Delete this method.
+         *
+         * Declare and initialize a preferences object for this class.
+         */
         final Preferences preferences =
                 Preferences.userRoot().node(
                         CommandLineArguments.class.getName());
@@ -160,7 +164,11 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      */
     public static void main(@NotNull String[] arguments) {
 
-        // Declare tests.
+        /*
+         * TODO : Delete this method.
+         *
+         * Declare tests.
+         */
         final String[][] tests = {
                 {},
                 {"--p=/my_path_1", "--p"},
