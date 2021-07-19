@@ -16,7 +16,8 @@ import java.util.regex.Pattern;
 public class DateUtilities {
 
     // The data directory
-    private static final File dataDirectory = new File("data");
+    private static final File dataDirectory =
+            PreferenceManager.getInstance().getPath().toFile();
 
     // The template for the parse format
     private static final String formatTemplate = "yyyyMMdd";

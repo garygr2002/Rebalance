@@ -54,7 +54,7 @@ public class PreferenceManager {
      * @return The default destination path for data file backup
      */
     public static @NotNull String getDestinationNameDefault() {
-        return ".";
+        return "backup";
     }
 
     /**
@@ -76,6 +76,15 @@ public class PreferenceManager {
     }
 
     /**
+     * Gets a preference manager instance.
+     *
+     * @return A preference manager instance
+     */
+    public static @NotNull PreferenceManager getInstance() {
+        return instance;
+    }
+
+    /**
      * Gets the default desired logging level.
      *
      * @return The default desired logging level
@@ -90,7 +99,7 @@ public class PreferenceManager {
      * @return The default path for the data files
      */
     public static @NotNull String getPathNameDefault() {
-        return ".";
+        return "data";
     }
 
     /**
@@ -150,15 +159,6 @@ public class PreferenceManager {
      */
     public double getInflation() {
         return getDouble(PreferenceId.INFLATION, getInflationDefault());
-    }
-
-    /**
-     * Gets a preference manager instance.
-     *
-     * @return A preference manager instance
-     */
-    public static @NotNull PreferenceManager getInstance() {
-        return instance;
     }
 
     /**
