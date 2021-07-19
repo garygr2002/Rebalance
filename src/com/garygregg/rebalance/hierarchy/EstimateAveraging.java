@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
-public class HouseSalesCosts extends Synthesizer {
+public class EstimateAverager extends Synthesizer {
 
     // Value by 'considered'
     private final static Valuator byConsidered =
@@ -64,7 +64,7 @@ public class HouseSalesCosts extends Synthesizer {
 
     @Override
     public @NotNull DistinguishedAccounts getAccount() {
-        return DistinguishedAccounts.HOUSE_SALES_COSTS;
+        return DistinguishedAccounts.HOUSE_AVERAGING_ESTIMATE;
     }
 
     @Override
