@@ -22,8 +22,8 @@ public class Account extends
 
     static {
 
-        // Put the house sales cost synthesizer in the map.
-        Synthesizer synthesizer = new HouseSalesCosts();
+        // Put an estimate averaging synthesizer in the map.
+        Synthesizer synthesizer = new EstimateAveraging();
         synthesizerMap.put(synthesizer.getKey(), synthesizer);
 
         // Put a 'my pension' synthesizer in the map.

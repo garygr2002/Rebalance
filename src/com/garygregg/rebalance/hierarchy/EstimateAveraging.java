@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
-public class EstimateAverager extends Synthesizer {
+public class EstimateAveraging extends Synthesizer {
 
     // Value by 'considered'
     private final static Valuator byConsidered =

@@ -14,14 +14,14 @@ public enum DistinguishedAccounts {
     // The Health Savings Account
     HEALTH_SAVINGS_ACCOUNT,
 
+    // House averaging estimate
+    HOUSE_AVERAGING_ESTIMATE,
+
     // The 1st house estimate
     HOUSE_ESTIMATE_1,
 
     // The 2nd house estimate
     HOUSE_ESTIMATE_2,
-
-    // House sales costs
-    HOUSE_SALES_COSTS,
 
     // The large beneficiary IRA
     LARGE_BENEFICIARY,
