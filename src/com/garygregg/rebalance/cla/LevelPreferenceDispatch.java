@@ -1,33 +1,15 @@
 package com.garygregg.rebalance.cla;
 
 import com.garygregg.rebalance.PreferenceId;
+import com.garygregg.rebalance.PreferenceManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.prefs.Preferences;
 
 public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
         extends IntPreferenceDispatch<KeyType> {
-
-    // A map of integer values to the levels with which they correspond
-    private static final Map<Integer, Level> levelMap = new HashMap<>();
-
-    static {
-
-        // Load up the level map.
-        put(Level.ALL);
-        put(Level.CONFIG);
-        put(Level.FINE);
-        put(Level.FINER);
-        put(Level.FINEST);
-        put(Level.INFO);
-        put(Level.OFF);
-        put(Level.SEVERE);
-        put(Level.WARNING);
-    }
 
     /**
      * Constructs the level preferences dispatch.
@@ -52,8 +34,8 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
      * @return The level associated with the given value, or null if there is
      * no such associated level
      */
-    private static Level get(int value) {
-        return levelMap.get(value);
+    private Level get(int value) {
+        return PreferenceManager.getInstance().get(value);
     }
 
     /**
@@ -72,7 +54,7 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
                 new LevelPreferenceDispatch<>(PreferenceId.LEVEL,
                 Preferences.userRoot().node(
                         LevelPreferenceDispatch.class.getName()),
-                System.out, Level.INFO);
+                System.out, PreferenceManager.getLevelDefault());
 
         // Wrap all dispatch calls for exceptions.
         try {
@@ -91,17 +73,6 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
         catch (@NotNull CLAException exception) {
             System.err.println(exception.getMessage());
         }
-    }
-
-    /**
-     * Puts a level in the level map.
-     *
-     * @param level The level to put in the level map
-     * @return Any level previously in the map using the same integer value
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    private static Level put(@NotNull Level level) {
-        return levelMap.put(level.intValue(), level);
     }
 
     @Override

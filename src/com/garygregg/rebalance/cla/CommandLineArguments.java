@@ -2,6 +2,7 @@ package com.garygregg.rebalance.cla;
 
 import com.garygregg.rebalance.Pair;
 import com.garygregg.rebalance.PreferenceId;
+import com.garygregg.rebalance.PreferenceManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -85,27 +86,27 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         // Declare an 'on current' dispatch action.
         final Dispatch<PreferenceId> onCurrent =
                 new DoublePreferenceDispatch<>(PreferenceId.CURRENT, preferences,
-                        System.out, 0.);
+                        System.out, PreferenceManager.getCurrentDefault());
 
         // Declare an 'on destination' dispatch action.
         final Dispatch<PreferenceId> onDestination =
                 new PathPreferenceDispatch<>(PreferenceId.DESTINATION, preferences,
-                        System.out, ".");
+                        System.out, PreferenceManager.getDestinationNameDefault());
 
         // Declare an 'on high' dispatch action.
         final Dispatch<PreferenceId> onHigh =
                 new DoublePreferenceDispatch<>(PreferenceId.HIGH, preferences,
-                        System.out, 0.);
+                        System.out, PreferenceManager.getHighDefault());
 
         // Declare an 'on inflation' dispatch action.
         final Dispatch<PreferenceId> onInflation =
                 new DoublePreferenceDispatch<>(PreferenceId.INFLATION, preferences,
-                        System.out, 1.);
+                        System.out, PreferenceManager.getInflationDefault());
 
         // Declare an 'on level' dispatch action.
         final Dispatch<PreferenceId> onLevel =
                 new LevelPreferenceDispatch<>(PreferenceId.LEVEL, preferences,
-                        System.out, Level.ALL);
+                        System.out, PreferenceManager.getLevelDefault());
 
         // Declare an 'on none' dispatch action.
         final Dispatch<PreferenceId> onNone = new Dispatch<>() {
@@ -124,7 +125,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         // Declare an 'on path' dispatch action.
         final Dispatch<PreferenceId> onPath =
                 new PathPreferenceDispatch<>(PreferenceId.PATH, preferences,
-                        System.out, ".");
+                        System.out, PreferenceManager.getPathNameDefault());
 
         /*
          * Declare and initialize a dispatch list for token IDs, then add a
