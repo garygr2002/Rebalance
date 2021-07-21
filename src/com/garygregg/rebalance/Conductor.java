@@ -57,6 +57,10 @@ public class Conductor implements Dispatch<CommandLineId> {
     private static final MaxLengthAction maxLengthAction =
             new MaxLengthAction();
 
+    // The command line option list
+    private static final List<Pair<String, String>> optionList =
+            buildOptionList();
+
     // The output stream we will use
     private static final PrintStream outputStream = System.out;
 
@@ -178,6 +182,65 @@ public class Conductor implements Dispatch<CommandLineId> {
     }
 
     /**
+     * Builds the command option list.
+     *
+     * @return The command option list
+     */
+    private static @NotNull List<Pair<String, String>> buildOptionList() {
+
+        // Declare automatic variables.
+        String argumentClose;
+        String argumentName;
+        String argumentOpen;
+
+        /*
+         * Declare and initialize well-known strings. Declare and initialize
+         * the return variable. Cycle for each command line ID.
+         */
+        final String closeBracket = "]", empty = "", openBracket = "[";
+        final List<Pair<String, String>> optionList = new ArrayList<>();
+        for (CommandLineId commandLineId : CommandLineId.values()) {
+
+            // Do not add 'other'.
+            if (!CommandLineId.OTHER.equals(commandLineId)) {
+
+                /*
+                 * Get the argument name. Is the option argument
+                 * mandatory?
+                 */
+                argumentName = commandLineId.getArgumentName();
+                if (commandLineId.isArgumentMandatory()) {
+
+                    /*
+                     * The options argument is mandatory. Do not add open and
+                     * close brackets.
+                     */
+                    argumentClose = argumentOpen = empty;
+                }
+
+                // The option argument is not mandatory.
+                else {
+
+                    // Give the option argument open and close brackets.
+                    argumentClose = closeBracket;
+                    argumentOpen = openBracket;
+                }
+
+                // Format the option, and add it to the list.
+                optionList.add(new Pair<>(String.format("-%s%s",
+                        commandLineId.toString().toLowerCase(),
+                        (null == argumentName) ? empty :
+                                String.format(" %s%s%s", argumentOpen,
+                                        argumentName, argumentClose)),
+                        commandLineId.getDescription()));
+            }
+        }
+
+        // Return the list.
+        return optionList;
+    }
+
+    /**
      * Configures logging for conductors.
      *
      * @return True if logging was successfully configures, false otherwise
@@ -221,21 +284,9 @@ public class Conductor implements Dispatch<CommandLineId> {
      */
     private static void displayUsage(@NotNull String programName) {
 
-        // Declare and initialize a list of options and their descriptions.
-        final List<Pair<String, String>> options = List.of(
-                new Pair<>("-level vl", "ALL, CONFIG, FINE, FINER, FINEST, " +
-                        "INFO, OFF, SEVERE or WARNING"),
-                new Pair<>("-inflation fltn", "annual inflation rate"),
-                new Pair<>("-high sph", "S&P 500 high"),
-                new Pair<>("-current spc", "S&P 500 current"),
-                new Pair<>("-p datpth", "data path"),
-                new Pair<>("-d bckpth", "backup path"),
-                new Pair<>("-backup", "perform backup")
-        );
-
         // Build the usage line.
         buildOptionAction.resetBuffer(programName);
-        iterate(options, buildOptionAction);
+        iterate(optionList, buildOptionAction);
 
         // Get the output stream, and output the usage line.
         final PrintStream stream = getOutputStream();
@@ -243,11 +294,11 @@ public class Conductor implements Dispatch<CommandLineId> {
 
         // Calculate the length of the longest option.
         maxLengthAction.zeroMaxLength();
-        iterate(options, maxLengthAction);
+        iterate(optionList, maxLengthAction);
 
         // Describe the options.
         describeOptionAction.setLength(maxLengthAction.getMaxLength());
-        iterate(options, describeOptionAction);
+        iterate(optionList, describeOptionAction);
     }
 
     /**
@@ -348,6 +399,7 @@ public class Conductor implements Dispatch<CommandLineId> {
      * @param action The action to perform on each element in the list
      * @param <T>    The type of elements in the list
      */
+    @SuppressWarnings("SameParameterValue")
     private static <T> void iterate(@NotNull List<T> list,
                                     @NotNull Action<? super T> action) {
 
