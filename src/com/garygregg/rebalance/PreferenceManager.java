@@ -119,7 +119,7 @@ public class PreferenceManager {
      * @return The current value of the S&P 500.
      */
     public double getCurrent() {
-        return getDouble(PreferenceId.CURRENT, getCurrentDefault());
+        return getDouble(CommandLineId.CURRENT, getCurrentDefault());
     }
 
     /**
@@ -128,7 +128,7 @@ public class PreferenceManager {
      * @return The destination path for data file backup
      */
     public @NotNull Path getDestination() {
-        return getPath(PreferenceId.DESTINATION, getDestinationNameDefault());
+        return getPath(CommandLineId.DESTINATION, getDestinationNameDefault());
     }
 
     /**
@@ -139,7 +139,7 @@ public class PreferenceManager {
      *                     preference is not set
      * @return The double value for the given preference ID
      */
-    private double getDouble(@NotNull PreferenceId id, double defaultValue) {
+    private double getDouble(@NotNull CommandLineId id, double defaultValue) {
         return preferences.getDouble(id.name(), defaultValue);
     }
 
@@ -149,7 +149,7 @@ public class PreferenceManager {
      * @return The high value of the S&P 500.
      */
     public double getHigh() {
-        return getDouble(PreferenceId.HIGH, getHighDefault());
+        return getDouble(CommandLineId.HIGH, getHighDefault());
     }
 
     /**
@@ -158,7 +158,7 @@ public class PreferenceManager {
      * @return The expected annual inflation rate
      */
     public double getInflation() {
-        return getDouble(PreferenceId.INFLATION, getInflationDefault());
+        return getDouble(CommandLineId.INFLATION, getInflationDefault());
     }
 
     /**
@@ -170,7 +170,7 @@ public class PreferenceManager {
      * @return The integer value for the given preference ID
      */
     @SuppressWarnings("SameParameterValue")
-    private int getInt(@NotNull PreferenceId id, int defaultValue) {
+    private int getInt(@NotNull CommandLineId id, int defaultValue) {
         return preferences.getInt(id.name(), defaultValue);
     }
 
@@ -188,7 +188,7 @@ public class PreferenceManager {
          * the logging level corresponding to the preference.
          */
         final Level defaultValue = getLevelDefault();
-        final Level result = get(getInt(PreferenceId.LEVEL,
+        final Level result = get(getInt(CommandLineId.LEVEL,
                 defaultValue.intValue()));
         return (null == result) ? defaultValue : result;
     }
@@ -199,7 +199,7 @@ public class PreferenceManager {
      * @return The path for the data files
      */
     public @NotNull Path getPath() {
-        return getPath(PreferenceId.PATH, getPathNameDefault());
+        return getPath(CommandLineId.PATH, getPathNameDefault());
     }
 
     /**
@@ -210,7 +210,7 @@ public class PreferenceManager {
      *                     preference is not set
      * @return The path value for the given preference ID
      */
-    private @NotNull Path getPath(@NotNull PreferenceId id,
+    private @NotNull Path getPath(@NotNull CommandLineId id,
                                   @NotNull String defaultValue) {
         return Paths.get(preferences.get(id.name(), defaultValue));
     }
