@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.cla;
 
+import com.garygregg.rebalance.CommandLineId;
 import com.garygregg.rebalance.PreferenceManager;
 import org.jetbrains.annotations.NotNull;
 

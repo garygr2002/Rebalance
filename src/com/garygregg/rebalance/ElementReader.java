@@ -305,7 +305,7 @@ public abstract class ElementReader extends ElementProcessor {
      *
      * @return The prefix for configuration files of a subclass
      */
-    protected abstract @NotNull String getPrefix();
+    public abstract @NotNull String getPrefix();
 
     /**
      * Processes line elements.

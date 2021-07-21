@@ -106,7 +106,8 @@ public class AccountsBuilder extends ElementReader {
     }
 
     @Override
-    protected @NotNull String getPrefix() {
+    @NotNull
+    public String getPrefix() {
         return "account";
     }
 

@@ -1,4 +1,4 @@
-package com.garygregg.rebalance.cla;
+package com.garygregg.rebalance.conductor;
 
 class Token<T extends Enum<T>> {
 

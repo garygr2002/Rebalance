@@ -1,10 +1,12 @@
-package com.garygregg.rebalance.cla;
+package com.garygregg.rebalance.conductor;
 
+import com.garygregg.rebalance.CommandLineId;
 import com.garygregg.rebalance.Pair;
-import com.garygregg.rebalance.PreferenceManager;
+import com.garygregg.rebalance.cla.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.logging.Level;
 import java.util.prefs.Preferences;
 
 public class CommandLineArguments<TokenType extends Enum<TokenType>> {
@@ -84,27 +86,27 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         // Declare an 'on current' dispatch action.
         final Dispatch<CommandLineId> onCurrent =
                 new DoublePreferenceDispatch<>(CommandLineId.CURRENT, preferences,
-                        System.out, PreferenceManager.getCurrentDefault());
+                        System.out, getCurrentDefault());
 
         // Declare an 'on destination' dispatch action.
         final Dispatch<CommandLineId> onDestination =
                 new PathPreferenceDispatch<>(CommandLineId.DESTINATION, preferences,
-                        System.out, PreferenceManager.getDestinationNameDefault());
+                        System.out, getDestinationNameDefault());
 
         // Declare an 'on high' dispatch action.
         final Dispatch<CommandLineId> onHigh =
                 new DoublePreferenceDispatch<>(CommandLineId.HIGH, preferences,
-                        System.out, PreferenceManager.getHighDefault());
+                        System.out, getHighDefault());
 
         // Declare an 'on inflation' dispatch action.
         final Dispatch<CommandLineId> onInflation =
                 new DoublePreferenceDispatch<>(CommandLineId.INFLATION, preferences,
-                        System.out, PreferenceManager.getInflationDefault());
+                        System.out, getInflationDefault());
 
         // Declare an 'on level' dispatch action.
         final Dispatch<CommandLineId> onLevel =
                 new LevelPreferenceDispatch<>(CommandLineId.LEVEL, preferences,
-                        System.out, PreferenceManager.getLevelDefault());
+                        System.out, getLevelDefault());
 
         // Declare an 'on none' dispatch action.
         final Dispatch<CommandLineId> onNone = new Dispatch<>() {
@@ -115,13 +117,15 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
             }
 
             @Override
-            public @NotNull CommandLineId getKey() { return CommandLineId.OTHER; }
+            public @NotNull CommandLineId getKey() {
+                return CommandLineId.OTHER;
+            }
         };
 
         // Declare an 'on path' dispatch action.
         final Dispatch<CommandLineId> onPath =
                 new PathPreferenceDispatch<>(CommandLineId.PATH, preferences,
-                        System.out, PreferenceManager.getPathNameDefault());
+                        System.out, getPathNameDefault());
 
         /*
          * Declare and initialize a dispatch list for token IDs, then add a
@@ -152,6 +156,60 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         catch (CLAException exception) {
             System.err.println(exception.getMessage());
         }
+    }
+
+    /**
+     * Gets the default current value of the S&P 500.
+     *
+     * @return The default current value of the S&P 500.
+     */
+    public static double getCurrentDefault() {
+        return 0.;
+    }
+
+    /**
+     * Gets the default destination path for data file backup.
+     *
+     * @return The default destination path for data file backup
+     */
+    public static @NotNull String getDestinationNameDefault() {
+        return "backup";
+    }
+
+    /**
+     * Gets the default high value of the S&P 500.
+     *
+     * @return The default high value of the S&P 500.
+     */
+    public static double getHighDefault() {
+        return 0.;
+    }
+
+    /**
+     * Gets the default expected annual inflation rate.
+     *
+     * @return The default expected annual inflation rate
+     */
+    public static double getInflationDefault() {
+        return 0.;
+    }
+
+    /**
+     * Gets the default desired logging level.
+     *
+     * @return The default desired logging level
+     */
+    public static @NotNull Level getLevelDefault() {
+        return Level.INFO;
+    }
+
+    /**
+     * Gets the default path for the data files.
+     *
+     * @return The default path for the data files
+     */
+    public static @NotNull String getPathNameDefault() {
+        return "data";
     }
 
     /**

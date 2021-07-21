@@ -1,6 +1,6 @@
 package com.garygregg.rebalance;
 
-import com.garygregg.rebalance.cla.CommandLineId;
+import com.garygregg.rebalance.conductor.CommandLineArguments;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
@@ -46,7 +46,7 @@ public class PreferenceManager {
      * @return The default current value of the S&P 500.
      */
     public static double getCurrentDefault() {
-        return 0.;
+        return CommandLineArguments.getCurrentDefault();
     }
 
     /**
@@ -55,7 +55,7 @@ public class PreferenceManager {
      * @return The default destination path for data file backup
      */
     public static @NotNull String getDestinationNameDefault() {
-        return "backup";
+        return CommandLineArguments.getDestinationNameDefault();
     }
 
     /**
@@ -64,7 +64,7 @@ public class PreferenceManager {
      * @return The default high value of the S&P 500.
      */
     public static double getHighDefault() {
-        return 0.;
+        return CommandLineArguments.getHighDefault();
     }
 
     /**
@@ -73,7 +73,7 @@ public class PreferenceManager {
      * @return The default expected annual inflation rate
      */
     public static double getInflationDefault() {
-        return 0.;
+        return CommandLineArguments.getInflationDefault();
     }
 
     /**
@@ -91,7 +91,7 @@ public class PreferenceManager {
      * @return The default desired logging level
      */
     public static @NotNull Level getLevelDefault() {
-        return Level.INFO;
+        return CommandLineArguments.getLevelDefault();
     }
 
     /**
@@ -100,7 +100,7 @@ public class PreferenceManager {
      * @return The default path for the data files
      */
     public static @NotNull String getPathNameDefault() {
-        return "data";
+        return CommandLineArguments.getPathNameDefault();
     }
 
     /**
