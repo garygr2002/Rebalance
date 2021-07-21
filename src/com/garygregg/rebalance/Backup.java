@@ -1,6 +1,7 @@
 package com.garygregg.rebalance;
 
 import com.garygregg.rebalance.cla.CLAException;
+import com.garygregg.rebalance.cla.CommandLineId;
 import com.garygregg.rebalance.cla.Dispatch;
 import org.jetbrains.annotations.NotNull;
 
