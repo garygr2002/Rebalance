@@ -1,6 +1,6 @@
 package com.garygregg.rebalance;
 
-public enum PreferenceId {
+public enum CommandLineId {
 
     /*
      * Note: values are ordered according to how they will be acted upon from
@@ -24,6 +24,9 @@ public enum PreferenceId {
 
     // Destination for data directory backup (string path)
     DESTINATION,
+
+    // The backup command
+    BACKUP,
 
     // Presumed to be an option argument (string)
     OTHER
