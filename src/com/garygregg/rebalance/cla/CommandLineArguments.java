@@ -1,12 +1,11 @@
 package com.garygregg.rebalance.cla;
 
 import com.garygregg.rebalance.Pair;
-import com.garygregg.rebalance.PreferenceId;
+import com.garygregg.rebalance.CommandLineId;
 import com.garygregg.rebalance.PreferenceManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.logging.Level;
 import java.util.prefs.Preferences;
 
 public class CommandLineArguments<TokenType extends Enum<TokenType>> {
@@ -84,32 +83,32 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
                         CommandLineArguments.class.getName());
 
         // Declare an 'on current' dispatch action.
-        final Dispatch<PreferenceId> onCurrent =
-                new DoublePreferenceDispatch<>(PreferenceId.CURRENT, preferences,
+        final Dispatch<CommandLineId> onCurrent =
+                new DoublePreferenceDispatch<>(CommandLineId.CURRENT, preferences,
                         System.out, PreferenceManager.getCurrentDefault());
 
         // Declare an 'on destination' dispatch action.
-        final Dispatch<PreferenceId> onDestination =
-                new PathPreferenceDispatch<>(PreferenceId.DESTINATION, preferences,
+        final Dispatch<CommandLineId> onDestination =
+                new PathPreferenceDispatch<>(CommandLineId.DESTINATION, preferences,
                         System.out, PreferenceManager.getDestinationNameDefault());
 
         // Declare an 'on high' dispatch action.
-        final Dispatch<PreferenceId> onHigh =
-                new DoublePreferenceDispatch<>(PreferenceId.HIGH, preferences,
+        final Dispatch<CommandLineId> onHigh =
+                new DoublePreferenceDispatch<>(CommandLineId.HIGH, preferences,
                         System.out, PreferenceManager.getHighDefault());
 
         // Declare an 'on inflation' dispatch action.
-        final Dispatch<PreferenceId> onInflation =
-                new DoublePreferenceDispatch<>(PreferenceId.INFLATION, preferences,
+        final Dispatch<CommandLineId> onInflation =
+                new DoublePreferenceDispatch<>(CommandLineId.INFLATION, preferences,
                         System.out, PreferenceManager.getInflationDefault());
 
         // Declare an 'on level' dispatch action.
-        final Dispatch<PreferenceId> onLevel =
-                new LevelPreferenceDispatch<>(PreferenceId.LEVEL, preferences,
+        final Dispatch<CommandLineId> onLevel =
+                new LevelPreferenceDispatch<>(CommandLineId.LEVEL, preferences,
                         System.out, PreferenceManager.getLevelDefault());
 
         // Declare an 'on none' dispatch action.
-        final Dispatch<PreferenceId> onNone = new Dispatch<>() {
+        final Dispatch<CommandLineId> onNone = new Dispatch<>() {
 
             @Override
             public void dispatch(String argument) {
@@ -117,19 +116,19 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
             }
 
             @Override
-            public @NotNull PreferenceId getKey() { return PreferenceId.OTHER; }
+            public @NotNull CommandLineId getKey() { return CommandLineId.OTHER; }
         };
 
         // Declare an 'on path' dispatch action.
-        final Dispatch<PreferenceId> onPath =
-                new PathPreferenceDispatch<>(PreferenceId.PATH, preferences,
+        final Dispatch<CommandLineId> onPath =
+                new PathPreferenceDispatch<>(CommandLineId.PATH, preferences,
                         System.out, PreferenceManager.getPathNameDefault());
 
         /*
          * Declare and initialize a dispatch list for token IDs, then add a
          * dispatch action for 'on current' and 'on destination' arguments.
          */
-        final List<Dispatch<PreferenceId>> dispatchList = new ArrayList<>();
+        final List<Dispatch<CommandLineId>> dispatchList = new ArrayList<>();
         dispatchList.add(onCurrent);
         dispatchList.add(onDestination);
 
@@ -142,7 +141,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         dispatchList.add(onPath);
 
         // Create a command line argument processor using the 'on none' action.
-        final CommandLineArguments<PreferenceId> cla =
+        final CommandLineArguments<CommandLineId> cla =
                 new CommandLineArguments<>(dispatchList, onNone);
         try {
 
@@ -323,7 +322,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
 
             // The option exists, but does it have an argument?
             else if ((i < size &&
-                    ((token = tokens.get(i)).getId()).equals(PreferenceId.OTHER))) {
+                    ((token = tokens.get(i)).getId()).equals(CommandLineId.OTHER))) {
 
                 /*
                  * The option has an argument. Increment the index to point to
