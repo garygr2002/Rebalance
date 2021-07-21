@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.cla;
 
-import com.garygregg.rebalance.PreferenceId;
+import com.garygregg.rebalance.CommandLineId;
 import com.garygregg.rebalance.PreferenceManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,8 +50,8 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
          *
          * Declare and initialize a level preference dispatch.
          */
-        final LevelPreferenceDispatch<PreferenceId> dispatch =
-                new LevelPreferenceDispatch<>(PreferenceId.LEVEL,
+        final LevelPreferenceDispatch<CommandLineId> dispatch =
+                new LevelPreferenceDispatch<>(CommandLineId.LEVEL,
                 Preferences.userRoot().node(
                         LevelPreferenceDispatch.class.getName()),
                 System.out, PreferenceManager.getLevelDefault());
