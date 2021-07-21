@@ -1,12 +1,13 @@
 package com.garygregg.rebalance.cla;
 
+import com.garygregg.rebalance.Informer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
 import java.util.prefs.Preferences;
 
 public class PreferenceDispatch<KeyType extends Enum<KeyType>>
-        implements Dispatch<KeyType> {
+        extends Informer implements Dispatch<KeyType> {
 
     // The key for this dispatch
     private final KeyType key;
@@ -16,9 +17,6 @@ public class PreferenceDispatch<KeyType extends Enum<KeyType>>
 
     // The preferences object to use
     private final Preferences preferences;
-
-    // The output stream for messages
-    private final PrintStream stream;
 
     /**
      * Constructs the preferences dispatch.
@@ -31,13 +29,13 @@ public class PreferenceDispatch<KeyType extends Enum<KeyType>>
                               @NotNull Preferences preferences,
                               @NotNull PrintStream stream) {
 
-        // Set the key and its name.
+        // Call the superclass method and set the key.
+        super(stream);
         this.key = key;
-        this.keyName = getKey().name();
 
-        // Set the preferences object and output stream.
+        // Set the name of the key, and the preferences object.
+        this.keyName = getKey().name();
         this.preferences = preferences;
-        this.stream = stream;
     }
 
     @Override
@@ -100,15 +98,6 @@ public class PreferenceDispatch<KeyType extends Enum<KeyType>>
      */
     protected Preferences getPreferences() {
         return preferences;
-    }
-
-    /**
-     * Gets the output stream for messages.
-     *
-     * @return The output stream for messages
-     */
-    private PrintStream getStream() {
-        return stream;
     }
 
     /**
