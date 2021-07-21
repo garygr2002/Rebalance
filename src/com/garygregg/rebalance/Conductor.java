@@ -30,14 +30,32 @@ import java.util.List;
 import java.util.logging.*;
 import java.util.prefs.Preferences;
 
-public class Conductor implements Dispatch<PreferenceId> {
+public class Conductor implements Dispatch<CommandLineId> {
+
+    // The action for building command line options
+    private static final BuildOptionAction buildOptionAction =
+            new BuildOptionAction();
 
     // The format for reporting the date of a library
     private final static String dateMessageFormat =
             "The date of the %s library/libraries is/are: %s.";
 
+    // The default name of this program
+    private static final String defaultProgramName = "program.name";
+
+    // The action for describing options
+    private static final DescribeOptionAction describeOptionAction =
+            new DescribeOptionAction();
+
     // The error stream we will use
     private static final PrintStream errorStream = System.err;
+
+    // A conductor instance
+    private static final Conductor instance = new Conductor();
+
+    // The action for determining maximum option description length
+    private static final MaxLengthAction maxLengthAction =
+            new MaxLengthAction();
 
     // The output stream we will use
     private static final PrintStream outputStream = System.out;
@@ -48,6 +66,9 @@ public class Conductor implements Dispatch<PreferenceId> {
 
     // The root logger
     private static final Logger rootLogger = Logger.getLogger("");
+
+    // The canonical name of this class
+    private static String myCanonicalName;
 
     // Produces an account library
     private final Factory account = AccountLibrary::getInstance;
@@ -77,7 +98,7 @@ public class Conductor implements Dispatch<PreferenceId> {
     {
 
         // Assign the logger based on class canonical name.
-        setLogger(Logger.getLogger(Conductor.class.getCanonicalName()));
+        setLogger(Logger.getLogger(getMyCanonicalName()));
     }
 
     /**
@@ -194,12 +215,112 @@ public class Conductor implements Dispatch<PreferenceId> {
     }
 
     /**
+     * Displays a usage line.
+     *
+     * @param programName The name of this program.
+     */
+    private static void displayUsage(@NotNull String programName) {
+
+        // Declare and initialize a list of options and their descriptions.
+        final List<Pair<String, String>> options = List.of(
+                new Pair<>("-level vl", "ALL, CONFIG, FINE, FINER, FINEST, " +
+                        "INFO, OFF, SEVERE or WARNING"),
+                new Pair<>("-inflation fltn", "annual inflation rate"),
+                new Pair<>("-high sph", "S&P 500 high"),
+                new Pair<>("-current spc", "S&P 500 current"),
+                new Pair<>("-p datpth", "data path"),
+                new Pair<>("-d bckpth", "backup path"),
+                new Pair<>("-backup", "perform backup")
+        );
+
+        // Build the usage line.
+        buildOptionAction.resetBuffer(programName);
+        iterate(options, buildOptionAction);
+
+        // Get the output stream, and output the usage line.
+        final PrintStream stream = getOutputStream();
+        stream.println(buildOptionAction.getBuffer());
+
+        // Calculate the length of the longest option.
+        maxLengthAction.zeroMaxLength();
+        iterate(options, maxLengthAction);
+
+        // Describe the options.
+        describeOptionAction.setLength(maxLengthAction.getMaxLength());
+        iterate(options, describeOptionAction);
+    }
+
+    /**
+     * Gets the default program name.
+     *
+     * @return The default program name
+     */
+    private static @NotNull String getDefaultProgramName() {
+
+        /*
+         * Declare a hard-coded default in case the package parsing regular
+         * expression is bad. Get the package elements of this class, and split
+         * it by the name separator character. (Is this character declared
+         * somewhere?)
+         */
+        String result = defaultProgramName;
+        final String[] packageElements = getMyCanonicalName().split("\\.");
+
+        /*
+         * Get the length of package elements. If there is not at least one
+         * element then there is something wrong with the regular expression
+         * used to do the split. Leave it to the user to figure that out when
+         * she receives the default name. Is there more than one package
+         * element?
+         */
+        final int length = packageElements.length;
+        if (0 < length) {
+
+            /*
+             * There is more than one package element. Choose an element
+             * depending on whether there are two or more elements, or there is
+             * only one.
+             */
+            result = (1 < length) ? packageElements[length - 2] :
+                    packageElements[0];
+        }
+
+        // Return the result.
+        return result;
+    }
+
+    /**
      * The error stream we will use.
      *
      * @return The error stream we will use
      */
     private static @NotNull PrintStream getErrorStream() {
         return errorStream;
+    }
+
+    /**
+     * Gets a conductor instance.
+     *
+     * @return A conductor instance
+     */
+    private static Conductor getInstance() {
+        return instance;
+    }
+
+    /**
+     * Gets the canonical name of this class.
+     *
+     * @return The canonical name of this class
+     */
+    public static String getMyCanonicalName() {
+
+        // Set the canonical name if it is null.
+        if (null == myCanonicalName) {
+            myCanonicalName = Conductor.class.getCanonicalName();
+        }
+
+        // Return the canonical name.
+        return myCanonicalName;
     }
 
     /**
@@ -221,6 +342,22 @@ public class Conductor implements Dispatch<PreferenceId> {
     }
 
     /**
+     * Iterates over a list, and performs an action on each element.
+     *
+     * @param list   The list
+     * @param action The action to perform on each element in the list
+     * @param <T>    The type of elements in the list
+     */
+    private static <T> void iterate(@NotNull List<T> list,
+                                    @NotNull Action<? super T> action) {
+
+        // Cycle for each element in the list, and perform the action
+        for (T element : list) {
+            action.perform(element);
+        }
+    }
+
+    /**
      * Conducts the rebalancer.
      *
      * @param arguments Command line arguments.
@@ -228,46 +365,50 @@ public class Conductor implements Dispatch<PreferenceId> {
     public static void main(@NotNull String[] arguments) {
 
         // Declare local and initialize local variables.
-        final List<Dispatch<PreferenceId>> dispatchList = new ArrayList<>();
+        final List<Dispatch<CommandLineId>> dispatchList = new ArrayList<>();
         final Preferences preferences = preferenceManager.getPreferences();
         final PrintStream outputStream = getOutputStream();
 
         // Add a preference dispatch for the S&P 500 current value.
-        dispatchList.add(new DoublePreferenceDispatch<>(PreferenceId.CURRENT,
+        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.CURRENT,
                 preferences, outputStream,
                 PreferenceManager.getCurrentDefault()));
 
         // Add a preference dispatch for the data backup path.
-        dispatchList.add(new PathPreferenceDispatch<>(PreferenceId.DESTINATION,
+        dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.DESTINATION,
                 preferences, outputStream,
                 PreferenceManager.getDestinationNameDefault()));
 
         // Add a preference dispatch for the S&P 500 high value.
-        dispatchList.add(new DoublePreferenceDispatch<>(PreferenceId.HIGH,
+        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.HIGH,
                 preferences, outputStream,
                 PreferenceManager.getHighDefault()));
 
         // Add a preference dispatch for the expected annual inflation.
-        dispatchList.add(new DoublePreferenceDispatch<>(PreferenceId.INFLATION,
+        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.INFLATION,
                 preferences, outputStream,
                 PreferenceManager.getInflationDefault()));
 
         // Add a preference dispatch for the desired logging level.
-        dispatchList.add(new LevelPreferenceDispatch<>(PreferenceId.LEVEL,
+        dispatchList.add(new LevelPreferenceDispatch<>(CommandLineId.LEVEL,
                 preferences, outputStream,
                 PreferenceManager.getLevelDefault()));
 
-        // Add a preference dispatch for the data location path.
-        dispatchList.add(new PathPreferenceDispatch<>(PreferenceId.PATH,
+        /*
+         * Add a preference dispatch for the data location path, and a dispatch
+         * for data backup.
+         */
+        dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.PATH,
                 preferences, outputStream,
                 PreferenceManager.getPathNameDefault()));
+        dispatchList.add(new Backup(outputStream));
 
         /*
-         * Create a command line arguments object with a new instance of the
+         * Create a command line arguments object with an instance of the
          * conductor.
          */
-        final CommandLineArguments<PreferenceId> cla =
-                new CommandLineArguments<>(dispatchList, new Conductor());
+        final CommandLineArguments<CommandLineId> cla =
+                new CommandLineArguments<>(dispatchList, getInstance());
         try {
 
             // Try to process the command line arguments, if any.
@@ -279,7 +420,21 @@ public class Conductor implements Dispatch<PreferenceId> {
          * to the error stream.
          */
         catch (@NotNull CLAException exception) {
+
+            /*
+             * Get the error stream and display the message of the exception.
+             * Get the program name system property.
+             */
             getErrorStream().println(exception.getMessage());
+            final String programName = System.getProperty(defaultProgramName);
+
+            /*
+             * Use the program name system property to display a usage message
+             * if the program name property is not null. Otherwise use a default
+             * program name.
+             */
+            displayUsage((null == programName) ? getDefaultProgramName() :
+                    programName);
         }
     }
 
@@ -311,10 +466,10 @@ public class Conductor implements Dispatch<PreferenceId> {
         configureLogging();
 
         /*
-         * Create a conductor, and build the libraries. Was the build not
+         * Get a conductor instance and build the libraries. Was the build not
          * successful?
          */
-        final Conductor conductor = new Conductor();
+        final Conductor conductor = getInstance();
         conductor.logMessage(Level.INFO, "I am building libraries...");
         if (!conductor.buildLibraries()) {
 
@@ -361,16 +516,7 @@ public class Conductor implements Dispatch<PreferenceId> {
             return;
         }
 
-        /*
-         * TODO:
-         *
-         * 1. Rebalance portfolio(s).
-         *
-         * 2. Create a differences file between actual and proposed values.
-         *
-         * 3. Create a report based on 'proposed' and 'not considered'
-         * portfolio values.
-         */
+        // Log a success message if we get this far.
         conductor.logMessage(Level.INFO, "Congratulations; it seems I " +
                 "have completed my work correctly!");
     }
@@ -468,8 +614,8 @@ public class Conductor implements Dispatch<PreferenceId> {
     }
 
     @Override
-    public @NotNull PreferenceId getKey() {
-        return PreferenceId.OTHER;
+    public @NotNull CommandLineId getKey() {
+        return CommandLineId.OTHER;
     }
 
     /**
@@ -500,6 +646,16 @@ public class Conductor implements Dispatch<PreferenceId> {
         messageLogger.setLogger(logger);
     }
 
+    private interface Action<T> {
+
+        /**
+         * Performs an action on an argument.
+         *
+         * @param argument The argument for the action
+         */
+        void perform(@NotNull T argument);
+    }
+
     private interface Factory {
 
         /**
@@ -508,5 +664,115 @@ public class Conductor implements Dispatch<PreferenceId> {
          * @return A library
          */
         @NotNull Library<?, ?> produce();
+    }
+
+    private static class BuildOptionAction
+            implements Action<Pair<String, String>> {
+
+        // The buffer for formatting the usage line
+        private final StringBuffer buffer = new StringBuffer();
+
+        /**
+         * Gets the formatted usage line.
+         *
+         * @return The formatted usage line
+         */
+        public String getBuffer() {
+            return buffer.toString();
+        }
+
+        @Override
+        public void perform(@NotNull Pair<String, String> argument) {
+            buffer.append(String.format(" [%s]", argument.getFirst()));
+        }
+
+        /**
+         * Resets the buffer.
+         *
+         * @param programName The argument for the program name
+         */
+        public void resetBuffer(@NotNull String programName) {
+            buffer.replace(0, buffer.length(), String.format("usage: %s",
+                    programName));
+        }
+    }
+
+    private static class DescribeOptionAction
+            implements Action<Pair<String, String>> {
+
+        // The prefix of the description
+        private final String prefix;
+
+        // The suffix of the description
+        private final String suffix;
+
+        // The format for displaying option syntax
+        private String optionFormat;
+
+        {
+
+            /*
+             * Initialize the length of the option name field. Declare
+             * what a space is.
+             */
+            setLength(0);
+            final String space = " ";
+
+            /*
+             * Declare and initialize elements of the options description
+             * lines.
+             */
+            prefix = space.repeat(4);
+            suffix = String.format(":%s", space);
+        }
+
+        @Override
+        public void perform(@NotNull Pair<String, String> argument) {
+            getOutputStream().printf((optionFormat) + "%n", prefix,
+                    argument.getFirst(), suffix, argument.getSecond());
+        }
+
+        /**
+         * Sets the length of the option name field.
+         *
+         * @param length The length of the option name field
+         */
+        public void setLength(int length) {
+            optionFormat = String.format("%%s%%%ds%%s%%s", length);
+        }
+    }
+
+    private static class MaxLengthAction
+            implements Action<Pair<String, String>> {
+
+        // The calculated maximum length
+        private int maxLength;
+
+        {
+
+            // Zero the maximum length upon construction.
+            zeroMaxLength();
+        }
+
+        /**
+         * Gets the maximum length.
+         *
+         * @return The maximum length
+         */
+        public int getMaxLength() {
+            return maxLength;
+        }
+
+        @Override
+        public void perform(@NotNull Pair<String, String> argument) {
+            maxLength = Math.max(maxLength, argument.getFirst().length());
+        }
+
+        /**
+         * Zeros the maximum length.
+         */
+        public void zeroMaxLength() {
+            maxLength = 0;
+        }
     }
 }
