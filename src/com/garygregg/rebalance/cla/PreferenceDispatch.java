@@ -53,7 +53,7 @@ public class PreferenceDispatch<KeyType extends Enum<KeyType>>
              */
             if (null == argument) {
                 getStream().printf("The current value for '%s' is set to " +
-                        "'%s'.%n", getKeyName(), get());
+                        "'%s'.%n", getKeyName().toLowerCase(), get());
             }
 
             // ...otherwise set the non-null argument as the new preference.
@@ -104,8 +104,9 @@ public class PreferenceDispatch<KeyType extends Enum<KeyType>>
      * Associates a new non-null preference with the key name.
      *
      * @param value The new non-null preference to associate with the key name
+     * @throws CLAException Indicates that there is something wrong the value
      */
-    protected void put(@NotNull String value) {
+    protected void put(@NotNull String value) throws CLAException {
         getPreferences().put(getKeyName(), value);
     }
 }
