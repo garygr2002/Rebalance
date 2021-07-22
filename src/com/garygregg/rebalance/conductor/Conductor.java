@@ -257,26 +257,17 @@ public class Conductor implements Dispatch<CommandLineId> {
         final PreferenceManager manager = PreferenceManager.getInstance();
         final List<String> missingPreferences = new ArrayList<>();
 
-        // Test current S&P 500 level and destination directory.
-        test(missingPreferences, CommandLineId.CURRENT, manager.getCurrent());
-        test(missingPreferences, CommandLineId.DESTINATION,
-                manager.getDestination());
-
-        // Test high S&P 500 level and expected annual inflation.
-        test(missingPreferences, CommandLineId.HIGH, manager.getHigh());
-        test(missingPreferences, CommandLineId.INFLATION,
-                manager.getInflation());
-
         /*
-         * Test logging level and source directory. Were there missing
-         * preferences?
+         * Currently test only that the source preference has been set.
+         * Other dispatchers or synthesizers can take appropriate action with
+         * unset preferences as the need arises. Was there this one, missing
+         * preference?
          */
-        test(missingPreferences, CommandLineId.LEVEL, manager.getLevel());
         test(missingPreferences, CommandLineId.SOURCE, manager.getSource());
         if (!missingPreferences.isEmpty()) {
 
             /*
-             * Get an iterator for missing preferences. Initialize a string
+             * Get an iterator for missing preference(s). Initialize a string
              * builder with the first missing preference name.
              */
             final Iterator<String> iterator = missingPreferences.iterator();
