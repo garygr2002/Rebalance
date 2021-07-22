@@ -8,34 +8,38 @@ import java.util.prefs.Preferences;
 public class IntPreferenceDispatch<KeyType extends Enum<KeyType>>
         extends FlaggedPreferenceDispatch<KeyType> {
 
-    // The default value to use in case of no current preference
-    private final int defaultValue;
-
     /**
      * Constructs the integer preference dispatch.
      *
-     * @param key          The key for this dispatch
-     * @param preferences  The preferences object to use
-     * @param stream       The output stream for messages
-     * @param flag         The flag; true if negatives are okay, false otherwise
-     * @param defaultValue The default value to use in case of no current
-     *                     preference
+     * @param key         The key for this dispatch
+     * @param preferences The preferences object to use
+     * @param stream      The output stream for messages
+     * @param flag        The flag; true if negatives are okay, false otherwise
      */
     public IntPreferenceDispatch(@NotNull KeyType key,
                                  @NotNull Preferences preferences,
                                  @NotNull PrintStream stream,
-                                 boolean flag,
-                                 int defaultValue) {
-
-        // Call the superclass constructor, and set the default value.
+                                 boolean flag) {
         super(key, preferences, stream, flag);
-        this.defaultValue = defaultValue;
     }
 
     @Override
     protected String get() {
-        return Integer.toString(getPreferences().getInt(getKeyName(),
-                getDefaultValue()));
+
+        /*
+         * Get the default value. Use the default to get the preference based
+         * on the key name.
+         */
+        final int defaultValue = getDefaultValue();
+        final int preference = getPreferences().getInt(getKeyName(),
+                getDefaultValue());
+
+        /*
+         * Return null if the default was returned as a preference, otherwise
+         * return the preference as a string.
+         */
+        return (preference == defaultValue) ? null :
+                Integer.toString(preference);
     }
 
     /**
@@ -44,7 +48,7 @@ public class IntPreferenceDispatch<KeyType extends Enum<KeyType>>
      * @return The default value to use in case of no current preference
      */
     protected int getDefaultValue() {
-        return defaultValue;
+        return Integer.MIN_VALUE;
     }
 
     @Override
@@ -73,7 +77,9 @@ public class IntPreferenceDispatch<KeyType extends Enum<KeyType>>
 
         // The received value cannot be parsed as an integer.
         catch (@NotNull NumberFormatException exception) {
-            throw new CLAException(exception.getMessage());
+            throw new CLAException(String.format("Unable to parse an " +
+                            "integer value for option '%s' - %s.",
+                    getKeyName().toLowerCase(), exception.getMessage()));
         }
 
         // Set the integer value as the preference under the key name.

@@ -39,9 +39,8 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
      */
     public LevelPreferenceDispatch(@NotNull KeyType key,
                                    @NotNull Preferences preferences,
-                                   @NotNull PrintStream stream,
-                                   Level defaultValue) {
-        super(key, preferences, stream, false, defaultValue.intValue());
+                                   @NotNull PrintStream stream) {
+        super(key, preferences, stream, false);
     }
 
     /**
