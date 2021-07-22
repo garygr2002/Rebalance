@@ -2,11 +2,11 @@ package com.garygregg.rebalance.conductor;
 
 import com.garygregg.rebalance.CommandLineId;
 import com.garygregg.rebalance.Pair;
+import com.garygregg.rebalance.PreferenceManager;
 import com.garygregg.rebalance.cla.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.logging.Level;
 import java.util.prefs.Preferences;
 
 public class CommandLineArguments<TokenType extends Enum<TokenType>> {
@@ -86,27 +86,29 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         // Declare an 'on current' dispatch action.
         final Dispatch<CommandLineId> onCurrent =
                 new DoublePreferenceDispatch<>(CommandLineId.CURRENT, preferences,
-                        System.out, getCurrentDefault());
+                        System.out, false,
+                        PreferenceManager.getCurrentDefault());
 
         // Declare an 'on destination' dispatch action.
         final Dispatch<CommandLineId> onDestination =
                 new PathPreferenceDispatch<>(CommandLineId.DESTINATION, preferences,
-                        System.out, getDestinationNameDefault());
+                        System.out);
 
         // Declare an 'on high' dispatch action.
         final Dispatch<CommandLineId> onHigh =
                 new DoublePreferenceDispatch<>(CommandLineId.HIGH, preferences,
-                        System.out, getHighDefault());
+                        System.out, false, PreferenceManager.getHighDefault());
 
         // Declare an 'on inflation' dispatch action.
         final Dispatch<CommandLineId> onInflation =
                 new DoublePreferenceDispatch<>(CommandLineId.INFLATION, preferences,
-                        System.out, getInflationDefault());
+                        System.out, true,
+                        PreferenceManager.getInflationDefault());
 
         // Declare an 'on level' dispatch action.
         final Dispatch<CommandLineId> onLevel =
                 new LevelPreferenceDispatch<>(CommandLineId.LEVEL, preferences,
-                        System.out, getLevelDefault());
+                        System.out, PreferenceManager.getLevelDefault());
 
         // Declare an 'on none' dispatch action.
         final Dispatch<CommandLineId> onNone = new Dispatch<>() {
@@ -125,7 +127,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         // Declare an 'on path' dispatch action.
         final Dispatch<CommandLineId> onPath =
                 new PathPreferenceDispatch<>(CommandLineId.PATH, preferences,
-                        System.out, getPathNameDefault());
+                        System.out);
 
         /*
          * Declare and initialize a dispatch list for token IDs, then add a
@@ -156,60 +158,6 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         catch (CLAException exception) {
             System.err.println(exception.getMessage());
         }
-    }
-
-    /**
-     * Gets the default current value of the S&P 500.
-     *
-     * @return The default current value of the S&P 500.
-     */
-    public static double getCurrentDefault() {
-        return 0.;
-    }
-
-    /**
-     * Gets the default destination path for data file backup.
-     *
-     * @return The default destination path for data file backup
-     */
-    public static @NotNull String getDestinationNameDefault() {
-        return "backup";
-    }
-
-    /**
-     * Gets the default high value of the S&P 500.
-     *
-     * @return The default high value of the S&P 500.
-     */
-    public static double getHighDefault() {
-        return 0.;
-    }
-
-    /**
-     * Gets the default expected annual inflation rate.
-     *
-     * @return The default expected annual inflation rate
-     */
-    public static double getInflationDefault() {
-        return 0.;
-    }
-
-    /**
-     * Gets the default desired logging level.
-     *
-     * @return The default desired logging level
-     */
-    public static @NotNull Level getLevelDefault() {
-        return Level.INFO;
-    }
-
-    /**
-     * Gets the default path for the data files.
-     *
-     * @return The default path for the data files
-     */
-    public static @NotNull String getPathNameDefault() {
-        return "data";
     }
 
     /**
@@ -437,11 +385,31 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
                                  @NotNull String argument) {
 
         /*
-         * Lookup the option ID for the argument. Add a new token with the ID
-         * and the argument.
+         * First assume the argument is a numeric value that had been negative,
+         * and that its preceding hyphen had been misinterpreted as an option
+         * flag.
          */
-        final TokenType id = optionLookup.get(match(argument.toLowerCase()));
-        tokens.add(new Token<>(id, argument));
+        try {
+
+            /*
+             * Try to parse the argument as a double. If that works, add a
+             * token with the distinguished token ID and an argument with the
+             * minus sign put back in.
+             */
+            Double.parseDouble(argument);
+            tokens.add(new Token<>(getDistinguished(), "-" + argument));
+        }
+
+        // The argument could not be parsed as a double.
+        catch (@NotNull NumberFormatException exception) {
+
+            /*
+             * Lookup the option ID for the argument. Add a new token with the ID
+             * and the argument.
+             */
+            final TokenType id = optionLookup.get(match(argument.toLowerCase()));
+            tokens.add(new Token<>(id, argument));
+        }
     }
 
     /**
@@ -502,11 +470,8 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         final List<Token<TokenType>> tokens = new ArrayList<>();
         for (String string : arguments) {
 
-            /*
-             * Split the first/next command line argument around any hyphen.
-             * How many hyphens are there?
-             */
-            split = string.trim().split("(?<=-)");
+            // Identify how many hyphens precede the command.
+            split = string.trim().split("^-|(?<=^-)-");
             switch (splitLength = split.length) {
 
                 case 0:
