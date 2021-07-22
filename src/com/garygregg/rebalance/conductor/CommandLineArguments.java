@@ -2,7 +2,6 @@ package com.garygregg.rebalance.conductor;
 
 import com.garygregg.rebalance.CommandLineId;
 import com.garygregg.rebalance.Pair;
-import com.garygregg.rebalance.PreferenceManager;
 import com.garygregg.rebalance.cla.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -86,8 +85,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         // Declare an 'on current' dispatch action.
         final Dispatch<CommandLineId> onCurrent =
                 new DoublePreferenceDispatch<>(CommandLineId.CURRENT, preferences,
-                        System.out, false,
-                        PreferenceManager.getCurrentDefault());
+                        System.out, false);
 
         // Declare an 'on destination' dispatch action.
         final Dispatch<CommandLineId> onDestination =
@@ -97,18 +95,17 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         // Declare an 'on high' dispatch action.
         final Dispatch<CommandLineId> onHigh =
                 new DoublePreferenceDispatch<>(CommandLineId.HIGH, preferences,
-                        System.out, false, PreferenceManager.getHighDefault());
+                        System.out, false);
 
         // Declare an 'on inflation' dispatch action.
         final Dispatch<CommandLineId> onInflation =
                 new DoublePreferenceDispatch<>(CommandLineId.INFLATION, preferences,
-                        System.out, true,
-                        PreferenceManager.getInflationDefault());
+                        System.out, true);
 
         // Declare an 'on level' dispatch action.
         final Dispatch<CommandLineId> onLevel =
                 new LevelPreferenceDispatch<>(CommandLineId.LEVEL, preferences,
-                        System.out, PreferenceManager.getLevelDefault());
+                        System.out);
 
         // Declare an 'on none' dispatch action.
         final Dispatch<CommandLineId> onNone = new Dispatch<>() {
