@@ -1,12 +1,10 @@
 package com.garygregg.rebalance;
 
-import com.garygregg.rebalance.conductor.CommandLineArguments;
+import com.garygregg.rebalance.cla.LevelPreferenceDispatch;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.prefs.Preferences;
 
@@ -15,30 +13,10 @@ public class PreferenceManager {
     // A single instance of the preference manager
     private static final PreferenceManager instance = new PreferenceManager();
 
-    // A map of integer values to the levels with which they correspond
-    private final Map<Integer, Level> levelMap = new HashMap<>();
-
     // A preferences object for this manager
     private final Preferences preferences =
             Preferences.userRoot().node(
                     PreferenceManager.class.getName());
-
-    /**
-     * Constructs a preference manager instance.
-     */
-    private PreferenceManager() {
-
-        // Load up the level map.
-        put(Level.ALL);
-        put(Level.CONFIG);
-        put(Level.FINE);
-        put(Level.FINER);
-        put(Level.FINEST);
-        put(Level.INFO);
-        put(Level.OFF);
-        put(Level.SEVERE);
-        put(Level.WARNING);
-    }
 
     /**
      * Gets the default current value of the S&P 500.
@@ -46,7 +24,7 @@ public class PreferenceManager {
      * @return The default current value of the S&P 500.
      */
     public static double getCurrentDefault() {
-        return CommandLineArguments.getCurrentDefault();
+        return 0.;
     }
 
     /**
@@ -55,7 +33,7 @@ public class PreferenceManager {
      * @return The default destination path for data file backup
      */
     public static @NotNull String getDestinationNameDefault() {
-        return CommandLineArguments.getDestinationNameDefault();
+        return "backup";
     }
 
     /**
@@ -64,7 +42,7 @@ public class PreferenceManager {
      * @return The default high value of the S&P 500.
      */
     public static double getHighDefault() {
-        return CommandLineArguments.getHighDefault();
+        return 0.;
     }
 
     /**
@@ -73,7 +51,7 @@ public class PreferenceManager {
      * @return The default expected annual inflation rate
      */
     public static double getInflationDefault() {
-        return CommandLineArguments.getInflationDefault();
+        return 0.;
     }
 
     /**
@@ -91,7 +69,7 @@ public class PreferenceManager {
      * @return The default desired logging level
      */
     public static @NotNull Level getLevelDefault() {
-        return CommandLineArguments.getLevelDefault();
+        return Level.INFO;
     }
 
     /**
@@ -100,7 +78,7 @@ public class PreferenceManager {
      * @return The default path for the data files
      */
     public static @NotNull String getPathNameDefault() {
-        return CommandLineArguments.getPathNameDefault();
+        return "data";
     }
 
     /**
@@ -111,7 +89,7 @@ public class PreferenceManager {
      * no such associated level
      */
     public Level get(int value) {
-        return levelMap.get(value);
+        return LevelPreferenceDispatch.getLevel(value);
     }
 
     /**
@@ -223,16 +201,5 @@ public class PreferenceManager {
      */
     public @NotNull Preferences getPreferences() {
         return preferences;
-    }
-
-    /**
-     * Puts a level in the level map.
-     *
-     * @param level The level to put in the level map
-     * @return Any level previously in the map using the same integer value
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    private Level put(@NotNull Level level) {
-        return levelMap.put(level.intValue(), level);
     }
 }
