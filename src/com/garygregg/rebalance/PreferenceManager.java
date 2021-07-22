@@ -132,8 +132,16 @@ public class PreferenceManager {
      *
      * @return The desired logging level
      */
-    public Level getLevel() {
-        return LevelPreferenceDispatch.getLevel(getInt(CommandLineId.LEVEL));
+    public @NotNull Level getLevel() {
+
+        /*
+         * Do not let the returned level be null. If the currently set
+         * preference is not representable as a level, then return a non-null
+         * default.
+         */
+        final Level level = LevelPreferenceDispatch.getLevel(
+                getInt(CommandLineId.LEVEL));
+        return (null == level) ? Level.ALL : level;
     }
 
     /**
