@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.*;
 import java.util.prefs.Preferences;
@@ -242,6 +243,62 @@ public class Conductor implements Dispatch<CommandLineId> {
     }
 
     /**
+     * Checks that all required preferences have been set.
+     *
+     * @throws CLAException Indicates that one or more required preferences
+     *                      have not yet been set
+     */
+    private static void checkPreferences() throws CLAException {
+
+        /*
+         * Get a preference manager instance. Create a list of missing
+         * preference names.
+         */
+        final PreferenceManager manager = PreferenceManager.getInstance();
+        final List<String> missingPreferences = new ArrayList<>();
+
+        // Test current S&P 500 level and backup directory.
+        test(missingPreferences, CommandLineId.CURRENT, manager.getCurrent());
+        test(missingPreferences, CommandLineId.DESTINATION,
+                manager.getDestination());
+
+        // Test high S&P 500 level and expected annual inflation.
+        test(missingPreferences, CommandLineId.HIGH, manager.getHigh());
+        test(missingPreferences, CommandLineId.INFLATION,
+                manager.getInflation());
+
+        /*
+         * Test logging level and data directory. Were there missing
+         * preferences?
+         */
+        test(missingPreferences, CommandLineId.LEVEL, manager.getLevel());
+        test(missingPreferences, CommandLineId.PATH, manager.getPath());
+        if (!missingPreferences.isEmpty()) {
+
+            /*
+             * Get an iterator for missing preferences. Initialize a string
+             * builder with the first missing preference name.
+             */
+            final Iterator<String> iterator = missingPreferences.iterator();
+            final StringBuilder buffer = new StringBuilder(
+                    String.format("The following required preferences have " +
+                            "not yet been set: %s", iterator.next()));
+
+            // Append missing preference names while they exist.
+            while (iterator.hasNext()) {
+                buffer.append(String.format(", %s", iterator.next()));
+            }
+
+            /*
+             * Append a period to the message, and throw a new CLA exception
+             * with the names of the missing preferences.
+             */
+            buffer.append(".");
+            throw new CLAException(buffer.toString());
+        }
+    }
+
+    /**
      * Configures logging for conductors.
      *
      * @return True if logging was successfully configures, false otherwise
@@ -425,8 +482,7 @@ public class Conductor implements Dispatch<CommandLineId> {
         // Add a dispatch for the S&P 500 current value.
         dispatchList.add(new Backup(outputStream));
         dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.CURRENT,
-                preferences, outputStream, false,
-                PreferenceManager.getCurrentDefault()));
+                preferences, outputStream, false));
 
         // Add a preference dispatch for the data backup path.
         dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.DESTINATION,
@@ -434,18 +490,15 @@ public class Conductor implements Dispatch<CommandLineId> {
 
         // Add a preference dispatch for the S&P 500 high value.
         dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.HIGH,
-                preferences, outputStream, false,
-                PreferenceManager.getHighDefault()));
+                preferences, outputStream, false));
 
         // Add a preference dispatch for the expected annual inflation.
         dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.INFLATION,
-                preferences, outputStream, true,
-                PreferenceManager.getInflationDefault()));
+                preferences, outputStream, true));
 
         // Add a preference dispatch for the desired logging level.
         dispatchList.add(new LevelPreferenceDispatch<>(CommandLineId.LEVEL,
-                preferences, outputStream,
-                PreferenceManager.getLevelDefault()));
+                preferences, outputStream));
 
         // Add dispatches for backup and reset.
         dispatchList.add(new Backup(outputStream));
@@ -506,6 +559,26 @@ public class Conductor implements Dispatch<CommandLineId> {
             if (handler instanceof ConsoleHandler) {
                 root.removeHandler(handler);
             }
+        }
+    }
+
+    /**
+     * Tests a preference against null.
+     *
+     * @param missingPreferences A list of missing preferences
+     * @param commandLineId      A command line ID corresponding to the preference
+     * @param preference         The preference object
+     */
+    private static void test(@NotNull List<String> missingPreferences,
+                             @NotNull CommandLineId commandLineId,
+                             Object preference) {
+
+        /*
+         * Add the name of the command line ID to the list of missing
+         * preferences if the preference object is null.
+         */
+        if (null == preference) {
+            missingPreferences.add(commandLineId.name().toLowerCase());
         }
     }
 
@@ -663,7 +736,13 @@ public class Conductor implements Dispatch<CommandLineId> {
     }
 
     @Override
-    public void dispatch(String argument) {
+    public void dispatch(String argument) throws CLAException {
+
+        /*
+         * Check that all required preferences have been set before working
+         * with portfolios.
+         */
+        checkPreferences();
         workWithPortfolios();
     }
 
