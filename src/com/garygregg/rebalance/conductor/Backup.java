@@ -21,7 +21,7 @@ class Backup extends Informer implements Dispatch<CommandLineId> {
 
     @Override
     public void dispatch(String argument) throws CLAException {
-        getStream().printf("Backup command received with argument of '%s'.",
+        getStream().printf("Backup command received with argument of '%s'.%n",
                 argument);
     }
 
