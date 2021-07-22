@@ -19,39 +19,30 @@ public class PreferenceManager {
                     PreferenceManager.class.getName());
 
     /**
-     * Gets the default current value of the S&P 500.
+     * Gets the default double.
      *
-     * @return The default current value of the S&P 500.
+     * @return The default double
      */
-    public static double getCurrentDefault() {
-        return 0.;
+    private static double getDefaultDouble() {
+        return Double.MIN_VALUE;
     }
 
     /**
-     * Gets the default destination path for data file backup.
+     * Gets the default integer.
      *
-     * @return The default destination path for data file backup
+     * @return The default integer
      */
-    public static @NotNull String getDestinationNameDefault() {
-        return "backup";
+    private static int getDefaultInt() {
+        return Integer.MIN_VALUE;
     }
 
     /**
-     * Gets the default high value of the S&P 500.
+     * Gets the default path name.
      *
-     * @return The default high value of the S&P 500.
+     * @return The default path name
      */
-    public static double getHighDefault() {
-        return 0.;
-    }
-
-    /**
-     * Gets the default expected annual inflation rate.
-     *
-     * @return The default expected annual inflation rate
-     */
-    public static double getInflationDefault() {
-        return 0.;
+    private static String getDefaultPathName() {
+        return "";
     }
 
     /**
@@ -64,41 +55,12 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the default desired logging level.
-     *
-     * @return The default desired logging level
-     */
-    public static @NotNull Level getLevelDefault() {
-        return Level.INFO;
-    }
-
-    /**
-     * Gets the default path for the data files.
-     *
-     * @return The default path for the data files
-     */
-    public static @NotNull String getPathNameDefault() {
-        return "data";
-    }
-
-    /**
-     * Gets the level associated with a value.
-     *
-     * @param value The level associated with the given value
-     * @return The level associated with the given value, or null if there is
-     * no such associated level
-     */
-    public Level get(int value) {
-        return LevelPreferenceDispatch.getLevel(value);
-    }
-
-    /**
      * Gets the current value of the S&P 500.
      *
-     * @return The current value of the S&P 500.
+     * @return The current value of the S&P 500
      */
-    public double getCurrent() {
-        return getDouble(CommandLineId.CURRENT, getCurrentDefault());
+    public Double getCurrent() {
+        return getDouble(CommandLineId.CURRENT);
     }
 
     /**
@@ -106,29 +68,35 @@ public class PreferenceManager {
      *
      * @return The destination path for data file backup
      */
-    public @NotNull Path getDestination() {
-        return getPath(CommandLineId.DESTINATION, getDestinationNameDefault());
+    public Path getDestination() {
+        return getPath(CommandLineId.DESTINATION);
     }
 
     /**
      * Gets a double value for a preference ID.
      *
-     * @param id           The ID for which to get a double preference
-     * @param defaultValue The default value to use in the event the
-     *                     preference is not set
+     * @param id The ID for which to get a double preference
      * @return The double value for the given preference ID
      */
-    private double getDouble(@NotNull CommandLineId id, double defaultValue) {
-        return preferences.getDouble(id.name(), defaultValue);
+    private Double getDouble(@NotNull CommandLineId id) {
+
+        /*
+         * Get the default double. Get a preference for name of the command
+         * line ID using the default. Return null if the default was returned,
+         * otherwise return the result.
+         */
+        final double defaultDouble = getDefaultDouble();
+        final double result = preferences.getDouble(id.name(), defaultDouble);
+        return (0 == Double.compare(result, defaultDouble)) ? null : result;
     }
 
     /**
      * Gets the high value of the S&P 500.
      *
-     * @return The high value of the S&P 500.
+     * @return The high value of the S&P 500
      */
-    public double getHigh() {
-        return getDouble(CommandLineId.HIGH, getHighDefault());
+    public Double getHigh() {
+        return getDouble(CommandLineId.HIGH);
     }
 
     /**
@@ -136,21 +104,27 @@ public class PreferenceManager {
      *
      * @return The expected annual inflation rate
      */
-    public double getInflation() {
-        return getDouble(CommandLineId.INFLATION, getInflationDefault());
+    public Double getInflation() {
+        return getDouble(CommandLineId.INFLATION);
     }
 
     /**
      * Gets an integer value for a preference ID.
      *
-     * @param id           The ID for which to get an integer preference
-     * @param defaultValue The default value to use in the event the
-     *                     preference is not set
+     * @param id The ID for which to get an integer preference
      * @return The integer value for the given preference ID
      */
     @SuppressWarnings("SameParameterValue")
-    private int getInt(@NotNull CommandLineId id, int defaultValue) {
-        return preferences.getInt(id.name(), defaultValue);
+    private Integer getInt(@NotNull CommandLineId id) {
+
+        /*
+         * Get the default integer. Get a preference for name of the command
+         * line ID using the default. Return null if the default was returned,
+         * otherwise return the result.
+         */
+        final int defaultInt = getDefaultInt();
+        final int result = preferences.getInt(id.name(), defaultInt);
+        return (result == defaultInt) ? null : result;
     }
 
     /**
@@ -158,18 +132,8 @@ public class PreferenceManager {
      *
      * @return The desired logging level
      */
-    public @NotNull Level getLevel() {
-
-        /*
-         * Declare and initialize the default logging level. Get the preference
-         * for logging level as an integer. Return the default value if there
-         * is no logging level for the set integer preference; otherwise return
-         * the logging level corresponding to the preference.
-         */
-        final Level defaultValue = getLevelDefault();
-        final Level result = get(getInt(CommandLineId.LEVEL,
-                defaultValue.intValue()));
-        return (null == result) ? defaultValue : result;
+    public Level getLevel() {
+        return LevelPreferenceDispatch.getLevel(getInt(CommandLineId.LEVEL));
     }
 
     /**
@@ -177,21 +141,26 @@ public class PreferenceManager {
      *
      * @return The path for the data files
      */
-    public @NotNull Path getPath() {
-        return getPath(CommandLineId.PATH, getPathNameDefault());
+    public Path getPath() {
+        return getPath(CommandLineId.PATH);
     }
 
     /**
      * Gets a path for a preference ID.
      *
-     * @param id           The ID for which to get a path preference
-     * @param defaultValue The default path name value to use in the event the
-     *                     preference is not set
+     * @param id The ID for which to get a path preference
      * @return The path value for the given preference ID
      */
-    private @NotNull Path getPath(@NotNull CommandLineId id,
-                                  @NotNull String defaultValue) {
-        return Paths.get(preferences.get(id.name(), defaultValue));
+    private Path getPath(@NotNull CommandLineId id) {
+
+        /*
+         * Get the default path name. Get a preference for name of the command
+         * line ID using the default. Return null if the default was returned,
+         * otherwise return the result as a path.
+         */
+        final String defaultPathName = getDefaultPathName();
+        final String result = preferences.get(id.name(), defaultPathName);
+        return (result.equals(defaultPathName)) ? null : Paths.get(result);
     }
 
     /**
@@ -201,5 +170,82 @@ public class PreferenceManager {
      */
     public @NotNull Preferences getPreferences() {
         return preferences;
+    }
+
+    /**
+     * Sets the current value of the S&P 500.
+     *
+     * @param value The current value of the S&P 500
+     */
+    public void setCurrent(Double value) {
+        setDouble(CommandLineId.CURRENT, value);
+    }
+
+    /**
+     * Sets the destination path for data file backup.
+     *
+     * @param value The destination path for data file backup
+     */
+    public void setDestination(Path value) {
+        setPath(CommandLineId.DESTINATION, value);
+    }
+
+    /**
+     * Sets a double value for a preference ID.
+     *
+     * @param id    The ID for which to set a double preference
+     * @param value The double value for the given preference ID
+     */
+    private void setDouble(@NotNull CommandLineId id, Double value) {
+        getPreferences().putDouble(id.name(), (null == value) ?
+                getDefaultDouble() : value);
+    }
+
+    /**
+     * Gets the high value of the S&P 500.
+     *
+     * @param value The high value of the S&P 500
+     */
+    public void setHigh(Double value) {
+        setDouble(CommandLineId.HIGH, value);
+    }
+
+    /**
+     * Gets the expected annual inflation rate.
+     *
+     * @param value The expected annual inflation rate
+     */
+    public void setInflation(Double value) {
+        setDouble(CommandLineId.INFLATION, value);
+    }
+
+    /**
+     * Sets the desired logging level.
+     *
+     * @param value The desired logging level
+     */
+    public void setLevel(Level value) {
+        getPreferences().putInt(CommandLineId.LEVEL.name(), (null == value) ?
+                getDefaultInt() : value.intValue());
+    }
+
+    /**
+     * Sets the path for the data files.
+     *
+     * @param value The path for the data files
+     */
+    public void setPath(Path value) {
+        setPath(CommandLineId.PATH, value);
+    }
+
+    /**
+     * Sets a path name value for a preference ID.
+     *
+     * @param id    The ID for which to set a path name preference
+     * @param value The string value for the given preference ID
+     */
+    private void setPath(@NotNull CommandLineId id, Path value) {
+        getPreferences().put(id.name(),
+                (null == value) ? getDefaultPathName() : value.toString());
     }
 }
