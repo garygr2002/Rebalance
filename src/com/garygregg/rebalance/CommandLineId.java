@@ -9,6 +9,9 @@ public enum CommandLineId {
      * the command line.
      */
 
+    // Resets all preferences
+    RESET("reset preferences to defaults", null, false),
+
     // The logging level (valid Level values)
     LEVEL("ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE or WARNING",
             "lglv", true),
