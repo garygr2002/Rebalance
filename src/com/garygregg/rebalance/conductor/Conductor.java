@@ -422,24 +422,24 @@ public class Conductor implements Dispatch<CommandLineId> {
         final Preferences preferences = preferenceManager.getPreferences();
         final PrintStream outputStream = getOutputStream();
 
-        // Add a preference dispatch for the S&P 500 current value.
+        // Add a dispatch for the S&P 500 current value.
+        dispatchList.add(new Backup(outputStream));
         dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.CURRENT,
-                preferences, outputStream,
+                preferences, outputStream, false,
                 PreferenceManager.getCurrentDefault()));
 
         // Add a preference dispatch for the data backup path.
         dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.DESTINATION,
-                preferences, outputStream,
-                PreferenceManager.getDestinationNameDefault()));
+                preferences, outputStream));
 
         // Add a preference dispatch for the S&P 500 high value.
         dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.HIGH,
-                preferences, outputStream,
+                preferences, outputStream, false,
                 PreferenceManager.getHighDefault()));
 
         // Add a preference dispatch for the expected annual inflation.
         dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.INFLATION,
-                preferences, outputStream,
+                preferences, outputStream, true,
                 PreferenceManager.getInflationDefault()));
 
         // Add a preference dispatch for the desired logging level.
@@ -447,14 +447,16 @@ public class Conductor implements Dispatch<CommandLineId> {
                 preferences, outputStream,
                 PreferenceManager.getLevelDefault()));
 
+        // Add dispatches for backup and reset.
+        dispatchList.add(new Backup(outputStream));
+        dispatchList.add(new Reset(outputStream));
+
         /*
          * Add a preference dispatch for the data location path, and a dispatch
-         * for data backup.
+         * for reset.
          */
         dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.PATH,
-                preferences, outputStream,
-                PreferenceManager.getPathNameDefault()));
-        dispatchList.add(new Backup(outputStream));
+                preferences, outputStream));
 
         /*
          * Create a command line arguments object with an instance of the
@@ -471,8 +473,7 @@ public class Conductor implements Dispatch<CommandLineId> {
         /*
          * Catch any command line exception, and print the exception message
          * to the error stream.
-         */
-        catch (@NotNull CLAException exception) {
+         */ catch (@NotNull CLAException exception) {
 
             /*
              * Get the error stream and display the message of the exception.
@@ -555,7 +556,7 @@ public class Conductor implements Dispatch<CommandLineId> {
 
         try {
 
-            // Try to write a report for each portfolio in the hiearchy.
+            // Try to write a report for each portfolio in the hierarchy.
             new CurrentReportWriter().writeLines(hierarchy, null);
         }
 
