@@ -20,19 +20,19 @@ public enum CommandLineId {
     INFLATION("annual inflation rate", "fltn", true),
 
     // High S&P 500 value (double, 2 decimal precision)
-    HIGH("S&P 500 high", "spgh", true),
+    HIGH("S&P 500 high", "sphg", true),
 
     // Current S&P 500 value (double, 2 decimal precision)
     CURRENT("S&P 500 current", "spcr", true),
 
-    // The path for the data directory (string path)
-    PATH("data path", "dpth", true),
+    // Source data directory (string path)
+    SOURCE("data source", "spth", true),
 
     // Destination for data directory backup (string path)
-    DESTINATION("backup destination", "bpth", true),
+    DESTINATION("backup destination", "dpth", true),
 
     // The backup command
-    BACKUP("perform backup", "bpth", false),
+    BACKUP("perform backup now; dpth if no bpth specified (see above)", "bpth", false),
 
     // Presumed to be an option argument (string)
     OTHER("other command argument", null, false);

@@ -121,9 +121,9 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
             }
         };
 
-        // Declare an 'on path' dispatch action.
-        final Dispatch<CommandLineId> onPath =
-                new PathPreferenceDispatch<>(CommandLineId.PATH, preferences,
+        // Declare an 'on source' dispatch action.
+        final Dispatch<CommandLineId> onSource =
+                new PathPreferenceDispatch<>(CommandLineId.SOURCE, preferences,
                         System.out);
 
         /*
@@ -138,9 +138,9 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         dispatchList.add(onHigh);
         dispatchList.add(onInflation);
 
-        // Add dispatch actions for 'on level' and 'on path' arguments.
+        // Add dispatch actions for 'on level' and 'on source' arguments.
         dispatchList.add(onLevel);
-        dispatchList.add(onPath);
+        dispatchList.add(onSource);
 
         // Create a command line argument processor using the 'on none' action.
         final CommandLineArguments<CommandLineId> cla =

@@ -17,7 +17,7 @@ public class DateUtilities {
 
     // The data directory
     private static final File dataDirectory =
-            PreferenceManager.getInstance().getPath().toFile();
+            PreferenceManager.getInstance().getSource().toFile();
 
     // The template for the parse format
     private static final String formatTemplate = "yyyyMMdd";

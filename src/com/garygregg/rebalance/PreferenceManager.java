@@ -64,12 +64,12 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the destination path for data file backup.
+     * Gets the destination for data directory backup.
      *
-     * @return The destination path for data file backup
+     * @return The destination path for data directory backup
      */
     public Path getDestination() {
-        return getPath(CommandLineId.DESTINATION);
+        return getSource(CommandLineId.DESTINATION);
     }
 
     /**
@@ -137,12 +137,12 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the path for the data files.
+     * Gets the preferences object used by the preference manager.
      *
-     * @return The path for the data files
+     * @return The preferences object used by the preference manager
      */
-    public Path getPath() {
-        return getPath(CommandLineId.PATH);
+    public @NotNull Preferences getPreferences() {
+        return preferences;
     }
 
     /**
@@ -151,7 +151,7 @@ public class PreferenceManager {
      * @param id The ID for which to get a path preference
      * @return The path value for the given preference ID
      */
-    private Path getPath(@NotNull CommandLineId id) {
+    private Path getSource(@NotNull CommandLineId id) {
 
         /*
          * Get the default path name. Get a preference for name of the command
@@ -164,12 +164,12 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the preferences object used by the preference manager.
+     * Gets the source data directory.
      *
-     * @return The preferences object used by the preference manager
+     * @return The source data directory
      */
-    public @NotNull Preferences getPreferences() {
-        return preferences;
+    public Path getSource() {
+        return getSource(CommandLineId.SOURCE);
     }
 
     /**
@@ -182,9 +182,9 @@ public class PreferenceManager {
     }
 
     /**
-     * Sets the destination path for data file backup.
+     * Sets the destination for data directory backup.
      *
-     * @param value The destination path for data file backup
+     * @param value The destination path for data directory backup
      */
     public void setDestination(Path value) {
         setPath(CommandLineId.DESTINATION, value);
@@ -230,15 +230,6 @@ public class PreferenceManager {
     }
 
     /**
-     * Sets the path for the data files.
-     *
-     * @param value The path for the data files
-     */
-    public void setPath(Path value) {
-        setPath(CommandLineId.PATH, value);
-    }
-
-    /**
      * Sets a path name value for a preference ID.
      *
      * @param id    The ID for which to set a path name preference
@@ -247,5 +238,14 @@ public class PreferenceManager {
     private void setPath(@NotNull CommandLineId id, Path value) {
         getPreferences().put(id.name(),
                 (null == value) ? getDefaultPathName() : value.toString());
+    }
+
+    /**
+     * Sets the source data directory.
+     *
+     * @param value The source data directory
+     */
+    public void setSource(Path value) {
+        setPath(CommandLineId.SOURCE, value);
     }
 }

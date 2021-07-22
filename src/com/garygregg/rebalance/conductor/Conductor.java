@@ -257,7 +257,7 @@ public class Conductor implements Dispatch<CommandLineId> {
         final PreferenceManager manager = PreferenceManager.getInstance();
         final List<String> missingPreferences = new ArrayList<>();
 
-        // Test current S&P 500 level and backup directory.
+        // Test current S&P 500 level and destination directory.
         test(missingPreferences, CommandLineId.CURRENT, manager.getCurrent());
         test(missingPreferences, CommandLineId.DESTINATION,
                 manager.getDestination());
@@ -268,11 +268,11 @@ public class Conductor implements Dispatch<CommandLineId> {
                 manager.getInflation());
 
         /*
-         * Test logging level and data directory. Were there missing
+         * Test logging level and source directory. Were there missing
          * preferences?
          */
         test(missingPreferences, CommandLineId.LEVEL, manager.getLevel());
-        test(missingPreferences, CommandLineId.PATH, manager.getPath());
+        test(missingPreferences, CommandLineId.SOURCE, manager.getSource());
         if (!missingPreferences.isEmpty()) {
 
             /*
@@ -484,7 +484,7 @@ public class Conductor implements Dispatch<CommandLineId> {
         dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.CURRENT,
                 preferences, outputStream, false));
 
-        // Add a preference dispatch for the data backup path.
+        // Add a preference dispatch for the data directory backup.
         dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.DESTINATION,
                 preferences, outputStream));
 
@@ -504,11 +504,8 @@ public class Conductor implements Dispatch<CommandLineId> {
         dispatchList.add(new Backup(outputStream));
         dispatchList.add(new Reset(outputStream));
 
-        /*
-         * Add a preference dispatch for the data location path, and a dispatch
-         * for reset.
-         */
-        dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.PATH,
+        // Add a preference dispatch for source data directory.
+        dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.SOURCE,
                 preferences, outputStream));
 
         /*

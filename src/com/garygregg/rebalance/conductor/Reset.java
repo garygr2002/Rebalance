@@ -5,8 +5,6 @@ import com.garygregg.rebalance.Informer;
 import com.garygregg.rebalance.PreferenceManager;
 import com.garygregg.rebalance.cla.CLAException;
 import com.garygregg.rebalance.cla.Dispatch;
-import com.garygregg.rebalance.cla.DoublePreferenceDispatch;
-import com.garygregg.rebalance.cla.LevelPreferenceDispatch;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
@@ -41,7 +39,7 @@ class Reset extends Informer implements Dispatch<CommandLineId> {
          */
         manager.setInflation(null);
         manager.setLevel(null);
-        manager.setPath(null);
+        manager.setSource(null);
     }
 
     @Override
