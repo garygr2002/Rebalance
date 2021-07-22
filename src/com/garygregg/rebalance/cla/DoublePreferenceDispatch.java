@@ -6,27 +6,28 @@ import java.io.PrintStream;
 import java.util.prefs.Preferences;
 
 public class DoublePreferenceDispatch<KeyType extends Enum<KeyType>>
-        extends PreferenceDispatch<KeyType> {
+        extends FlaggedPreferenceDispatch<KeyType> {
 
     // The default value to use in case of no current preference
     private final double defaultValue;
 
     /**
-     * Constructs the double preferences dispatch.
+     * Constructs the double preference dispatch.
      *
      * @param key          The key for this dispatch
      * @param preferences  The preferences object to use
      * @param stream       The output stream for messages
+     * @param flag         The flag; true if negatives are okay, false otherwise
      * @param defaultValue The default value to use in case of no current
      *                     preference
      */
     public DoublePreferenceDispatch(@NotNull KeyType key,
                                     @NotNull Preferences preferences,
-                                    @NotNull PrintStream stream,
+                                    @NotNull PrintStream stream, boolean flag,
                                     double defaultValue) {
 
         // Call the superclass constructor, and set the default value.
-        super(key, preferences, stream);
+        super(key, preferences, stream, flag);
         this.defaultValue = defaultValue;
     }
 
@@ -46,7 +47,35 @@ public class DoublePreferenceDispatch<KeyType extends Enum<KeyType>>
     }
 
     @Override
-    protected void put(@NotNull String value) {
-        getPreferences().putDouble(getKeyName(), Double.parseDouble(value));
+    protected void put(@NotNull String value) throws CLAException {
+
+        // Declare a variable to receive a parsed double.
+        double doubleValue;
+        try {
+
+            /*
+             * Try to parse the double. Was a negative double received when
+             * it is not permitted?
+             */
+            doubleValue = Double.parseDouble(value);
+            if (!(getFlag() || (0. <= doubleValue))) {
+
+                /*
+                 * An impermissible negative value was received. Throw a new
+                 * CLA exception.
+                 */
+                throw new CLAException(String.format("Negative values are " +
+                                "not permitted for '%s'; %f received.",
+                        getKeyName().toLowerCase(), doubleValue));
+            }
+        }
+
+        // The received value cannot be parsed as a double.
+        catch (@NotNull NumberFormatException exception) {
+            throw new CLAException(exception.getMessage());
+        }
+
+        // Set the double value as the preference under the key name.
+        getPreferences().putDouble(getKeyName(), doubleValue);
     }
 }
