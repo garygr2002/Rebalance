@@ -11,7 +11,7 @@ import java.io.PrintStream;
 class Backup extends Informer implements Dispatch<CommandLineId> {
 
     /**
-     * Constructs the informer.
+     * Constructs the backup dispatch.
      *
      * @param stream The output stream for messages
      */
