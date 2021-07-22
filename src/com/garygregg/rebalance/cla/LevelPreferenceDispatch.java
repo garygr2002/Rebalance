@@ -1,15 +1,32 @@
 package com.garygregg.rebalance.cla;
 
-import com.garygregg.rebalance.CommandLineId;
-import com.garygregg.rebalance.PreferenceManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.prefs.Preferences;
 
 public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
         extends IntPreferenceDispatch<KeyType> {
+
+    // A map of integer values to the levels with which they correspond
+    private final static Map<Integer, Level> levelMap = new HashMap<>();
+
+    static {
+
+        // Load up the level map.
+        put(Level.ALL);
+        put(Level.CONFIG);
+        put(Level.FINE);
+        put(Level.FINER);
+        put(Level.FINEST);
+        put(Level.INFO);
+        put(Level.OFF);
+        put(Level.SEVERE);
+        put(Level.WARNING);
+    }
 
     /**
      * Constructs the level preferences dispatch.
@@ -24,7 +41,29 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
                                    @NotNull Preferences preferences,
                                    @NotNull PrintStream stream,
                                    Level defaultValue) {
-        super(key, preferences, stream, defaultValue.intValue());
+        super(key, preferences, stream, false, defaultValue.intValue());
+    }
+
+    /**
+     * Gets a level corresponding to an integer value.
+     *
+     * @param value An integer value
+     * @return The level corresponding to the integer value, or null if no
+     * level corresponds to the value
+     */
+    public static Level getLevel(Integer value) {
+        return levelMap.get(value);
+    }
+
+    /**
+     * Puts a level in the level map.
+     *
+     * @param level The level to put in the level map
+     * @return Any level previously in the map using the same integer value
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    private static Level put(@NotNull Level level) {
+        return levelMap.put(level.intValue(), level);
     }
 
     /**
@@ -35,44 +74,7 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
      * no such associated level
      */
     private Level get(int value) {
-        return PreferenceManager.getInstance().get(value);
-    }
-
-    /**
-     * Tests this preference dispatch.
-     *
-     * @param arguments Command line arguments
-     */
-    public static void main(@NotNull String[] arguments) {
-
-        /*
-         * TODO: Delete this method.
-         *
-         * Declare and initialize a level preference dispatch.
-         */
-        final LevelPreferenceDispatch<CommandLineId> dispatch =
-                new LevelPreferenceDispatch<>(CommandLineId.LEVEL,
-                Preferences.userRoot().node(
-                        LevelPreferenceDispatch.class.getName()),
-                System.out, PreferenceManager.getLevelDefault());
-
-        // Wrap all dispatch calls for exceptions.
-        try {
-
-            /*
-             * Get the current preference, set a new preference, then make
-             * sure the preference was set.
-             */
-            dispatch.dispatch(null);
-            dispatch.dispatch(Level.CONFIG.toString());
-            dispatch.dispatch(null);
-
-        }
-
-        // Report any CLA exceptions.
-        catch (@NotNull CLAException exception) {
-            System.err.println(exception.getMessage());
-        }
+        return getLevel(value);
     }
 
     @Override
@@ -81,7 +83,7 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
     }
 
     @Override
-    protected void put(@NotNull String value) {
+    protected void put(@NotNull String value) throws CLAException {
         super.put(Integer.toString(
                 Level.parse(value.toUpperCase()).intValue()));
     }
