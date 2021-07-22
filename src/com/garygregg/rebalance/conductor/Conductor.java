@@ -527,15 +527,23 @@ public class Conductor implements Dispatch<CommandLineId> {
 
             /*
              * Get the error stream and display the message of the exception.
-             * Get the program name system property.
+             * Get the program name system property. Note: To set this property
+             * on the command line, use:
+             *
+             * -Dprogram.name = <name>
+             *
+             * In IntelliJ, select 'Add VM options' under 'Modify options'. Use
+             * the same syntax as above. A properly configured alias for
+             * starting the conductor should be able to added to a user login
+             * file.
              */
             getErrorStream().println(exception.getMessage());
             final String programName = System.getProperty(defaultProgramName);
 
             /*
              * Use the program name system property to display a usage message
-             * if the program name property is not null. Otherwise use a default
-             * program name.
+             * if the program name property is not null. Otherwise use a
+             * default program name.
              */
             displayUsage((null == programName) ? getDefaultProgramName() :
                     programName);
