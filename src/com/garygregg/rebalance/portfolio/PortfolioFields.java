@@ -16,8 +16,8 @@ enum PortfolioFields {
     // Projected mortality date of the portfolio owner
     MORTALITY_DATE(3, null),
 
-    // Monthly SSN income starting at age 62
-    SSN_MONTHLY(4, null),
+    // Monthly Social Security income starting at age 62
+    SS_MONTHLY(4, null),
 
     // Other current monthly annuity income
     OTHER_MONTHLY(5, null),

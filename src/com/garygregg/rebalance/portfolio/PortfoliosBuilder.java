@@ -83,13 +83,13 @@ public class PortfoliosBuilder extends ElementReader {
     // A map of element positions to portfolio fields
     private final Map<Integer, PortfolioFields> positionMap = new HashMap<>();
 
-    // The monthly SSN income processor
-    private final FieldProcessor<PortfolioDescription> ssnMonthlyProcessor =
-            new FieldProcessor<PortfolioDescription>() {
+    // The monthly Social Security monthly income processor
+    private final FieldProcessor<PortfolioDescription>
+            socialSecurityMonthlyProcessor = new FieldProcessor<PortfolioDescription>() {
                 @Override
                 public void processField(@NotNull String field,
                                          int lineNumber) {
-                    getTarget().setSsnMonthly(new Currency(processFloat(
+                    getTarget().setSocialSecurityMonthly(new Currency(processFloat(
                             preprocessField(field), 0., lineNumber)));
                 }
             };
@@ -122,8 +122,8 @@ public class PortfoliosBuilder extends ElementReader {
         addFieldProcessor(++fieldIndex, birthDateProcessor);
         addFieldProcessor(++fieldIndex, mortalityDateProcessor);
 
-        // Add the SSN and other monthly annuity income processors.
-        addFieldProcessor(++fieldIndex, ssnMonthlyProcessor);
+        // Add the Social Security and other monthly annuity income processors.
+        addFieldProcessor(++fieldIndex, socialSecurityMonthlyProcessor);
         addFieldProcessor(++fieldIndex, otherMonthlyProcessor);
 
         // Add the CPI adjusted flag process and the taxable income processor.
@@ -170,8 +170,8 @@ public class PortfoliosBuilder extends ElementReader {
                 // Display statistics for the first/next portfolio description.
                 System.out.printf("Portfolio (%d) '%s' with name '%s' now " +
                                 "loaded;%nBirth date: %s; " +
-                                "Mortality date: %s;%nMonthly SSN: %s; Other " +
-                                "monthly annuity: %s; " +
+                                "Mortality date: %s;%nMonthly Social " +
+                                "Security: %s; Other monthly annuity: %s; " +
                                 "Annuity CPI adjusted: %b;%nTaxable annual " +
                                 "income: %s;%nStock: %f, Bond: %f, " +
                                 "Cash: %f, Real estate: %f.%n%n",
@@ -180,7 +180,7 @@ public class PortfoliosBuilder extends ElementReader {
                         description.getName(),
                         DateUtilities.format(description.getBirthDate()),
                         DateUtilities.format(description.getMortalityDate()),
-                        description.getSsnMonthly(),
+                        description.getSocialSecurityMonthly(),
                         description.getOtherMonthly(),
                         description.getCpiAdjusted(),
                         description.getTaxableAnnual(),
@@ -458,10 +458,10 @@ public class PortfoliosBuilder extends ElementReader {
 
         /*
          * Set the target for the other monthly annuity income processor and
-         * the monthly SSN income processor.
+         * the monthly Social Security income processor.
          */
         otherMonthlyProcessor.setTarget(description);
-        ssnMonthlyProcessor.setTarget(description);
+        socialSecurityMonthlyProcessor.setTarget(description);
 
         /*
          * Set the target for the mortality date processor, the birth date

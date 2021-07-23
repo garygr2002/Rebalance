@@ -32,8 +32,8 @@ public class PortfolioDescription implements Description<String> {
     // Other monthly annuity income
     private Currency otherMonthly;
 
-    // The monthly SSN income starting at age 62
-    private Currency ssnMonthly;
+    // The monthly Social Security income starting at age 62
+    private Currency socialSecurityMonthly;
 
     // Taxable annual income of the portfolio owner
     private Currency taxableAnnual;
@@ -125,12 +125,12 @@ public class PortfolioDescription implements Description<String> {
     }
 
     /**
-     * Gets the monthly SSN income starting at age 62.
+     * Gets the monthly Social Security income starting at age 62.
      *
-     * @return The monthly SSN income starting at age 62
+     * @return The monthly Social Security income starting at age 62
      */
-    public Currency getSsnMonthly() {
-        return ssnMonthly;
+    public Currency getSocialSecurityMonthly() {
+        return socialSecurityMonthly;
     }
 
     /**
@@ -190,12 +190,13 @@ public class PortfolioDescription implements Description<String> {
     }
 
     /**
-     * Sets the monthly SSN income starting at age 62.
+     * Sets the monthly Social Security income starting at age 62.
      *
-     * @param ssnMonthly The monthly SSN income starting at age 62
+     * @param socialSecurityMonthly The monthly Social Security income starting
+     *                              at age 62
      */
-    void setSsnMonthly(Currency ssnMonthly) {
-        this.ssnMonthly = ssnMonthly;
+    void setSocialSecurityMonthly(Currency socialSecurityMonthly) {
+        this.socialSecurityMonthly = socialSecurityMonthly;
     }
 
     /**
