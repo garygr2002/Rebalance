@@ -10,17 +10,35 @@ enum PortfolioFields {
     // Name of the portfolio
     NAME(1, null),
 
+    // Birth date of the portfolio owner
+    BIRTH_DATE(2, null),
+
+    // Projected mortality date of the portfolio owner
+    MORTALITY_DATE(3, null),
+
+    // Monthly SSN income starting at age 62
+    SSN_MONTHLY(4, null),
+
+    // Other current monthly annuity income
+    OTHER_MONTHLY(5, null),
+
+    // Flag to indicate if OTHER_MONTHLY is CPI adjusted
+    CPI_ADJUSTED(6, null),
+
+    // Taxable annual income of the portfolio owner
+    TAXABLE_ANNUAL(7, null),
+
     // Desired percentage stocks in the portfolio
-    PERCENTAGE_STOCK(2, WeightType.STOCK),
+    PERCENTAGE_STOCK(8, WeightType.STOCK),
 
     // Desired percentage bonds in the portfolio
-    PERCENTAGE_BOND(3, WeightType.BOND),
+    PERCENTAGE_BOND(9, WeightType.BOND),
 
     // Desired percentage cash in the portfolio
-    PERCENTAGE_CASH(4, WeightType.CASH),
+    PERCENTAGE_CASH(10, WeightType.CASH),
 
     // Desired percentage real estate in the portfolio
-    PERCENTAGE_REAL_ESTATE(5, WeightType.REAL_ESTATE);
+    PERCENTAGE_REAL_ESTATE(11, WeightType.REAL_ESTATE);
 
     // The position of the field in the data file
     final int position;

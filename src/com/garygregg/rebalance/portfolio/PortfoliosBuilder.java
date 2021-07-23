@@ -3,9 +3,11 @@ package com.garygregg.rebalance.portfolio;
 import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.WeightType;
+import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,21 +25,85 @@ public class PortfoliosBuilder extends ElementReader {
             new PortfoliosBuilder.MyAllocationProcessor()
     };
 
+    // The birth date processor
+    private final FieldProcessor<PortfolioDescription> birthDateProcessor =
+            new FieldProcessor<>() {
+                @Override
+                public void processField(@NotNull String field,
+                                         int lineNumber) {
+                    getTarget().setBirthDate(processDate(
+                            preprocessField(field), lineNumber));
+                }
+            };
+
+    // The CPI adjusted flag processor
+    private final FieldProcessor<PortfolioDescription> cpiAdjustedProcessor =
+            new FieldProcessor<PortfolioDescription>() {
+                @Override
+                public void processField(@NotNull String field, int lineNumber) {
+                    getTarget().setCpiAdjusted(processBoolean(
+                            preprocessField(field), lineNumber));
+                }
+            };
+
     // The portfolio library instance
     private final PortfolioLibrary library = PortfolioLibrary.getInstance();
+
+    // The projected mortality date processor
+    private final FieldProcessor<PortfolioDescription> mortalityDateProcessor =
+            new FieldProcessor<>() {
+                @Override
+                public void processField(@NotNull String field, int lineNumber) {
+                    getTarget().setMortalityDate(processDate(
+                            preprocessField(field), lineNumber));
+                }
+            };
 
     // The name processor
     private final FieldProcessor<PortfolioDescription> nameProcessor =
             new FieldProcessor<>() {
 
                 @Override
-                public void processField(@NotNull String field, int lineNumber) {
+                public void processField(@NotNull String field,
+                                         int lineNumber) {
                     getTarget().setName(processName(preprocessField(field)));
+                }
+            };
+
+    // The other monthly annuity income processor
+    private final FieldProcessor<PortfolioDescription> otherMonthlyProcessor =
+            new FieldProcessor<PortfolioDescription>() {
+                @Override
+                public void processField(@NotNull String field, int lineNumber) {
+                    getTarget().setOtherMonthly(new Currency(processFloat(
+                            preprocessField(field), 0., lineNumber)));
                 }
             };
 
     // A map of element positions to portfolio fields
     private final Map<Integer, PortfolioFields> positionMap = new HashMap<>();
+
+    // The monthly SSN income processor
+    private final FieldProcessor<PortfolioDescription> ssnMonthlyProcessor =
+            new FieldProcessor<PortfolioDescription>() {
+                @Override
+                public void processField(@NotNull String field,
+                                         int lineNumber) {
+                    getTarget().setSsnMonthly(new Currency(processFloat(
+                            preprocessField(field), 0., lineNumber)));
+                }
+            };
+
+    // The taxable annual income processor
+    private final FieldProcessor<PortfolioDescription> taxableAnnualProcessor =
+            new FieldProcessor<PortfolioDescription>() {
+                @Override
+                public void processField(@NotNull String field,
+                                         int lineNumber) {
+                    getTarget().setTaxableAnnual(new Currency(processFloat(
+                            preprocessField(field), 0., lineNumber)));
+                }
+            };
 
     {
 
@@ -48,12 +114,23 @@ public class PortfoliosBuilder extends ElementReader {
             positionMap.put(field.getPosition(), field);
         }
 
-        /*
-         * Initialize a field index, and add the portfolio name processor.
-         * Cycle for each allocation processor.
-         */
+        // Initialize a field index, and add the portfolio name processor.
         int fieldIndex = 0;
         addFieldProcessor(++fieldIndex, nameProcessor);
+
+        // Add the birth date and mortality date processors.
+        addFieldProcessor(++fieldIndex, birthDateProcessor);
+        addFieldProcessor(++fieldIndex, mortalityDateProcessor);
+
+        // Add the SSN and other monthly annuity income processors.
+        addFieldProcessor(++fieldIndex, ssnMonthlyProcessor);
+        addFieldProcessor(++fieldIndex, otherMonthlyProcessor);
+
+        // Add the CPI adjusted flag process and the taxable income processor.
+        addFieldProcessor(++fieldIndex, cpiAdjustedProcessor);
+        addFieldProcessor(++fieldIndex, taxableAnnualProcessor);
+
+        // Cycle for each allocation processor.
         for (MyAllocationProcessor processor : allocationProcessors) {
 
             /*
@@ -87,13 +164,26 @@ public class PortfoliosBuilder extends ElementReader {
                     DateUtilities.format(library.getDate()));
 
             // Cycle for each portfolio description in the library.
+            int portfolio = 0;
             for (PortfolioDescription description : library.getCatalog()) {
 
                 // Display statistics for the first/next portfolio description.
-                System.out.printf("Portfolio '%s' with name '%s' now " +
-                                "loaded; Stock: %f, Bond: %f, Cash: %f, " +
-                                "Real estate: %f.%n", description.getKey(),
+                System.out.printf("Portfolio (%d) '%s' with name '%s' now " +
+                                "loaded;%nBirth date: %s; " +
+                                "Mortality date: %s;%nMonthly SSN: %s; Other " +
+                                "monthly annuity: %s; " +
+                                "Annuity CPI adjusted: %b;%nTaxable annual " +
+                                "income: %s;%nStock: %f, Bond: %f, " +
+                                "Cash: %f, Real estate: %f.%n%n",
+                        ++portfolio,
+                        description.getKey(),
                         description.getName(),
+                        DateUtilities.format(description.getBirthDate()),
+                        DateUtilities.format(description.getMortalityDate()),
+                        description.getSsnMonthly(),
+                        description.getOtherMonthly(),
+                        description.getCpiAdjusted(),
+                        description.getTaxableAnnual(),
                         description.getAllocation(WeightType.STOCK),
                         description.getAllocation(WeightType.BOND),
                         description.getAllocation(WeightType.CASH),
@@ -115,7 +205,7 @@ public class PortfoliosBuilder extends ElementReader {
      * @param mnemonic The mnemonic to process
      * @return The processed mnemonic
      */
-    private static String processMnemonic(@NotNull String mnemonic) {
+    private static @NotNull String processMnemonic(@NotNull String mnemonic) {
         return mnemonic;
     }
 
@@ -125,13 +215,8 @@ public class PortfoliosBuilder extends ElementReader {
      * @param name The name to process
      * @return A processed name
      */
-    private static String processName(@NotNull String name) {
+    private static @NotNull String processName(@NotNull String name) {
         return name;
-    }
-
-    @Override
-    protected @NotNull Logger getReadingLogger() {
-        return Logger.getLogger(PortfoliosBuilder.class.getCanonicalName());
     }
 
     @Override
@@ -140,9 +225,13 @@ public class PortfoliosBuilder extends ElementReader {
     }
 
     @Override
-    @NotNull
-    public String getPrefix() {
+    public @NotNull String getPrefix() {
         return "portfolio";
+    }
+
+    @Override
+    protected @NotNull Logger getReadingLogger() {
+        return Logger.getLogger(PortfoliosBuilder.class.getCanonicalName());
     }
 
     /**
@@ -159,12 +248,12 @@ public class PortfoliosBuilder extends ElementReader {
         Double result = null;
         try {
 
-            /*
-             * Parse the allocation as a floating point number. Catch any
-             * number format exception that may occur.
-             */
+            // Parse the allocation as a floating point number.
             result = Double.parseDouble(allocation);
-        } catch (@NotNull NumberFormatException exception) {
+        }
+
+        // Catch any number format exception that may occur.
+        catch (@NotNull NumberFormatException exception) {
 
             // Log a warning message describing the unparseable allocation.
             logMessage(Level.WARNING, String.format("Unparseable allocation " +
@@ -174,6 +263,64 @@ public class PortfoliosBuilder extends ElementReader {
 
         // Return the result.
         return result;
+    }
+
+    /**
+     * Process a boolean.
+     *
+     * @param aBoolean   The boolean to process
+     * @param lineNumber The line number where the boolean element occurs
+     * @return A processed boolean
+     */
+    private boolean processBoolean(@NotNull String aBoolean, int lineNumber) {
+
+        /*
+         * Parse the argument as a boolean. Is the string representation of
+         * the result not equal to the lowercase translation of the argument?
+         */
+        final boolean result = Boolean.parseBoolean(aBoolean);
+        if (!Boolean.toString(result).equals(aBoolean.toLowerCase())) {
+
+            /*
+             * The string representation of the result is not equal to the
+             * lowercase translation of the argument. This means the argument
+             * was not a proper boolean representation. Log a warning.
+             */
+            logMessage(Level.WARNING, String.format("Unparseable boolean " +
+                            "'%s' at line number %d in portfolio file; using %s.",
+                    aBoolean, lineNumber, result));
+        }
+
+        // Return the result.
+        return result;
+    }
+
+    /**
+     * Processes a date.
+     *
+     * @param date       The date to process
+     * @param lineNumber The line number where the date element occurs
+     * @return A processed date
+     */
+    private Date processDate(@NotNull String date, int lineNumber) {
+
+        // Declare and initialize the result to a default value.
+        Date parsedDate = null;
+        try {
+
+            // Try to parse the date.
+            parsedDate = DateUtilities.parse(date);
+        }
+
+        // Catch any parse exception that may occur.
+        catch (@NotNull ParseException exception) {
+            logMessage(Level.WARNING, String.format("Unparseable date '%s' at " +
+                            "line number %d in portfolio file; using null.", date,
+                    lineNumber));
+        }
+
+        // Return the result.
+        return parsedDate;
     }
 
     @Override
@@ -252,6 +399,45 @@ public class PortfoliosBuilder extends ElementReader {
     }
 
     /**
+     * Processes a floating point element.
+     *
+     * @param element      The floating point element
+     * @param defaultValue The value to return if the element is an empty string
+     * @param lineNumber   The line number where the floating point element
+     *                     occurs
+     * @return A processed floating point element
+     */
+    private double processFloat(@NotNull String element, double defaultValue,
+                                int lineNumber) {
+
+        // Declare and initialize the result to a default value.
+        double result = defaultValue;
+        try {
+
+            /*
+             * Use the default value if the element is the empty string.
+             * Otherwise parse the allocation as a floating point number. Catch
+             * any number format exception that may occur.
+             */
+            result = element.isEmpty() ? defaultValue :
+                    Double.parseDouble(element);
+        } catch (@NotNull NumberFormatException exception) {
+
+            /*
+             * Log a warning message describing the unparseable floating point
+             * element.
+             */
+            logMessage(Level.WARNING, String.format("Unparseable floating " +
+                            "point number '%s' at line number %d in " +
+                            "portfolio file; using default %f instead.",
+                    element, lineNumber, defaultValue));
+        }
+
+        // Return the result.
+        return result;
+    }
+
+    /**
      * Sets the target in the field processors.
      *
      * @param description The target to set in the field processors
@@ -263,7 +449,26 @@ public class PortfoliosBuilder extends ElementReader {
             processor.setTarget(description);
         }
 
-        // Set the target in the name processor.
+        /*
+         * Set the target for the taxable annual income processor and the CPI
+         * adjusted flag processor.
+         */
+        taxableAnnualProcessor.setTarget(description);
+        cpiAdjustedProcessor.setTarget(description);
+
+        /*
+         * Set the target for the other monthly annuity income processor and
+         * the monthly SSN income processor.
+         */
+        otherMonthlyProcessor.setTarget(description);
+        ssnMonthlyProcessor.setTarget(description);
+
+        /*
+         * Set the target for the mortality date processor, the birth date
+         * processor and the name processor.
+         */
+        mortalityDateProcessor.setTarget(description);
+        birthDateProcessor.setTarget(description);
         nameProcessor.setTarget(description);
     }
 
