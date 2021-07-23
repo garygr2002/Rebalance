@@ -165,7 +165,7 @@ public class DateUtilities {
      *
      * @return The date format used for parsing
      */
-    public static @NotNull DateFormat getDateFormat() {
+    private static @NotNull DateFormat getDateFormat() {
         return dateFormat;
     }
 
@@ -210,6 +210,19 @@ public class DateUtilities {
          * separators!
          */
         return "_";
+    }
+
+    /**
+     * Parses a string expected to be in the standardized date format.
+     *
+     * @param date A string expected to be in standardized date format
+     * @return The parsed date
+     * @throws ParseException Indicates that the argument is not in the
+     *                        standardized date format
+     */
+    public static @NotNull Date parse(@NotNull String date)
+            throws ParseException {
+        return getMessageFormat().parse(date);
     }
 
     /**
