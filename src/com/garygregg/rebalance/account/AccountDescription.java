@@ -60,7 +60,7 @@ public class AccountDescription implements Description<AccountKey> {
      * @param type  The designated fund type
      * @param value The desired allocation weight
      */
-    void adjustAllocation(@NotNull FundType type, double value) {
+    void adjustAllocation(@NotNull FundType type, Double value) {
         allocation.put(type, value);
     }
 
