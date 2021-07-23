@@ -134,8 +134,8 @@ public class AccountsBuilder extends ElementReader {
 
             // Log a warning message describing the unparseable allocation.
             logMessage(Level.WARNING, String.format("Unparseable allocation " +
-                            "'%s' at line number %d in account file; using null",
-                    allocation, lineNumber));
+                            "'%s' at line number %d in account file; " +
+                            "using null.", allocation, lineNumber));
         }
 
         // Return the result.
@@ -236,7 +236,8 @@ public class AccountsBuilder extends ElementReader {
              */
             field = positionMap.get(i);
             description.adjustAllocation(field.getType(),
-                    processAllocation(elements[i], lineNumber));
+                    processAllocation(preprocessField(elements[i]),
+                            lineNumber));
         }
 
         // Log some information and return the result.

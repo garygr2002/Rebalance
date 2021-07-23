@@ -895,11 +895,11 @@ public class TickersBuilder extends ElementReader {
                     processName(preprocessField(elements[
                             TickerFields.NAME.getPosition()])),
 
-                    processMinimum(elements[
-                            TickerFields.MINIMUM.getPosition()], lineNumber),
+                    processMinimum(preprocessField(elements[
+                            TickerFields.MINIMUM.getPosition()]), lineNumber),
 
-                    processBalanceRounding(elements[
-                                    TickerFields.PREFERRED_ROUNDING.getPosition()],
+                    processBalanceRounding(preprocessField(elements[
+                            TickerFields.PREFERRED_ROUNDING.getPosition()]),
                             lineNumber),
 
                     lineNumber

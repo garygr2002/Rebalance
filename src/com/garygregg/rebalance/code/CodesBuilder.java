@@ -232,7 +232,7 @@ public class CodesBuilder extends ElementReader {
         for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
 
             // Process the first/next field.
-            processField(i, elements[i], lineNumber);
+            processField(i, preprocessField(elements[i]), lineNumber);
         }
 
         // Log some information and return the result.

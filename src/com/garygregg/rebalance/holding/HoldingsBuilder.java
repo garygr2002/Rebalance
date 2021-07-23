@@ -305,7 +305,7 @@ public class HoldingsBuilder extends ElementReader {
 
         // Cycle for each remaining field-to-process, and process it.
         for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
-            processField(i, elements[i], lineNumber);
+            processField(i, preprocessField(elements[i]), lineNumber);
         }
 
         // Log some information and return the result.

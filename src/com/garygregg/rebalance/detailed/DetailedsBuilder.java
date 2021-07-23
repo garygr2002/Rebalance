@@ -238,7 +238,8 @@ public class DetailedsBuilder extends ElementReader {
              */
             field = positionMap.get(i);
             description.adjustAllocation(field.getType(),
-                    processAllocation(elements[i], lineNumber));
+                    processAllocation(preprocessField(elements[i]),
+                            lineNumber));
         }
 
         // Log some information and return the result.
