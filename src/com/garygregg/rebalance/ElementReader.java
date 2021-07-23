@@ -474,9 +474,9 @@ public abstract class ElementReader extends ElementProcessor {
         }
 
         // Log an exit message.
-        logMessage(getExtraordinary(), String.format("Element processor of " +
-                        "type '%s' is exiting with%s warnings or errors.",
-                prefix, result ? " no" : ""));
+        logMessage(getExtraordinary(), String.format("Element reader of " +
+                        "type '%s' is exiting %s reading all elements.",
+                prefix, result ? "after" : "before"));
 
         // Return the result.
         return result;
