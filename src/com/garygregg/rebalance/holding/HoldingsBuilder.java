@@ -345,9 +345,9 @@ public class HoldingsBuilder extends ElementReader {
              * element.
              */
             logMessage(Level.WARNING, String.format("Unparseable floating " +
-                            "point number '%s' at line number %d in holding file; " +
-                            "using default %f instead.", element, lineNumber,
-                    defaultValue));
+                            "point number '%s' at line number %d in holding " +
+                            "file; using default %f instead.", element,
+                    lineNumber, defaultValue));
         }
 
         // Return the result.
