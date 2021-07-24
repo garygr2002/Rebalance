@@ -62,12 +62,21 @@ public abstract class ElementProcessor {
     protected abstract @NotNull String getPrefix();
 
     /**
-     * Returns whether there was a problem processing lines.
+     * Returns whether there was a problem processing a file.
      *
-     * @return True if there was a problem processing lines, false otherwise
+     * @return True if there was a problem processing a file, false otherwise
      */
-    public boolean hadProblem() {
-        return messageLogger.hadProblem();
+    public boolean hadFileProblem() {
+        return messageLogger.hadProblem1();
+    }
+
+    /**
+     * Returns whether there was a problem processing a line
+     *
+     * @return True if there was a problem processing a line, false otherwise
+     */
+    public boolean hadLineProblem() {
+        return messageLogger.hadProblem2();
     }
 
     /**
@@ -83,10 +92,17 @@ public abstract class ElementProcessor {
     }
 
     /**
-     * Resets the problem flag.
+     * Resets a file problem.
      */
-    protected void resetProblem() {
-        messageLogger.resetProblem();
+    protected void resetFileProblem() {
+        messageLogger.resetProblem1();
+    }
+
+    /**
+     * Resets a line problem.
+     */
+    protected void resetLineProblem() {
+        messageLogger.resetProblem2();
     }
 
     /**

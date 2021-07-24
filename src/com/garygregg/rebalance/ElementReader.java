@@ -121,15 +121,18 @@ public abstract class ElementReader extends ElementProcessor {
 
                 /*
                  * The field count is at least as long as the minimum number of
-                 * fields. Process the elements.
+                 * fields. Reset the line problem flag, process the elements,
+                 * and determine if there has been no problem in doing so.
                  */
-                processResult = processElements(line.split(","), lineNumber++);
-            } else {
+                resetLineProblem();
+                processElements(line.split(","), lineNumber++);
+                processResult = !hadLineProblem();
+            }
 
-                /*
-                 * There are an insufficient number of fields. Log a descriptive
-                 * message.
-                 */
+            // There are an insufficient number of fields.
+            else {
+
+                // Log a descriptive message.
                 logMessage(continueOnFalse ? Level.WARNING : Level.SEVERE,
                         String.format("File at line " +
                                         "%d contains insufficient elements, " +
@@ -173,13 +176,6 @@ public abstract class ElementReader extends ElementProcessor {
     protected String getFileType() {
         return "csv";
     }
-
-    /**
-     * Gets the specific class/subclass reading logger.
-     *
-     * @return The specific class/subclass reading logger
-     */
-    protected abstract @NotNull Logger getReadingLogger();
 
     /**
      * Gets the minimum number of fields a line must contain.
@@ -308,14 +304,20 @@ public abstract class ElementReader extends ElementProcessor {
     public abstract @NotNull String getPrefix();
 
     /**
+     * Gets the specific class/subclass reading logger.
+     *
+     * @return The specific class/subclass reading logger
+     */
+    protected abstract @NotNull Logger getReadingLogger();
+
+    /**
      * Processes line elements.
      *
      * @param elements   The line elements
      * @param lineNumber The line number where the elements occur
-     * @return True if the line was successfully processed, false otherwise
      */
-    protected abstract boolean processElements(@NotNull String[] elements,
-                                               int lineNumber);
+    protected abstract void processElements(@NotNull String[] elements,
+                                            int lineNumber);
 
     /**
      * Calls a field processor for a given element index.
@@ -353,7 +355,7 @@ public abstract class ElementReader extends ElementProcessor {
          * Reset the problem flag. Get the most recent reader for the type
          * directory and date.
          */
-        resetProblem();
+        resetFileProblem();
         final FileReader reader = getMostRecentReader(
                 getDateUtilities().getTypeDirectory(), date);
 
