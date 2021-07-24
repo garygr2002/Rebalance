@@ -44,7 +44,10 @@ public class DistinguishedsBuilder extends ElementReader {
                                         "represent any known, distinguished account.",
                                 keyString, lineNumber));
 
-                    } else {
+                    }
+
+                    // The string represents a known distinguished account key.
+                    else {
 
                         /*
                          * The distinguished account is recognized. But is it
@@ -78,10 +81,11 @@ public class DistinguishedsBuilder extends ElementReader {
                                 accountNumber)) {
 
                             /*
-                             * The key elements are okay according to the distinguished
-                             * account library. Create a new distinguished account
-                             * description using the named institution, and account
-                             * number converted to a long integer.
+                             * The key elements are okay according to the
+                             * distinguished account library. Create a new
+                             * distinguished account description using the
+                             * named institution, and account number converted
+                             * to a long integer.
                              */
                             description =
                                     new DistinguishedAccountDescription(
@@ -92,25 +96,28 @@ public class DistinguishedsBuilder extends ElementReader {
 
                             /*
                              * Add the new description to the distinguished account
-                             * library.
+                             * library. Log exit information.
                              */
                             accountLibrary.addDescription(description);
-
-                            // Log success information.
                             logMessage(getOrdinary(),
-                                    String.format("Successfully loaded " +
+                                    String.format("Load of metadata for " +
                                                     "distinguished account " +
-                                                    "description with key " +
-                                                    "'%s' and value '%s' at " +
-                                                    "line %d.",
+                                                    "with key '%s' and " +
+                                                    "value '%s' at line %d " +
+                                                    "was%s successful.",
                                             description.getKey(),
-                                            description.getValue(), lineNumber));
-                        } else {
+                                            description.getValue(), lineNumber,
+                                            hadLineProblem() ? " not" : ""));
+                        }
 
-                            /*
-                             * There is something wrong with the given value. Log an
-                             * error message.
-                             */
+                        /*
+                         * The key elements are not okay according to the
+                         * distinguished account library. There is something
+                         * wrong with the given value.
+                         */
+                        else {
+
+                            // Log an error message.
                             logMessage(Level.SEVERE, String.format("There is " +
                                     "something wrong with key '%s' in its " +
                                     "distinguished account description " +
@@ -156,7 +163,10 @@ public class DistinguishedsBuilder extends ElementReader {
                                 "'%s' named at line %d does not represent any " +
                                 "known, distinguished institution.", keyString,
                         lineNumber));
-            } else {
+            }
+
+            // The string represents a known distinguished institution key.
+            else {
 
                 /*
                  * The distinguished institution is recognized. But is it
@@ -192,20 +202,26 @@ public class DistinguishedsBuilder extends ElementReader {
 
                     /*
                      * Add the new description to the distinguished institution
-                     * library. Log success information.
+                     * library. Log exit information.
                      */
                     institutionLibrary.addDescription(description);
-                    logMessage(getOrdinary(), String.format("Successfully " +
-                                    "loaded distinguished institution " +
-                                    "description with key '%s' and value " +
-                                    "'%s' at line %d.", description.getKey(),
-                            description.getValue(), lineNumber));
-                } else {
+                    logMessage(getOrdinary(), String.format("Load of " +
+                                    "metadata for distinguished institution " +
+                                    "with key '%s' and value '%s' at line " +
+                                    "%d was%s successful.",
+                                    description.getKey(),
+                                    description.getValue(), lineNumber,
+                                    hadLineProblem() ? " not" : ""));
+                }
 
-                    /*
-                     * There is something wrong with the given value. Log an
-                     * error message.
-                     */
+                /*
+                 * The key is not okay according to the distinguished
+                 * institution library. There is something wrong with the given
+                 * value.
+                 */
+                else {
+
+                    // Log an error message.
                     logMessage(Level.SEVERE, String.format("There is " +
                             "something wrong with key '%s' in its " +
                             "distinguished institution description " +
@@ -251,7 +267,10 @@ public class DistinguishedsBuilder extends ElementReader {
                                 "'%s' named at line %d does not represent any " +
                                 "known, distinguished portfolio.", keyString,
                         lineNumber));
-            } else {
+            }
+
+            // The string represents a known distinguished portfolio key.
+            else {
 
                 /*
                  * The distinguished portfolio is recognized. But is it
@@ -287,20 +306,26 @@ public class DistinguishedsBuilder extends ElementReader {
 
                     /*
                      * Add the new description to the distinguished portfolio
-                     * library. Log success information.
+                     * library. Log exit information.
                      */
                     portfolioLibrary.addDescription(description);
-                    logMessage(getOrdinary(), String.format("Successfully " +
-                                    "loaded distinguished portfolio " +
-                                    "description with key '%s' and value " +
-                                    "'%s' at line %d.", description.getKey(),
-                            description.getValue(), lineNumber));
-                } else {
+                    logMessage(getOrdinary(), String.format("Load of " +
+                                    "metadata for distinguished portfolio " +
+                                    "with key '%s' and value '%s' at line " +
+                                    "%d was%s successful.",
+                            description.getKey(),
+                            description.getValue(), lineNumber,
+                            hadLineProblem() ? " not" : ""));
+                }
 
-                    /*
-                     * There is something wrong with the given value. Log an
-                     * error message.
-                     */
+                /*
+                 * The key is not okay according to the distinguished
+                 * portfolio library. There is something wrong with the given
+                 * value.
+                 */
+                else {
+
+                    // Log an error message.
                     logMessage(Level.SEVERE, String.format("There is " +
                             "something wrong with key '%s' in its " +
                             "distinguished portfolio description " +
@@ -411,7 +436,7 @@ public class DistinguishedsBuilder extends ElementReader {
             // Say whether the element processor had warning or error.
             System.out.printf("The element processor " +
                             "completed %s warning or error.%n",
-                    (processor.hadProblem() ? "with a" : "without"));
+                    (processor.hadFileProblem() ? "with a" : "without"));
         } catch (@NotNull IOException exception) {
             System.err.println(exception.getMessage());
         }
@@ -536,7 +561,7 @@ public class DistinguishedsBuilder extends ElementReader {
     }
 
     @Override
-    protected boolean processElements(@NotNull String[] elements, int lineNumber) {
+    protected void processElements(@NotNull String[] elements, int lineNumber) {
 
         // Get the line code.
         final Character lineCode = processCode(preprocessField(
@@ -572,9 +597,6 @@ public class DistinguishedsBuilder extends ElementReader {
              */
             dispatchProcessor(lineType, keyString, value, lineNumber);
         }
-
-        // Return the result.
-        return true;
     }
 
     @Override

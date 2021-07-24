@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.ticker;
 
+import com.garygregg.rebalance.AccountKeyLibrary;
 import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.FundType;
@@ -337,7 +338,7 @@ public class TickersBuilder extends ElementReader {
             // Say whether the element processor had warning or error.
             System.out.printf("The element processor " +
                             "completed %s warning or error.%n",
-                    (processor.hadProblem() ? "with a" : "without"));
+                    (processor.hadFileProblem() ? "with a" : "without"));
         } catch (@NotNull IOException exception) {
             System.err.println(exception.getMessage());
         }
@@ -785,11 +786,6 @@ public class TickersBuilder extends ElementReader {
     }
 
     @Override
-    protected @NotNull Logger getReadingLogger() {
-        return Logger.getLogger(TickersBuilder.class.getCanonicalName());
-    }
-
-    @Override
     public int getMinimumFields() {
         return 5;
     }
@@ -798,6 +794,11 @@ public class TickersBuilder extends ElementReader {
     @NotNull
     public String getPrefix() {
         return "ticker";
+    }
+
+    @Override
+    protected @NotNull Logger getReadingLogger() {
+        return Logger.getLogger(TickersBuilder.class.getCanonicalName());
     }
 
     /**
@@ -856,7 +857,7 @@ public class TickersBuilder extends ElementReader {
     }
 
     @Override
-    public boolean processElements(String[] elements, int lineNumber) {
+    public void processElements(String[] elements, int lineNumber) {
 
         // Get the ticker type.
         final Character tickerCode = processCode(
@@ -899,7 +900,7 @@ public class TickersBuilder extends ElementReader {
                             TickerFields.MINIMUM.getPosition()]), lineNumber),
 
                     processBalanceRounding(preprocessField(elements[
-                            TickerFields.PREFERRED_ROUNDING.getPosition()]),
+                                    TickerFields.PREFERRED_ROUNDING.getPosition()]),
                             lineNumber),
 
                     lineNumber
@@ -968,14 +969,12 @@ public class TickersBuilder extends ElementReader {
                 processField(i, elements[i], lineNumber);
             }
 
-            // Log success information.
-            logMessage(getOrdinary(), String.format("Successfully loaded " +
-                            "metadata for ticker with symbol '%s' at line %d.",
-                    description.getTicker(), lineNumber));
+            // Log some exit information.
+            logMessage(getOrdinary(), String.format("Load of metadata for " +
+                            "ticker with symbol '%s' at line %d was%s " +
+                            "successful.", description.getTicker(), lineNumber,
+                    hadLineProblem() ? " not" : ""));
         }
-
-        // Return the result.
-        return true;
     }
 
     /**

@@ -86,7 +86,7 @@ public class DetailedsBuilder extends ElementReader {
             // Say whether the element processor had warning or error.
             System.out.printf("The element processor " +
                             "completed %s warning or error.%n",
-                    (processor.hadProblem() ? "with a" : "without"));
+                    (processor.hadFileProblem() ? "with a" : "without"));
         } catch (@NotNull IOException exception) {
             System.err.println(exception.getMessage());
         }
@@ -160,8 +160,8 @@ public class DetailedsBuilder extends ElementReader {
     }
 
     @Override
-    protected boolean processElements(@NotNull String[] elements,
-                                      int lineNumber) {
+    protected void processElements(@NotNull String[] elements,
+                                   int lineNumber) {
 
         // Create a new detailed description with the detailed number and name.
         final DetailedDescription description = new DetailedDescription(
@@ -242,13 +242,13 @@ public class DetailedsBuilder extends ElementReader {
                             lineNumber));
         }
 
-        // Log some information and return the result.
-        logMessage(getOrdinary(), String.format("Successfully loaded " +
-                        "detailed metadata for account number '%s' (\"%s\") " +
-                        "at line %d.",
+        // Log some exit information.
+        logMessage(getOrdinary(), String.format("Load of detailed metadata " +
+                        "for account with number '%s' (\"%s\") at line %d " +
+                        "was%s successful.",
                 AccountKeyLibrary.format(description.getNumber()),
-                description.getName(), lineNumber));
-        return true;
+                description.getName(), lineNumber,
+                hadLineProblem() ? " not" : ""));
     }
 
     /**

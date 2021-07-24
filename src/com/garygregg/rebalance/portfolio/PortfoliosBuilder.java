@@ -193,7 +193,7 @@ public class PortfoliosBuilder extends ElementReader {
             // Say whether the element processor had warning or error.
             System.out.printf("The element processor " +
                             "completed %s warning or error.%n",
-                    (processor.hadProblem() ? "with a" : "without"));
+                    (processor.hadFileProblem() ? "with a" : "without"));
         } catch (@NotNull IOException exception) {
             System.err.println(exception.getMessage());
         }
@@ -324,8 +324,8 @@ public class PortfoliosBuilder extends ElementReader {
     }
 
     @Override
-    protected boolean processElements(@NotNull String[] elements,
-                                      int lineNumber) {
+    protected void processElements(@NotNull String[] elements,
+                                   int lineNumber) {
 
         // Create a new portfolio description with the index.
         final PortfolioDescription description = new PortfolioDescription(
@@ -391,11 +391,11 @@ public class PortfoliosBuilder extends ElementReader {
             processField(i, preprocessField(elements[i]), lineNumber);
         }
 
-        // Log some information and return the result.
-        logMessage(getOrdinary(), String.format("Successfully loaded " +
-                "metadata for portfolio with mnemonic '%s' at line " +
-                "%d.", description.getKey(), lineNumber));
-        return true;
+        // Log some exit information.
+        logMessage(getOrdinary(), String.format("Load of metadata for " +
+                "portfolio with mnemonic '%s' at line %d was%s successful.",
+                description.getKey(), lineNumber,
+                hadLineProblem() ? " not" : ""));
     }
 
     /**

@@ -159,7 +159,7 @@ public class HoldingsBuilder extends ElementReader {
             // Say whether the element processor had warning or error.
             System.out.printf("The element processor " +
                             "completed %s warning or error.%n",
-                    (processor.hadProblem() ? "with a" : "without"));
+                    (processor.hadFileProblem() ? "with a" : "without"));
         } catch (@NotNull IOException exception) {
             System.err.println(exception.getMessage());
         }
@@ -216,8 +216,8 @@ public class HoldingsBuilder extends ElementReader {
     }
 
     @Override
-    protected boolean processElements(@NotNull String[] elements,
-                                      int lineNumber) {
+    protected void processElements(@NotNull String[] elements,
+                                   int lineNumber) {
 
         // Get the line code.
         final Character lineCode = processCode(preprocessField(
@@ -308,11 +308,11 @@ public class HoldingsBuilder extends ElementReader {
             processField(i, preprocessField(elements[i]), lineNumber);
         }
 
-        // Log some information and return the result.
-        logMessage(getOrdinary(), String.format("Successfully loaded " +
-                        "metadata for holding with key '%s' at line %d.",
-                description.getHoldingParentChild().getSecond(), lineNumber));
-        return true;
+        // Log some exit information.
+        logMessage(getOrdinary(), String.format("Load of metadata for " +
+                        "holding with key '%s' at line %d was%s successful.",
+                description.getHoldingParentChild().getSecond(), lineNumber,
+                hadLineProblem() ? " not" : ""));
     }
 
     /**
