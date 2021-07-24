@@ -10,11 +10,12 @@ public class MessageLogger {
     // The default logger in case the current logger is null.
     private final Logger defaultLogger;
 
+    // The level threshold monitors
+    private final Pair<ThresholdMonitor, ThresholdMonitor> monitors =
+            new Pair<>(new ThresholdMonitor(), new ThresholdMonitor());
+
     // The current logger is null.
     private Logger logger;
-
-    // True if there was a problem processing lines, false otherwise
-    private boolean problem;
 
     /**
      * Constructs the message logger.
@@ -30,10 +31,11 @@ public class MessageLogger {
         /*
          * Set the current logger. Note: Setting the current logger to null
          * will automatically use the default as current. Initialize the
-         * problem flag.
+         * threshold monitors.
          */
         setLogger(null);
-        resetProblem();
+        resetProblem1();
+        resetProblem2();
     }
 
     /**
@@ -51,8 +53,18 @@ public class MessageLogger {
      * @return True if there was a problem since the last problem reset, false
      * otherwise
      */
-    public boolean hadProblem() {
-        return problem;
+    public boolean hadProblem1() {
+        return monitors.getFirst().isThresholdReached();
+    }
+
+    /**
+     * Returns whether there was a problem since the last problem reset.
+     *
+     * @return True if there was a problem since the last problem reset, false
+     * otherwise
+     */
+    public boolean hadProblem2() {
+        return monitors.getSecond().isThresholdReached();
     }
 
     /**
@@ -65,23 +77,25 @@ public class MessageLogger {
     public boolean logMessage(@NotNull Level level,
                               @NotNull String message) {
 
-        /*
-         * Determine the problem value for this message, and set the object
-         * flag as required.
-         */
-        final boolean problem = Level.WARNING.intValue() <= level.intValue();
-        setProblem(problem);
-
         // Log the message, and return the problem flag for this message.
-        getLogger().log(level, message);
-        return problem;
+        final ThresholdMonitor first = monitors.getFirst();
+        getLogger().log(first.observe(monitors.getSecond().observe(level)),
+                message);
+        return first.isThresholdReached(level);
     }
 
     /**
      * Resets the problem flag.
      */
-    public void resetProblem() {
-        problem = false;
+    public void resetProblem1() {
+        monitors.getFirst().reset();
+    }
+
+    /**
+     * Resets the problem flag.
+     */
+    public void resetProblem2() {
+        monitors.getSecond().reset();
     }
 
     /**
@@ -91,16 +105,5 @@ public class MessageLogger {
      */
     public void setLogger(Logger logger) {
         this.logger = (null == logger) ? defaultLogger : logger;
-    }
-
-    /**
-     * Sets the problem flag.
-     *
-     * @param problem True if a problem was encountered, false otherwise
-     */
-    private void setProblem(boolean problem) {
-
-        // Keep the problem flag true until it is explicitly reset.
-        this.problem |= problem;
     }
 }
