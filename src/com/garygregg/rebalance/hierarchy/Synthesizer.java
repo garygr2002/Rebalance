@@ -53,7 +53,7 @@ abstract class Synthesizer {
          * it, and cancel its work if the result is false. Reset the logger
          * for problems. Get the key of given account, and the intended key.
          */
-        getLogger().resetProblem();
+        getLogger().resetProblem1();
         final AccountKey givenKey = account.getKey();
         final AccountKey intendedKey = getKey();
 

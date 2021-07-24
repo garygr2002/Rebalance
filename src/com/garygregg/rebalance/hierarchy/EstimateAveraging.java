@@ -130,7 +130,7 @@ public class EstimateAveraging extends Synthesizer {
              */
             account.setConsidered(sum(estimateList, byConsidered));
             account.setNotConsidered(sum(estimateList, byNotConsidered));
-            result = !logger.hadProblem();
+            result = !logger.hadProblem1();
         }
 
         /*

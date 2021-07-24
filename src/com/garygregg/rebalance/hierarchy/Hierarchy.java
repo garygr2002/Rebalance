@@ -376,7 +376,7 @@ public class Hierarchy {
             System.out.printf("The date of the holding library is: %s; " +
                             "problems were%s detected.%n",
                     DateUtilities.format(date),
-                    (holdings.hadProblem() ? "" : " not"));
+                    (holdings.hadFileProblem() ? "" : " not"));
 
             /*
              * Create a portfolios builder. Read lines from a portfolio
@@ -394,7 +394,7 @@ public class Hierarchy {
                             "problems were%s detected.%n",
                     DateUtilities.format(
                             PortfolioLibrary.getInstance().getDate()),
-                    (portfolios.hadProblem() ? "" : " not"));
+                    (portfolios.hadFileProblem() ? "" : " not"));
 
             /*
              * Create an accounts builder. Read lines from an account
@@ -412,7 +412,7 @@ public class Hierarchy {
                             "problems were%s detected.%n",
                     DateUtilities.format(
                             AccountLibrary.getInstance().getDate()),
-                    (accounts.hadProblem() ? "" : " not"));
+                    (accounts.hadFileProblem() ? "" : " not"));
 
             /*
              * Create a ticker builder. Read lines from a ticker description
@@ -429,7 +429,7 @@ public class Hierarchy {
                             "problems were%s detected.%n",
                     DateUtilities.format(
                             TickerLibrary.getInstance().getDate()),
-                    (tickers.hadProblem() ? "" : " not"));
+                    (tickers.hadFileProblem() ? "" : " not"));
 
             // Get a hierarchy instance and build it.
             final Hierarchy hierarchy = Hierarchy.getInstance();
@@ -1103,7 +1103,7 @@ public class Hierarchy {
      * hierarchy, false otherwise
      */
     public boolean hadProblem() {
-        return logger.hadProblem();
+        return logger.hadProblem1();
     }
 
     /**
@@ -1156,7 +1156,7 @@ public class Hierarchy {
      * Resets the problem flag.
      */
     private void resetProblem() {
-        logger.resetProblem();
+        logger.resetProblem1();
     }
 
     /**
