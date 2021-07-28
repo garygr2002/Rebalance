@@ -594,6 +594,14 @@ public class Hierarchy {
         }
 
         /*
+         * The account description is not null. Check to be certain the name in
+         * the account description matches that in the holding description.
+         */
+        else {
+            checkEqualNames(holdingDescription, accountDescription);
+        }
+
+        /*
          * Set the 'not considered' value of the account using the value in the
          * holding description. Put the account in the account map.
          */
@@ -789,6 +797,15 @@ public class Hierarchy {
         }
 
         /*
+         * The portfolio description is not null. Check to be certain the name
+         * in the portfolio description matches that in the holding
+         * description.
+         */
+        else {
+            checkEqualNames(holdingDescription, portfolioDescription);
+        }
+
+        /*
          * Set the 'not considered' value of the portfolio using the value in
          * the holding description. Put the portfolio in the portfolio map.
          */
@@ -869,19 +886,36 @@ public class Hierarchy {
         }
 
         /*
-         * The ticker description is not null. Set 'considered' values if the
-         * ticker description so indicates.
+         * The ticker description is not null. Check to be certain the name in
+         * the ticker description matches that in the holding description.
          */
-        else if (tickerDescription.isConsidered()) {
-            setConsidered(ticker, holdingDescription);
-        }
 
-        /*
-         * The ticker description does not indicate that the values are
-         * considered for rebalancing.
-         */
+        // The ticker description is not null.
         else {
-            setNotConsidered(ticker, holdingDescription);
+
+            /*
+             * Check to be certain the name in the ticker description matches
+             * that in the holding description. Does the ticker description
+             * indicate that the value for this ticker is considered for
+             * re-balancing?
+             */
+            checkEqualNames(holdingDescription, tickerDescription);
+            if (tickerDescription.isConsidered()) {
+
+                /*
+                 * The ticker description indicates that the value for this
+                 * ticker is considered for re-balancing.
+                 */
+                setConsidered(ticker, holdingDescription);
+            }
+
+            /*
+             * The ticker description indicates that the value for this ticker
+             * is *not* considered for re-balancing.
+             */
+            else {
+                setNotConsidered(ticker, holdingDescription);
+            }
         }
 
         // Log exit information.
@@ -942,6 +976,31 @@ public class Hierarchy {
         // Check and report on the weight type.
         checkAndReport(allConsidered, weightConsidered, aggregate);
         checkAndReport(allNotConsidered, weightNotConsidered, aggregate);
+    }
+
+    /**
+     * Checks to be certain the name in a holding description matches the
+     * name in another description.
+     * @param holding The holding description
+     * @param other The other description
+     */
+    private void checkEqualNames(@NotNull HoldingDescription holding,
+                                 @NotNull Description<?> other) {
+
+        // Get the names of the two descriptions. Are the names not equal?
+        final String holdingName = holding.getName();
+        final String otherName = other.getName();
+        if (!Objects.equals(holdingName, otherName)) {
+
+            /*
+             * The names of the two descriptions are not equal. Log a
+             * warning.
+             */
+            logMessage(Level.WARNING, String.format("Description of type %s " +
+                            "has name '%s', but holding description has " +
+                            "name '%s'.", other.getClass().getSimpleName(),
+                    otherName, holdingName));
+        }
     }
 
     /**
@@ -1268,7 +1327,7 @@ public class Hierarchy {
             actualTotal.add(notConsidered);
 
             // Does the actual total not match the expected total?
-            //noinspection EqualsBetweenInconvertibleTypes
+            //noinspection EqualsBetweenInconvertibleTypes,AssignmentUsedAsCondition
             if (result = (!actualTotal.equals(expectedTotal))) {
 
                 /*
