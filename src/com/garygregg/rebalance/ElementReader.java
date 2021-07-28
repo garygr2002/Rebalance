@@ -462,13 +462,12 @@ public abstract class ElementReader extends ElementProcessor {
             logMessage(getOrdinary(), String.format("Reading lines for " +
                     "element processor of type '%s'.", prefix));
             result = doReadLines(fileReader, continueOnFalse);
+        }
 
-        } finally {
+        // Do this block even if an exception occurred.
+        finally {
 
-            /*
-             * Log a 'stop processing' message, and stop processing whether
-             * or not an exception occurred.
-             */
+            // Log 'stop processing' message.
             logMessage(getOrdinary(), String.format("Stopping " +
                             "processing for element processor of type '%s'.",
                     prefix));
@@ -476,11 +475,10 @@ public abstract class ElementReader extends ElementProcessor {
         }
 
         // Log an exit message.
-        final String successResult = "after";
         logMessage(getExtraordinary(), String.format("Element reader of " +
-                        "type '%s' is exiting %s reading all elements.",
-                prefix, result ? successResult : String.format("with error %s",
-                        continueOnFalse ? successResult : "before")));
+                "type '%s' is exiting with%s error(s) %s reading all " +
+                "elements.", prefix, result ? " no" : "",
+                continueOnFalse ? "after" : "before"));
 
         // Return the result.
         return result;
