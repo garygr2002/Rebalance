@@ -657,7 +657,8 @@ public class DistinguishedsBuilder extends ElementReader {
              * Catch any illegal argument exception that may occur (meaning:
              * the argument does not represent any key of the type of this
              * class). Initialize the result to null;
-             */ catch (@NotNull IllegalArgumentException exception) {
+             */
+            catch (@NotNull IllegalArgumentException exception) {
                 result = null;
             }
 
