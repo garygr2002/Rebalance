@@ -8,14 +8,14 @@ public enum DistinguishedAccounts {
     // The default (unused)
     DEFAULT,
 
+    // House averaging estimate
+    ESTIMATE_AVERAGING,
+
     // The 1st 401k
     FIRST_401K,
 
     // The Health Savings Account
     HEALTH_SAVINGS_ACCOUNT,
-
-    // House averaging estimate
-    HOUSE_AVERAGING_ESTIMATE,
 
     // The 1st house estimate
     HOUSE_ESTIMATE_1,

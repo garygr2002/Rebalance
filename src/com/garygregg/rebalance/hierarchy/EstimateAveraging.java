@@ -64,7 +64,7 @@ public class EstimateAveraging extends Synthesizer {
 
     @Override
     public @NotNull DistinguishedAccounts getAccount() {
-        return DistinguishedAccounts.HOUSE_AVERAGING_ESTIMATE;
+        return DistinguishedAccounts.ESTIMATE_AVERAGING;
     }
 
     @Override
