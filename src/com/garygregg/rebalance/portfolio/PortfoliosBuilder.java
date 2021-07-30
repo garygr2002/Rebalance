@@ -31,8 +31,7 @@ public class PortfoliosBuilder extends ElementReader {
                 @Override
                 public void processField(@NotNull String field,
                                          int lineNumber) {
-                    getTarget().setBirthDate(processDate(
-                            preprocessField(field), lineNumber));
+                    getTarget().setBirthDate(processDate(field, lineNumber));
                 }
             };
 
@@ -41,8 +40,8 @@ public class PortfoliosBuilder extends ElementReader {
             new FieldProcessor<PortfolioDescription>() {
                 @Override
                 public void processField(@NotNull String field, int lineNumber) {
-                    getTarget().setCpiAdjusted(processBoolean(
-                            preprocessField(field), lineNumber));
+                    getTarget().setCpiAdjusted(processBoolean(field,
+                            lineNumber));
                 }
             };
 
@@ -54,8 +53,8 @@ public class PortfoliosBuilder extends ElementReader {
             new FieldProcessor<>() {
                 @Override
                 public void processField(@NotNull String field, int lineNumber) {
-                    getTarget().setMortalityDate(processDate(
-                            preprocessField(field), lineNumber));
+                    getTarget().setMortalityDate(processDate(field,
+                            lineNumber));
                 }
             };
 
@@ -66,7 +65,7 @@ public class PortfoliosBuilder extends ElementReader {
                 @Override
                 public void processField(@NotNull String field,
                                          int lineNumber) {
-                    getTarget().setName(processName(preprocessField(field)));
+                    getTarget().setName(processName(field));
                 }
             };
 
@@ -76,7 +75,7 @@ public class PortfoliosBuilder extends ElementReader {
                 @Override
                 public void processField(@NotNull String field, int lineNumber) {
                     getTarget().setOtherMonthly(new Currency(processFloat(
-                            preprocessField(field), 0., lineNumber)));
+                            field, 0., lineNumber)));
                 }
             };
 
@@ -89,8 +88,8 @@ public class PortfoliosBuilder extends ElementReader {
                 @Override
                 public void processField(@NotNull String field,
                                          int lineNumber) {
-                    getTarget().setSocialSecurityMonthly(new Currency(processFloat(
-                            preprocessField(field), 0., lineNumber)));
+                    getTarget().setSocialSecurityMonthly(new Currency(
+                            processFloat(field, 0., lineNumber)));
                 }
             };
 
@@ -100,8 +99,8 @@ public class PortfoliosBuilder extends ElementReader {
                 @Override
                 public void processField(@NotNull String field,
                                          int lineNumber) {
-                    getTarget().setTaxableAnnual(new Currency(processFloat(
-                            preprocessField(field), 0., lineNumber)));
+                    getTarget().setTaxableAnnual(new Currency(
+                            processFloat(field, 0., lineNumber)));
                 }
             };
 
@@ -329,8 +328,8 @@ public class PortfoliosBuilder extends ElementReader {
 
         // Create a new portfolio description with the index.
         final PortfolioDescription description = new PortfolioDescription(
-                processMnemonic(preprocessField(
-                        elements[PortfolioFields.MNEMONIC.getPosition()])));
+                processMnemonic(
+                        elements[PortfolioFields.MNEMONIC.getPosition()]));
 
         /*
          * Check the key of the description against the default key in the
@@ -388,7 +387,7 @@ public class PortfoliosBuilder extends ElementReader {
 
         // Cycle for each remaining field-to-process, and process it.
         for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
-            processField(i, preprocessField(elements[i]), lineNumber);
+            processField(i, elements[i], lineNumber);
         }
 
         // Log some exit information.
@@ -517,7 +516,7 @@ public class PortfoliosBuilder extends ElementReader {
         @Override
         public void processField(@NotNull String field, int lineNumber) {
             getTarget().adjustAllocation(positionMap.get(getIndex()).getType(),
-                    processAllocation(preprocessField(field), lineNumber));
+                    processAllocation(field, lineNumber));
         }
 
         /**

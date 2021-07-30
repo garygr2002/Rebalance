@@ -564,8 +564,8 @@ public class DistinguishedsBuilder extends ElementReader {
     protected void processElements(@NotNull String[] elements, int lineNumber) {
 
         // Get the line code.
-        final Character lineCode = processCode(preprocessField(
-                elements[DistinguishedFields.LINE_TYPE.getPosition()]));
+        final Character lineCode = processCode(
+                elements[DistinguishedFields.LINE_TYPE.getPosition()]);
 
         // Determine the line type from the code. Is the line type known?
         final HoldingLineType lineType =
@@ -579,8 +579,8 @@ public class DistinguishedsBuilder extends ElementReader {
         } else {
 
             // The line type is recognized. Get the key string.
-            final String keyString = processKeyString(preprocessField(
-                    elements[DistinguishedFields.KEY.getPosition()]));
+            final String keyString = processKeyString(
+                    elements[DistinguishedFields.KEY.getPosition()]);
 
             /*
              * Create a new value. Note: the tracker is creating a 'key' for a
@@ -588,8 +588,8 @@ public class DistinguishedsBuilder extends ElementReader {
              * distinguished value library the key is actually a value.
              */
             final Pair<String, String> value = tracker.constructKey(lineCode,
-                    processValue(preprocessField(
-                            elements[DistinguishedFields.VALUE.getPosition()])));
+                    processValue(
+                            elements[DistinguishedFields.VALUE.getPosition()]));
 
             /*
              * Dispatch the processor for the line type, key string, value and

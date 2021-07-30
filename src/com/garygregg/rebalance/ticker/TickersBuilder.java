@@ -861,7 +861,7 @@ public class TickersBuilder extends ElementReader {
 
         // Get the ticker type.
         final Character tickerCode = processCode(
-                preprocessField(elements[TickerFields.CODE.getPosition()]));
+                elements[TickerFields.CODE.getPosition()]);
 
         /*
          * Get the ticker factory based on the ticker type. Is a factory
@@ -887,23 +887,19 @@ public class TickersBuilder extends ElementReader {
              */
             final TickerDescription description = factory.createDescription(
 
-                    processTicker(preprocessField(elements[
-                            TickerFields.TICKER.getPosition()])),
+                    processTicker(elements[TickerFields.TICKER.getPosition()]),
 
-                    processNumber(preprocessField(elements[
-                            TickerFields.NUMBER.getPosition()]), lineNumber),
-
-                    processName(preprocessField(elements[
-                            TickerFields.NAME.getPosition()])),
-
-                    processMinimum(preprocessField(elements[
-                            TickerFields.MINIMUM.getPosition()]), lineNumber),
-
-                    processBalanceRounding(preprocessField(elements[
-                                    TickerFields.PREFERRED_ROUNDING.getPosition()]),
+                    processNumber(elements[TickerFields.NUMBER.getPosition()],
                             lineNumber),
 
-                    lineNumber
+                    processName(elements[TickerFields.NAME.getPosition()]),
+
+                    processMinimum(elements[TickerFields.MINIMUM.getPosition()],
+                            lineNumber),
+
+                    processBalanceRounding(elements[
+                            TickerFields.PREFERRED_ROUNDING.getPosition()],
+                            lineNumber), lineNumber
             );
 
             /*

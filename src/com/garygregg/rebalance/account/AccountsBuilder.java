@@ -152,27 +152,27 @@ public class AccountsBuilder extends ElementReader {
          */
         final AccountDescription description = new AccountDescription(
 
-                processInstitution(preprocessField(
-                        elements[AccountFields.INSTITUTION.getPosition()])),
+                processInstitution(
+                        elements[AccountFields.INSTITUTION.getPosition()]),
 
-                processNumber(preprocessField(
-                        elements[AccountFields.NUMBER.getPosition()]),
+                processNumber(
+                        elements[AccountFields.NUMBER.getPosition()],
                         lineNumber),
 
-                processRebalanceOrder(preprocessField(
+                processRebalanceOrder(
                         elements[AccountFields.REBALANCE_ORDER.
-                                getPosition()]), lineNumber),
+                                getPosition()], lineNumber),
 
-                processName(preprocessField(
-                        elements[AccountFields.NAME.getPosition()])),
+                processName(
+                        elements[AccountFields.NAME.getPosition()]),
 
-                processType(preprocessField(
-                        elements[AccountFields.TYPE.getPosition()]),
+                processType(
+                        elements[AccountFields.TYPE.getPosition()],
                         lineNumber),
 
-                processRebalanceProcedure(preprocessField(
+                processRebalanceProcedure(
                         elements[AccountFields.REBALANCE_PROCEDURE.
-                                getPosition()]), lineNumber));
+                                getPosition()], lineNumber));
 
         /*
          * Check the key of the description against the default key in the
@@ -236,8 +236,7 @@ public class AccountsBuilder extends ElementReader {
              */
             field = positionMap.get(i);
             description.adjustAllocation(field.getType(),
-                    processAllocation(preprocessField(elements[i]),
-                            lineNumber));
+                    processAllocation(elements[i], lineNumber));
         }
 
         // Log some exit information.

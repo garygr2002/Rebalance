@@ -166,15 +166,15 @@ public class DetailedsBuilder extends ElementReader {
         // Create a new detailed description with the detailed number and name.
         final DetailedDescription description = new DetailedDescription(
 
-                processInstitution(preprocessField(
-                        elements[DetailedFields.INSTITUTION.getPosition()])),
+                processInstitution(
+                        elements[DetailedFields.INSTITUTION.getPosition()]),
 
-                processNumber(preprocessField(
-                        elements[DetailedFields.NUMBER.getPosition()]),
+                processNumber(
+                        elements[DetailedFields.NUMBER.getPosition()],
                         lineNumber),
 
-                processName(preprocessField(
-                        elements[DetailedFields.NAME.getPosition()])));
+                processName(
+                        elements[DetailedFields.NAME.getPosition()]));
 
         /*
          * Check the key of the description against the default key in the
@@ -238,8 +238,7 @@ public class DetailedsBuilder extends ElementReader {
              */
             field = positionMap.get(i);
             description.adjustAllocation(field.getType(),
-                    processAllocation(preprocessField(elements[i]),
-                            lineNumber));
+                    processAllocation(elements[i], lineNumber));
         }
 
         // Log some exit information.

@@ -20,7 +20,7 @@ public class HoldingsBuilder extends ElementReader {
 
                 @Override
                 public void processField(@NotNull String field, int lineNumber) {
-                    getTarget().setName(processName(preprocessField(field)));
+                    getTarget().setName(processName(field));
                 }
             };
 
@@ -31,8 +31,7 @@ public class HoldingsBuilder extends ElementReader {
                 @Override
                 public void processNotEmptyField(@NotNull String field,
                                                  int lineNumber) {
-                    getTarget().setPrice(processFloat(preprocessField(field),
-                            1., lineNumber));
+                    getTarget().setPrice(processFloat(field, 1., lineNumber));
                 }
             };
 
@@ -43,8 +42,7 @@ public class HoldingsBuilder extends ElementReader {
                 @Override
                 public void processNotEmptyField(@NotNull String field,
                                                  int lineNumber) {
-                    getTarget().setShares(processFloat(preprocessField(field),
-                            0., lineNumber));
+                    getTarget().setShares(processFloat(field, 0., lineNumber));
                 }
             };
 
@@ -71,8 +69,8 @@ public class HoldingsBuilder extends ElementReader {
                             Currency.getZero().getValue() : current.getValue();
 
                     // Set the value of the target using the field.
-                    description.setValue(processFloat(preprocessField(field),
-                            defaultValue, lineNumber));
+                    description.setValue(processFloat(field, defaultValue,
+                            lineNumber));
                 }
             };
 
@@ -220,8 +218,8 @@ public class HoldingsBuilder extends ElementReader {
                                    int lineNumber) {
 
         // Get the line code.
-        final Character lineCode = processCode(preprocessField(
-                elements[HoldingFields.LINE_TYPE.getPosition()]));
+        final Character lineCode = processCode(elements[
+                HoldingFields.LINE_TYPE.getPosition()]);
 
         // Determine the line type from the code. Is the line type known?
         final HoldingLineType lineType =
@@ -236,8 +234,7 @@ public class HoldingsBuilder extends ElementReader {
 
         // Create a new holding description key.
         final HoldingKey key = new HoldingKey(tracker.constructKey(lineCode,
-                processKey(preprocessField(
-                        elements[HoldingFields.KEY.getPosition()]))));
+                processKey(elements[HoldingFields.KEY.getPosition()])));
 
         /*
          * Create a new holding description with the key. Set the line type
@@ -305,7 +302,7 @@ public class HoldingsBuilder extends ElementReader {
 
         // Cycle for each remaining field-to-process, and process it.
         for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
-            processField(i, preprocessField(elements[i]), lineNumber);
+            processField(i, elements[i], lineNumber);
         }
 
         // Log some exit information.

@@ -20,8 +20,7 @@ public class CodesBuilder extends ElementReader {
                 public void processField(@NotNull String field,
                                          int lineNumber) {
                     getTarget().setDescription(
-                            preprocessField(
-                                    CodesBuilder.processDescription(field)));
+                            CodesBuilder.processDescription(field));
                 }
             };
 
@@ -34,8 +33,7 @@ public class CodesBuilder extends ElementReader {
 
                 @Override
                 public void processField(@NotNull String field, int lineNumber) {
-                    getTarget().setName(preprocessField(
-                            CodesBuilder.processName(field)));
+                    getTarget().setName(CodesBuilder.processName(field));
 
                 }
             };
@@ -171,8 +169,7 @@ public class CodesBuilder extends ElementReader {
 
         // Create a new code description with the code.
         final CodeDescription description = new CodeDescription(
-                processCode(preprocessField(
-                        elements[CodeFields.CODE.getPosition()])));
+                processCode(elements[CodeFields.CODE.getPosition()]));
 
         /*
          * Check the key of the description against the default key in the
@@ -233,7 +230,7 @@ public class CodesBuilder extends ElementReader {
         for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
 
             // Process the first/next field.
-            processField(i, preprocessField(elements[i]), lineNumber);
+            processField(i, elements[i], lineNumber);
         }
 
         // Log some exit information.
@@ -250,7 +247,7 @@ public class CodesBuilder extends ElementReader {
      * @return A processed subcode
      */
     private Character processSubcode(@NotNull String subcode) {
-        return processCode(preprocessField(subcode));
+        return processCode(subcode);
     }
 
     /**
