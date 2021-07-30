@@ -30,8 +30,29 @@ public abstract class ElementReader extends ElementProcessor {
      * @param field The field to preprocess
      * @return The preprocessed field
      */
-    protected static String preprocessField(String field) {
+    private static String preprocessField(@NotNull String field) {
         return field.trim();
+    }
+
+    /**
+     * Preprocesses fields for element processors.
+     *
+     * @param fields The fields to preprocess.
+     * @return The preprocessed fields
+     */
+    private static @NotNull String[] preprocessFields(
+            @NotNull String[] fields) {
+
+        // Get the length of the field array, and cycle for each element.
+        final int length = fields.length;
+        for (int i = 0; i < length; ++i) {
+
+            // Preprocess the first/next field.
+            fields[i] = preprocessField(fields[i]);
+        }
+
+        // Return the preprocessed fields.
+        return fields;
     }
 
     /**
@@ -117,15 +138,18 @@ public abstract class ElementReader extends ElementProcessor {
              */
             elements = line.split(",");
             fieldCount = elements.length;
-            if (processResult = minimumFields <= fieldCount) {
+            //noinspection AssignmentUsedAsCondition
+            if (processResult = (minimumFields <= fieldCount)) {
 
                 /*
                  * The field count is at least as long as the minimum number of
-                 * fields. Reset the line problem flag, process the elements,
-                 * and determine if there has been no problem in doing so.
+                 * fields. Reset the line problem flag. Preprocess, then
+                 * process the elements. Determine if there has been no problem
+                 * in doing so by checking the line problem flag.
                  */
                 resetLineProblem();
-                processElements(line.split(","), lineNumber++);
+                processElements(preprocessFields(line.split(",")),
+                        lineNumber++);
                 processResult = !hadLineProblem();
             }
 
@@ -476,9 +500,9 @@ public abstract class ElementReader extends ElementProcessor {
 
         // Log an exit message.
         logMessage(getExtraordinary(), String.format("Element reader of " +
-                "type '%s' is exiting with%s error(s) %s reading all " +
-                "elements.", prefix, result ? " no" : "",
-                continueOnFalse ? "after" : "before"));
+                        "type '%s' is exiting with%s error(s)%s.",
+                prefix, result ? " no" : "", (result || continueOnFalse) ? "" :
+                        "; unread lines after the first error may exist."));
 
         // Return the result.
         return result;
