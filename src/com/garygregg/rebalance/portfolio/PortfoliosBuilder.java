@@ -37,7 +37,7 @@ public class PortfoliosBuilder extends ElementReader {
 
     // The CPI adjusted flag processor
     private final FieldProcessor<PortfolioDescription> cpiAdjustedProcessor =
-            new FieldProcessor<PortfolioDescription>() {
+            new FieldProcessor<>() {
                 @Override
                 public void processField(@NotNull String field, int lineNumber) {
                     getTarget().setCpiAdjusted(processBoolean(field,
@@ -71,7 +71,7 @@ public class PortfoliosBuilder extends ElementReader {
 
     // The other monthly annuity income processor
     private final FieldProcessor<PortfolioDescription> otherMonthlyProcessor =
-            new FieldProcessor<PortfolioDescription>() {
+            new FieldProcessor<>() {
                 @Override
                 public void processField(@NotNull String field, int lineNumber) {
                     getTarget().setOtherMonthly(new Currency(processFloat(
@@ -84,18 +84,18 @@ public class PortfoliosBuilder extends ElementReader {
 
     // The monthly Social Security monthly income processor
     private final FieldProcessor<PortfolioDescription>
-            socialSecurityMonthlyProcessor = new FieldProcessor<PortfolioDescription>() {
-                @Override
-                public void processField(@NotNull String field,
-                                         int lineNumber) {
-                    getTarget().setSocialSecurityMonthly(new Currency(
-                            processFloat(field, 0., lineNumber)));
-                }
-            };
+            socialSecurityMonthlyProcessor = new FieldProcessor<>() {
+        @Override
+        public void processField(@NotNull String field,
+                                 int lineNumber) {
+            getTarget().setSocialSecurityMonthly(new Currency(
+                    processFloat(field, 0., lineNumber)));
+        }
+    };
 
     // The taxable annual income processor
     private final FieldProcessor<PortfolioDescription> taxableAnnualProcessor =
-            new FieldProcessor<PortfolioDescription>() {
+            new FieldProcessor<>() {
                 @Override
                 public void processField(@NotNull String field,
                                          int lineNumber) {
@@ -406,6 +406,7 @@ public class PortfoliosBuilder extends ElementReader {
      *                     occurs
      * @return A processed floating point element
      */
+    @SuppressWarnings("SameParameterValue")
     private double processFloat(@NotNull String element, double defaultValue,
                                 int lineNumber) {
 
