@@ -97,7 +97,7 @@ public class Pair<FirstType, SecondType> {
         else {
 
             /*
-             * First comes before second if second is null. Otherwise use the
+             * First comes before second if second is null. Otherwise, use the
              * native comparator to compare the two values.
              */
             result = (null == second) ? Integer.MAX_VALUE :
