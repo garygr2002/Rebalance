@@ -6,7 +6,7 @@ import java.text.NumberFormat;
 import java.util.Objects;
 
 public class MutableShares extends MutableCountable
-        implements Factory<Shares> {
+        implements Comparable<MutableShares>, Factory<Shares> {
 
     // A class comparable to this one
     private static final Class<Shares> comparableClass = Shares.class;
@@ -107,6 +107,11 @@ public class MutableShares extends MutableCountable
         if (null != container) {
             container.clear();
         }
+    }
+
+    @Override
+    public int compareTo(@NotNull MutableShares mutableShares) {
+        return (int) Math.signum(getValue() - mutableShares.getValue());
     }
 
     @Override

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.text.NumberFormat;
 import java.util.Objects;
 
-public class Currency extends Countable {
+public class Currency extends Countable implements Comparable<Currency> {
 
     // A class comparable to this one
     private static final Class<MutableCurrency> comparableClass =
@@ -95,6 +95,11 @@ public class Currency extends Countable {
     @Override
     public boolean areNotEqual(double value) {
         return !ICountable.areEqual(value, getValue(), getPrecision());
+    }
+
+    @Override
+    public int compareTo(@NotNull Currency currency) {
+        return (int) Math.signum(getValue() - currency.getValue());
     }
 
     @Override

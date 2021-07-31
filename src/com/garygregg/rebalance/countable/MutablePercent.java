@@ -6,7 +6,7 @@ import java.text.NumberFormat;
 import java.util.Objects;
 
 public class MutablePercent extends MutableCountable
-        implements Factory<Percent> {
+        implements Comparable<MutablePercent>, Factory<Percent> {
 
     // A class comparable to this one
     private static final Class<Percent> comparableClass = Percent.class;
@@ -107,6 +107,11 @@ public class MutablePercent extends MutableCountable
         if (null != container) {
             container.clear();
         }
+    }
+
+    @Override
+    public int compareTo(@NotNull MutablePercent mutablePercent) {
+        return (int) Math.signum(getValue() - mutablePercent.getValue());
     }
 
     @Override

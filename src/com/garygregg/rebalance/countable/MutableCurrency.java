@@ -6,7 +6,7 @@ import java.text.NumberFormat;
 import java.util.Objects;
 
 public class MutableCurrency extends MutableCountable
-        implements Factory<Currency> {
+        implements Comparable<MutableCurrency>, Factory<Currency> {
 
     // A class comparable to this one
     private static final Class<Currency> comparableClass = Currency.class;
@@ -107,6 +107,11 @@ public class MutableCurrency extends MutableCountable
         if (null != container) {
             container.clear();
         }
+    }
+
+    @Override
+    public int compareTo(@NotNull MutableCurrency mutableCurrency) {
+        return (int) Math.signum(getValue() - mutableCurrency.getValue());
     }
 
     /**

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.text.NumberFormat;
 import java.util.Objects;
 
-public class Shares extends Countable {
+public class Shares extends Countable implements Comparable<Shares> {
 
     // A class comparable to this one
     private static final Class<MutableShares> comparableClass =
@@ -104,6 +104,11 @@ public class Shares extends Countable {
      */
     public boolean areOne() {
         return equals(getOne());
+    }
+
+    @Override
+    public int compareTo(@NotNull Shares shares) {
+        return (int) Math.signum(getValue() - shares.getValue());
     }
 
     @Override

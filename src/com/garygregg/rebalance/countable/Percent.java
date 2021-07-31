@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.text.NumberFormat;
 import java.util.Objects;
 
-public class Percent extends Countable {
+public class Percent extends Countable implements Comparable<Percent> {
 
     // A class comparable to this one
     private static final Class<MutablePercent> comparableClass =
@@ -104,6 +104,11 @@ public class Percent extends Countable {
      */
     public boolean areOneHundred() {
         return equals(getOneHundred());
+    }
+
+    @Override
+    public int compareTo(@NotNull Percent percent) {
+        return (int) Math.signum(getValue() - percent.getValue());
     }
 
     @Override
