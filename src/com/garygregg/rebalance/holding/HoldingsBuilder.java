@@ -62,7 +62,7 @@ public class HoldingsBuilder extends ElementReader {
                     final Currency current = getTarget().getValue();
 
                     /*
-                     * Use the current value of the description if the
+                     * Use the current value of the description of the
                      * description if it is not null; otherwise use zero.
                      */
                     final double defaultValue = (null == current) ?
@@ -105,7 +105,7 @@ public class HoldingsBuilder extends ElementReader {
 
         /*
          * Format the parent of holding key as an account key if the line type
-         * is 'ticker'. Otherwise just output the parent itself.
+         * is 'ticker'. Otherwise, just output the parent itself.
          */
         return ((null != lineType) &&
                 (lineType.equals(HoldingLineType.TICKER))) ?
@@ -181,7 +181,7 @@ public class HoldingsBuilder extends ElementReader {
      */
     private static @NotNull String processKey(@NotNull String key) {
 
-        // Currently we just return the argument.
+        // Currently, we just return the argument.
         return key;
     }
 
@@ -193,7 +193,7 @@ public class HoldingsBuilder extends ElementReader {
      */
     private static @NotNull String processName(@NotNull String name) {
 
-        // Currently we just return the argument.
+        // Currently, we just return the argument.
         return name;
     }
 
@@ -330,7 +330,7 @@ public class HoldingsBuilder extends ElementReader {
 
             /*
              * Use the default value if the element is the empty string.
-             * Otherwise parse the allocation as a floating point number. Catch
+             * Otherwise, parse the allocation as a floating point number. Catch
              * any number format exception that may occur.
              */
             result = element.isEmpty() ? defaultValue :
