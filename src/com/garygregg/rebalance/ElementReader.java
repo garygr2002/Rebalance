@@ -213,7 +213,7 @@ public abstract class ElementReader extends ElementProcessor {
      * is flagged as occurring before the given date (date may be null).
      *
      * @param directory The directory from which to return a reader
-     * @param date      The given date (may be null)
+     * @param date      The given date (maybe null)
      * @return A file reader for the thus described file, or null if none exists
      */
     private FileReader getMostRecentReader(@NotNull File directory, Date date) {
