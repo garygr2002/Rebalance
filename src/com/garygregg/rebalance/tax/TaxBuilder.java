@@ -37,7 +37,8 @@ abstract class TaxBuilder extends ElementReader {
 
         // Get the tax rate, and format a message.
         final Percent taxRate = description.getTaxRate();
-        final String taxMessage = (taxRate.compareTo(Percent.getZero()) < 0) ?
+        final String taxMessage = (taxRate.compareTo(Percent.getZero()) < 0) ||
+                (Percent.getOneHundred().compareTo(taxRate) < 0) ?
                 String.format("tax rate is %s", taxRate) : "";
 
         // Get the threshold, and format a message.
@@ -100,12 +101,14 @@ abstract class TaxBuilder extends ElementReader {
 
             /*
              * Use the default value if the element is the empty string.
-             * Otherwise, parse the allocation as a floating point number. Catch
-             * any number format exception that may occur.
+             * Otherwise, parse the allocation as a floating point number.
              */
             result = element.isEmpty() ? defaultValue :
                     Double.parseDouble(element);
-        } catch (@NotNull NumberFormatException exception) {
+        }
+
+        // Catch any number format exception that may occur.
+        catch (@NotNull NumberFormatException exception) {
 
             /*
              * Log a warning message describing the unparseable floating point
