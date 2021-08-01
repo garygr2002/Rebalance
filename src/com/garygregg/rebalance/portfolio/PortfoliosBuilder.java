@@ -25,7 +25,7 @@ public class PortfoliosBuilder extends ElementReader {
             new PortfoliosBuilder.MyAllocationProcessor()
     };
 
-    // The birth date processor
+    // The birthdate processor
     private final FieldProcessor<PortfolioDescription> birthDateProcessor =
             new FieldProcessor<>() {
                 @Override
@@ -65,7 +65,7 @@ public class PortfoliosBuilder extends ElementReader {
                 @Override
                 public void processField(@NotNull String field,
                                          int lineNumber) {
-                    getTarget().setName(processName(field));
+                    getTarget().setName(field);
                 }
             };
 
@@ -117,7 +117,7 @@ public class PortfoliosBuilder extends ElementReader {
         int fieldIndex = 0;
         addFieldProcessor(++fieldIndex, nameProcessor);
 
-        // Add the birth date and mortality date processors.
+        // Add the birthdate and mortality date processors.
         addFieldProcessor(++fieldIndex, birthDateProcessor);
         addFieldProcessor(++fieldIndex, mortalityDateProcessor);
 
@@ -198,26 +198,6 @@ public class PortfoliosBuilder extends ElementReader {
         }
     }
 
-    /**
-     * Processes a mnemonic.
-     *
-     * @param mnemonic The mnemonic to process
-     * @return The processed mnemonic
-     */
-    private static @NotNull String processMnemonic(@NotNull String mnemonic) {
-        return mnemonic;
-    }
-
-    /**
-     * Processes a name.
-     *
-     * @param name The name to process
-     * @return A processed name
-     */
-    private static @NotNull String processName(@NotNull String name) {
-        return name;
-    }
-
     @Override
     public int getMinimumFields() {
         return 1;
@@ -265,17 +245,18 @@ public class PortfoliosBuilder extends ElementReader {
     }
 
     /**
-     * Process a boolean.
+     * Process a boolean object.
      *
-     * @param aBoolean   The boolean to process
+     * @param aBoolean   The boolean to object to process
      * @param lineNumber The line number where the boolean element occurs
-     * @return A processed boolean
+     * @return A processed boolean object
      */
     private boolean processBoolean(@NotNull String aBoolean, int lineNumber) {
 
         /*
-         * Parse the argument as a boolean. Is the string representation of
-         * the result not equal to the lowercase translation of the argument?
+         * Parse the argument as a boolean object. Is the string representation
+         * of the result not equal to the lowercase translation of the
+         * argument?
          */
         final boolean result = Boolean.parseBoolean(aBoolean);
         if (!Boolean.toString(result).equals(aBoolean.toLowerCase())) {
@@ -328,8 +309,7 @@ public class PortfoliosBuilder extends ElementReader {
 
         // Create a new portfolio description with the index.
         final PortfolioDescription description = new PortfolioDescription(
-                processMnemonic(
-                        elements[PortfolioFields.MNEMONIC.getPosition()]));
+                elements[PortfolioFields.MNEMONIC.getPosition()]);
 
         /*
          * Check the key of the description against the default key in the
@@ -416,12 +396,14 @@ public class PortfoliosBuilder extends ElementReader {
 
             /*
              * Use the default value if the element is the empty string.
-             * Otherwise parse the allocation as a floating point number. Catch
-             * any number format exception that may occur.
+             * Otherwise, parse the allocation as a floating point number.
              */
             result = element.isEmpty() ? defaultValue :
                     Double.parseDouble(element);
-        } catch (@NotNull NumberFormatException exception) {
+        }
+
+        // Catch any number format exception that may occur.
+        catch (@NotNull NumberFormatException exception) {
 
             /*
              * Log a warning message describing the unparseable floating point
@@ -464,7 +446,7 @@ public class PortfoliosBuilder extends ElementReader {
         socialSecurityMonthlyProcessor.setTarget(description);
 
         /*
-         * Set the target for the mortality date processor, the birth date
+         * Set the target for the mortality date processor, the birthdate
          * processor and the name processor.
          */
         mortalityDateProcessor.setTarget(description);

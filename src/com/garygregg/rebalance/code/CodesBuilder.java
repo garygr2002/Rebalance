@@ -1,6 +1,5 @@
 package com.garygregg.rebalance.code;
 
-import com.garygregg.rebalance.AccountKeyLibrary;
 import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.FundType;
@@ -33,7 +32,7 @@ public class CodesBuilder extends ElementReader {
 
                 @Override
                 public void processField(@NotNull String field, int lineNumber) {
-                    getTarget().setName(CodesBuilder.processName(field));
+                    getTarget().setName(field);
 
                 }
             };
@@ -119,16 +118,6 @@ public class CodesBuilder extends ElementReader {
     }
 
     /**
-     * Processes a code.
-     *
-     * @param code The code
-     * @return A processed code
-     */
-    private static @NotNull Character processCode(@NotNull String code) {
-        return code.charAt(0);
-    }
-
-    /**
      * Processes a description.
      *
      * @param description The description to processes
@@ -136,16 +125,6 @@ public class CodesBuilder extends ElementReader {
      */
     private static String processDescription(@NotNull String description) {
         return description.replace(";", ",");
-    }
-
-    /**
-     * Processes a name.
-     *
-     * @param name The name to process
-     * @return A processed name
-     */
-    private static String processName(@NotNull String name) {
-        return name;
     }
 
     @Override
@@ -169,7 +148,7 @@ public class CodesBuilder extends ElementReader {
 
         // Create a new code description with the code.
         final CodeDescription description = new CodeDescription(
-                processCode(elements[CodeFields.CODE.getPosition()]));
+                interpretCode(elements[CodeFields.CODE.getPosition()]));
 
         /*
          * Check the key of the description against the default key in the
@@ -238,16 +217,6 @@ public class CodesBuilder extends ElementReader {
                         "code '%c' at line %d was%s successful.",
                 description.getCode(), lineNumber,
                 hadLineProblem() ? " not" : ""));
-    }
-
-    /**
-     * Processes a subcode.
-     *
-     * @param subcode The subcode to process
-     * @return A processed subcode
-     */
-    private Character processSubcode(@NotNull String subcode) {
-        return processCode(subcode);
     }
 
     /**
@@ -358,7 +327,7 @@ public class CodesBuilder extends ElementReader {
     /**
      * A subcode processor for CodeDescription targets.
      */
-    private class MySubcodeProcessor extends
+    private static class MySubcodeProcessor extends
             FieldProcessor<CodeDescription> {
 
         // The index for subcode fields
@@ -391,8 +360,7 @@ public class CodesBuilder extends ElementReader {
 
         @Override
         public void processField(@NotNull String field, int lineNumber) {
-            getTarget().setSubcode(CodesBuilder.this.processSubcode(field),
-                    getIndex());
+            getTarget().setSubcode(interpretCode(field), getIndex());
         }
 
         /**

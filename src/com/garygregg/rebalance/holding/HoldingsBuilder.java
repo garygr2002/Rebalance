@@ -20,7 +20,7 @@ public class HoldingsBuilder extends ElementReader {
 
                 @Override
                 public void processField(@NotNull String field, int lineNumber) {
-                    getTarget().setName(processName(field));
+                    getTarget().setName(field);
                 }
             };
 
@@ -163,40 +163,6 @@ public class HoldingsBuilder extends ElementReader {
         }
     }
 
-    /**
-     * Processes a code.
-     *
-     * @param code The code
-     * @return A processed code
-     */
-    private static @NotNull Character processCode(@NotNull String code) {
-        return code.charAt(0);
-    }
-
-    /**
-     * Processes a key element.
-     *
-     * @param key The key element
-     * @return A processed key element
-     */
-    private static @NotNull String processKey(@NotNull String key) {
-
-        // Currently, we just return the argument.
-        return key;
-    }
-
-    /**
-     * Processes a name element.
-     *
-     * @param name The name element
-     * @return A processed name element
-     */
-    private static @NotNull String processName(@NotNull String name) {
-
-        // Currently, we just return the argument.
-        return name;
-    }
-
     @Override
     protected @NotNull Logger getReadingLogger() {
         return Logger.getLogger(HoldingsBuilder.class.getCanonicalName());
@@ -218,7 +184,7 @@ public class HoldingsBuilder extends ElementReader {
                                    int lineNumber) {
 
         // Get the line code.
-        final Character lineCode = processCode(elements[
+        final Character lineCode = interpretCode(elements[
                 HoldingFields.LINE_TYPE.getPosition()]);
 
         // Determine the line type from the code. Is the line type known?
@@ -234,7 +200,7 @@ public class HoldingsBuilder extends ElementReader {
 
         // Create a new holding description key.
         final HoldingKey key = new HoldingKey(tracker.constructKey(lineCode,
-                processKey(elements[HoldingFields.KEY.getPosition()])));
+                elements[HoldingFields.KEY.getPosition()]));
 
         /*
          * Create a new holding description with the key. Set the line type

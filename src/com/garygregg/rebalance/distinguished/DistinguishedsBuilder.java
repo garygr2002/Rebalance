@@ -437,44 +437,12 @@ public class DistinguishedsBuilder extends ElementReader {
             System.out.printf("The element processor " +
                             "completed %s warning or error.%n",
                     (processor.hadFileProblem() ? "with a" : "without"));
-        } catch (@NotNull IOException exception) {
+        }
+
+        // Catch any I/O exception that may occur.
+        catch (@NotNull IOException exception) {
             System.err.println(exception.getMessage());
         }
-    }
-
-    /**
-     * Processes a code.
-     *
-     * @param code The code
-     * @return A processed code
-     */
-    private static @NotNull Character processCode(@NotNull String code) {
-        return code.charAt(0);
-    }
-
-    /**
-     * Processes a key string element.
-     *
-     * @param keyString The key string element
-     * @return A processed key string element
-     */
-    private static @NotNull String processKeyString(
-            @NotNull String keyString) {
-
-        // Currently we just return the argument.
-        return keyString;
-    }
-
-    /**
-     * Processes a value element.
-     *
-     * @param value The value element
-     * @return A processed value element
-     */
-    private static @NotNull String processValue(@NotNull String value) {
-
-        // Currently we just return the argument.
-        return value;
     }
 
     /**
@@ -510,10 +478,13 @@ public class DistinguishedsBuilder extends ElementReader {
                             "there should be an element processor for each " +
                             "line type.",
                     holdingLineType, lineNumber, keyString, value));
-        } else {
+        }
+
+        // The element processor is not null, meaning that it was located.
+        else {
 
             /*
-             * Element processor located. Call it, and receive a distinguished
+             * Call the element processor, and receive a distinguished
              * description in return. Is the description null?
              */
             final DistinguishedDescription<?, ?> description =
@@ -563,8 +534,8 @@ public class DistinguishedsBuilder extends ElementReader {
     @Override
     protected void processElements(@NotNull String[] elements, int lineNumber) {
 
-        // Get the line code.
-        final Character lineCode = processCode(
+        // Interpret the line code.
+        final Character lineCode = interpretCode(
                 elements[DistinguishedFields.LINE_TYPE.getPosition()]);
 
         // Determine the line type from the code. Is the line type known?
@@ -579,8 +550,8 @@ public class DistinguishedsBuilder extends ElementReader {
         } else {
 
             // The line type is recognized. Get the key string.
-            final String keyString = processKeyString(
-                    elements[DistinguishedFields.KEY.getPosition()]);
+            final String keyString =
+                    elements[DistinguishedFields.KEY.getPosition()];
 
             /*
              * Create a new value. Note: the tracker is creating a 'key' for a
@@ -588,8 +559,7 @@ public class DistinguishedsBuilder extends ElementReader {
              * distinguished value library the key is actually a value.
              */
             final Pair<String, String> value = tracker.constructKey(lineCode,
-                    processValue(
-                            elements[DistinguishedFields.VALUE.getPosition()]));
+                    elements[DistinguishedFields.VALUE.getPosition()]);
 
             /*
              * Dispatch the processor for the line type, key string, value and
@@ -640,8 +610,7 @@ public class DistinguishedsBuilder extends ElementReader {
          *
          * @param keyString The string representation of a key
          * @return The key determined from its string representation, or null
-         * if the string does not represent any key of the type type of this
-         * class
+         * if the string does not represent any key of the type of this class
          */
         protected T determineKey(@NotNull String keyString) {
 

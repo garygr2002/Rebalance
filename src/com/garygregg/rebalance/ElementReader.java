@@ -25,6 +25,26 @@ public abstract class ElementReader extends ElementProcessor {
     }
 
     /**
+     * Interprets a code.
+     *
+     * @param code The code as a string
+     * @return The interpreted code
+     */
+    protected static @NotNull Character interpretCode(@NotNull String code) {
+        return code.charAt(0);
+    }
+
+    /**
+     * Interprets a ticker symbol.
+     *
+     * @param ticker The ticker symbol
+     * @return An interpreted ticker symbol
+     */
+    protected static @NotNull String interpretTicker(@NotNull String ticker) {
+        return ticker.toUpperCase();
+    }
+
+    /**
      * Preprocesses fields for element processors.
      *
      * @param field The field to preprocess

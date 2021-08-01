@@ -92,26 +92,6 @@ public class DetailedsBuilder extends ElementReader {
         }
     }
 
-    /**
-     * Processes an institution.
-     *
-     * @param institution The institution
-     * @return A processed institution
-     */
-    private static String processInstitution(@NotNull String institution) {
-        return institution;
-    }
-
-    /**
-     * Processes an account name.
-     *
-     * @param name The account name
-     * @return A processed account name
-     */
-    private static String processName(@NotNull String name) {
-        return name;
-    }
-
     @Override
     protected @NotNull Logger getReadingLogger() {
         return Logger.getLogger(DetailedsBuilder.class.getCanonicalName());
@@ -142,12 +122,12 @@ public class DetailedsBuilder extends ElementReader {
         Double result = null;
         try {
 
-            /*
-             * Parse the allocation as a floating point number. Catch any
-             * number format exception that may occur.
-             */
+            // Parse the allocation as a floating point number.
             result = Double.parseDouble(allocation);
-        } catch (@NotNull NumberFormatException exception) {
+        }
+
+        // Catch any number format exception that may occur.
+        catch (@NotNull NumberFormatException exception) {
 
             // Log a warning message describing the unparseable allocation.
             logMessage(Level.WARNING, String.format("Unparseable allocation " +
@@ -166,15 +146,11 @@ public class DetailedsBuilder extends ElementReader {
         // Create a new detailed description with the detailed number and name.
         final DetailedDescription description = new DetailedDescription(
 
-                processInstitution(
-                        elements[DetailedFields.INSTITUTION.getPosition()]),
-
+                elements[DetailedFields.INSTITUTION.getPosition()],
                 processNumber(
                         elements[DetailedFields.NUMBER.getPosition()],
                         lineNumber),
-
-                processName(
-                        elements[DetailedFields.NAME.getPosition()]));
+                elements[DetailedFields.NAME.getPosition()]);
 
         /*
          * Check the key of the description against the default key in the

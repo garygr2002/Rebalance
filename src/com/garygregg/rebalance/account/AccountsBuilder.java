@@ -75,26 +75,6 @@ public class AccountsBuilder extends ElementReader {
         }
     }
 
-    /**
-     * Processes an institution.
-     *
-     * @param institution The institution
-     * @return A processed institution
-     */
-    private static String processInstitution(@NotNull String institution) {
-        return institution;
-    }
-
-    /**
-     * Processes an account name.
-     *
-     * @param name The account name
-     * @return A processed account name
-     */
-    private static String processName(@NotNull String name) {
-        return name;
-    }
-
     @Override
     protected @NotNull Logger getReadingLogger() {
         return Logger.getLogger(AccountsBuilder.class.getCanonicalName());
@@ -152,9 +132,7 @@ public class AccountsBuilder extends ElementReader {
          */
         final AccountDescription description = new AccountDescription(
 
-                processInstitution(
-                        elements[AccountFields.INSTITUTION.getPosition()]),
-
+                elements[AccountFields.INSTITUTION.getPosition()],
                 processNumber(
                         elements[AccountFields.NUMBER.getPosition()],
                         lineNumber),
@@ -163,9 +141,7 @@ public class AccountsBuilder extends ElementReader {
                         elements[AccountFields.REBALANCE_ORDER.
                                 getPosition()], lineNumber),
 
-                processName(
-                        elements[AccountFields.NAME.getPosition()]),
-
+                elements[AccountFields.NAME.getPosition()],
                 processType(
                         elements[AccountFields.TYPE.getPosition()],
                         lineNumber),

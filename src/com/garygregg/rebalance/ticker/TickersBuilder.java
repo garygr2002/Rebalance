@@ -1,6 +1,5 @@
 package com.garygregg.rebalance.ticker;
 
-import com.garygregg.rebalance.AccountKeyLibrary;
 import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.FundType;
@@ -196,16 +195,12 @@ public class TickersBuilder extends ElementReader {
 
     // The new-flair-out growth checker
     private final ConsistencyChecker nflgChecker = this::checkNFOG;
-
-    // The not-a-fund checker
-    private final ConsistencyChecker notAFundChecker = this::checkNotAFund;
-
-    // The not-considered factory
-    private final TickerFactory notConsideredFactory = (ticker, number, name, minimum, balanceRounding, lineNumber) -> new NotConsideredDescription(ticker, number, name, minimum, balanceRounding);
-
     // The real estate checker
     private final ConsistencyChecker realEstateChecker = this::checkRealEstate;
-
+    // The not-a-fund checker
+    private final ConsistencyChecker notAFundChecker = this::checkNotAFund;
+    // The not-considered factory
+    private final TickerFactory notConsideredFactory = (ticker, number, name, minimum, balanceRounding, lineNumber) -> new NotConsideredDescription(ticker, number, name, minimum, balanceRounding);
     // The stock checker
     private final ConsistencyChecker stockChecker = this::checkStock;
 
@@ -345,43 +340,13 @@ public class TickersBuilder extends ElementReader {
     }
 
     /**
-     * Processes a line code
-     *
-     * @param lineCode The line code
-     * @return A processed line code
-     */
-    private static Character processCode(@NotNull String lineCode) {
-        return lineCode.toUpperCase().charAt(0);
-    }
-
-    /**
      * Processes a fund type.
      *
      * @param fundType The fund type
      * @return A processed fund type
      */
     private static FundType processFundType(@NotNull String fundType) {
-        return baseTypeMap.get(processCode(fundType));
-    }
-
-    /**
-     * Processes a name.
-     *
-     * @param name The name
-     * @return A processed name
-     */
-    private static String processName(@NotNull String name) {
-        return name;
-    }
-
-    /**
-     * Processes a ticker symbol.
-     *
-     * @param ticker The ticker symbol
-     * @return A processed ticker symbol
-     */
-    private static String processTicker(@NotNull String ticker) {
-        return ticker.toUpperCase();
+        return baseTypeMap.get(interpretCode(fundType));
     }
 
     /**
@@ -825,7 +790,10 @@ public class TickersBuilder extends ElementReader {
              * number.
              */
             result = Double.parseDouble(balanceRounding);
-        } catch (@NotNull NumberFormatException exception) {
+        }
+
+        // Catch any number format exception that may occur.
+        catch (@NotNull NumberFormatException exception) {
 
             /*
              * Log a warning message describing the unparseable balance
@@ -859,8 +827,8 @@ public class TickersBuilder extends ElementReader {
     @Override
     public void processElements(String[] elements, int lineNumber) {
 
-        // Get the ticker type.
-        final Character tickerCode = processCode(
+        // Interpret the ticker code.
+        final Character tickerCode = interpretCode(
                 elements[TickerFields.CODE.getPosition()]);
 
         /*
@@ -887,18 +855,16 @@ public class TickersBuilder extends ElementReader {
              */
             final TickerDescription description = factory.createDescription(
 
-                    processTicker(elements[TickerFields.TICKER.getPosition()]),
-
+                    interpretTicker(elements[TickerFields.TICKER.getPosition()]),
                     processNumber(elements[TickerFields.NUMBER.getPosition()],
                             lineNumber),
 
-                    processName(elements[TickerFields.NAME.getPosition()]),
-
+                    elements[TickerFields.NAME.getPosition()],
                     processMinimum(elements[TickerFields.MINIMUM.getPosition()],
                             lineNumber),
 
                     processBalanceRounding(elements[
-                            TickerFields.PREFERRED_ROUNDING.getPosition()],
+                                    TickerFields.PREFERRED_ROUNDING.getPosition()],
                             lineNumber), lineNumber
             );
 
