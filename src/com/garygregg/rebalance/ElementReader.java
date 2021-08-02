@@ -45,34 +45,27 @@ public abstract class ElementReader extends ElementProcessor {
     }
 
     /**
-     * Preprocesses fields for element processors.
+     * Preprocesses elements for element processors.
      *
-     * @param field The field to preprocess
-     * @return The preprocessed field
+     * @param elements The elements to preprocess.
+     * @return The preprocessed elements
      */
-    private static String preprocessField(@NotNull String field) {
-        return field.trim();
-    }
+    private static @NotNull String[] preprocessElements(
+            @NotNull String[] elements) {
 
-    /**
-     * Preprocesses fields for element processors.
-     *
-     * @param fields The fields to preprocess.
-     * @return The preprocessed fields
-     */
-    private static @NotNull String[] preprocessFields(
-            @NotNull String[] fields) {
-
-        // Get the length of the field array, and cycle for each element.
-        final int length = fields.length;
+        // Get the length of the element array, and cycle for each element.
+        final int length = elements.length;
         for (int i = 0; i < length; ++i) {
 
-            // Preprocess the first/next field.
-            fields[i] = preprocessField(fields[i]);
+            /*
+             * Preprocess the first/next element by removing leading and
+             * trailing whitespace.
+             */
+            elements[i] = elements[i].trim();
         }
 
-        // Return the preprocessed fields.
-        return fields;
+        // Return the preprocessed elements.
+        return elements;
     }
 
     /**
@@ -134,7 +127,7 @@ public abstract class ElementReader extends ElementProcessor {
          */
         String[] elements;
         String line;
-        int lineNumber = 0;
+        int lineNumber = 1;
 
         /*
          * Declare a variable to receive a field count. Get the minimum number
@@ -168,7 +161,7 @@ public abstract class ElementReader extends ElementProcessor {
                  * in doing so by checking the line problem flag.
                  */
                 resetLineProblem();
-                processElements(preprocessFields(line.split(",")),
+                processElements(preprocessElements(line.split(",")),
                         lineNumber++);
                 processResult = !hadLineProblem();
             }
