@@ -1,4 +1,4 @@
-package com.garygregg.rebalance;
+package com.garygregg.rebalance.cla;
 
 import org.jetbrains.annotations.NotNull;
 

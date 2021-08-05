@@ -1,9 +1,9 @@
 package com.garygregg.rebalance.conductor;
 
 import com.garygregg.rebalance.CommandLineId;
-import com.garygregg.rebalance.Informer;
 import com.garygregg.rebalance.cla.CLAException;
 import com.garygregg.rebalance.cla.Dispatch;
+import com.garygregg.rebalance.cla.Informer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
