@@ -1,6 +1,7 @@
 package com.garygregg.rebalance.distinguished;
 
 import com.garygregg.rebalance.*;
+import com.garygregg.rebalance.interpreter.CodeInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -209,9 +210,9 @@ public class DistinguishedsBuilder extends ElementReader {
                                     "metadata for distinguished institution " +
                                     "with key '%s' and value '%s' at line " +
                                     "%d was%s successful.",
-                                    description.getKey(),
-                                    description.getValue(), lineNumber,
-                                    hadLineProblem() ? " not" : ""));
+                            description.getKey(),
+                            description.getValue(), lineNumber,
+                            hadLineProblem() ? " not" : ""));
                 }
 
                 /*
@@ -233,6 +234,9 @@ public class DistinguishedsBuilder extends ElementReader {
             return description;
         }
     };
+
+    // Our code interpreter
+    private final CodeInterpreter interpreter = new CodeInterpreter();
 
     // The distinguished portfolio library instance
     private final DistinguishedPortfolioLibrary portfolioLibrary =
@@ -515,12 +519,6 @@ public class DistinguishedsBuilder extends ElementReader {
     }
 
     @Override
-    protected @NotNull Logger getReadingLogger() {
-        return Logger.getLogger(
-                DistinguishedsBuilder.class.getCanonicalName());
-    }
-
-    @Override
     public int getMinimumFields() {
         return DistinguishedFields.values().length;
     }
@@ -532,10 +530,20 @@ public class DistinguishedsBuilder extends ElementReader {
     }
 
     @Override
+    protected @NotNull Logger getReadingLogger() {
+        return Logger.getLogger(
+                DistinguishedsBuilder.class.getCanonicalName());
+    }
+
+    @Override
     protected void processElements(@NotNull String[] elements, int lineNumber) {
 
-        // Interpret the line code.
-        final Character lineCode = interpretCode(
+        /*
+         * Set the line number as the marker in the code interpreter, and get
+         * the line code.
+         */
+        interpreter.setMarker(lineNumber);
+        final Character lineCode = interpreter.interpret(
                 elements[DistinguishedFields.LINE_TYPE.getPosition()]);
 
         // Determine the line type from the code. Is the line type known?
@@ -626,8 +634,7 @@ public class DistinguishedsBuilder extends ElementReader {
              * Catch any illegal argument exception that may occur (meaning:
              * the argument does not represent any key of the type of this
              * class). Initialize the result to null;
-             */
-            catch (@NotNull IllegalArgumentException exception) {
+             */ catch (@NotNull IllegalArgumentException exception) {
                 result = null;
             }
 

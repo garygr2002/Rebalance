@@ -3,6 +3,7 @@ package com.garygregg.rebalance.holding;
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.HoldingKey;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.interpreter.CodeInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -10,6 +11,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HoldingsBuilder extends ElementReader {
+
+    // Our code interpreter
+    private final CodeInterpreter interpreter = new CodeInterpreter();
 
     // The holding library instance
     private final HoldingLibrary library = HoldingLibrary.getInstance();
@@ -164,11 +168,6 @@ public class HoldingsBuilder extends ElementReader {
     }
 
     @Override
-    protected @NotNull Logger getReadingLogger() {
-        return Logger.getLogger(HoldingsBuilder.class.getCanonicalName());
-    }
-
-    @Override
     public int getMinimumFields() {
         return 2;
     }
@@ -180,12 +179,21 @@ public class HoldingsBuilder extends ElementReader {
     }
 
     @Override
+    protected @NotNull Logger getReadingLogger() {
+        return Logger.getLogger(HoldingsBuilder.class.getCanonicalName());
+    }
+
+    @Override
     protected void processElements(@NotNull String[] elements,
                                    int lineNumber) {
 
-        // Get the line code.
-        final Character lineCode = interpretCode(elements[
-                HoldingFields.LINE_TYPE.getPosition()]);
+        /*
+         * Set the line number as the marker in the code interpreter, and get
+         * the line code.
+         */
+        interpreter.setMarker(lineNumber);
+        final Character lineCode = interpreter.interpret(
+                elements[HoldingFields.LINE_TYPE.getPosition()]);
 
         // Determine the line type from the code. Is the line type known?
         final HoldingLineType lineType =
