@@ -3,6 +3,7 @@ package com.garygregg.rebalance.code;
 import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.FundType;
+import com.garygregg.rebalance.interpreter.CodeInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -22,6 +23,9 @@ public class CodesBuilder extends ElementReader {
                             CodesBuilder.processDescription(field));
                 }
             };
+
+    // Our code interpreter
+    private final CodeInterpreter interpreter = new CodeInterpreter();
 
     // The code library instance
     private final CodeLibrary library = CodeLibrary.getInstance();
@@ -146,9 +150,14 @@ public class CodesBuilder extends ElementReader {
     @Override
     protected void processElements(@NotNull String[] elements, int lineNumber) {
 
-        // Create a new code description with the code.
+        /*
+         * Set the line number as the marker in the code interpreter, and get
+         * the code. Create a new code description with the interpreted code.
+         */
+        interpreter.setMarker(lineNumber);
         final CodeDescription description = new CodeDescription(
-                interpretCode(elements[CodeFields.CODE.getPosition()]));
+                interpreter.interpret(
+                        elements[CodeFields.CODE.getPosition()]));
 
         /*
          * Check the key of the description against the default key in the
@@ -330,6 +339,9 @@ public class CodesBuilder extends ElementReader {
     private static class MySubcodeProcessor extends
             FieldProcessor<CodeDescription> {
 
+        // Our code interpreter
+        private final CodeInterpreter interpreter = new CodeInterpreter();
+
         // The index for subcode fields
         private Integer index;
 
@@ -360,7 +372,13 @@ public class CodesBuilder extends ElementReader {
 
         @Override
         public void processField(@NotNull String field, int lineNumber) {
-            getTarget().setSubcode(interpretCode(field), getIndex());
+
+            /*
+             * Set the line number as the marker, and interpret the field as a
+             * code. Set the code as a subcode in the target.
+             */
+            interpreter.setMarker(lineNumber);
+            getTarget().setSubcode(interpreter.interpret(field), getIndex());
         }
 
         /**
