@@ -11,22 +11,6 @@ import java.util.logging.Logger;
 
 public abstract class ElementReader extends ElementProcessor {
 
-    // The procedure for interpreting doubles
-    private static final InterpretProcedure<Double> doubleProcedure =
-            Double::parseDouble;
-
-    // The procedure for interpreting long integers
-    private static final InterpretProcedure<Long> longProcedure =
-            Long::parseLong;
-
-    // The procedure for interpreting rebalance procedure
-    private static final InterpretProcedure<RebalanceProcedure>
-            rebalanceProcedure = RebalanceProcedure::valueOf;
-
-    // The procedure for interpreting tax type
-    private static final InterpretProcedure<TaxType> taxTypeProcedure =
-            TaxType::valueOf;
-
     // A map of element indices to field processors
     private final Map<Integer, FieldProcessor<?>> processorMap =
             new HashMap<>();
@@ -38,125 +22,6 @@ public abstract class ElementReader extends ElementProcessor {
 
         // Assign the logger based on the class canonical name.
         setLogger(Logger.getLogger(ElementReader.class.getCanonicalName()));
-    }
-
-    /**
-     * Interprets a string.
-     *
-     * @param string       The string to interpret
-     * @param procedure    The procedure for interpreting the string
-     * @param defaultValue The default value to use if the procedure throws an
-     *                     exception
-     * @param receiver     The receiver for any exception that the
-     *                     interpretation procedure throws
-     * @param <T>          The type of the interpretation
-     * @return The result of the interpretation
-     */
-    private static <T> T interpret(@NotNull String string,
-                                   @NotNull InterpretProcedure<T> procedure,
-                                   T defaultValue,
-                                   ExceptionReceiver receiver) {
-
-        // Declare the result, and initialize it with the default.
-        T result = defaultValue;
-        try {
-
-            // Try to interpret the string using the given procedure.
-            result = procedure.interpret(string);
-        }
-
-        // Catch any exception that the procedure may throw.
-        catch (@NotNull Exception exception) {
-
-            // Call the receiver if it is not null.
-            if (null != receiver) {
-                receiver.receive(exception, string);
-            }
-        }
-
-        // Return the result of the interpretation.
-        return result;
-    }
-
-    /**
-     * Interprets a code.
-     *
-     * @param code The code as a string
-     * @return The interpreted code
-     */
-    protected static @NotNull Character interpretCode(@NotNull String code) {
-        return code.charAt(0);
-    }
-
-    /**
-     * Interprets a string as a floating point number with a default value of
-     * null.
-     *
-     * @param string   The string to interpret
-     * @param receiver The receiver for any exception that the
-     *                 interpretation procedure throws
-     * @return The result of the interpretation
-     */
-    public static Double interpretDouble(@NotNull String string,
-                                         ExceptionReceiver receiver) {
-        return interpret(string, doubleProcedure, null, receiver);
-    }
-
-    /**
-     * Interprets a string as a floating point number with an explicit non-null
-     * default value.
-     *
-     * @param string       The string to interpret
-     * @param defaultValue The default value to use in the event of a
-     *                     translation exception
-     * @param receiver     The receiver for any exception that the
-     *                     interpretation procedure throws
-     * @return The result of the interpretation
-     */
-    public static Double interpretDouble(@NotNull String string,
-                                         double defaultValue,
-                                         ExceptionReceiver receiver) {
-        return interpret(string, doubleProcedure, defaultValue, receiver);
-    }
-
-    /**
-     * Interprets a string as a long integer with a default value of null.
-     *
-     * @param string   The string to interpret
-     * @param receiver The receiver for any exception that the
-     *                 interpretation procedure throws
-     * @return The result of the interpretation
-     */
-    public static Long interpretLong(@NotNull String string,
-                                     ExceptionReceiver receiver) {
-        return interpret(string, longProcedure, null, receiver);
-    }
-
-    /**
-     * Interprets a string as a long integer with an explicit non-null default
-     * value.
-     *
-     * @param string       The string to interpret
-     * @param defaultValue The default value to use in the event of a
-     *                     translation exception
-     * @param receiver     The receiver for any exception that the
-     *                     interpretation procedure throws
-     * @return The result of the interpretation
-     */
-    public static Long interpretLong(@NotNull String string,
-                                     long defaultValue,
-                                     ExceptionReceiver receiver) {
-        return interpret(string, longProcedure, defaultValue, receiver);
-    }
-
-    /**
-     * Interprets a ticker symbol.
-     *
-     * @param ticker The ticker symbol
-     * @return An interpreted ticker symbol
-     */
-    protected static @NotNull String interpretTicker(@NotNull String ticker) {
-        return ticker.toUpperCase();
     }
 
     /**
@@ -463,38 +328,6 @@ public abstract class ElementReader extends ElementProcessor {
     protected abstract @NotNull Logger getReadingLogger();
 
     /**
-     * Interprets a string as a rebalance procedure.
-     *
-     * @param string       The string to interpret
-     * @param defaultValue The default value to use in the event of a
-     *                     translation exception
-     * @param receiver     The receiver for any exception that the
-     *                     interpretation procedure throws
-     * @return The result of the interpretation
-     */
-    public RebalanceProcedure interpretRebalanceProcedure(
-            @NotNull String string, RebalanceProcedure defaultValue,
-            ExceptionReceiver receiver) {
-        return interpret(string, rebalanceProcedure, defaultValue, receiver);
-    }
-
-    /**
-     * Interprets a string as a tax type.
-     *
-     * @param string       The string to interpret
-     * @param defaultValue The default value to use in the event of a
-     *                     translation exception
-     * @param receiver     The receiver for any exception that the
-     *                     interpretation procedure throws
-     * @return The result of the interpretation
-     */
-    public TaxType interpretTaxType(@NotNull String string,
-                                    TaxType defaultValue,
-                                    ExceptionReceiver receiver) {
-        return interpret(string, taxTypeProcedure, defaultValue, receiver);
-    }
-
-    /**
      * Processes line elements.
      *
      * @param elements   The line elements
@@ -584,6 +417,7 @@ public abstract class ElementReader extends ElementProcessor {
      * @return True if one or more lines had an error, false otherwise
      * @throws IOException Indicates an I/O exception occurred
      */
+    @SuppressWarnings("unused")
     public boolean readLines(boolean continueOnFalse)
             throws IOException {
         return readLines((Date) (null), continueOnFalse);
@@ -725,37 +559,6 @@ public abstract class ElementReader extends ElementProcessor {
         // Clear the dates parsed and restore the last logger, if any.
         setDatesParsed(null);
         restoreLogger();
-    }
-
-    /**
-     * An object that receives information about an exception.
-     */
-    public interface ExceptionReceiver {
-
-        /**
-         * Receives an exception.
-         *
-         * @param exception An exception
-         * @param string    The string that generated the exception
-         */
-        void receive(@NotNull Exception exception,
-                     @NotNull String string);
-    }
-
-    /**
-     * An object that interprets a string.
-     *
-     * @param <T> The type of the interpretation
-     */
-    private interface InterpretProcedure<T> {
-
-        /**
-         * Interprets a string.
-         *
-         * @param string The string to interpret
-         * @return The interpreted string
-         */
-        T interpret(@NotNull String string);
     }
 
     /**
