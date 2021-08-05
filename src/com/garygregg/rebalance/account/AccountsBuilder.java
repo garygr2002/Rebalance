@@ -1,6 +1,8 @@
 package com.garygregg.rebalance.account;
 
 import com.garygregg.rebalance.*;
+import com.garygregg.rebalance.interpreter.DoubleInterpreter;
+import com.garygregg.rebalance.interpreter.LongInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -10,6 +12,31 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class AccountsBuilder extends ElementReader {
+
+    // Our account number interpreter
+    private final LongInterpreter accountNumberInterpreter =
+            new LongInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string) {
+                    logMessage(Level.WARNING, String.format("Unparseable account " +
+                            "number '%s' at line number %d in account file; " +
+                            "using null.", string, getMarker()));
+                }
+            };
+
+    // Our allocation interpreter
+    private final DoubleInterpreter allocationInterpreter = new DoubleInterpreter() {
+
+        @Override
+        protected void receiveException(@NotNull Exception exception,
+                                        @NotNull String string) {
+            logMessage(Level.WARNING, String.format("Unparseable allocation " +
+                            "'%s' at line number %d in account file; using null.",
+                    string, getMarker()));
+        }
+    };
 
     // The account library instance
     private final AccountLibrary library = AccountLibrary.getInstance();
@@ -76,11 +103,6 @@ public class AccountsBuilder extends ElementReader {
     }
 
     @Override
-    protected @NotNull Logger getReadingLogger() {
-        return Logger.getLogger(AccountsBuilder.class.getCanonicalName());
-    }
-
-    @Override
     public int getMinimumFields() {
         return 6;
     }
@@ -91,35 +113,9 @@ public class AccountsBuilder extends ElementReader {
         return "account";
     }
 
-    /**
-     * Processes an allocation element.
-     *
-     * @param allocation The allocation element
-     * @param lineNumber The line number where the allocation occurs
-     * @return A processed allocation
-     */
-    private Double processAllocation(@NotNull String allocation,
-                                     int lineNumber) {
-
-        // Declare and initialize the result to a default value.
-        Double result = null;
-        try {
-
-            /*
-             * Parse the allocation as a floating point number. Catch any
-             * number format exception that may occur.
-             */
-            result = Double.parseDouble(allocation);
-        } catch (@NotNull NumberFormatException exception) {
-
-            // Log a warning message describing the unparseable allocation.
-            logMessage(Level.WARNING, String.format("Unparseable allocation " +
-                            "'%s' at line number %d in account file; " +
-                            "using null.", allocation, lineNumber));
-        }
-
-        // Return the result.
-        return result;
+    @Override
+    protected @NotNull Logger getReadingLogger() {
+        return Logger.getLogger(AccountsBuilder.class.getCanonicalName());
     }
 
     @Override
@@ -127,15 +123,16 @@ public class AccountsBuilder extends ElementReader {
                                    int lineNumber) {
 
         /*
-         * Create a new account description with the account number, rebalance
-         * order, name, tax type, and rebalance procedure.
+         * Set the line number as the marker in the account number interpreter.
+         * Create a new account description with the interpreted account
+         * number, re-balance order, name, tax type and re-balance procedure.
          */
+        accountNumberInterpreter.setMarker(lineNumber);
         final AccountDescription description = new AccountDescription(
 
                 elements[AccountFields.INSTITUTION.getPosition()],
-                processNumber(
-                        elements[AccountFields.NUMBER.getPosition()],
-                        lineNumber),
+                accountNumberInterpreter.interpret(
+                        elements[AccountFields.NUMBER.getPosition()]),
 
                 processRebalanceOrder(
                         elements[AccountFields.REBALANCE_ORDER.
@@ -207,12 +204,15 @@ public class AccountsBuilder extends ElementReader {
         for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
 
             /*
-             * Get the field associated with the position, Adjust the
-             * allocation of the associated fund type.
+             * Get the field associated with the position. Set the line number
+             * as the marker in the allocation interpreter.
              */
             field = positionMap.get(i);
+            allocationInterpreter.setMarker(lineNumber);
+
+            // Adjust the allocation of the associated fund type.
             description.adjustAllocation(field.getType(),
-                    processAllocation(elements[i], lineNumber));
+                    allocationInterpreter.interpret(elements[i]));
         }
 
         // Log some exit information.
@@ -222,32 +222,6 @@ public class AccountsBuilder extends ElementReader {
                 AccountKeyLibrary.format(description.getNumber()),
                 description.getName(), lineNumber,
                 hadLineProblem() ? " not" : ""));
-    }
-
-    /**
-     * Processes an account number.
-     *
-     * @param number     The account number
-     * @param lineNumber The line number where the account number occurs
-     * @return A processed account number
-     */
-    private Long processNumber(@NotNull String number, int lineNumber) {
-
-        // Try to parse an account number. Is the number not parseable?
-        final Long result = AccountKey.parseLong(number);
-        if (null == result) {
-
-            /*
-             * The number is not parseable. Log a warning message describing
-             * the unparseable account number.
-             */
-            logMessage(Level.WARNING, String.format("Unparseable account " +
-                    "number '%s' at line number %d in account file; " +
-                    "using null.", number, lineNumber));
-        }
-
-        // Return the result.
-        return result;
     }
 
     /**
