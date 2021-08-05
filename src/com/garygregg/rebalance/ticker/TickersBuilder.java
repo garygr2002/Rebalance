@@ -5,6 +5,8 @@ import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.FundType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Shares;
+import com.garygregg.rebalance.interpreter.CodeInterpreter;
+import com.garygregg.rebalance.interpreter.TickerInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -125,6 +127,9 @@ public class TickersBuilder extends ElementReader {
         }
     }
 
+    // Our code interpreter
+    private final CodeInterpreter codeInterpreter = new CodeInterpreter();
+
     // A map of base fund types to consistency checkers
     private final Map<FundType, ConsistencyChecker> consistencyCheckers =
             new HashMap<>();
@@ -150,7 +155,9 @@ public class TickersBuilder extends ElementReader {
     private final Map<Character, TickerFactory> factoryMap = new HashMap<>();
 
     // The fund ticker factory
-    private final TickerFactory fundFactory = (ticker, number, name, minimum, balanceRounding, lineNumber) -> new FundDescription(ticker, number, name, minimum, balanceRounding);
+    private final TickerFactory fundFactory =
+            (ticker, number, name, minimum, balanceRounding, lineNumber) ->
+                    new FundDescription(ticker, number, name, minimum, balanceRounding);
 
     // A field processor for fund types
     private final FieldProcessor<TickerDescription> fundTypeProcessor =
@@ -160,7 +167,7 @@ public class TickersBuilder extends ElementReader {
                 public void processField(@NotNull String field, int lineNumber) {
 
                     // Process the fund type. Is the fund type null?
-                    final FundType fundType = processFundType(field);
+                    final FundType fundType = processFundType(field, lineNumber);
                     if (null == fundType) {
 
                         // The fund type is null. Issue a warning, and skip the code.
@@ -195,12 +202,19 @@ public class TickersBuilder extends ElementReader {
 
     // The new-flair-out growth checker
     private final ConsistencyChecker nflgChecker = this::checkNFOG;
+
     // The real estate checker
     private final ConsistencyChecker realEstateChecker = this::checkRealEstate;
+
     // The not-a-fund checker
     private final ConsistencyChecker notAFundChecker = this::checkNotAFund;
+
     // The not-considered factory
-    private final TickerFactory notConsideredFactory = (ticker, number, name, minimum, balanceRounding, lineNumber) -> new NotConsideredDescription(ticker, number, name, minimum, balanceRounding);
+    private final TickerFactory notConsideredFactory =
+            (ticker, number, name, minimum, balanceRounding, lineNumber) ->
+                    new NotConsideredDescription(ticker, number, name, minimum,
+                            balanceRounding);
+
     // The stock checker
     private final ConsistencyChecker stockChecker = this::checkStock;
 
@@ -220,6 +234,10 @@ public class TickersBuilder extends ElementReader {
         // Return a new stock description with a default minimum.
         return new StockDescription(ticker, number, name, minimum, balanceRounding);
     };
+
+    // Our ticker interpreter
+    private final TickerInterpreter tickerInterpreter =
+            new TickerInterpreter();
 
     {
         // Populate the consistency checker map.
@@ -337,16 +355,6 @@ public class TickersBuilder extends ElementReader {
         } catch (@NotNull IOException exception) {
             System.err.println(exception.getMessage());
         }
-    }
-
-    /**
-     * Processes a fund type.
-     *
-     * @param fundType The fund type
-     * @return A processed fund type
-     */
-    private static FundType processFundType(@NotNull String fundType) {
-        return baseTypeMap.get(interpretCode(fundType));
     }
 
     /**
@@ -520,7 +528,7 @@ public class TickersBuilder extends ElementReader {
     }
 
     /**
-     * Checks a description to insure that it has exactly one location subtype.
+     * Checks a description to ensure that it has exactly one location subtype.
      *
      * @param description The ticker description for which to check consistency
      * @param target      The target base fund type
@@ -708,7 +716,7 @@ public class TickersBuilder extends ElementReader {
         if (!(description.hasType(FundType.DOMESTIC) ||
                 description.hasType(FundType.FOREIGN))) {
 
-            // Stock ticker neither domestic or foreign.
+            // Stock ticker neither domestic nor foreign.
             logMessage(Level.WARNING, String.format("Ticker '%s' of %s type " +
                             "is neither domestic nor foreign.",
                     ticker, target));
@@ -827,8 +835,12 @@ public class TickersBuilder extends ElementReader {
     @Override
     public void processElements(String[] elements, int lineNumber) {
 
-        // Interpret the ticker code.
-        final Character tickerCode = interpretCode(
+        /*
+         * Set the line number as the marker in the code interpreter, and get
+         * the line code.
+         */
+        codeInterpreter.setMarker(lineNumber);
+        final Character tickerCode = codeInterpreter.interpret(
                 elements[TickerFields.CODE.getPosition()]);
 
         /*
@@ -846,23 +858,34 @@ public class TickersBuilder extends ElementReader {
                             "available for code '%c' at line number %d; " +
                             "skipping creation of a fund description.",
                     tickerCode, lineNumber));
-        } else {
+        }
+
+        // A factory is available for the given ticker type.
+        else {
 
             /*
-             * A factory is available for the given ticker type. Use it to
-             * create a new ticker description with the ticker, number, name,
-             * minimum investment, and preferred rounding.
+             * Set the line number as the marker in the ticker interpreter. Use
+             * the factory for the given ticker type to create a new ticker
+             * description with the interpreted ticker, number, name, minimum
+             * investment, and preferred rounding.
              */
+            tickerInterpreter.setMarker(lineNumber);
             final TickerDescription description = factory.createDescription(
 
-                    interpretTicker(elements[TickerFields.TICKER.getPosition()]),
+                    // Ticker...
+                    tickerInterpreter.interpret(
+                            elements[TickerFields.TICKER.getPosition()]),
+
+                    // ...number...
                     processNumber(elements[TickerFields.NUMBER.getPosition()],
                             lineNumber),
 
+                    // ...name and minimum investment...
                     elements[TickerFields.NAME.getPosition()],
                     processMinimum(elements[TickerFields.MINIMUM.getPosition()],
                             lineNumber),
 
+                    // ... and preferred rounding.
                     processBalanceRounding(elements[
                                     TickerFields.PREFERRED_ROUNDING.getPosition()],
                             lineNumber), lineNumber
@@ -937,6 +960,24 @@ public class TickersBuilder extends ElementReader {
                             "successful.", description.getTicker(), lineNumber,
                     hadLineProblem() ? " not" : ""));
         }
+    }
+
+    /**
+     * Processes a fund type.
+     *
+     * @param fundType   The fund type
+     * @param lineNumber The line number where the fund type occurs
+     * @return A processed fund type
+     */
+    private FundType processFundType(@NotNull String fundType,
+                                     int lineNumber) {
+
+        /*
+         * Set the line number as the marker in the code interpreter. Interpret
+         * the fund type as a code, and translate the code into a fund type.
+         */
+        codeInterpreter.setMarker(lineNumber);
+        return baseTypeMap.get(codeInterpreter.interpret(fundType));
     }
 
     /**
