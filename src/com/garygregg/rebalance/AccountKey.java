@@ -20,8 +20,8 @@ public class AccountKey extends Pair<String, Long> implements
                 @Override
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string) {
-                    logger.log(Level.WARNING, String.format("Received an " +
-                                    "exception of type '%s' with message " +
+                    logger.log(Level.FINE, String.format("Caught thrown " +
+                                    "exception, type '%s', with message " +
                                     "'%s' when trying to parse '%s' as an " +
                                     "account number; using null.",
                             exception.getClass().getSimpleName(),
