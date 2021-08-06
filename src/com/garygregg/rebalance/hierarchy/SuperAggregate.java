@@ -39,7 +39,7 @@ abstract class SuperAggregate<KeyType,
     private final TaxBreakdownManager<ChildType> taxTypeManager =
             new TaxBreakdownManager<>();
 
-    // Accumulates values by tax type in each child
+    // Accumulate values by tax type in each child
     private final Operation taxTypeAccumulate = new Operation() {
 
         @Override
