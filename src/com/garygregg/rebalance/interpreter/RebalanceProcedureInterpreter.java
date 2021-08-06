@@ -8,7 +8,7 @@ public class RebalanceProcedureInterpreter
         extends Interpreter<RebalanceProcedure> {
 
     /**
-     * Constructs the rebalance procedure interpreter.
+     * Constructs the re-balance procedure interpreter.
      */
     public RebalanceProcedureInterpreter() {
         super();
