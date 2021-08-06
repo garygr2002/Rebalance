@@ -1,15 +1,39 @@
 package com.garygregg.rebalance;
 
+import com.garygregg.rebalance.interpreter.LongInterpreter;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AccountKey extends Pair<String, Long> implements
         Comparable<AccountKey> {
+
+    // Our logger
+    private static final Logger logger =
+            Logger.getLogger(AccountKey.class.getCanonicalName());
+
+    // Our account number interpreter
+    private static final LongInterpreter accountNumberInterpreter =
+            new LongInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string) {
+                    logger.log(Level.WARNING, String.format("Received an " +
+                                    "exception of type '%s' with message " +
+                                    "'%s' when trying to parse '%s' as an " +
+                                    "account number; using null.",
+                            exception.getClass().getSimpleName(),
+                            exception.getMessage(), string));
+                }
+            };
 
     /*
      * The separator between institution and account number that produces a
      * unique key
      */
-    static final String unitSeparator = "\u001f";
+    private static final String unitSeparator = "\u001f";
 
     /**
      * Constructs an account key from its constituents.
@@ -139,24 +163,7 @@ public class AccountKey extends Pair<String, Long> implements
      * @return A valid long if the value had been parseable, otherwise null.
      */
     public static Long parseLong(@NotNull String value) {
-
-        // Declare the result.
-        Long result;
-        try {
-
-            // Try to parse the value
-            result = Long.parseLong(value);
-        }
-
-        /*
-         * Catch any number format exception, and initialize the result to
-         * null.
-         */ catch (@NotNull NumberFormatException exception) {
-            result = null;
-        }
-
-        // Return the result.
-        return result;
+        return accountNumberInterpreter.interpret(value);
     }
 
     /**
