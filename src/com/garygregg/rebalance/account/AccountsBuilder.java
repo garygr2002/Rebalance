@@ -27,7 +27,8 @@ public class AccountsBuilder extends ElementReader {
             };
 
     // Our allocation interpreter
-    private final DoubleInterpreter allocationInterpreter = new DoubleInterpreter() {
+    private final DoubleInterpreter allocationInterpreter =
+            new DoubleInterpreter() {
 
         @Override
         protected void receiveException(@NotNull Exception exception,
