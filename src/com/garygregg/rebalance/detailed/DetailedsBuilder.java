@@ -1,6 +1,8 @@
 package com.garygregg.rebalance.detailed;
 
 import com.garygregg.rebalance.*;
+import com.garygregg.rebalance.interpreter.DoubleInterpreter;
+import com.garygregg.rebalance.interpreter.LongInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -10,6 +12,34 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DetailedsBuilder extends ElementReader {
+
+    // Our account number interpreter
+    private final LongInterpreter accountNumberInterpreter =
+            new LongInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "account number '%s' at line number %d in " +
+                                    "detailed file; using null.", string,
+                            getMarker()));
+                }
+            };
+
+    // Our allocation interpreter
+    private final DoubleInterpreter allocationInterpreter =
+            new DoubleInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "allocation '%s' at line number %d in " +
+                                    "detailed file; using null.", string,
+                            getMarker()));
+                }
+            };
 
     // The detailed library instance
     private final DetailedLibrary library = DetailedLibrary.getInstance();
@@ -93,11 +123,6 @@ public class DetailedsBuilder extends ElementReader {
     }
 
     @Override
-    protected @NotNull Logger getReadingLogger() {
-        return Logger.getLogger(DetailedsBuilder.class.getCanonicalName());
-    }
-
-    @Override
     public int getMinimumFields() {
         return 3;
     }
@@ -108,48 +133,32 @@ public class DetailedsBuilder extends ElementReader {
         return "detailed";
     }
 
-    /**
-     * Processes an allocation element.
-     *
-     * @param allocation The allocation element
-     * @param lineNumber The line number where the allocation occurs
-     * @return A processed allocation
-     */
-    private Double processAllocation(@NotNull String allocation,
-                                     int lineNumber) {
-
-        // Declare and initialize the result to a default value.
-        Double result = null;
-        try {
-
-            // Parse the allocation as a floating point number.
-            result = Double.parseDouble(allocation);
-        }
-
-        // Catch any number format exception that may occur.
-        catch (@NotNull NumberFormatException exception) {
-
-            // Log a warning message describing the unparseable allocation.
-            logMessage(Level.WARNING, String.format("Unparseable allocation " +
-                            "'%s' at line number %d in detailed file; using null",
-                    allocation, lineNumber));
-        }
-
-        // Return the result.
-        return result;
+    @Override
+    protected @NotNull Logger getReadingLogger() {
+        return Logger.getLogger(DetailedsBuilder.class.getCanonicalName());
     }
 
     @Override
     protected void processElements(@NotNull String[] elements,
                                    int lineNumber) {
 
-        // Create a new detailed description with the detailed number and name.
+        /*
+         * Set the line number as the marker in the account number interpreter
+         * and allocation interpreter.
+         */
+        accountNumberInterpreter.setMarker(lineNumber);
+        allocationInterpreter.setMarker(lineNumber);
+
+        /*
+         * Create a new detailed description with the institution mnemonic,
+         * account number and name.
+         */
         final DetailedDescription description = new DetailedDescription(
 
                 elements[DetailedFields.INSTITUTION.getPosition()],
-                processNumber(
+                accountNumberInterpreter.interpret(
                         elements[DetailedFields.NUMBER.getPosition()],
-                        lineNumber),
+                        AccountKeyLibrary.getDefaultAccountNumber()),
                 elements[DetailedFields.NAME.getPosition()]);
 
         /*
@@ -209,12 +218,12 @@ public class DetailedsBuilder extends ElementReader {
         for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
 
             /*
-             * Get the field associated with the position, Adjust the
+             * Get the field associated with the position. Adjust the
              * allocation of the associated fund type.
              */
             field = positionMap.get(i);
             description.adjustAllocation(field.getType(),
-                    processAllocation(elements[i], lineNumber));
+                    allocationInterpreter.interpret(elements[i]));
         }
 
         // Log some exit information.
@@ -224,32 +233,6 @@ public class DetailedsBuilder extends ElementReader {
                 AccountKeyLibrary.format(description.getNumber()),
                 description.getName(), lineNumber,
                 hadLineProblem() ? " not" : ""));
-    }
-
-    /**
-     * Processes an account number.
-     *
-     * @param number     The account number
-     * @param lineNumber The line number where the account number occurs
-     * @return A processed account number
-     */
-    private Long processNumber(@NotNull String number, int lineNumber) {
-
-        // Try to parse an account number. Is the number not parseable?
-        final Long result = AccountKey.parseLong(number);
-        if (null == result) {
-
-            /*
-             * The number is not parseable. Log a warning message describing
-             * the unparseable account number.
-             */
-            logMessage(Level.WARNING, String.format("Unparseable account " +
-                    "number '%s' at line number %d in detailed file; " +
-                    "using null.", number, lineNumber));
-        }
-
-        // Return the result.
-        return result;
     }
 
     @Override
