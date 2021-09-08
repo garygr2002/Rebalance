@@ -16,6 +16,6 @@ public class RebalanceProcedureInterpreter
 
     @Override
     protected @NotNull RebalanceProcedure doInterpret(@NotNull String string) {
-        return RebalanceProcedure.valueOf(string);
+        return RebalanceProcedure.valueOf(string.toUpperCase());
     }
 }

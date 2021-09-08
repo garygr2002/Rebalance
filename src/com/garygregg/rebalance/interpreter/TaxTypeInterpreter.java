@@ -14,6 +14,6 @@ public class TaxTypeInterpreter extends Interpreter<TaxType> {
 
     @Override
     protected @NotNull TaxType doInterpret(@NotNull String string) {
-        return TaxType.valueOf(string);
+        return TaxType.valueOf(string.toUpperCase());
     }
 }
