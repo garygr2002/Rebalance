@@ -186,16 +186,18 @@ public class AccountsBuilder extends ElementReader {
                                    int lineNumber) {
 
         /*
-         * Set the line number as the marker in the account number interpreter,
-         * and re-balance order interpreter.
+         * Set the line number as the marker in the account number interpreter
+         * and allocation interpreter.
          */
         accountNumberInterpreter.setMarker(lineNumber);
-        rebalanceOrderInterpreter.setMarker(lineNumber);
+        allocationInterpreter.setMarker(lineNumber);
 
         /*
-         * Set the line number as the marker in the re-balance procedure
-         * interpreter and the tax type interpreter.
+         * Set the line number as the marker in the re-balancer order
+         * interpreter, the re-balance procedure interpreter, and the tax type
+         * interpreter.
          */
+        rebalanceOrderInterpreter.setMarker(lineNumber);
         rebalanceProcedureInterpreter.setMarker(lineNumber);
         taxTypeInterpreter.setMarker(lineNumber);
 
@@ -208,7 +210,8 @@ public class AccountsBuilder extends ElementReader {
                 // Institution and account number
                 elements[AccountFields.INSTITUTION.getPosition()],
                 accountNumberInterpreter.interpret(
-                        elements[AccountFields.NUMBER.getPosition()]),
+                        elements[AccountFields.NUMBER.getPosition()],
+                        AccountKeyLibrary.getDefaultAccountNumber()),
 
                 // Re-balancer order
                 rebalanceOrderInterpreter.interpret(
@@ -280,13 +283,10 @@ public class AccountsBuilder extends ElementReader {
         for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
 
             /*
-             * Get the field associated with the position. Set the line number
-             * as the marker in the allocation interpreter.
+             * Get the field associated with the position. Adjust the
+             * allocation of the associated fund type.
              */
             field = positionMap.get(i);
-            allocationInterpreter.setMarker(lineNumber);
-
-            // Adjust the allocation of the associated fund type.
             description.adjustAllocation(field.getType(),
                     allocationInterpreter.interpret(elements[i]));
         }
