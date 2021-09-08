@@ -45,7 +45,7 @@ public class DetailedDescription implements Description<AccountKey> {
      * @param type  The designated weight type
      * @param value The desired allocation weight
      */
-    void adjustAllocation(@NotNull WeightType type, double value) {
+    void adjustAllocation(@NotNull WeightType type, Double value) {
         allocation.put(type, value);
     }
 
