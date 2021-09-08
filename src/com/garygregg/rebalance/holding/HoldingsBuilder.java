@@ -4,6 +4,7 @@ import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.HoldingKey;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.interpreter.CodeInterpreter;
+import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.util.logging.Logger;
 public class HoldingsBuilder extends ElementReader {
 
     // Our code interpreter
-    private final CodeInterpreter interpreter = new CodeInterpreter();
+    private final CodeInterpreter codeInterpreter = new CodeInterpreter();
 
     // The holding library instance
     private final HoldingLibrary library = HoldingLibrary.getInstance();
@@ -28,6 +29,20 @@ public class HoldingsBuilder extends ElementReader {
                 }
             };
 
+    // Our price interpreter
+    private final DoubleInterpreter priceInterpreter =
+            new DoubleInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "price '%s' at line number %d in " +
+                                    "holding file; using default %f instead.",
+                            string, getMarker(), -1000.));
+                }
+            };
+
     // The price processor
     private final FieldProcessorIfNotEmpty<HoldingDescription> priceProcessor =
             new FieldProcessorIfNotEmpty<>() {
@@ -35,7 +50,22 @@ public class HoldingsBuilder extends ElementReader {
                 @Override
                 public void processNotEmptyField(@NotNull String field,
                                                  int lineNumber) {
-                    getTarget().setPrice(processFloat(field, 1., lineNumber));
+                    getTarget().setPrice(priceInterpreter.interpret(field,
+                            1.));
+                }
+            };
+
+    // Our shares interpreter
+    private final DoubleInterpreter sharesInterpreter =
+            new DoubleInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "shares '%s' at line number %d in " +
+                                    "holding file; using default %f instead.",
+                            string, getMarker(), -1000.));
                 }
             };
 
@@ -46,12 +76,27 @@ public class HoldingsBuilder extends ElementReader {
                 @Override
                 public void processNotEmptyField(@NotNull String field,
                                                  int lineNumber) {
-                    getTarget().setShares(processFloat(field, 0., lineNumber));
+                    getTarget().setShares(sharesInterpreter.interpret(field,
+                            0.));
                 }
             };
 
     // The parent tracker
     private final ParentTracker tracker = new ParentTracker();
+
+    // Our value interpreter
+    private final DoubleInterpreter valueInterpreter =
+            new DoubleInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "value '%s' at line number %d in " +
+                                    "holding file; using default %f instead.",
+                            string, getMarker(), -1000.));
+                }
+            };
 
     // The value processor
     private final FieldProcessorIfNotEmpty<HoldingDescription> valueProcessor =
@@ -73,8 +118,8 @@ public class HoldingsBuilder extends ElementReader {
                             Currency.getZero().getValue() : current.getValue();
 
                     // Set the value of the target using the field.
-                    description.setValue(processFloat(field, defaultValue,
-                            lineNumber));
+                    description.setValue(valueInterpreter.interpret(field,
+                            defaultValue));
                 }
             };
 
@@ -188,11 +233,21 @@ public class HoldingsBuilder extends ElementReader {
                                    int lineNumber) {
 
         /*
-         * Set the line number as the marker in the code interpreter, and get
-         * the line code.
+         * Set the line number as the marker in the code interpreter and the
+         * price interpreter.
          */
-        interpreter.setMarker(lineNumber);
-        final Character lineCode = interpreter.interpret(
+        codeInterpreter.setMarker(lineNumber);
+        priceInterpreter.setMarker(lineNumber);
+
+        /*
+         * Set the line number as the marker in the shares interpreter and the
+         * value interpreter.
+         */
+        sharesInterpreter.setMarker(lineNumber);
+        valueInterpreter.setMarker(lineNumber);
+
+        // Get the line code.
+        final Character lineCode = codeInterpreter.interpret(
                 elements[HoldingFields.LINE_TYPE.getPosition()]);
 
         // Determine the line type from the code. Is the line type known?
@@ -284,49 +339,6 @@ public class HoldingsBuilder extends ElementReader {
                         "holding with key '%s' at line %d was%s successful.",
                 description.getHoldingParentChild().getSecond(), lineNumber,
                 hadLineProblem() ? " not" : ""));
-    }
-
-    /**
-     * Processes a floating point element.
-     *
-     * @param element      The floating point element
-     * @param defaultValue The value to return if the element is an empty string
-     * @param lineNumber   The line number where the floating point element
-     *                     occurs
-     * @return A processed floating point element
-     */
-    private double processFloat(@NotNull String element, double defaultValue,
-                                int lineNumber) {
-
-        // Declare and initialize the result to a default value.
-        double result = defaultValue;
-        try {
-
-            /*
-             * Use the default value if the element is the empty string.
-             * Otherwise, parse the allocation as a floating point number. Catch
-             * any number format exception that may occur.
-             *
-             * TODO:
-             *
-             * This check for an empty element appears to be redundant.
-             */
-            result = element.isEmpty() ? defaultValue :
-                    Double.parseDouble(element);
-        } catch (@NotNull NumberFormatException exception) {
-
-            /*
-             * Log a warning message describing the unparseable floating point
-             * element.
-             */
-            logMessage(Level.WARNING, String.format("Unparseable floating " +
-                            "point number '%s' at line number %d in holding " +
-                            "file; using default %f instead.", element,
-                    lineNumber, defaultValue));
-        }
-
-        // Return the result.
-        return result;
     }
 
     /**
