@@ -21,10 +21,11 @@ public class AccountsBuilder extends ElementReader {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string) {
+                                                @NotNull String string,
+                                                Long defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable account " +
                             "number '%s' at line number %d in account file; " +
-                            "using null.", string, getMarker()));
+                            "using %d.", string, getMarker(), defaultValue));
                 }
             };
 
@@ -34,11 +35,12 @@ public class AccountsBuilder extends ElementReader {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string) {
+                                                @NotNull String string,
+                                                Double defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable allocation " +
                                     "'%s' at line number %d in account file; using " +
-                                    "null.",
-                            string, getMarker()));
+                                    "%f.",
+                            string, getMarker(), defaultValue));
                 }
             };
 
@@ -72,11 +74,12 @@ public class AccountsBuilder extends ElementReader {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string) {
+                                                @NotNull String string,
+                                                Long defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "re-balance order '%s' at line number " +
-                                    "%d in account file; using null.",
-                            string, getMarker()));
+                                    "%d in account file; using %d.",
+                            string, getMarker(), defaultValue));
                 }
             };
 
@@ -86,11 +89,12 @@ public class AccountsBuilder extends ElementReader {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string) {
+                                                @NotNull String string,
+                                                RebalanceProcedure defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                             "account re-balance procedure '%s' at " +
                             "line number %d in account file; using " +
-                            "null.", string, getMarker()));
+                            "%s.", string, getMarker(), defaultValue));
                 }
             };
 
@@ -100,10 +104,12 @@ public class AccountsBuilder extends ElementReader {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string) {
+                                                @NotNull String string,
+                                                TaxType defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                             "account tax type '%s' at line number %d in " +
-                            "account file; using null.", string, getMarker()));
+                            "account file; using %s.", string, getMarker(),
+                            defaultValue));
                 }
             };
 

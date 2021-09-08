@@ -60,7 +60,7 @@ abstract class Interpreter<T> {
 
         // Catch any exception that the procedure may throw.
         catch (@NotNull Exception exception) {
-            receiveException(exception, string);
+            receiveException(exception, string, defaultValue);
         }
 
         // Return the result of the interpretation.
@@ -82,9 +82,11 @@ abstract class Interpreter<T> {
      *
      * @param exception The exception that was thrown
      * @param string    The string that caused the exception
+     * @param defaultValue The default value to be used
      */
     protected void receiveException(@NotNull Exception exception,
-                                    @NotNull String string) {
+                                    @NotNull String string,
+                                    T defaultValue) {
         throw new RuntimeException(exception);
     }
 

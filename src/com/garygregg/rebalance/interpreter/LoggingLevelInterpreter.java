@@ -30,7 +30,8 @@ public class LoggingLevelInterpreter extends Interpreter<Level> {
 
         @Override
         protected void receiveException(@NotNull Exception exception,
-                                        @NotNull String string) {
+                                        @NotNull String string,
+                                        Integer defaultValue) {
 
             // This enclosing class will deal with parse errors.
         }

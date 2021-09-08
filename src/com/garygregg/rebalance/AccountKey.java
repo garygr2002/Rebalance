@@ -19,13 +19,14 @@ public class AccountKey extends Pair<String, Long> implements
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string) {
+                                                @NotNull String string,
+                                                Long defaultValue) {
                     logger.log(Level.FINE, String.format("Caught thrown " +
                                     "exception, type '%s', with message " +
                                     "'%s' when trying to parse '%s' as an " +
-                                    "account number; using null.",
+                                    "account number; using %d.",
                             exception.getClass().getSimpleName(),
-                            exception.getMessage(), string));
+                            exception.getMessage(), string, defaultValue));
                 }
             };
 

@@ -35,11 +35,12 @@ public class HoldingsBuilder extends ElementReader {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string) {
+                                                @NotNull String string,
+                                                Double defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "price '%s' at line number %d in " +
                                     "holding file; using default %f instead.",
-                            string, getMarker(), -1000.));
+                            string, getMarker(), defaultValue));
                 }
             };
 
@@ -61,11 +62,12 @@ public class HoldingsBuilder extends ElementReader {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string) {
+                                                @NotNull String string,
+                                                Double defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "shares '%s' at line number %d in " +
                                     "holding file; using default %f instead.",
-                            string, getMarker(), -1000.));
+                            string, getMarker(), defaultValue));
                 }
             };
 
@@ -90,11 +92,12 @@ public class HoldingsBuilder extends ElementReader {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string) {
+                                                @NotNull String string,
+                                                Double defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "value '%s' at line number %d in " +
                                     "holding file; using default %f instead.",
-                            string, getMarker(), -1000.));
+                            string, getMarker(), defaultValue));
                 }
             };
 

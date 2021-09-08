@@ -19,11 +19,12 @@ public class DetailedsBuilder extends ElementReader {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string) {
+                                                @NotNull String string,
+                                                Long defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "account number '%s' at line number %d in " +
-                                    "detailed file; using null.", string,
-                            getMarker()));
+                                    "detailed file; using %d.", string,
+                            getMarker(), defaultValue));
                 }
             };
 
@@ -33,11 +34,12 @@ public class DetailedsBuilder extends ElementReader {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string) {
+                                                @NotNull String string,
+                                                Double defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "allocation '%s' at line number %d in " +
-                                    "detailed file; using null.", string,
-                            getMarker()));
+                                    "detailed file; using %f.", string,
+                            getMarker(), defaultValue));
                 }
             };
 
