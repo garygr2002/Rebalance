@@ -1,10 +1,7 @@
 package com.garygregg.rebalance.account;
 
 import com.garygregg.rebalance.*;
-import com.garygregg.rebalance.interpreter.DoubleInterpreter;
-import com.garygregg.rebalance.interpreter.LongInterpreter;
-import com.garygregg.rebalance.interpreter.RebalanceProcedureInterpreter;
-import com.garygregg.rebalance.interpreter.TaxTypeInterpreter;
+import com.garygregg.rebalance.interpreter.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -58,7 +55,7 @@ public class AccountsBuilder extends ElementReader {
                 protected @NotNull Long doInterpret(@NotNull String string) {
 
                     /*
-                     * Parse the rebalance order as an integer. Make sure the
+                     * Parse the re-balance order as an integer. Make sure the
                      * parsed value is unique in the account file by: 1)
                      * removing the sign bit; 2) casting the value to a long
                      * integer; 3) shifting the value to the left by the size
