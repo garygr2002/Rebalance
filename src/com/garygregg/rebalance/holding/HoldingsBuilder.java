@@ -306,6 +306,10 @@ public class HoldingsBuilder extends ElementReader {
              * Use the default value if the element is the empty string.
              * Otherwise, parse the allocation as a floating point number. Catch
              * any number format exception that may occur.
+             *
+             * TODO:
+             *
+             * This check for an empty element appears to be redundant.
              */
             result = element.isEmpty() ? defaultValue :
                     Double.parseDouble(element);
