@@ -3,6 +3,8 @@ package com.garygregg.rebalance.account;
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import com.garygregg.rebalance.interpreter.LongInterpreter;
+import com.garygregg.rebalance.interpreter.RebalanceProcedureInterpreter;
+import com.garygregg.rebalance.interpreter.TaxTypeInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -30,20 +32,80 @@ public class AccountsBuilder extends ElementReader {
     private final DoubleInterpreter allocationInterpreter =
             new DoubleInterpreter() {
 
-        @Override
-        protected void receiveException(@NotNull Exception exception,
-                                        @NotNull String string) {
-            logMessage(Level.WARNING, String.format("Unparseable allocation " +
-                            "'%s' at line number %d in account file; using null.",
-                    string, getMarker()));
-        }
-    };
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string) {
+                    logMessage(Level.WARNING, String.format("Unparseable allocation " +
+                                    "'%s' at line number %d in account file; using " +
+                                    "null.",
+                            string, getMarker()));
+                }
+            };
 
     // The account library instance
     private final AccountLibrary library = AccountLibrary.getInstance();
 
     // A map of element positions to account fields
     private final Map<Integer, AccountFields> positionMap = new HashMap<>();
+
+    // Our re-balance order interpreter
+    private final LongInterpreter rebalanceOrderInterpreter =
+            new LongInterpreter() {
+
+                @Override
+                protected @NotNull Long doInterpret(@NotNull String string) {
+
+                    /*
+                     * Parse the rebalance order as an integer. Make sure the
+                     * parsed value is unique in the account file by: 1)
+                     * removing the sign bit; 2) casting the value to a long
+                     * integer; 3) shifting the value to the left by the size
+                     * of an ordinary integer, and 4) adding the marker. This
+                     * will mean that accounts with the same re-balance order
+                     * will be rebalanced by which occurred first in the
+                     * accounts file.
+                     */
+                    final int parsedValue = Integer.parseInt(string);
+                    return (((long) (parsedValue & Integer.MAX_VALUE)) <<
+                            Integer.SIZE) + getMarker();
+                }
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "re-balance order '%s' at line number " +
+                                    "%d in account file; using null.",
+                            string, getMarker()));
+                }
+            };
+
+    // Our re-balance procedure interpreter
+    private final RebalanceProcedureInterpreter rebalanceProcedureInterpreter =
+            new RebalanceProcedureInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                            "account re-balance procedure '%s' at " +
+                            "line number %d in account file; using " +
+                            "null.", string, getMarker()));
+                }
+            };
+
+    // Our tax type interpreter
+    private final TaxTypeInterpreter taxTypeInterpreter =
+            new TaxTypeInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                            "account tax type '%s' at line number %d in " +
+                            "account file; using null.", string, getMarker()));
+                }
+            };
 
     {
 
@@ -124,29 +186,42 @@ public class AccountsBuilder extends ElementReader {
                                    int lineNumber) {
 
         /*
-         * Set the line number as the marker in the account number interpreter.
-         * Create a new account description with the interpreted account
-         * number, re-balance order, name, tax type and re-balance procedure.
+         * Set the line number as the marker in the account number interpreter,
+         * and re-balance order interpreter.
          */
         accountNumberInterpreter.setMarker(lineNumber);
+        rebalanceOrderInterpreter.setMarker(lineNumber);
+
+        /*
+         * Set the line number as the marker in the re-balance procedure
+         * interpreter and the tax type interpreter.
+         */
+        rebalanceProcedureInterpreter.setMarker(lineNumber);
+        taxTypeInterpreter.setMarker(lineNumber);
+
+        /*
+         * Create a new account description with the interpreted account
+         * number, re-balancer order, name, tax type and re-balance procedure.
+         */
         final AccountDescription description = new AccountDescription(
 
+                // Institution and account number
                 elements[AccountFields.INSTITUTION.getPosition()],
                 accountNumberInterpreter.interpret(
                         elements[AccountFields.NUMBER.getPosition()]),
 
-                processRebalanceOrder(
-                        elements[AccountFields.REBALANCE_ORDER.
-                                getPosition()], lineNumber),
+                // Re-balancer order
+                rebalanceOrderInterpreter.interpret(
+                        elements[AccountFields.REBALANCE_ORDER.getPosition()]),
 
+                // Name and tax type
                 elements[AccountFields.NAME.getPosition()],
-                processType(
-                        elements[AccountFields.TYPE.getPosition()],
-                        lineNumber),
+                taxTypeInterpreter.interpret(
+                        elements[AccountFields.TYPE.getPosition()]),
 
-                processRebalanceProcedure(
-                        elements[AccountFields.REBALANCE_PROCEDURE.
-                                getPosition()], lineNumber));
+                // Re-balance procedure
+                rebalanceProcedureInterpreter.interpret(elements[
+                        AccountFields.REBALANCE_PROCEDURE.getPosition()]));
 
         /*
          * Check the key of the description against the default key in the
@@ -223,108 +298,6 @@ public class AccountsBuilder extends ElementReader {
                 AccountKeyLibrary.format(description.getNumber()),
                 description.getName(), lineNumber,
                 hadLineProblem() ? " not" : ""));
-    }
-
-    /**
-     * Processes a rebalance order.
-     *
-     * @param rebalanceOrder The rebalance order
-     * @param lineNumber     The line number where the rebalance order occurs
-     * @return A processed rebalance order
-     */
-    private Long processRebalanceOrder(@NotNull String rebalanceOrder,
-                                       int lineNumber) {
-
-        // Declare and initialize the result with a default value.
-        Long result = null;
-        try {
-
-            /*
-             * Parse the rebalance order as an integer. Make sure the parsed
-             * value is unique in the account file by: 1) removing the sign
-             * bit; 2) casting the value to a long integer; 3) shifting the
-             * value to the left by the size of an ordinary integer, and 4)
-             * adding the line number. This will mean that accounts with the
-             * same rebalance order will be rebalanced by which occurred first
-             * in the accounts file.
-             */
-            final int parsedValue = Integer.parseInt(rebalanceOrder);
-            result = (((long) (parsedValue & Integer.MAX_VALUE)) <<
-                    Integer.SIZE) + lineNumber;
-        } catch (@NotNull NumberFormatException exception) {
-
-            /*
-             * Log a warning message describing the unparseable rebalance
-             * order.
-             */
-            logMessage(Level.WARNING, String.format("Unparseable re-balance " +
-                    "order '%s' at line number %d in account file; using " +
-                    "null.", rebalanceOrder, lineNumber));
-        }
-
-        // Return the result.
-        return result;
-    }
-
-    /**
-     * Processes a rebalance procedure.
-     *
-     * @param rebalanceProcedure The rebalance procedure to process
-     * @param lineNumber         The line number where the rebalance procedure
-     *                           occurs
-     * @return A processed rebalance procedure
-     */
-    private RebalanceProcedure processRebalanceProcedure(
-            @NotNull String rebalanceProcedure, int lineNumber) {
-
-        // Declare and initialize the result with a default value.
-        RebalanceProcedure result = null;
-        try {
-
-            // Parse the rebalance procedure.
-            result = RebalanceProcedure.valueOf(
-                    rebalanceProcedure.toUpperCase());
-        } catch (@NotNull IllegalArgumentException exception) {
-
-            /*
-             * Log a warning message describing the unparseable rebalance
-             * procedure.
-             */
-            logMessage(Level.WARNING, String.format("Unparseable account " +
-                            "rebalance procedure '%s' at line number %d in " +
-                            "account file; using null.",
-                    rebalanceProcedure, lineNumber));
-        }
-
-        // Return the result.
-        return result;
-    }
-
-    /**
-     * Processes a tax type.
-     *
-     * @param type       The tax type to process
-     * @param lineNumber The line number where the tax type occurs
-     * @return A processed tax type
-     */
-    private TaxType processType(@NotNull String type, int lineNumber) {
-
-        // Declare and initialize the result with a default value.
-        TaxType result = null;
-        try {
-
-            // Parse the tax type.
-            result = TaxType.valueOf(type.toUpperCase());
-        } catch (@NotNull IllegalArgumentException exception) {
-
-            // Log a warning message describing the unparseable tax type.
-            logMessage(Level.WARNING, String.format("Unparseable account " +
-                    "tax type '%s' at line number %d in account file; using " +
-                    "null.", type, lineNumber));
-        }
-
-        // Return the result.
-        return result;
     }
 
     @Override
