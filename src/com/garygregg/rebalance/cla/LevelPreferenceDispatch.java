@@ -34,8 +34,6 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
      * @param key          The key for this dispatch
      * @param preferences  The preferences object to use
      * @param stream       The output stream for messages
-     * @param defaultValue The default value to use in case of no current
-     *                     preference
      */
     public LevelPreferenceDispatch(@NotNull KeyType key,
                                    @NotNull Preferences preferences,
