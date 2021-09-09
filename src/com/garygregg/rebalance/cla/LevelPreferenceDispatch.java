@@ -31,9 +31,9 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
     /**
      * Constructs the level preferences dispatch.
      *
-     * @param key          The key for this dispatch
-     * @param preferences  The preferences object to use
-     * @param stream       The output stream for messages
+     * @param key         The key for this dispatch
+     * @param preferences The preferences object to use
+     * @param stream      The output stream for messages
      */
     public LevelPreferenceDispatch(@NotNull KeyType key,
                                    @NotNull Preferences preferences,
@@ -76,12 +76,50 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
 
     @Override
     protected String get() {
-        return get(Integer.parseInt(super.get())).getName();
+
+        /*
+         * Get the known integer (or null) from the superclass. Is the known
+         * integer not null?
+         */
+        String result = super.get();
+        if (null != result) {
+
+            /*
+             * The known integer is not null. Parse it as an integer, and use
+             * the result to get a logging level. Reset the result to null if
+             * the logging level is null, otherwise reset the result to the
+             * name of the logging level.
+             */
+            final Level level = get(Integer.parseInt(result));
+            result = (null == level) ? null : level.getName();
+        }
+
+        // Return the result.
+        return result;
     }
 
     @Override
     protected void put(@NotNull String value) throws CLAException {
-        super.put(Integer.toString(
-                Level.parse(value.toUpperCase()).intValue()));
+
+        // Declare a variable to receive a logging level.
+        Level level;
+        try {
+
+            // Try to parse the given value as a logging level.
+            level = Level.parse(value.toUpperCase());
+        }
+
+        /*
+         * Catch any illegal argument exception that may occur, wrap it in a
+         * new CLA exception.
+         */
+        catch (@NotNull IllegalArgumentException exception) {
+            throw new CLAException(String.format("Unable to parse a logging " +
+                            "level value for option '%s' - %s.",
+                    getKeyName().toLowerCase(), exception.getMessage()));
+        }
+
+        // Call the superclass method to put the resulting logging level.
+        super.put(Integer.toString(level.intValue()));
     }
 }
