@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.cla;
 
+import com.garygregg.rebalance.interpreter.CatchInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
@@ -7,6 +8,10 @@ import java.util.prefs.Preferences;
 
 public class IntPreferenceDispatch<KeyType extends Enum<KeyType>>
         extends FlaggedPreferenceDispatch<KeyType> {
+
+    // Our catch interpreter
+    private final CatchInterpreter catchInterpreter =
+            new CatchInterpreter();
 
     /**
      * Constructs the integer preference dispatch.
@@ -54,32 +59,38 @@ public class IntPreferenceDispatch<KeyType extends Enum<KeyType>>
     @Override
     protected void put(@NotNull String value) throws CLAException {
 
-        // Declare a variable to receive a parsed integer.
-        int intValue;
-        try {
+        /*
+         * Clear the catch interpreter. Try to parse the integer. Was the catch
+         * interpreter set, indicating it caught an exception?
+         */
+        catchInterpreter.clear();
+        int intValue = catchInterpreter.interpret(value);
+        if (catchInterpreter.isSet()) {
 
             /*
-             * Try to parse the integer. Was a negative integer received when
-             * it is not permitted?
+             * The catch interpreter is set, indicating it caught an
+             * exception. This means the given string cannot be parsed as an
+             * integer. Throw a new CLA exception with the details.
              */
-            intValue = Integer.parseInt(value);
-            if (!(getFlag() || (0 <= intValue))) {
-
-                /*
-                 * An impermissible negative value was received. Throw a new
-                 * CLA exception.
-                 */
-                throw new CLAException(String.format("Negative values are " +
-                                "not permitted for '%s'; %d received.",
-                        getKeyName().toLowerCase(), intValue));
-            }
-        }
-
-        // The received value cannot be parsed as an integer.
-        catch (@NotNull NumberFormatException exception) {
             throw new CLAException(String.format("Unable to parse an " +
                             "integer value for option '%s' - %s.",
-                    getKeyName().toLowerCase(), exception.getMessage()));
+                    getKeyName().toLowerCase(),
+                    catchInterpreter.getException().getMessage()));
+        }
+
+        /*
+         * The catch interpreter was not set, but did it read a negative value
+         * when negative values are not permitted?
+         */
+        else if (!(getFlag() || (0 <= intValue))) {
+
+            /*
+             * An impermissible negative value was received. Throw a new
+             * CLA exception.
+             */
+            throw new CLAException(String.format("Negative values are " +
+                            "not permitted for '%s'; %d received.",
+                    getKeyName().toLowerCase(), intValue));
         }
 
         // Set the integer value as the preference under the key name.
