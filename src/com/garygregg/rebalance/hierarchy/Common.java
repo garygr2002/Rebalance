@@ -1,6 +1,8 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.*;
+import com.garygregg.rebalance.Description;
+import com.garygregg.rebalance.HoldingLineType;
+import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
 

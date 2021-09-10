@@ -1,7 +1,6 @@
 package com.garygregg.rebalance.holding;
 
 import com.garygregg.rebalance.*;
-import com.garygregg.rebalance.HoldingKey;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.interpreter.CodeInterpreter;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;

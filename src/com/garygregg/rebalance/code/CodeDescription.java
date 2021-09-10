@@ -1,7 +1,7 @@
 package com.garygregg.rebalance.code;
 
-import com.garygregg.rebalance.FundType;
 import com.garygregg.rebalance.Description;
+import com.garygregg.rebalance.FundType;
 import org.jetbrains.annotations.NotNull;
 
 public class CodeDescription implements Description<Character> {

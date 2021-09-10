@@ -5,7 +5,10 @@ import com.garygregg.rebalance.countable.MutableCountable;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 public class Reallocator {
 

@@ -1,11 +1,11 @@
 package com.garygregg.rebalance.holding;
 
 import com.garygregg.rebalance.Description;
+import com.garygregg.rebalance.HoldingKey;
 import com.garygregg.rebalance.HoldingLineType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Purse;
 import com.garygregg.rebalance.countable.Shares;
-import com.garygregg.rebalance.HoldingKey;
 import org.jetbrains.annotations.NotNull;
 
 public class HoldingDescription implements Description<Integer> {

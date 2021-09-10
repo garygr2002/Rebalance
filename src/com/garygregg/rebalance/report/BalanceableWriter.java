@@ -1,9 +1,13 @@
 package com.garygregg.rebalance.report;
 
-import com.garygregg.rebalance.*;
+import com.garygregg.rebalance.CategoryType;
+import com.garygregg.rebalance.Reallocator;
+import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutablePercent;
-import com.garygregg.rebalance.hierarchy.*;
+import com.garygregg.rebalance.hierarchy.Institution;
+import com.garygregg.rebalance.hierarchy.Portfolio;
+import com.garygregg.rebalance.hierarchy.Valuator;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileWriter;
