@@ -55,17 +55,17 @@ public class AccountsBuilder extends ElementReader {
                 protected @NotNull Long doInterpret(@NotNull String string) {
 
                     /*
-                     * Parse the re-balance order as an integer. Make sure the
-                     * parsed value is unique in the account file by: 1)
-                     * removing the sign bit; 2) casting the value to a long
-                     * integer; 3) shifting the value to the left by the size
-                     * of an ordinary integer, and 4) adding the marker. This
-                     * will mean that accounts with the same re-balance order
-                     * will be rebalanced by which occurred first in the
-                     * accounts file.
+                     * Parse the re-balance order using the superclass. Make
+                     * sure the parsed value is unique (to an integer value) in
+                     * the account file by: 1) removing the high-end bits
+                     * greater than an ordinary integer; 2) shifting the value
+                     * to the left by the size of an ordinary integer, and 3)
+                     * adding the marker. This will mean that accounts with the
+                     * same, integer re-balance order will be rebalanced by
+                     * that which occurred first in the accounts file.
                      */
-                    final int parsedValue = Integer.parseInt(string);
-                    return (((long) (parsedValue & Integer.MAX_VALUE)) <<
+                    final long parsedValue = super.doInterpret(string);
+                    return ((parsedValue & Integer.MAX_VALUE) <<
                             Integer.SIZE) + getMarker();
                 }
 
