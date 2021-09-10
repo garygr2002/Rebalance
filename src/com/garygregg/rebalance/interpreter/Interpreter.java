@@ -2,7 +2,7 @@ package com.garygregg.rebalance.interpreter;
 
 import org.jetbrains.annotations.NotNull;
 
-abstract class Interpreter<T> {
+public abstract class Interpreter<T> {
 
     // The position marker
     private int marker;
