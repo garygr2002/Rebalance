@@ -1,8 +1,5 @@
 package com.garygregg.rebalance;
 
-import com.garygregg.rebalance.account.AccountLibrary;
-import com.garygregg.rebalance.portfolio.PortfolioLibrary;
-import com.garygregg.rebalance.ticker.TickerLibrary;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -11,22 +8,36 @@ import java.util.Stack;
 
 public class ParentTracker {
 
+    // An instance of the parent tracker.
+    private static ParentTracker instance;
+
     // A stack of potential, active parent keys
     private final Stack<String> actives = new Stack<>();
 
     // An association of line codes to their holding line types
-    private final Map<Character, HoldingLineType> association = new HashMap<>();
+    private final Map<Character, HoldingLineType> association =
+            new HashMap<>();
 
     // A hierarchy of expected line types
     private final Expecting expecting = new Expecting();
 
-    {
+    // The distinguished account library
+    private Library<?, ?> accountLibrary;
 
-        // Add all the line code associations
-        addAssociations(PortfolioLibrary.getInstance(), HoldingLineType.PORTFOLIO);
-        addAssociation('I', HoldingLineType.INSTITUTION);
-        addAssociations(AccountLibrary.getInstance(), HoldingLineType.ACCOUNT);
-        addAssociations(TickerLibrary.getInstance(), HoldingLineType.TICKER);
+    /**
+     * Constructs the parent tracker.
+     */
+    private ParentTracker() {
+        // This declaration exists only to make the constructor private.
+    }
+
+    /**
+     * Gets an instance of the parent tracker.
+     *
+     * @return An instance of the parent tracker
+     */
+    public static @NotNull ParentTracker getInstance() {
+        return (null == instance) ? (instance = new ParentTracker()) : instance;
     }
 
     /**
@@ -35,8 +46,8 @@ public class ParentTracker {
      * @param lineCode The line code
      * @param lineType The holding line type associated with the line code
      */
-    private void addAssociation(@NotNull Character lineCode,
-                                @NotNull HoldingLineType lineType) {
+    public void addAssociation(@NotNull Character lineCode,
+                               @NotNull HoldingLineType lineType) {
         association.put(lineCode, lineType);
     }
 
@@ -46,13 +57,39 @@ public class ParentTracker {
      * @param library  The library
      * @param lineType The holding line type associated with the line code
      */
-    private void addAssociations(@NotNull Library<?, ?> library,
-                                 @NotNull HoldingLineType lineType) {
+    public void addAssociations(@NotNull Library<?, ?> library,
+                                @NotNull HoldingLineType lineType) {
 
         // Add an association for each line code declared by the library.
         for (Character lineCode : library.getLineCodes()) {
             addAssociation(lineCode, lineType);
         }
+    }
+
+    /**
+     * Determines if key elements are okay with the distinguished account
+     * library.
+     *
+     * @param elements The key elements
+     * @return True if the given key elements are okay with the distinguished
+     * account library; false otherwise
+     */
+    private boolean areKeyElementsOkay(String... elements) {
+
+        /*
+         * Get the distinguished account library. Return true if the library is
+         * null, or if the elements are okay with the non-null library.
+         */
+        final Library<?, ?> accountLibrary = getAccountLibrary();
+        return (null == accountLibrary) ||
+                accountLibrary.areKeyElementsOkay(elements);
+    }
+
+    /**
+     * Clears the association of line codes to their holding types.
+     */
+    public void clearAssociations() {
+        association.clear();
     }
 
     /**
@@ -133,6 +170,15 @@ public class ParentTracker {
     }
 
     /**
+     * Gets the account library.
+     *
+     * @return The account library
+     */
+    public Library<?, ?> getAccountLibrary() {
+        return accountLibrary;
+    }
+
+    /**
      * Gets a holding line type given a line code.
      *
      * @param lineCode The line code
@@ -153,7 +199,7 @@ public class ParentTracker {
 
         /*
          * If there is no current top-of-stack, use the default string key.
-         * Otherwise use a formatted version of a unique account string
+         * Otherwise, use a formatted version of a unique account string
          * representation if we are expecting a ticker. Use the unmodified
          * top-of-stack if expecting anything else.
          *
@@ -175,8 +221,8 @@ public class ParentTracker {
          * acceptable as a key for the account library? And are we seeking an
          * account line?
          */
-        if (AccountLibrary.getInstance().areKeyElementsOkay(lastActive,
-                newActive) && expecting.isCurrent(HoldingLineType.ACCOUNT)) {
+        if (areKeyElementsOkay(lastActive, newActive) &&
+                expecting.isCurrent(HoldingLineType.ACCOUNT)) {
 
             /*
              * The combination of last and new tops-of-stack make acceptable
@@ -218,6 +264,16 @@ public class ParentTracker {
             // Push the default string key onto the actives stack.
             actives.push(Library.getDefaultStringKey());
         }
+    }
+
+    /**
+     * Sets the account library.
+     *
+     * @param accountLibrary The account library
+     */
+    public void setAccountLibrary(Library<?, ?> accountLibrary) {
+        addAssociations(this.accountLibrary = accountLibrary,
+                HoldingLineType.ACCOUNT);
     }
 
     private static class Expecting {
@@ -313,8 +369,8 @@ public class ParentTracker {
         public boolean isCurrent(@NotNull HoldingLineType holdingLineType) {
 
             /*
-             * Get the current holding line type type, and return true only if
-             * it is non-null, and equals the given holding line type.
+             * Get the current holding line type, and return true only if it
+             * is non-null, and equals the given holding line type.
              */
             final HoldingLineType current = hierarchy[currentlyExpecting];
             return (current != null) && current.equals(holdingLineType);

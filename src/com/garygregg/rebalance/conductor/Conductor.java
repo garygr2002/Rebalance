@@ -214,7 +214,7 @@ public class Conductor implements Dispatch<CommandLineId> {
                 if (commandLineId.isArgumentMandatory()) {
 
                     /*
-                     * The options argument is mandatory. Do not add open and
+                     * The 'options' argument is mandatory. Do not add open and
                      * close brackets.
                      */
                     argumentClose = argumentOpen = empty;
@@ -258,7 +258,7 @@ public class Conductor implements Dispatch<CommandLineId> {
         final List<String> missingPreferences = new ArrayList<>();
 
         /*
-         * Currently test only that the source preference has been set.
+         * Currently, test only that the source preference has been set.
          * Other dispatchers or synthesizers can take appropriate action with
          * unset preferences as the need arises. Was there this one, missing
          * preference?
@@ -465,7 +465,7 @@ public class Conductor implements Dispatch<CommandLineId> {
      */
     public static void main(@NotNull String[] arguments) {
 
-        // Declare local and initialize local variables.
+        // Declare and initialize local variables.
         final List<Dispatch<CommandLineId>> dispatchList = new ArrayList<>();
         final Preferences preferences = preferenceManager.getPreferences();
         final PrintStream outputStream = getOutputStream();
@@ -533,7 +533,7 @@ public class Conductor implements Dispatch<CommandLineId> {
 
             /*
              * Use the program name system property to display a usage message
-             * if the program name property is not null. Otherwise use a
+             * if the program name property is not null. Otherwise, use a
              * default program name.
              */
             displayUsage((null == programName) ? getDefaultProgramName() :
@@ -657,10 +657,13 @@ public class Conductor implements Dispatch<CommandLineId> {
         try {
 
             /*
-             * Build the holdings library with no date floor. Get the date of
-             * the library, and use it to build the code library.
+             * Initialize the parent tracker instance. Build the 'holdings'
+             * library with no date floor. Get the date of the library, and use
+             * it to build the code library.
              */
+            initialize();
             result = buildLibrary(new HoldingsBuilder(), null, holding);
+
             final Date floor = HoldingLibrary.getInstance().getDate();
             result = buildLibrary(new CodesBuilder(), floor, code) && result;
 
@@ -683,7 +686,6 @@ public class Conductor implements Dispatch<CommandLineId> {
             // Use the date floor to build the distinguished libraries.
             result = buildLibrary(new DistinguishedsBuilder(), floor,
                     distinguished) && result;
-
         }
 
         // Catch any I/O exception that may have occurred.
@@ -745,6 +747,33 @@ public class Conductor implements Dispatch<CommandLineId> {
     @Override
     public @NotNull CommandLineId getKey() {
         return CommandLineId.OTHER;
+    }
+
+    /**
+     * Initializes the parent tracker.
+     */
+    private void initialize() {
+
+        // Get the parent tracker instance and clear its associations.
+        final ParentTracker tracker = ParentTracker.getInstance();
+        tracker.clearAssociations();
+
+        /*
+         * Add line code associations for the portfolio library. Add the single
+         * line code for institutions.
+         */
+        tracker.addAssociations(PortfolioLibrary.getInstance(),
+                HoldingLineType.PORTFOLIO);
+        tracker.addAssociation('I', HoldingLineType.INSTITUTION);
+
+        /*
+         * Set the distinguished account library in the parent tracker
+         * with the account library instance. Add line code associations
+         * for the ticker library.
+         */
+        tracker.setAccountLibrary(AccountLibrary.getInstance());
+        tracker.addAssociations(TickerLibrary.getInstance(),
+                HoldingLineType.TICKER);
     }
 
     /**
@@ -848,7 +877,7 @@ public class Conductor implements Dispatch<CommandLineId> {
             final String space = " ";
 
             /*
-             * Declare and initialize elements of the options description
+             * Declare and initialize elements of the 'options' description
              * lines.
              */
             prefix = space.repeat(4);

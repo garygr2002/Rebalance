@@ -369,7 +369,7 @@ public class DistinguishedsBuilder extends ElementReader {
         }
     };
     // The parent tracker
-    private final ParentTracker tracker = new ParentTracker();
+    private final ParentTracker tracker = ParentTracker.getInstance();
 
     {
 

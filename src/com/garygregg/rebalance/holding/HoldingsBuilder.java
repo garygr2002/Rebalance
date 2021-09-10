@@ -83,7 +83,7 @@ public class HoldingsBuilder extends ElementReader {
             };
 
     // The parent tracker
-    private final ParentTracker tracker = new ParentTracker();
+    private final ParentTracker tracker = ParentTracker.getInstance();
 
     // Our value interpreter
     private final DoubleInterpreter valueInterpreter =
