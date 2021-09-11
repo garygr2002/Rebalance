@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.portfolio;
 
+import com.garygregg.rebalance.DateInterpreter;
 import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.WeightType;
@@ -7,7 +8,6 @@ import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +31,21 @@ public class PortfoliosBuilder extends ElementReader {
                 @Override
                 public void processField(@NotNull String field,
                                          int lineNumber) {
-                    getTarget().setBirthDate(processDate(field, lineNumber));
+                    getTarget().setBirthDate(birthdateInterpreter.interpret(field));
+                }
+            };
+
+    // Our birthdate interpreter
+    private final DateInterpreter birthdateInterpreter =
+            new DateInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Date defaultValue) {
+                    logMessage(Level.WARNING, String.format("Unparseable birthdate " +
+                                    "'%s' at line number %d in portfolio file; using %s.",
+                            string, getMarker(), defaultValue));
                 }
             };
 
@@ -48,13 +62,28 @@ public class PortfoliosBuilder extends ElementReader {
     // The portfolio library instance
     private final PortfolioLibrary library = PortfolioLibrary.getInstance();
 
+    // Our mortality date interpreter
+    private final DateInterpreter mortalityDateInterpreter =
+            new DateInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Date defaultValue) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "mortality date '%s' at line number %d " +
+                                    "in portfolio file; using %s.", string,
+                            getMarker(), defaultValue));
+                }
+            };
+
     // The projected mortality date processor
     private final FieldProcessor<PortfolioDescription> mortalityDateProcessor =
             new FieldProcessor<>() {
                 @Override
                 public void processField(@NotNull String field, int lineNumber) {
-                    getTarget().setMortalityDate(processDate(field,
-                            lineNumber));
+                    getTarget().setMortalityDate(
+                            mortalityDateInterpreter.interpret(field));
                 }
             };
 
@@ -275,37 +304,16 @@ public class PortfoliosBuilder extends ElementReader {
         return result;
     }
 
-    /**
-     * Processes a date.
-     *
-     * @param date       The date to process
-     * @param lineNumber The line number where the date element occurs
-     * @return A processed date
-     */
-    private Date processDate(@NotNull String date, int lineNumber) {
-
-        // Declare and initialize the result to a default value.
-        Date parsedDate = null;
-        try {
-
-            // Try to parse the date.
-            parsedDate = DateUtilities.parse(date);
-        }
-
-        // Catch any parse exception that may occur.
-        catch (@NotNull ParseException exception) {
-            logMessage(Level.WARNING, String.format("Unparseable date '%s' at " +
-                            "line number %d in portfolio file; using null.", date,
-                    lineNumber));
-        }
-
-        // Return the result.
-        return parsedDate;
-    }
-
     @Override
     protected void processElements(@NotNull String[] elements,
                                    int lineNumber) {
+
+        /*
+         * Set the line number as the marker in the birthdate interpreter and
+         * the projected mortality date interpreter.
+         */
+        birthdateInterpreter.setMarker(lineNumber);
+        mortalityDateInterpreter.setMarker(lineNumber);
 
         // Create a new portfolio description with the index.
         final PortfolioDescription description = new PortfolioDescription(
@@ -372,7 +380,7 @@ public class PortfoliosBuilder extends ElementReader {
 
         // Log some exit information.
         logMessage(getOrdinary(), String.format("Load of metadata for " +
-                "portfolio with mnemonic '%s' at line %d was%s successful.",
+                        "portfolio with mnemonic '%s' at line %d was%s successful.",
                 description.getKey(), lineNumber,
                 hadLineProblem() ? " not" : ""));
     }

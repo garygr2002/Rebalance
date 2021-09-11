@@ -1,6 +1,5 @@
-package com.garygregg.rebalance.ticker;
+package com.garygregg.rebalance;
 
-import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.interpreter.Interpreter;
 import org.jetbrains.annotations.NotNull;
 
