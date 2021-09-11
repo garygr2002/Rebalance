@@ -31,7 +31,8 @@ public class PortfoliosBuilder extends ElementReader {
                 @Override
                 public void processField(@NotNull String field,
                                          int lineNumber) {
-                    getTarget().setBirthDate(birthdateInterpreter.interpret(field));
+                    getTarget().setBirthDate(
+                            birthdateInterpreter.interpret(field));
                 }
             };
 
@@ -43,8 +44,9 @@ public class PortfoliosBuilder extends ElementReader {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Date defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable birthdate " +
-                                    "'%s' at line number %d in portfolio file; using %s.",
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "birthdate '%s' at line number %d in " +
+                                    "portfolio file; using %s.",
                             string, getMarker(), defaultValue));
                 }
             };
