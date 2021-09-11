@@ -360,8 +360,12 @@ public class HoldingsBuilder extends ElementReader {
     @Override
     protected void startProcessing() {
 
-        // Call the superclass method, and set the date in the library.
+        /*
+         * Call the superclass method and reset the parent tracker. Set the
+         * date in the library.
+         */
         super.startProcessing();
+        tracker.reset();
         setDate(library);
     }
 }

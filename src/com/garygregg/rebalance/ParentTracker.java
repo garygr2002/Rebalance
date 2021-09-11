@@ -28,7 +28,7 @@ public class ParentTracker {
      * Constructs the parent tracker.
      */
     private ParentTracker() {
-        // This declaration exists only to make the constructor private.
+        reset();
     }
 
     /**
@@ -267,6 +267,19 @@ public class ParentTracker {
     }
 
     /**
+     * Resets the object.
+     */
+    public void reset() {
+
+        /*
+         * Clear the stack of active parent keys, and reset the 'expecting'
+         * object.
+         */
+        actives.clear();
+        expecting.reset();
+    }
+
+    /**
      * Sets the account library.
      *
      * @param accountLibrary The account library
@@ -317,6 +330,13 @@ public class ParentTracker {
                 return (currentlyExpecting < hierarchy.length - 1);
             }
         };
+
+        /**
+         * Constructs the object.
+         */
+        public Expecting() {
+            reset();
+        }
 
         /**
          * Decrements the currently expected holding line.
@@ -374,6 +394,13 @@ public class ParentTracker {
              */
             final HoldingLineType current = hierarchy[currentlyExpecting];
             return (current != null) && current.equals(holdingLineType);
+        }
+
+        /**
+         * Resets the object.
+         */
+        public void reset() {
+            currentlyExpecting = 0;
         }
 
         private interface TestAndAct {

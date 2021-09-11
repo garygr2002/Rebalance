@@ -580,11 +580,11 @@ public class DistinguishedsBuilder extends ElementReader {
     @Override
     protected void startProcessing() {
 
-        /*
-         * Call the superclass method, and set the date in each of the
-         * libraries.
-         */
+        // Call the superclass method and reset the parent tracker.
         super.startProcessing();
+        tracker.reset();
+
+        // Set the date in each of the libraries.
         setDate(accountLibrary);
         setDate(institutionLibrary);
         setDate(portfolioLibrary);
