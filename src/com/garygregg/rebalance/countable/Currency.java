@@ -66,6 +66,16 @@ public class Currency extends Countable implements Comparable<Currency> {
     }
 
     /**
+     * Formats a value.
+     *
+     * @param value The value to format
+     * @return The formatted value
+     */
+    public static String format(Double value) {
+        return (null == value) ? null : formatter.format(value);
+    }
+
+    /**
      * Gets a known cent.
      *
      * @return A known cent

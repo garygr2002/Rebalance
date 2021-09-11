@@ -2,6 +2,7 @@ package com.garygregg.rebalance.holding;
 
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.countable.Shares;
 import com.garygregg.rebalance.interpreter.CodeInterpreter;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import org.jetbrains.annotations.NotNull;
@@ -38,8 +39,9 @@ public class HoldingsBuilder extends ElementReader {
                                                 Double defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "price '%s' at line number %d in " +
-                                    "holding file; using default %f instead.",
-                            string, getMarker(), defaultValue));
+                                    "holding file; using default %s instead.",
+                            string, getMarker(),
+                            Currency.format(defaultValue)));
                 }
             };
 
@@ -65,8 +67,8 @@ public class HoldingsBuilder extends ElementReader {
                                                 Double defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "shares '%s' at line number %d in " +
-                                    "holding file; using default %f instead.",
-                            string, getMarker(), defaultValue));
+                                    "holding file; using default %s instead.",
+                            string, getMarker(), Shares.format(defaultValue)));
                 }
             };
 
@@ -95,8 +97,9 @@ public class HoldingsBuilder extends ElementReader {
                                                 Double defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "value '%s' at line number %d in " +
-                                    "holding file; using default %f instead.",
-                            string, getMarker(), defaultValue));
+                                    "holding file; using default %s instead.",
+                            string, getMarker(),
+                            Currency.format(defaultValue)));
                 }
             };
 

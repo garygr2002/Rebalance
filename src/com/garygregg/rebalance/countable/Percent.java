@@ -66,6 +66,16 @@ public class Percent extends Countable implements Comparable<Percent> {
     }
 
     /**
+     * Formats a value.
+     *
+     * @param value The value to format
+     * @return The formatted value
+     */
+    public static String format(Double value) {
+        return (null == value) ? null : formatter.format(value);
+    }
+
+    /**
      * Gets a known minimum.
      *
      * @return A known minimum
