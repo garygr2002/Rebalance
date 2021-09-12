@@ -343,7 +343,8 @@ public abstract class ElementReader extends ElementProcessor {
      * @param field      The field to processor
      * @param lineNumber The line number where the field occurs
      */
-    protected void processField(int index, @NotNull String field, int lineNumber) {
+    protected void processField(int index, @NotNull String field,
+                                int lineNumber) {
 
         // Get the indexed field processor. Is the processor not null?
         final FieldProcessor<?> processor = processorMap.get(index);
