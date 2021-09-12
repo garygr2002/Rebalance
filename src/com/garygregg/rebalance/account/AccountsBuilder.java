@@ -25,7 +25,7 @@ public class AccountsBuilder extends ElementReader {
                                                 Long defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable account " +
                             "number '%s' at line number %d in account file; " +
-                            "using %d.", string, getMarker(), defaultValue));
+                            "using %d.", string, getRow(), defaultValue));
                 }
             };
 
@@ -40,7 +40,7 @@ public class AccountsBuilder extends ElementReader {
                     logMessage(Level.WARNING, String.format("Unparseable allocation " +
                                     "'%s' at line number %d in account file; using " +
                                     "%f.",
-                            string, getMarker(), defaultValue));
+                            string, getRow(), defaultValue));
                 }
             };
 
@@ -63,13 +63,13 @@ public class AccountsBuilder extends ElementReader {
                      * the account file by: 1) removing the high-end bits
                      * greater than an ordinary integer; 2) shifting the value
                      * to the left by the size of an ordinary integer, and 3)
-                     * adding the marker. This will mean that accounts with the
+                     * adding the row. This will mean that accounts with the
                      * same, integer re-balance order will be rebalanced by
                      * that which occurred first in the accounts file.
                      */
                     final long parsedValue = super.doInterpret(string);
                     return ((parsedValue & Integer.MAX_VALUE) <<
-                            Integer.SIZE) + getMarker();
+                            Integer.SIZE) + getRow();
                 }
 
                 @Override
@@ -79,7 +79,7 @@ public class AccountsBuilder extends ElementReader {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "re-balance order '%s' at line number " +
                                     "%d in account file; using %d.",
-                            string, getMarker(), defaultValue));
+                            string, getRow(), defaultValue));
                 }
             };
 
@@ -94,7 +94,7 @@ public class AccountsBuilder extends ElementReader {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                             "account re-balance procedure '%s' at " +
                             "line number %d in account file; using " +
-                            "%s.", string, getMarker(), defaultValue));
+                            "%s.", string, getRow(), defaultValue));
                 }
             };
 
@@ -108,7 +108,7 @@ public class AccountsBuilder extends ElementReader {
                                                 TaxType defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                             "account tax type '%s' at line number %d in " +
-                            "account file; using %s.", string, getMarker(),
+                            "account file; using %s.", string, getRow(),
                             defaultValue));
                 }
             };
@@ -192,20 +192,20 @@ public class AccountsBuilder extends ElementReader {
                                    int lineNumber) {
 
         /*
-         * Set the line number as the marker in the account number interpreter
+         * Set the line number as the row in the account number interpreter
          * and allocation interpreter.
          */
-        accountNumberInterpreter.setMarker(lineNumber);
-        allocationInterpreter.setMarker(lineNumber);
+        accountNumberInterpreter.setRow(lineNumber);
+        allocationInterpreter.setRow(lineNumber);
 
         /*
-         * Set the line number as the marker in the re-balancer order
+         * Set the line number as the row in the re-balancer order
          * interpreter, the re-balance procedure interpreter, and the tax type
          * interpreter.
          */
-        rebalanceOrderInterpreter.setMarker(lineNumber);
-        rebalanceProcedureInterpreter.setMarker(lineNumber);
-        taxTypeInterpreter.setMarker(lineNumber);
+        rebalanceOrderInterpreter.setRow(lineNumber);
+        rebalanceProcedureInterpreter.setRow(lineNumber);
+        taxTypeInterpreter.setRow(lineNumber);
 
         /*
          * Create a new account description with the interpreted account

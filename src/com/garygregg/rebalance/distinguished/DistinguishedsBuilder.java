@@ -539,10 +539,10 @@ public class DistinguishedsBuilder extends ElementReader {
     protected void processElements(@NotNull String[] elements, int lineNumber) {
 
         /*
-         * Set the line number as the marker in the code interpreter, and get
-         * the line code.
+         * Set the line number as the row in the code interpreter, and get the
+         * line code.
          */
-        interpreter.setMarker(lineNumber);
+        interpreter.setRow(lineNumber);
         final Character lineCode = interpreter.interpret(
                 elements[DistinguishedFields.LINE_TYPE.getPosition()]);
 

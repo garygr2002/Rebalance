@@ -47,7 +47,7 @@ public class PortfoliosBuilder extends ElementReader {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "birthdate '%s' at line number %d in " +
                                     "portfolio file; using %s.",
-                            string, getMarker(), defaultValue));
+                            string, getRow(), defaultValue));
                 }
             };
 
@@ -75,7 +75,7 @@ public class PortfoliosBuilder extends ElementReader {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "mortality date '%s' at line number %d " +
                                     "in portfolio file; using %s.", string,
-                            getMarker(), defaultValue));
+                            getRow(), defaultValue));
                 }
             };
 
@@ -311,11 +311,11 @@ public class PortfoliosBuilder extends ElementReader {
                                    int lineNumber) {
 
         /*
-         * Set the line number as the marker in the birthdate interpreter and
-         * the projected mortality date interpreter.
+         * Set the line number as the row in the birthdate interpreter and the
+         * projected mortality date interpreter.
          */
-        birthdateInterpreter.setMarker(lineNumber);
-        mortalityDateInterpreter.setMarker(lineNumber);
+        birthdateInterpreter.setRow(lineNumber);
+        mortalityDateInterpreter.setRow(lineNumber);
 
         // Create a new portfolio description with the index.
         final PortfolioDescription description = new PortfolioDescription(

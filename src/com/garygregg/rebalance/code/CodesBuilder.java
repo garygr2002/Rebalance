@@ -151,10 +151,10 @@ public class CodesBuilder extends ElementReader {
     protected void processElements(@NotNull String[] elements, int lineNumber) {
 
         /*
-         * Set the line number as the marker in the code interpreter, and get
-         * the code. Create a new code description with the interpreted code.
+         * Set the line number as the row in the code interpreter, and get the
+         * code. Create a new code description with the interpreted code.
          */
-        interpreter.setMarker(lineNumber);
+        interpreter.setRow(lineNumber);
         final CodeDescription description = new CodeDescription(
                 interpreter.interpret(
                         elements[CodeFields.CODE.getPosition()]));
@@ -374,10 +374,10 @@ public class CodesBuilder extends ElementReader {
         public void processField(@NotNull String field, int lineNumber) {
 
             /*
-             * Set the line number as the marker, and interpret the field as a
+             * Set the line number as the row, and interpret the field as a
              * code. Set the code as a subcode in the target.
              */
-            interpreter.setMarker(lineNumber);
+            interpreter.setRow(lineNumber);
             getTarget().setSubcode(interpreter.interpret(field), getIndex());
         }
 

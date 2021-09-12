@@ -4,20 +4,20 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class Interpreter<T> {
 
-    // The position marker
-    private int marker;
+    // The row
+    private int row;
 
     /**
-     * Constructs the interpreter with an explicit position marker.
+     * Constructs the interpreter with an explicit row.
      *
-     * @param marker The position marker
+     * @param row The row
      */
-    public Interpreter(int marker) {
-        setMarker(marker);
+    public Interpreter(int row) {
+        setRow(row);
     }
 
     /**
-     * Constructs the interpreter with a default position marker.
+     * Constructs the interpreter with a default row.
      */
     public Interpreter() {
         this(0);
@@ -32,12 +32,12 @@ public abstract class Interpreter<T> {
     protected abstract @NotNull T doInterpret(@NotNull String string);
 
     /**
-     * Gets the position marker.
+     * Gets the row.
      *
-     * @return The position marker
+     * @return The row
      */
-    public int getMarker() {
-        return marker;
+    public int getRow() {
+        return row;
     }
 
     /**
@@ -80,8 +80,8 @@ public abstract class Interpreter<T> {
     /**
      * Receives any exception that may occur
      *
-     * @param exception The exception that was thrown
-     * @param string    The string that caused the exception
+     * @param exception    The exception that was thrown
+     * @param string       The string that caused the exception
      * @param defaultValue The default value to be used
      */
     protected void receiveException(@NotNull Exception exception,
@@ -91,11 +91,11 @@ public abstract class Interpreter<T> {
     }
 
     /**
-     * Sets the position marker.
+     * Sets the row.
      *
-     * @param marker The new position marker
+     * @param row The row
      */
-    public void setMarker(int marker) {
-        this.marker = marker;
+    public void setRow(int row) {
+        this.row = row;
     }
 }

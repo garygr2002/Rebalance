@@ -836,10 +836,10 @@ public class TickersBuilder extends ElementReader {
     public void processElements(String[] elements, int lineNumber) {
 
         /*
-         * Set the line number as the marker in the code interpreter, and get
-         * the line code.
+         * Set the line number as the row in the code interpreter, and get the
+         * line code.
          */
-        codeInterpreter.setMarker(lineNumber);
+        codeInterpreter.setRow(lineNumber);
         final Character tickerCode = codeInterpreter.interpret(
                 elements[TickerFields.CODE.getPosition()]);
 
@@ -864,12 +864,12 @@ public class TickersBuilder extends ElementReader {
         else {
 
             /*
-             * Set the line number as the marker in the ticker interpreter. Use
+             * Set the line number as the row in the ticker interpreter. Use
              * the factory for the given ticker type to create a new ticker
              * description with the interpreted ticker, number, name, minimum
              * investment, and preferred rounding.
              */
-            tickerInterpreter.setMarker(lineNumber);
+            tickerInterpreter.setRow(lineNumber);
             final TickerDescription description = factory.createDescription(
 
                     // Ticker...
@@ -973,10 +973,10 @@ public class TickersBuilder extends ElementReader {
                                      int lineNumber) {
 
         /*
-         * Set the line number as the marker in the code interpreter. Interpret
+         * Set the line number as the row in the code interpreter. Interpret
          * the fund type as a code, and translate the code into a fund type.
          */
-        codeInterpreter.setMarker(lineNumber);
+        codeInterpreter.setRow(lineNumber);
         return baseTypeMap.get(codeInterpreter.interpret(fundType));
     }
 

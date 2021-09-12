@@ -27,7 +27,7 @@ public class DetailedsBuilder extends ElementReader {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "account number '%s' at line number %d in " +
                                     "detailed file; using %d.", string,
-                            getMarker(), defaultValue));
+                            getRow(), defaultValue));
                 }
             };
 
@@ -42,7 +42,7 @@ public class DetailedsBuilder extends ElementReader {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "allocation '%s' at line number %d in " +
                                     "detailed file; using %f.", string,
-                            getMarker(), defaultValue));
+                            getRow(), defaultValue));
                 }
             };
 
@@ -148,11 +148,11 @@ public class DetailedsBuilder extends ElementReader {
                                    int lineNumber) {
 
         /*
-         * Set the line number as the marker in the account number interpreter
-         * and allocation interpreter.
+         * Set the line number as the row in the account number interpreter and
+         * allocation interpreter.
          */
-        accountNumberInterpreter.setMarker(lineNumber);
-        allocationInterpreter.setMarker(lineNumber);
+        accountNumberInterpreter.setRow(lineNumber);
+        allocationInterpreter.setRow(lineNumber);
 
         /*
          * Create a new detailed description with the institution mnemonic,

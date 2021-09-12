@@ -40,7 +40,7 @@ public class HoldingsBuilder extends ElementReader {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "price '%s' at line number %d in " +
                                     "holding file; using default %s instead.",
-                            string, getMarker(),
+                            string, getRow(),
                             Currency.format(defaultValue)));
                 }
             };
@@ -68,7 +68,7 @@ public class HoldingsBuilder extends ElementReader {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "shares '%s' at line number %d in " +
                                     "holding file; using default %s instead.",
-                            string, getMarker(), Shares.format(defaultValue)));
+                            string, getRow(), Shares.format(defaultValue)));
                 }
             };
 
@@ -98,7 +98,7 @@ public class HoldingsBuilder extends ElementReader {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "value '%s' at line number %d in " +
                                     "holding file; using default %s instead.",
-                            string, getMarker(),
+                            string, getRow(),
                             Currency.format(defaultValue)));
                 }
             };
@@ -238,18 +238,18 @@ public class HoldingsBuilder extends ElementReader {
                                    int lineNumber) {
 
         /*
-         * Set the line number as the marker in the code interpreter and the
-         * price interpreter.
+         * Set the line number as the row in the code interpreter and the price
+         * interpreter.
          */
-        codeInterpreter.setMarker(lineNumber);
-        priceInterpreter.setMarker(lineNumber);
+        codeInterpreter.setRow(lineNumber);
+        priceInterpreter.setRow(lineNumber);
 
         /*
-         * Set the line number as the marker in the shares interpreter and the
+         * Set the line number as the row in the shares interpreter and the
          * value interpreter.
          */
-        sharesInterpreter.setMarker(lineNumber);
-        valueInterpreter.setMarker(lineNumber);
+        sharesInterpreter.setRow(lineNumber);
+        valueInterpreter.setRow(lineNumber);
 
         // Get the line code.
         final Character lineCode = codeInterpreter.interpret(
