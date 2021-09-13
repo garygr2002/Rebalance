@@ -5,6 +5,8 @@ import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.interpreter.BooleanInterpreter;
+import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -24,6 +26,7 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
             new PortfoliosBuilder.MyAllocationProcessor(),
             new PortfoliosBuilder.MyAllocationProcessor()
     };
+
     // Our birthdate interpreter
     private final DateInterpreter birthdateInterpreter =
             new DateInterpreter() {
@@ -38,6 +41,7 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                             string, getRow(), defaultValue));
                 }
             };
+
     // The birthdate processor
     private final FieldProcessor<PortfolioDescription> birthDateProcessor =
             new FieldProcessor<>() {
@@ -47,17 +51,52 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                             birthdateInterpreter.interpret(field));
                 }
             };
+
+    // Our CPI adjusted flag interpreter
+    private final BooleanInterpreter cpiAdjustedInterpreter =
+            new BooleanInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Boolean defaultValue) {
+
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "CPI adjusted flag '%s' at line number " +
+                                    "%d in portfolio file; using %s.",
+                            string, getRow(), defaultValue));
+                }
+            };
+
     // The CPI adjusted flag processor
     private final FieldProcessor<PortfolioDescription> cpiAdjustedProcessor =
             new FieldProcessor<>() {
                 @Override
-                public void processField(@NotNull String field) { // TODO: Line number.
-                    getTarget().setCpiAdjusted(processBoolean(field, 0));
+                public void processField(@NotNull String field) {
+                    getTarget().setCpiAdjusted(
+                            cpiAdjustedInterpreter.interpret(field, false));
                 }
             };
 
     // The portfolio library instance
     private final PortfolioLibrary library = PortfolioLibrary.getInstance();
+
+    // Our monthly social security income interpreter
+    private final DoubleInterpreter monthlySsiInterpreter =
+            new DoubleInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Double defaultValue) {
+
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "monthly social security income '%s' at " +
+                                    "line number %d in portfolio file; " +
+                                    "using default %s instead.",
+                            string, getRow(), Currency.format(defaultValue)));
+                }
+            };
 
     // Our mortality date interpreter
     private final DateInterpreter mortalityDateInterpreter =
@@ -94,13 +133,30 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                 }
             };
 
+    // Our other monthly income interpreter
+    private final DoubleInterpreter otherMonthlyInterpreter =
+            new DoubleInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Double defaultValue) {
+
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "other monthly income '%s' at line " +
+                                    "number %d in portfolio file; using " +
+                                    "default %s instead.",
+                            string, getRow(), Currency.format(defaultValue)));
+                }
+            };
+
     // The other monthly annuity income processor
     private final FieldProcessor<PortfolioDescription> otherMonthlyProcessor =
             new FieldProcessor<>() {
                 @Override
-                public void processField(@NotNull String field) { // TODO: Line number.
-                    getTarget().setOtherMonthly(new Currency(processFloat(
-                            field, 0., 0)));
+                public void processField(@NotNull String field) {
+                    getTarget().setOtherMonthly(new Currency(
+                            otherMonthlyInterpreter.interpret(field, 0.)));
                 }
             };
 
@@ -110,10 +166,11 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
     // The monthly Social Security monthly income processor
     private final FieldProcessor<PortfolioDescription>
             socialSecurityMonthlyProcessor = new FieldProcessor<>() {
+
         @Override
-        public void processField(@NotNull String field) { // TODO: Line number.
+        public void processField(@NotNull String field) {
             getTarget().setSocialSecurityMonthly(new Currency(
-                    processFloat(field, 0., 0)));
+                    monthlySsiInterpreter.interpret(field, 0.)));
         }
     };
 
@@ -259,39 +316,8 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
 
             // Log a warning message describing the unparseable allocation.
             logMessage(Level.WARNING, String.format("Unparseable allocation " +
-                            "'%s' at line number %d in portfolio file; using null",
-                    allocation, lineNumber));
-        }
-
-        // Return the result.
-        return result;
-    }
-
-    /**
-     * Process a boolean object.
-     *
-     * @param aBoolean   The boolean to object to process
-     * @param lineNumber The line number where the boolean element occurs
-     * @return A processed boolean object
-     */
-    private boolean processBoolean(@NotNull String aBoolean, int lineNumber) {
-
-        /*
-         * Parse the argument as a boolean object. Is the string representation
-         * of the result not equal to the lowercase translation of the
-         * argument?
-         */
-        final boolean result = Boolean.parseBoolean(aBoolean);
-        if (!Boolean.toString(result).equals(aBoolean.toLowerCase())) {
-
-            /*
-             * The string representation of the result is not equal to the
-             * lowercase translation of the argument. This means the argument
-             * was not a proper boolean representation. Log a warning.
-             */
-            logMessage(Level.WARNING, String.format("Unparseable boolean " +
-                            "'%s' at line number %d in portfolio file; using %s.",
-                    aBoolean, lineNumber, result));
+                    "'%s' at line number %d in portfolio file; using " +
+                    "null.", allocation, lineNumber));
         }
 
         // Return the result.
@@ -427,6 +453,15 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
          */
         birthdateInterpreter.setRow(lineNumber);
         mortalityDateInterpreter.setRow(lineNumber);
+
+        /*
+         * Set the line number as the row in the monthly social security income
+         * interpreter, the other monthly income interpreter, and the CPI
+         * adjusted interpreter.
+         */
+        monthlySsiInterpreter.setRow(lineNumber);
+        otherMonthlyInterpreter.setRow(lineNumber);
+        cpiAdjustedInterpreter.setRow(lineNumber);
     }
 
     @Override
