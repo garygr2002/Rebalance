@@ -39,7 +39,7 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
                                                 Double defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "price '%s' at line number %d in " +
-                                    "holding file; using default %s instead.",
+                                    "holding file; using %s.",
                             string, getRow(),
                             Currency.format(defaultValue)));
                 }
@@ -66,7 +66,7 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
                                                 Double defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "shares '%s' at line number %d in " +
-                                    "holding file; using default %s instead.",
+                                    "holding file; using %s.",
                             string, getRow(), Shares.format(defaultValue)));
                 }
             };
@@ -95,7 +95,7 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
                                                 Double defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "value '%s' at line number %d in " +
-                                    "holding file; using default %s instead.",
+                                    "holding file; using %s.",
                             string, getRow(),
                             Currency.format(defaultValue)));
                 }

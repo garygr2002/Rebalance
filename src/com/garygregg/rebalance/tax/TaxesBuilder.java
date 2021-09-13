@@ -116,7 +116,7 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
              */
             logMessage(Level.WARNING, String.format("Unparseable floating " +
                             "point number '%s' at line number %d in holding " +
-                            "file; using default %f instead.", element,
+                            "file; using %f.", element,
                     lineNumber, defaultValue));
         }
 
