@@ -10,7 +10,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DistinguishedsBuilder extends ElementReader {
+public class DistinguishedsBuilder extends
+        ElementReader<DistinguishedDescription<?, ?>> {
 
     // The distinguished account library instance
     private final DistinguishedAccountLibrary accountLibrary =
@@ -422,7 +423,7 @@ public class DistinguishedsBuilder extends ElementReader {
         try {
 
             // Create an element processor. Read lines from the file object.
-            final DistinguishedsBuilder processor = new DistinguishedsBuilder();
+            final ElementReader<?> processor = new DistinguishedsBuilder();
             processor.readLines();
 
             // Describe the contents of the distinguished portfolio library.
@@ -538,11 +539,8 @@ public class DistinguishedsBuilder extends ElementReader {
     @Override
     protected void processElements(@NotNull String[] elements, int lineNumber) {
 
-        /*
-         * Set the line number as the row in the code interpreter, and get the
-         * line code.
-         */
-        interpreter.setRow(lineNumber);
+        // Set the line number and get the line code.
+        setLineNumber(lineNumber);
         final Character lineCode = interpreter.interpret(
                 elements[DistinguishedFields.LINE_TYPE.getPosition()]);
 
@@ -575,6 +573,11 @@ public class DistinguishedsBuilder extends ElementReader {
              */
             dispatchProcessor(lineType, keyString, value, lineNumber);
         }
+    }
+
+    @Override
+    protected void setLineNumber(int lineNumber) {
+        interpreter.setRow(lineNumber);
     }
 
     @Override

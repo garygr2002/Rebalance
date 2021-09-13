@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TickersBuilder extends ElementReader {
+public class TickersBuilder extends ElementReader<TickerDescription> {
 
     // A ticker must contain exactly one of these base types
     private static final FundType[] base = {FundType.BOND, FundType.CASH,
@@ -164,10 +164,10 @@ public class TickersBuilder extends ElementReader {
             new FieldProcessor<>() {
 
                 @Override
-                public void processField(@NotNull String field, int lineNumber) {
+                public void processField(@NotNull String field) {
 
-                    // Process the fund type. Is the fund type null?
-                    final FundType fundType = processFundType(field, lineNumber);
+                    // Process the fund type. Is the fund type null? TODO: line number.
+                    final FundType fundType = processFundType(field, 0);
                     if (null == fundType) {
 
                         // The fund type is null. Issue a warning, and skip the code.
@@ -175,7 +175,7 @@ public class TickersBuilder extends ElementReader {
                                         "type for unrecognized code '%s' at " +
                                         "line number %d in the ticker file; " +
                                         "skipping this code.",
-                                field, lineNumber));
+                                field, 0));
                     }
 
                     // Add to the target any type other than not-a-fund.
@@ -318,7 +318,7 @@ public class TickersBuilder extends ElementReader {
         try {
 
             // Create an element processor. Read lines from the file object.
-            final ElementReader processor = new TickersBuilder();
+            final ElementReader<?> processor = new TickersBuilder();
             processor.readLines();
 
             // The ticker library should now be populated. Print its date.
@@ -951,7 +951,7 @@ public class TickersBuilder extends ElementReader {
             for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
 
                 // Process the first/next field.
-                processField(i, elements[i], lineNumber);
+                processField(i, elements[i]);
             }
 
             // Log some exit information.
@@ -1039,12 +1039,8 @@ public class TickersBuilder extends ElementReader {
         return result;
     }
 
-    /**
-     * Sets the target in the field processors.
-     *
-     * @param description The target to set in the field processors
-     */
-    private void setTarget(@NotNull TickerDescription description) {
+    @Override
+    protected void setTarget(@NotNull TickerDescription description) {
         fundTypeProcessor.setTarget(description);
     }
 

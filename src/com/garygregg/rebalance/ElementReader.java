@@ -9,7 +9,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class ElementReader extends ElementProcessor {
+public abstract class ElementReader<DescriptionType extends Description<?>>
+        extends ElementProcessor {
 
     // A map of element indices to field processors
     private final Map<Integer, FieldProcessor<?>> processorMap =
@@ -294,7 +295,8 @@ public abstract class ElementReader extends ElementProcessor {
                  * do not allow our caller to have to check for the
                  * file-not-found exception. Wrap the thrown exception in a
                  * runtime exception.
-                 */ catch (@NotNull FileNotFoundException exception) {
+                 */
+                catch (@NotNull FileNotFoundException exception) {
                     throw new RuntimeException(exception);
                 }
             }
@@ -341,17 +343,15 @@ public abstract class ElementReader extends ElementProcessor {
      *
      * @param index      The given element index
      * @param field      The field to processor
-     * @param lineNumber The line number where the field occurs
      */
-    protected void processField(int index, @NotNull String field,
-                                int lineNumber) {
+    protected void processField(int index, @NotNull String field) {
 
         // Get the indexed field processor. Is the processor not null?
         final FieldProcessor<?> processor = processorMap.get(index);
         if (null != processor) {
 
             // The processor is not null. Call it to process the field.
-            processor.processField(field, lineNumber);
+            processor.processField(field);
         }
     }
 
@@ -546,6 +546,24 @@ public abstract class ElementReader extends ElementProcessor {
     }
 
     /**
+     * Sets the line number in the interpreters.
+     *
+     * @param lineNumber The line number to set in the interpreters
+     */
+    protected void setLineNumber(int lineNumber) {
+        // The default is to do nothing.
+    }
+
+    /**
+     * Sets the target in the field processors.
+     *
+     * @param description The target to set in the field processors
+     */
+    protected void setTarget(@NotNull DescriptionType description) {
+        // The default is to do nothing.
+    }
+
+    /**
      * Notifies a derived class that element processing is about to start.
      */
     protected void startProcessing() {
@@ -583,12 +601,8 @@ public abstract class ElementReader extends ElementProcessor {
 
         /**
          * Processes the field.
-         *
-         * @param field      The field
-         * @param lineNumber The line number where the field occurred
          */
-        public abstract void processField(@NotNull String field,
-                                          int lineNumber);
+        public abstract void processField(@NotNull String field);
 
         /**
          * Sets the target.
@@ -609,11 +623,11 @@ public abstract class ElementReader extends ElementProcessor {
             extends FieldProcessor<TargetType> {
 
         @Override
-        public final void processField(@NotNull String field, int lineNumber) {
+        public final void processField(@NotNull String field) {
 
             // Process the field if it is not blank.
             if (!field.trim().isBlank()) {
-                processNotEmptyField(field, lineNumber);
+                processNotEmptyField(field);
             }
         }
 
@@ -621,9 +635,7 @@ public abstract class ElementReader extends ElementProcessor {
          * Processes the non-blank field.
          *
          * @param field      The field
-         * @param lineNumber The line number where the field occurred
          */
-        public abstract void processNotEmptyField(@NotNull String field,
-                                                  int lineNumber);
+        public abstract void processNotEmptyField(@NotNull String field);
     }
 }

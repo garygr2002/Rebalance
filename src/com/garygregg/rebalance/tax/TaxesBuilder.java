@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
-abstract class TaxesBuilder extends ElementReader {
+abstract class TaxesBuilder extends ElementReader<TaxDescription> {
 
     // The tax library instance
     private final TaxLibrary library = getLibrary();

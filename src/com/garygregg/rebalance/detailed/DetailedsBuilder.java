@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DetailedsBuilder extends ElementReader {
+public class DetailedsBuilder extends ElementReader<DetailedDescription> {
 
     // Our account number interpreter
     private final LongInterpreter accountNumberInterpreter =
@@ -40,9 +40,9 @@ public class DetailedsBuilder extends ElementReader {
                                                 @NotNull String string,
                                                 Double defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "allocation '%s' at line number %d in " +
-                                    "detailed file; using %f.", string,
-                            getRow(), defaultValue));
+                                    "allocation '%s' at line number %d and " +
+                                    "column %d in detailed file; using %f.",
+                            string, getRow(), getColumn(), defaultValue));
                 }
             };
 
@@ -97,7 +97,7 @@ public class DetailedsBuilder extends ElementReader {
         try {
 
             // Create an element processor. Read lines from the file object.
-            final ElementReader processor = new DetailedsBuilder();
+            final ElementReader<?> processor = new DetailedsBuilder();
             processor.readLines();
 
             // The detailed library should now be populated. Print its date.
@@ -148,16 +148,10 @@ public class DetailedsBuilder extends ElementReader {
                                    int lineNumber) {
 
         /*
-         * Set the line number as the row in the account number interpreter and
-         * allocation interpreter.
+         * Set the line number. Create a new detailed description with the
+         * institution mnemonic, account number and name.
          */
-        accountNumberInterpreter.setRow(lineNumber);
-        allocationInterpreter.setRow(lineNumber);
-
-        /*
-         * Create a new detailed description with the institution mnemonic,
-         * account number and name.
-         */
+        setLineNumber(lineNumber);
         final DetailedDescription description = new DetailedDescription(
 
                 elements[DetailedFields.INSTITUTION.getPosition()],
@@ -223,10 +217,13 @@ public class DetailedsBuilder extends ElementReader {
         for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
 
             /*
-             * Get the field associated with the position. Adjust the
-             * allocation of the associated fund type.
+             * Set the column in the allocation interpreter. Get the field
+             * associated with the position.
              */
+            allocationInterpreter.setColumn(i + 1);
             field = positionMap.get(i);
+
+            // Adjust the allocation of the associated fund type.
             description.adjustAllocation(field.getType(),
                     allocationInterpreter.interpret(elements[i]));
         }
@@ -238,6 +235,17 @@ public class DetailedsBuilder extends ElementReader {
                 AccountKeyLibrary.format(description.getNumber()),
                 description.getName(), lineNumber,
                 hadLineProblem() ? " not" : ""));
+    }
+
+    @Override
+    protected void setLineNumber(int lineNumber) {
+
+        /*
+         * Set the line number as the row in the account number interpreter and
+         * allocation interpreter.
+         */
+        accountNumberInterpreter.setRow(lineNumber);
+        allocationInterpreter.setRow(lineNumber);
     }
 
     @Override

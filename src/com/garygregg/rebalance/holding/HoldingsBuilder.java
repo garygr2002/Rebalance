@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HoldingsBuilder extends ElementReader {
+public class HoldingsBuilder extends ElementReader<HoldingDescription> {
 
     // Our code interpreter
     private final CodeInterpreter codeInterpreter = new CodeInterpreter();
@@ -24,7 +24,7 @@ public class HoldingsBuilder extends ElementReader {
             new FieldProcessor<>() {
 
                 @Override
-                public void processField(@NotNull String field, int lineNumber) {
+                public void processField(@NotNull String field) {
                     getTarget().setName(field);
                 }
             };
@@ -50,8 +50,7 @@ public class HoldingsBuilder extends ElementReader {
             new FieldProcessorIfNotEmpty<>() {
 
                 @Override
-                public void processNotEmptyField(@NotNull String field,
-                                                 int lineNumber) {
+                public void processNotEmptyField(@NotNull String field) {
                     getTarget().setPrice(priceInterpreter.interpret(field,
                             1.));
                 }
@@ -77,8 +76,7 @@ public class HoldingsBuilder extends ElementReader {
             new FieldProcessorIfNotEmpty<>() {
 
                 @Override
-                public void processNotEmptyField(@NotNull String field,
-                                                 int lineNumber) {
+                public void processNotEmptyField(@NotNull String field) {
                     getTarget().setShares(sharesInterpreter.interpret(field,
                             0.));
                 }
@@ -108,8 +106,7 @@ public class HoldingsBuilder extends ElementReader {
             new FieldProcessorIfNotEmpty<>() {
 
                 @Override
-                public void processNotEmptyField(@NotNull String field,
-                                                 int lineNumber) {
+                public void processNotEmptyField(@NotNull String field) {
 
                     // Get the holding description and its current value.
                     final HoldingDescription description = getTarget();
@@ -179,7 +176,7 @@ public class HoldingsBuilder extends ElementReader {
         try {
 
             // Create an element processor. Read lines from the file object.
-            final ElementReader processor = new HoldingsBuilder();
+            final ElementReader<?> processor = new HoldingsBuilder();
             processor.readLines();
 
             // The holding library should now be populated. Print its date.
@@ -237,21 +234,8 @@ public class HoldingsBuilder extends ElementReader {
     protected void processElements(@NotNull String[] elements,
                                    int lineNumber) {
 
-        /*
-         * Set the line number as the row in the code interpreter and the price
-         * interpreter.
-         */
-        codeInterpreter.setRow(lineNumber);
-        priceInterpreter.setRow(lineNumber);
-
-        /*
-         * Set the line number as the row in the shares interpreter and the
-         * value interpreter.
-         */
-        sharesInterpreter.setRow(lineNumber);
-        valueInterpreter.setRow(lineNumber);
-
-        // Get the line code.
+        // Set the line number and get the line code.
+        setLineNumber(lineNumber);
         final Character lineCode = codeInterpreter.interpret(
                 elements[HoldingFields.LINE_TYPE.getPosition()]);
 
@@ -336,7 +320,7 @@ public class HoldingsBuilder extends ElementReader {
 
         // Cycle for each remaining field-to-process, and process it.
         for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
-            processField(i, elements[i], lineNumber);
+            processField(i, elements[i]);
         }
 
         // Log some exit information.
@@ -346,12 +330,26 @@ public class HoldingsBuilder extends ElementReader {
                 hadLineProblem() ? " not" : ""));
     }
 
-    /**
-     * Sets the target in the field processors.
-     *
-     * @param description The target to set in the field processors
-     */
-    private void setTarget(@NotNull HoldingDescription description) {
+    @Override
+    protected void setLineNumber(int lineNumber) {
+
+        /*
+         * Set the line number as the row in the code interpreter and the price
+         * interpreter.
+         */
+        codeInterpreter.setRow(lineNumber);
+        priceInterpreter.setRow(lineNumber);
+
+        /*
+         * Set the line number as the row in the shares interpreter and the
+         * value interpreter.
+         */
+        sharesInterpreter.setRow(lineNumber);
+        valueInterpreter.setRow(lineNumber);
+    }
+
+    @Override
+    protected void setTarget(@NotNull HoldingDescription description) {
 
         // Set the description in all the processors.
         nameProcessor.setTarget(description);

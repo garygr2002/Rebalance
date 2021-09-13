@@ -4,23 +4,26 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class Interpreter<T> {
 
+    // The column
+    private Integer column;
+
     // The row
-    private int row;
+    private Integer row;
 
     /**
-     * Constructs the interpreter with an explicit row.
+     * Constructs the interpreter with an explicit column.
      *
-     * @param row The row
+     * @param column The column of the interpreter
      */
-    public Interpreter(int row) {
-        setRow(row);
+    public Interpreter(Integer column) {
+        setColumn(column);
     }
 
     /**
-     * Constructs the interpreter with a default row.
+     * Constructs the interpreter with a default column.
      */
     public Interpreter() {
-        this(0);
+        this(null);
     }
 
     /**
@@ -32,11 +35,20 @@ public abstract class Interpreter<T> {
     protected abstract @NotNull T doInterpret(@NotNull String string);
 
     /**
+     * Gets the column.
+     *
+     * @return The column
+     */
+    protected Integer getColumn() {
+        return column;
+    }
+
+    /**
      * Gets the row.
      *
      * @return The row
      */
-    public int getRow() {
+    protected Integer getRow() {
         return row;
     }
 
@@ -91,11 +103,20 @@ public abstract class Interpreter<T> {
     }
 
     /**
+     * Sets the column.
+     *
+     * @param column The column
+     */
+    public void setColumn(Integer column) {
+        this.column = column;
+    }
+
+    /**
      * Sets the row.
      *
      * @param row The row
      */
-    public void setRow(int row) {
+    public void setRow(Integer row) {
         this.row = row;
     }
 }

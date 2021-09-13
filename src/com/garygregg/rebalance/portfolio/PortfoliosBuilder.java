@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PortfoliosBuilder extends ElementReader {
+public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
 
     // The allocation processors
     private final PortfoliosBuilder.MyAllocationProcessor[]
@@ -24,18 +24,6 @@ public class PortfoliosBuilder extends ElementReader {
             new PortfoliosBuilder.MyAllocationProcessor(),
             new PortfoliosBuilder.MyAllocationProcessor()
     };
-
-    // The birthdate processor
-    private final FieldProcessor<PortfolioDescription> birthDateProcessor =
-            new FieldProcessor<>() {
-                @Override
-                public void processField(@NotNull String field,
-                                         int lineNumber) {
-                    getTarget().setBirthDate(
-                            birthdateInterpreter.interpret(field));
-                }
-            };
-
     // Our birthdate interpreter
     private final DateInterpreter birthdateInterpreter =
             new DateInterpreter() {
@@ -50,14 +38,21 @@ public class PortfoliosBuilder extends ElementReader {
                             string, getRow(), defaultValue));
                 }
             };
-
+    // The birthdate processor
+    private final FieldProcessor<PortfolioDescription> birthDateProcessor =
+            new FieldProcessor<>() {
+                @Override
+                public void processField(@NotNull String field) {
+                    getTarget().setBirthDate(
+                            birthdateInterpreter.interpret(field));
+                }
+            };
     // The CPI adjusted flag processor
     private final FieldProcessor<PortfolioDescription> cpiAdjustedProcessor =
             new FieldProcessor<>() {
                 @Override
-                public void processField(@NotNull String field, int lineNumber) {
-                    getTarget().setCpiAdjusted(processBoolean(field,
-                            lineNumber));
+                public void processField(@NotNull String field) { // TODO: Line number.
+                    getTarget().setCpiAdjusted(processBoolean(field, 0));
                 }
             };
 
@@ -83,7 +78,7 @@ public class PortfoliosBuilder extends ElementReader {
     private final FieldProcessor<PortfolioDescription> mortalityDateProcessor =
             new FieldProcessor<>() {
                 @Override
-                public void processField(@NotNull String field, int lineNumber) {
+                public void processField(@NotNull String field) {
                     getTarget().setMortalityDate(
                             mortalityDateInterpreter.interpret(field));
                 }
@@ -94,8 +89,7 @@ public class PortfoliosBuilder extends ElementReader {
             new FieldProcessor<>() {
 
                 @Override
-                public void processField(@NotNull String field,
-                                         int lineNumber) {
+                public void processField(@NotNull String field) {
                     getTarget().setName(field);
                 }
             };
@@ -104,9 +98,9 @@ public class PortfoliosBuilder extends ElementReader {
     private final FieldProcessor<PortfolioDescription> otherMonthlyProcessor =
             new FieldProcessor<>() {
                 @Override
-                public void processField(@NotNull String field, int lineNumber) {
+                public void processField(@NotNull String field) { // TODO: Line number.
                     getTarget().setOtherMonthly(new Currency(processFloat(
-                            field, 0., lineNumber)));
+                            field, 0., 0)));
                 }
             };
 
@@ -117,10 +111,9 @@ public class PortfoliosBuilder extends ElementReader {
     private final FieldProcessor<PortfolioDescription>
             socialSecurityMonthlyProcessor = new FieldProcessor<>() {
         @Override
-        public void processField(@NotNull String field,
-                                 int lineNumber) {
+        public void processField(@NotNull String field) { // TODO: Line number.
             getTarget().setSocialSecurityMonthly(new Currency(
-                    processFloat(field, 0., lineNumber)));
+                    processFloat(field, 0., 0)));
         }
     };
 
@@ -128,10 +121,9 @@ public class PortfoliosBuilder extends ElementReader {
     private final FieldProcessor<PortfolioDescription> taxableAnnualProcessor =
             new FieldProcessor<>() {
                 @Override
-                public void processField(@NotNull String field,
-                                         int lineNumber) {
+                public void processField(@NotNull String field) { // TODO: Line number.
                     getTarget().setTaxableAnnual(new Currency(
-                            processFloat(field, 0., lineNumber)));
+                            processFloat(field, 0., 0)));
                 }
             };
 
@@ -185,7 +177,7 @@ public class PortfoliosBuilder extends ElementReader {
         try {
 
             // Create an element processor. Read lines from the file object.
-            final ElementReader processor = new PortfoliosBuilder();
+            final ElementReader<?> processor = new PortfoliosBuilder();
             processor.readLines(new Date());
 
             // The holding library should now be populated. Print its date.
@@ -311,13 +303,10 @@ public class PortfoliosBuilder extends ElementReader {
                                    int lineNumber) {
 
         /*
-         * Set the line number as the row in the birthdate interpreter and the
-         * projected mortality date interpreter.
+         * Set the line number, and create a new portfolio description with
+         * the index.
          */
-        birthdateInterpreter.setRow(lineNumber);
-        mortalityDateInterpreter.setRow(lineNumber);
-
-        // Create a new portfolio description with the index.
+        setLineNumber(lineNumber);
         final PortfolioDescription description = new PortfolioDescription(
                 elements[PortfolioFields.MNEMONIC.getPosition()]);
 
@@ -377,7 +366,7 @@ public class PortfoliosBuilder extends ElementReader {
 
         // Cycle for each remaining field-to-process, and process it.
         for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
-            processField(i, elements[i], lineNumber);
+            processField(i, elements[i]);
         }
 
         // Log some exit information.
@@ -429,12 +418,19 @@ public class PortfoliosBuilder extends ElementReader {
         return result;
     }
 
-    /**
-     * Sets the target in the field processors.
-     *
-     * @param description The target to set in the field processors
-     */
-    private void setTarget(@NotNull PortfolioDescription description) {
+    @Override
+    protected void setLineNumber(int lineNumber) {
+
+        /*
+         * Set the line number as the row in the birthdate interpreter and the
+         * projected mortality date interpreter.
+         */
+        birthdateInterpreter.setRow(lineNumber);
+        mortalityDateInterpreter.setRow(lineNumber);
+    }
+
+    @Override
+    protected void setTarget(@NotNull PortfolioDescription description) {
 
         // Cycle for each allocation processor and set its target.
         for (MyAllocationProcessor processor : allocationProcessors) {
@@ -507,9 +503,10 @@ public class PortfoliosBuilder extends ElementReader {
         }
 
         @Override
-        public void processField(@NotNull String field, int lineNumber) {
+        public void processField(@NotNull String field) {
+            // TODO: Line number.
             getTarget().adjustAllocation(positionMap.get(getIndex()).getType(),
-                    processAllocation(field, lineNumber));
+                    processAllocation(field, 0));
         }
 
         /**

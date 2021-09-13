@@ -10,15 +10,14 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class CodesBuilder extends ElementReader {
+public class CodesBuilder extends ElementReader<CodeDescription> {
 
     // The description processor
     private final FieldProcessor<CodeDescription> descriptionProcessor =
             new FieldProcessor<>() {
 
                 @Override
-                public void processField(@NotNull String field,
-                                         int lineNumber) {
+                public void processField(@NotNull String field) {
                     getTarget().setDescription(
                             CodesBuilder.processDescription(field));
                 }
@@ -35,7 +34,7 @@ public class CodesBuilder extends ElementReader {
             new FieldProcessor<>() {
 
                 @Override
-                public void processField(@NotNull String field, int lineNumber) {
+                public void processField(@NotNull String field) {
                     getTarget().setName(field);
 
                 }
@@ -85,7 +84,7 @@ public class CodesBuilder extends ElementReader {
         try {
 
             // Create an element processor. Read lines from the file object.
-            final ElementReader processor = new CodesBuilder();
+            final ElementReader<?> processor = new CodesBuilder();
             processor.readLines();
 
             // The code library should now be populated. Print its date.
@@ -151,10 +150,10 @@ public class CodesBuilder extends ElementReader {
     protected void processElements(@NotNull String[] elements, int lineNumber) {
 
         /*
-         * Set the line number as the row in the code interpreter, and get the
-         * code. Create a new code description with the interpreted code.
+         * Set the line number, get the code, and create a new code description
+         * with the interpreted code.
          */
-        interpreter.setRow(lineNumber);
+        setLineNumber(lineNumber);
         final CodeDescription description = new CodeDescription(
                 interpreter.interpret(
                         elements[CodeFields.CODE.getPosition()]));
@@ -218,7 +217,7 @@ public class CodesBuilder extends ElementReader {
         for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
 
             // Process the first/next field.
-            processField(i, elements[i], lineNumber);
+            processField(i, elements[i]);
         }
 
         // Log some exit information.
@@ -263,12 +262,13 @@ public class CodesBuilder extends ElementReader {
         }
     }
 
-    /**
-     * Sets the target in the field processors.
-     *
-     * @param description The target to set in the field processors
-     */
-    private void setTarget(@NotNull CodeDescription description) {
+    @Override
+    protected void setLineNumber(int lineNumber) {
+        interpreter.setRow(lineNumber);
+    }
+
+    @Override
+    protected void setTarget(@NotNull CodeDescription description) {
 
         // Cycle for the number of subcodes.
         final int subcodeFieldCount = CodeDescription.getSubcodeCount();
@@ -371,13 +371,12 @@ public class CodesBuilder extends ElementReader {
         }
 
         @Override
-        public void processField(@NotNull String field, int lineNumber) {
+        public void processField(@NotNull String field) {
 
             /*
-             * Set the line number as the row, and interpret the field as a
-             * code. Set the code as a subcode in the target.
+             * Interpret the field as a code, and set the code as a sub-code in
+             * the target.
              */
-            interpreter.setRow(lineNumber);
             getTarget().setSubcode(interpreter.interpret(field), getIndex());
         }
 
