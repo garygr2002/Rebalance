@@ -27,6 +27,20 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
             new PortfoliosBuilder.MyAllocationProcessor()
     };
 
+    // Our annual income interpreter
+    private final DoubleInterpreter annualIncomeInterpreter =
+            new DoubleInterpreter() {
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Double defaultValue) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "annual income '%s' at line number %d " +
+                                    "in portfolio file; using %s.",
+                            string, getRow(), Currency.format(defaultValue)));
+                }
+            };
+
     // Our birthdate interpreter
     private final DateInterpreter birthdateInterpreter =
             new DateInterpreter() {
@@ -89,11 +103,10 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "monthly social security income '%s' at " +
                                     "line number %d in portfolio file; " +
-                                    "using default %s instead.",
+                                    "using %s.",
                             string, getRow(), Currency.format(defaultValue)));
                 }
             };
@@ -108,8 +121,8 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                                                 Date defaultValue) {
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "mortality date '%s' at line number %d " +
-                                    "in portfolio file; using %s.", string,
-                            getRow(), defaultValue));
+                                    "in portfolio file; using %s.",
+                            string, getRow(), defaultValue));
                 }
             };
 
@@ -141,11 +154,10 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-
                     logMessage(Level.WARNING, String.format("Unparseable " +
                                     "other monthly income '%s' at line " +
                                     "number %d in portfolio file; using " +
-                                    "default %s instead.",
+                                    "%s.",
                             string, getRow(), Currency.format(defaultValue)));
                 }
             };
@@ -178,9 +190,10 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
     private final FieldProcessor<PortfolioDescription> taxableAnnualProcessor =
             new FieldProcessor<>() {
                 @Override
-                public void processField(@NotNull String field) { // TODO: Line number.
-                    getTarget().setTaxableAnnual(new Currency(
-                            processFloat(field, 0., 0)));
+                public void processField(@NotNull String field) {
+                    getTarget().setTaxableAnnual(
+                            new Currency(annualIncomeInterpreter.interpret(field,
+                                    0.)));
                 }
             };
 
@@ -213,10 +226,10 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
         for (MyAllocationProcessor processor : allocationProcessors) {
 
             /*
-             * Increment and set the first/next index in the field processor.
+             * Increment and set the first/next column in the field processor.
              * Add the processor.
              */
-            processor.setIndex(++fieldIndex);
+            processor.setColumn(++fieldIndex);
             addFieldProcessor(fieldIndex, processor);
         }
     }
@@ -291,37 +304,6 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
     @Override
     protected @NotNull Logger getReadingLogger() {
         return Logger.getLogger(PortfoliosBuilder.class.getCanonicalName());
-    }
-
-    /**
-     * Processes an allocation element.
-     *
-     * @param allocation The allocation element
-     * @param lineNumber The line number where the allocation occurs
-     * @return A processed allocation
-     */
-    private Double processAllocation(@NotNull String allocation,
-                                     int lineNumber) {
-
-        // Declare and initialize the result to a default value.
-        Double result = null;
-        try {
-
-            // Parse the allocation as a floating point number.
-            result = Double.parseDouble(allocation);
-        }
-
-        // Catch any number format exception that may occur.
-        catch (@NotNull NumberFormatException exception) {
-
-            // Log a warning message describing the unparseable allocation.
-            logMessage(Level.WARNING, String.format("Unparseable allocation " +
-                    "'%s' at line number %d in portfolio file; using " +
-                    "null.", allocation, lineNumber));
-        }
-
-        // Return the result.
-        return result;
     }
 
     @Override
@@ -402,48 +384,6 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                 hadLineProblem() ? " not" : ""));
     }
 
-    /**
-     * Processes a floating point element.
-     *
-     * @param element      The floating point element
-     * @param defaultValue The value to return if the element is an empty string
-     * @param lineNumber   The line number where the floating point element
-     *                     occurs
-     * @return A processed floating point element
-     */
-    @SuppressWarnings("SameParameterValue")
-    private double processFloat(@NotNull String element, double defaultValue,
-                                int lineNumber) {
-
-        // Declare and initialize the result to a default value.
-        double result = defaultValue;
-        try {
-
-            /*
-             * Use the default value if the element is the empty string.
-             * Otherwise, parse the allocation as a floating point number.
-             */
-            result = element.isEmpty() ? defaultValue :
-                    Double.parseDouble(element);
-        }
-
-        // Catch any number format exception that may occur.
-        catch (@NotNull NumberFormatException exception) {
-
-            /*
-             * Log a warning message describing the unparseable floating point
-             * element.
-             */
-            logMessage(Level.WARNING, String.format("Unparseable floating " +
-                            "point number '%s' at line number %d in " +
-                            "portfolio file; using default %f instead.",
-                    element, lineNumber, defaultValue));
-        }
-
-        // Return the result.
-        return result;
-    }
-
     @Override
     protected void setLineNumber(int lineNumber) {
 
@@ -462,6 +402,20 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
         monthlySsiInterpreter.setRow(lineNumber);
         otherMonthlyInterpreter.setRow(lineNumber);
         cpiAdjustedInterpreter.setRow(lineNumber);
+
+        /*
+         * Set the line number as the row in the annual income interpreter.
+         * Cycle for each allocation processor.
+         */
+        annualIncomeInterpreter.setRow(lineNumber);
+        for (MyAllocationProcessor processor : allocationProcessors) {
+
+            /*
+             * Set the line number as the row in the first/next allocation
+             * processor.
+             */
+            processor.setRow(lineNumber);
+        }
     }
 
     @Override
@@ -509,48 +463,55 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
     private class MyAllocationProcessor extends
             FieldProcessor<PortfolioDescription> {
 
-        // The index for allocation fields
-        private Integer index;
+        // Our allocation interpreter
+        private final DoubleInterpreter interpreter = new DoubleInterpreter() {
+
+            @Override
+            protected void receiveException(@NotNull Exception exception,
+                                            @NotNull String string,
+                                            Double defaultValue) {
+                logMessage(Level.WARNING, String.format("Unparseable " +
+                                "allocation '%s' at line number %d, " +
+                                "column number %d in portfolio file; using " +
+                                "%s.",
+                        string, getRow(), getColumn(), defaultValue));
+            }
+        };
+
+        // The column for allocation fields
+        private int column;
 
         /**
-         * Builds the processor.
+         * Gets the column.
          *
-         * @param index An index for the allocation field
+         * @return The column
          */
-        public MyAllocationProcessor(Integer index) {
-            setIndex(index);
-        }
-
-        /**
-         * Builds the processor with a default allocation field index.
-         */
-        public MyAllocationProcessor() {
-            this(null);
-        }
-
-        /**
-         * Gets the index for allocation fields.
-         *
-         * @return The index for allocation fields
-         */
-        public Integer getIndex() {
-            return index;
+        protected int getColumn() {
+            return column;
         }
 
         @Override
         public void processField(@NotNull String field) {
-            // TODO: Line number.
-            getTarget().adjustAllocation(positionMap.get(getIndex()).getType(),
-                    processAllocation(field, 0));
+            getTarget().adjustAllocation(positionMap.get(
+                    getColumn()).getType(), interpreter.interpret(field, 0.));
         }
 
         /**
-         * Sets the index for subcode fields.
+         * Sets the column.
          *
-         * @param index The index for subcode fields
+         * @param column The column
          */
-        public void setIndex(Integer index) {
-            this.index = index;
+        public void setColumn(int column) {
+            interpreter.setColumn(this.column = column);
+        }
+
+        /**
+         * Sets the row.
+         *
+         * @param row The row
+         */
+        public void setRow(int row) {
+            interpreter.setRow(row);
         }
     }
 }
