@@ -3,6 +3,7 @@ package com.garygregg.rebalance.tax;
 import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Percent;
+import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
@@ -11,6 +12,35 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
 
     // The tax library instance
     private final TaxLibrary library = getLibrary();
+
+    // Our rate interpreter
+    private final DoubleInterpreter rateInterpreter =
+            new DoubleInterpreter() {
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Double defaultValue) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "tax rate '%s' at line number %d in the " +
+                                    "%s tax file; using %s.", string, getRow(),
+                            getPrefix(), Percent.format(defaultValue)));
+                }
+            };
+
+    // Our threshold interpreter
+    private final DoubleInterpreter thresholdInterpreter =
+            new DoubleInterpreter() {
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Double defaultValue) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "income threshold '%s' at line number " +
+                                    "%d in the %s tax file; using %s.",
+                            string, getRow(), getPrefix(),
+                            Currency.format(defaultValue)));
+                }
+            };
 
     /**
      * Gets the tax library to be used by this reader.
@@ -28,12 +58,18 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
     protected void processElements(@NotNull String[] elements,
                                    int lineNumber) {
 
-        // Create a new tax description with the threshold and tax rate.
+        /*
+         * Set the line number, and create a new tax description with the
+         * threshold and tax rate.
+         */
+        setLineNumber(lineNumber);
         final TaxDescription description = new TaxDescription(
-                processFloat(elements[TaxFields.THRESHOLD.getPosition()],
-                        Currency.getZero().getValue(), lineNumber),
-                processFloat(elements[TaxFields.TAX_RATE.getPosition()],
-                        Percent.getZero().getValue(), lineNumber));
+                thresholdInterpreter.interpret(
+                        elements[TaxFields.THRESHOLD.getPosition()],
+                        Currency.getZero().getValue()),
+                rateInterpreter.interpret(
+                        elements[TaxFields.TAX_RATE.getPosition()],
+                        Percent.getZero().getValue()));
 
         // Get the tax rate, and format a message.
         final Percent taxRate = description.getTaxRate();
@@ -83,44 +119,14 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
                 hadLineProblem() ? " not" : ""));
     }
 
-    /**
-     * Processes a floating point element.
-     *
-     * @param element      The floating point element
-     * @param defaultValue The value to return if the element is an empty string
-     * @param lineNumber   The line number where the floating point element
-     *                     occurs
-     * @return A processed floating point element
-     */
-    private double processFloat(@NotNull String element, double defaultValue,
-                                int lineNumber) {
+    @Override
+    protected void setLineNumber(int lineNumber) {
 
-        // Declare and initialize the result to a default value.
-        double result = defaultValue;
-        try {
-
-            /*
-             * Use the default value if the element is the empty string.
-             * Otherwise, parse the allocation as a floating point number.
-             */
-            result = element.isEmpty() ? defaultValue :
-                    Double.parseDouble(element);
-        }
-
-        // Catch any number format exception that may occur.
-        catch (@NotNull NumberFormatException exception) {
-
-            /*
-             * Log a warning message describing the unparseable floating point
-             * element.
-             */
-            logMessage(Level.WARNING, String.format("Unparseable floating " +
-                            "point number '%s' at line number %d in holding " +
-                            "file; using %f.", element,
-                    lineNumber, defaultValue));
-        }
-
-        // Return the result.
-        return result;
+        /*
+         * Set the line number as the row in both the rate interpreter and
+         * the threshold interpreter.
+         */
+        rateInterpreter.setRow(lineNumber);
+        thresholdInterpreter.setRow(lineNumber);
     }
 }
