@@ -6,6 +6,8 @@ import com.garygregg.rebalance.FundType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Shares;
 import com.garygregg.rebalance.interpreter.CodeInterpreter;
+import com.garygregg.rebalance.interpreter.DoubleInterpreter;
+import com.garygregg.rebalance.interpreter.IntegerInterpreter;
 import com.garygregg.rebalance.interpreter.TickerInterpreter;
 import org.jetbrains.annotations.NotNull;
 
@@ -157,7 +159,8 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
     // The fund ticker factory
     private final TickerFactory fundFactory =
             (ticker, number, name, minimum, balanceRounding, lineNumber) ->
-                    new FundDescription(ticker, number, name, minimum, balanceRounding);
+                    new FundDescription(ticker, number, name, minimum,
+                            balanceRounding);
 
     // A field processor for fund types
     private final FieldProcessor<TickerDescription> fundTypeProcessor =
@@ -166,8 +169,9 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
                 @Override
                 public void processField(@NotNull String field) {
 
-                    // Process the fund type. Is the fund type null? TODO: line number.
-                    final FundType fundType = processFundType(field, 0);
+                    // Process the fund type. Is the fund type null?
+                    final FundType fundType =
+                            baseTypeMap.get(codeInterpreter.interpret(field));
                     if (null == fundType) {
 
                         // The fund type is null. Issue a warning, and skip the code.
@@ -206,6 +210,21 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
     // The real estate checker
     private final ConsistencyChecker realEstateChecker = this::checkRealEstate;
 
+    // Our minimum balance interpreter
+    private final DoubleInterpreter minimumInterpreter =
+            new DoubleInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Double defaultValue) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "ticker minimum '%s' at line number %d in " +
+                                    "ticker file; using %s.", string, getRow(),
+                            Currency.format(defaultValue)));
+                }
+            };
+
     // The not-a-fund checker
     private final ConsistencyChecker notAFundChecker = this::checkNotAFund;
 
@@ -214,6 +233,69 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
             (ticker, number, name, minimum, balanceRounding, lineNumber) ->
                     new NotConsideredDescription(ticker, number, name, minimum,
                             balanceRounding);
+
+    // Our fund number interpreter
+    private final IntegerInterpreter numberInterpreter =
+            new IntegerInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Integer defaultValue) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "ticker number '%s' at line number %d in ticker " +
+                                    "file; using %s.",
+                            string, getRow(), defaultValue));
+                }
+            };
+
+    // Our balance rounding interpreter
+    private final DoubleInterpreter roundingInterpreter =
+            new DoubleInterpreter() {
+
+                @Override
+                public Double interpret(@NotNull String string,
+                                        Double defaultValue) {
+
+                    /*
+                     * Use the superclass to interpret the string, then get the
+                     * minimum number of shares. Is the interpreted balance
+                     * rounding not null, and is it less than the minimum?
+                     */
+                    final Double result = super.interpret(string, defaultValue);
+                    final Shares minimum = Shares.getMinimum();
+                    if ((null != result) && (result < minimum.getValue())) {
+
+                        /*
+                         * The parsed balance rounding is not null, and it is
+                         * less than the minimum. Accept the value, but log
+                         * information saying that the minimum will be used
+                         * for re-balancing purposes.
+                         */
+                        logMessage(getExtraordinary(),
+                                String.format("Balance rounding %s at line " +
+                                                "number %d is less than " +
+                                                "minimum of %s; the " +
+                                                "preference is noted, but " +
+                                                "the minimum will be used.",
+                                        new Shares(result), getRow(),
+                                        minimum));
+                    }
+
+                    // Return the result.
+                    return result;
+                }
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Double defaultValue) {
+                    logMessage(Level.WARNING, String.format("Unparseable " +
+                                    "balance rounding '%s' at line number " +
+                                    "%d in ticker file; %s.", string, getRow(),
+                            Shares.format(defaultValue)));
+                }
+            };
 
     // The stock checker
     private final ConsistencyChecker stockChecker = this::checkStock;
@@ -277,7 +359,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
      * description contains
      */
     private static int count(@NotNull TickerDescription description,
-                             Iterator<FundType> iterator) {
+                             @NotNull Iterator<FundType> iterator) {
 
         // Declare and initialize the result. Cycle while fund types exist.
         int result = 0;
@@ -774,72 +856,11 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
         return Logger.getLogger(TickersBuilder.class.getCanonicalName());
     }
 
-    /**
-     * Process a ticker balance rounding.
-     *
-     * @param balanceRounding The preferred round number of shares to hold
-     * @param lineNumber      The line number where the ticker balance rounding
-     *                        occurs
-     * @return A processed ticker balance rounding
-     */
-    private double processBalanceRounding(@NotNull String balanceRounding,
-                                          int lineNumber) {
-
-        /*
-         * Get the minimum in shares for any investment. Declare and initialize
-         * the result, using the minimum as a default.
-         */
-        final Shares minimum = Shares.getMinimum();
-        double result = minimum.getValue();
-        try {
-
-            /*
-             * Parse the balance rounding as a double precision floating point
-             * number.
-             */
-            result = Double.parseDouble(balanceRounding);
-        }
-
-        // Catch any number format exception that may occur.
-        catch (@NotNull NumberFormatException exception) {
-
-            /*
-             * Log a warning message describing the unparseable balance
-             * rounding.
-             */
-            logMessage(Level.WARNING, String.format("Unparseable balance " +
-                            "rounding '%s' at line number %d in ticker file; " +
-                            "using minimum of %s.", balanceRounding, lineNumber,
-                    Shares.getMinimum()));
-        }
-
-        // Is the parsed balance rounding less than the minimum?
-        if (result < minimum.getValue()) {
-
-            /*
-             * The parsed balance rounding is less than the minimum. Accept the
-             * value, but log information saying that the minimum will be used
-             * for rebalancing purposes.
-             */
-            logMessage(getExtraordinary(), String.format("Balance rounding " +
-                            "%s at line number %d is less than minimum of " +
-                            "%s; the preference is noted, but the minimum " +
-                            "will be used.", new Shares(result), lineNumber,
-                    minimum));
-        }
-
-        // Return the result.
-        return result;
-    }
-
     @Override
     public void processElements(String[] elements, int lineNumber) {
 
-        /*
-         * Set the line number as the row in the code interpreter, and get the
-         * line code.
-         */
-        codeInterpreter.setRow(lineNumber);
+        // Set the line number, and get the line code.
+        setLineNumber(lineNumber);
         final Character tickerCode = codeInterpreter.interpret(
                 elements[TickerFields.CODE.getPosition()]);
 
@@ -864,12 +885,10 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
         else {
 
             /*
-             * Set the line number as the row in the ticker interpreter. Use
-             * the factory for the given ticker type to create a new ticker
+             * Use the factory for the given ticker type to create a new ticker
              * description with the interpreted ticker, number, name, minimum
              * investment, and preferred rounding.
              */
-            tickerInterpreter.setRow(lineNumber);
             final TickerDescription description = factory.createDescription(
 
                     // Ticker...
@@ -877,19 +896,19 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
                             elements[TickerFields.TICKER.getPosition()]),
 
                     // ...number...
-                    processNumber(elements[TickerFields.NUMBER.getPosition()],
-                            lineNumber),
+                    numberInterpreter.interpret(
+                            elements[TickerFields.NUMBER.getPosition()],
+                            null),
 
                     // ...name and minimum investment...
                     elements[TickerFields.NAME.getPosition()],
-                    processMinimum(elements[TickerFields.MINIMUM.getPosition()],
-                            lineNumber),
+                    minimumInterpreter.interpret(
+                            elements[TickerFields.MINIMUM.getPosition()], 0.),
 
                     // ... and preferred rounding.
-                    processBalanceRounding(elements[
+                    roundingInterpreter.interpret(elements[
                                     TickerFields.PREFERRED_ROUNDING.getPosition()],
-                            lineNumber), lineNumber
-            );
+                            Shares.getMinimum().getValue()), lineNumber);
 
             /*
              * Check the key of the description against the default key in the
@@ -962,81 +981,23 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
         }
     }
 
-    /**
-     * Processes a fund type.
-     *
-     * @param fundType   The fund type
-     * @param lineNumber The line number where the fund type occurs
-     * @return A processed fund type
-     */
-    private FundType processFundType(@NotNull String fundType,
-                                     int lineNumber) {
+    @Override
+    protected void setLineNumber(int lineNumber) {
 
         /*
-         * Set the line number as the row in the code interpreter. Interpret
-         * the fund type as a code, and translate the code into a fund type.
+         * Set the line number as the row in the code interpreter, the ticker
+         * interpreter and the number interpreter.
          */
         codeInterpreter.setRow(lineNumber);
-        return baseTypeMap.get(codeInterpreter.interpret(fundType));
-    }
+        tickerInterpreter.setRow(lineNumber);
+        numberInterpreter.setRow(lineNumber);
 
-    /**
-     * Processes a ticker minimum investment.
-     *
-     * @param minimum    The ticker minimum
-     * @param lineNumber The line number where the ticker minimum occurs
-     * @return A processed ticker minimum
-     */
-    private double processMinimum(@NotNull String minimum,
-                                  int lineNumber) {
-
-        // Declare and initialize the result with a default value.
-        double result = 0.;
-        try {
-
-            /*
-             * Parse the minimum investment as a double precision floating
-             * point number.
-             */
-            result = Double.parseDouble(minimum);
-        } catch (@NotNull NumberFormatException exception) {
-
-            // Log a warning message describing the unparseable minimum.
-            logMessage(Level.WARNING, String.format("Unparseable ticker " +
-                    "minimum '%s' at line number %d in ticker file; " +
-                    "using zero.", minimum, lineNumber));
-        }
-
-        // Return the result.
-        return result;
-    }
-
-    /**
-     * Processes a number.
-     *
-     * @param number     The number
-     * @param lineNumber The line number where the number occurs
-     * @return A processed number
-     */
-    private Integer processNumber(@NotNull String number,
-                                  int lineNumber) {
-
-        // Declare and initialize the result with a default value.
-        Integer result = null;
-        try {
-
-            // Parse the number as an integer.
-            result = Integer.parseInt(number);
-        } catch (@NotNull NumberFormatException exception) {
-
-            // Log a warning message describing the unparseable number.
-            logMessage(Level.WARNING, String.format("Unparseable number " +
-                    "'%s' at line number %d in ticker file; using " +
-                    "null.", number, lineNumber));
-        }
-
-        // Return the result.
-        return result;
+        /*
+         * Set the line number as the row in the minimum balance interpreter
+         * and the balance rounding interpreter.
+         */
+        minimumInterpreter.setRow(lineNumber);
+        roundingInterpreter.setRow(lineNumber);
     }
 
     @Override
