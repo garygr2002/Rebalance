@@ -259,18 +259,24 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
 
                     /*
                      * Use the superclass to interpret the string, then get the
-                     * minimum number of shares. Is the interpreted balance
-                     * rounding not null, and is it less than the minimum?
+                     * minimum number of shares.
                      */
-                    final Double result = super.interpret(string, defaultValue);
+                    Double result = super.interpret(string, defaultValue);
                     final Shares minimum = Shares.getMinimum();
-                    if ((null != result) && (result < minimum.getValue())) {
+
+                    /*
+                     * Get the value of the minimum number of shares. Is the
+                     * interpreted balance rounding not null, and is it less
+                     * than the minimum value?
+                     */
+                    final double minimumValue = minimum.getValue();
+                    if ((null != result) && (result < minimumValue)) {
 
                         /*
                          * The parsed balance rounding is not null, and it is
-                         * less than the minimum. Accept the value, but log
-                         * information saying that the minimum will be used
-                         * for re-balancing purposes.
+                         * less than the minimum value. Log information saying
+                         * that the minimum will be used for re-balancing
+                         * purposes.
                          */
                         logMessage(getExtraordinary(),
                                 String.format("Balance rounding %s at line " +
@@ -278,8 +284,10 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
                                                 "minimum of %s; the " +
                                                 "preference is noted, but " +
                                                 "the minimum will be used.",
-                                        new Shares(result), getRow(),
-                                        minimum));
+                                        result, getRow(), minimum));
+
+                        // Set the result to the minimum value.
+                        result = minimumValue;
                     }
 
                     // Return the result.
