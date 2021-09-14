@@ -23,7 +23,7 @@ public abstract class Interpreter<T> {
      *
      * @return The column
      */
-    protected int getColumn() {
+    public int getColumn() {
         return column;
     }
 

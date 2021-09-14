@@ -478,16 +478,13 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
             }
         };
 
-        // The column for allocation fields
-        private int column;
-
         /**
          * Gets the column.
          *
          * @return The column
          */
         protected int getColumn() {
-            return column;
+            return interpreter.getColumn();
         }
 
         @Override
@@ -502,7 +499,7 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
          * @param column The column
          */
         public void setColumn(int column) {
-            interpreter.setColumn(this.column = column);
+            interpreter.setColumn(column);
         }
 
         /**
