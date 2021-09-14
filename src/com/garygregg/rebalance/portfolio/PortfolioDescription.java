@@ -17,11 +17,11 @@ public class PortfolioDescription implements Description<String> {
     // The mnemonic of the portfolio
     private final String mnemonic;
 
-    // The birth date of the portfolio owner
+    // The birthdate of the portfolio owner
     private Date birthDate;
 
-    // Flag to indicate if other monthly annuity income is CPI adjusted
-    private Boolean cpiAdjusted;
+    // The monthly income that is CPI adjusted
+    private Currency cpiAdjusted;
 
     // The projected mortality date of the portfolio owner
     private Date mortalityDate;
@@ -29,8 +29,8 @@ public class PortfolioDescription implements Description<String> {
     // The name associated with the portfolio
     private String name;
 
-    // Other monthly annuity income
-    private Currency otherMonthly;
+    // The monthly income that is *not* CPI adjusted
+    private Currency nonCpiAdjusted;
 
     // The monthly Social Security income starting at age 62
     private Currency socialSecurityMonthly;
@@ -68,22 +68,20 @@ public class PortfolioDescription implements Description<String> {
     }
 
     /**
-     * Gets the birth date of the portfolio owner.
+     * Gets the birthdate of the portfolio owner.
      *
-     * @return The birth date of the portfolio owner
+     * @return The birthdate of the portfolio owner
      */
-    public Date getBirthDate() {
+    public Date getBirthdate() {
         return birthDate;
     }
 
     /**
-     * Gets the flag to indicate if other monthly annuity income is CPI
-     * adjusted.
+     * Gets CPI adjusted monthly income.
      *
-     * @return The flag to indicate if other monthly annuity income is CPI
-     * adjusted
+     * @return CPI adjusted monthly income
      */
-    public Boolean getCpiAdjusted() {
+    public Currency getCpiAdjusted() {
         return cpiAdjusted;
     }
 
@@ -116,18 +114,18 @@ public class PortfolioDescription implements Description<String> {
     }
 
     /**
-     * Gets other monthly annuity income.
+     * Gets non-CPI adjusted monthly income.
      *
-     * @return Other monthly annuity income
+     * @return Non-CPI adjusted monthly income
      */
-    public Currency getOtherMonthly() {
-        return otherMonthly;
+    public Currency getNonCpiAdjusted() {
+        return nonCpiAdjusted;
     }
 
     /**
-     * Gets the monthly Social Security income starting at age 62.
+     * Gets the Social Security monthly income starting at age 62.
      *
-     * @return The monthly Social Security income starting at age 62
+     * @return The Social Security monthly income starting at age 62
      */
     public Currency getSocialSecurityMonthly() {
         return socialSecurityMonthly;
@@ -143,22 +141,20 @@ public class PortfolioDescription implements Description<String> {
     }
 
     /**
-     * Gets the birth date of the portfolio owner.
+     * Sets the birthdate of the portfolio owner.
      *
-     * @param birthDate The birth date of the portfolio owner
+     * @param birthDate The birthdate of the portfolio owner
      */
-    void setBirthDate(Date birthDate) {
+    void setBirthdate(Date birthDate) {
         this.birthDate = birthDate;
     }
 
     /**
-     * Sets the flag to indicate if other monthly annuity income is CPI
-     * adjusted.
+     * Sets CPI adjusted monthly income.
      *
-     * @param cpiAdjusted The flag to indicate if other monthly annuity income
-     *                    is CPI adjusted
+     * @param cpiAdjusted CPI adjusted monthly income
      */
-    void setCpiAdjusted(Boolean cpiAdjusted) {
+    void setCpiAdjusted(Currency cpiAdjusted) {
         this.cpiAdjusted = cpiAdjusted;
     }
 
@@ -181,12 +177,12 @@ public class PortfolioDescription implements Description<String> {
     }
 
     /**
-     * Sets other monthly annuity income.
+     * Sets non-CPI adjusted monthly income.
      *
-     * @param otherMonthly Other monthly annuity income
+     * @param nonCpiAdjusted Non-CPI adjusted monthly income
      */
-    void setOtherMonthly(Currency otherMonthly) {
-        this.otherMonthly = otherMonthly;
+    void setNonCpiAdjusted(Currency nonCpiAdjusted) {
+        this.nonCpiAdjusted = nonCpiAdjusted;
     }
 
     /**

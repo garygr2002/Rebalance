@@ -5,7 +5,6 @@ import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
-import com.garygregg.rebalance.interpreter.BooleanInterpreter;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,20 +26,6 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
             new PortfoliosBuilder.MyAllocationProcessor()
     };
 
-    // Our annual income interpreter
-    private final DoubleInterpreter annualIncomeInterpreter =
-            new DoubleInterpreter() {
-                @Override
-                protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string,
-                                                Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Annual income " +
-                                    "'%s' at line number %d in portfolio " +
-                                    "file cannot be parsed; using %s.", string,
-                            getRow(), Currency.format(defaultValue)));
-                }
-            };
-
     // Our birthdate interpreter
     private final DateInterpreter birthdateInterpreter =
             new DateInterpreter() {
@@ -57,62 +42,46 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
             };
 
     // The birthdate processor
-    private final FieldProcessor<PortfolioDescription> birthDateProcessor =
+    private final FieldProcessor<PortfolioDescription> birthdateProcessor =
             new FieldProcessor<>() {
                 @Override
                 public void processField(@NotNull String field) {
-                    getTarget().setBirthDate(
+                    getTarget().setBirthdate(
                             birthdateInterpreter.interpret(field));
                 }
             };
 
-    // Our CPI adjusted flag interpreter
-    private final BooleanInterpreter cpiAdjustedInterpreter =
-            new BooleanInterpreter() {
-
-                @Override
-                protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string,
-                                                Boolean defaultValue) {
-
-                    logMessage(Level.WARNING, String.format("CPI adjusted " +
-                                    "flag '%s' at line number %d in the " +
-                                    "portfolio file cannot be parsed; " +
-                                    "using %s.", string, getRow(),
-                            defaultValue));
-                }
-            };
-
-    // The CPI adjusted flag processor
-    private final FieldProcessor<PortfolioDescription> cpiAdjustedProcessor =
-            new FieldProcessor<>() {
-                @Override
-                public void processField(@NotNull String field) {
-                    getTarget().setCpiAdjusted(
-                            cpiAdjustedInterpreter.interpret(field, false));
-                }
-            };
-
-    // The portfolio library instance
-    private final PortfolioLibrary library = PortfolioLibrary.getInstance();
-
-    // Our monthly social security income interpreter
-    private final DoubleInterpreter monthlySsiInterpreter =
+    // Our CPI adjusted monthly income interpreter
+    private final DoubleInterpreter cpiInterpreter =
             new DoubleInterpreter() {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Monthly " +
-                                    "social security income '%s' at line " +
-                                    "number %d in the portfolio file cannot " +
-                                    "be parsed; using %s.", string, getRow(),
+
+                    logMessage(Level.WARNING, String.format("Monthly CPI " +
+                                    "adjusted income '%s' at line number " +
+                                    "%d in the portfolio file cannot be " +
+                                    "parsed; using %s.", string, getRow(),
                             Currency.format(defaultValue)));
                 }
             };
 
-    // Our mortality date interpreter
+    // The CPI adjusted monthly income processor
+    private final FieldProcessor<PortfolioDescription> cpiProcessor =
+            new FieldProcessor<>() {
+                @Override
+                public void processField(@NotNull String field) {
+                    getTarget().setCpiAdjusted(new Currency(
+                            cpiInterpreter.interpret(field, 0.)));
+                }
+            };
+
+    // The portfolio library instance
+    private final PortfolioLibrary library = PortfolioLibrary.getInstance();
+
+    // Our projected mortality date interpreter
     private final DateInterpreter mortalityDateInterpreter =
             new DateInterpreter() {
 
@@ -148,53 +117,84 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                 }
             };
 
-    // Our other monthly income interpreter
-    private final DoubleInterpreter otherMonthlyInterpreter =
+    // Our non-CPI adjusted monthly income interpreter
+    private final DoubleInterpreter nonCpiInterpreter =
             new DoubleInterpreter() {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Other monthly " +
-                                    "income '%s' at line number %d in " +
-                                    "portfolio file cannot be parsed; " +
-                                    "using %s.", string, getRow(),
+
+                    logMessage(Level.WARNING, String.format("Monthly " +
+                                    "non-CPI adjusted income '%s' at line " +
+                                    "number %d in the portfolio file cannot " +
+                                    "be parsed; using %s.", string, getRow(),
                             Currency.format(defaultValue)));
                 }
             };
 
-    // The other monthly annuity income processor
-    private final FieldProcessor<PortfolioDescription> otherMonthlyProcessor =
+    // The non-CPI adjusted monthly income processor
+    private final FieldProcessor<PortfolioDescription> nonCpiProcessor =
             new FieldProcessor<>() {
                 @Override
                 public void processField(@NotNull String field) {
-                    getTarget().setOtherMonthly(new Currency(
-                            otherMonthlyInterpreter.interpret(field, 0.)));
+                    getTarget().setNonCpiAdjusted(new Currency(
+                            nonCpiInterpreter.interpret(field, 0.)));
                 }
             };
 
     // A map of element positions to portfolio fields
     private final Map<Integer, PortfolioFields> positionMap = new HashMap<>();
 
-    // The monthly Social Security monthly income processor
+    // Our Social Security monthly income interpreter
+    private final DoubleInterpreter socialSecurityInterpreter =
+            new DoubleInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Double defaultValue) {
+                    logMessage(Level.WARNING, String.format("Monthly " +
+                                    "Social Security income '%s' at line " +
+                                    "number %d in the portfolio file cannot " +
+                                    "be parsed; using %s.", string, getRow(),
+                            Currency.format(defaultValue)));
+                }
+            };
+
+    // The Social Security monthly income processor
     private final FieldProcessor<PortfolioDescription>
-            socialSecurityMonthlyProcessor = new FieldProcessor<>() {
+            socialSecurityProcessor = new FieldProcessor<>() {
 
         @Override
         public void processField(@NotNull String field) {
             getTarget().setSocialSecurityMonthly(new Currency(
-                    monthlySsiInterpreter.interpret(field, 0.)));
+                    socialSecurityInterpreter.interpret(field, 0.)));
         }
     };
 
+    // Our taxable annual income interpreter
+    private final DoubleInterpreter taxableInterpreter =
+            new DoubleInterpreter() {
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Double defaultValue) {
+                    logMessage(Level.WARNING, String.format("Taxable income " +
+                                    "'%s' at line number %d in portfolio " +
+                                    "file cannot be parsed; using %s.", string,
+                            getRow(), Currency.format(defaultValue)));
+                }
+            };
+
     // The taxable annual income processor
-    private final FieldProcessor<PortfolioDescription> taxableAnnualProcessor =
+    private final FieldProcessor<PortfolioDescription> taxableProcessor =
             new FieldProcessor<>() {
                 @Override
                 public void processField(@NotNull String field) {
                     getTarget().setTaxableAnnual(
-                            new Currency(annualIncomeInterpreter.interpret(field,
+                            new Currency(taxableInterpreter.interpret(field,
                                     0.)));
                 }
             };
@@ -213,16 +213,19 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
         addFieldProcessor(++fieldIndex, nameProcessor);
 
         // Add the birthdate and mortality date processors.
-        addFieldProcessor(++fieldIndex, birthDateProcessor);
+        addFieldProcessor(++fieldIndex, birthdateProcessor);
         addFieldProcessor(++fieldIndex, mortalityDateProcessor);
 
-        // Add the Social Security and other monthly annuity income processors.
-        addFieldProcessor(++fieldIndex, socialSecurityMonthlyProcessor);
-        addFieldProcessor(++fieldIndex, otherMonthlyProcessor);
+        // Add the Social Security and CPI adjusted income processors.
+        addFieldProcessor(++fieldIndex, socialSecurityProcessor);
+        addFieldProcessor(++fieldIndex, cpiProcessor);
 
-        // Add the CPI adjusted flag process and the taxable income processor.
-        addFieldProcessor(++fieldIndex, cpiAdjustedProcessor);
-        addFieldProcessor(++fieldIndex, taxableAnnualProcessor);
+        /*
+         * Add the non-CPI adjusted income processor and the taxable income
+         * processor.
+         */
+        addFieldProcessor(++fieldIndex, nonCpiProcessor);
+        addFieldProcessor(++fieldIndex, taxableProcessor);
 
         // Cycle for each allocation processor.
         for (MyAllocationProcessor processor : allocationProcessors) {
@@ -272,11 +275,11 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                         ++portfolio,
                         description.getKey(),
                         description.getName(),
-                        DateUtilities.format(description.getBirthDate()),
+                        DateUtilities.format(description.getBirthdate()),
                         DateUtilities.format(description.getMortalityDate()),
                         description.getSocialSecurityMonthly(),
-                        description.getOtherMonthly(),
                         description.getCpiAdjusted(),
+                        description.getNonCpiAdjusted(),
                         description.getTaxableAnnual(),
                         description.getAllocation(WeightType.STOCK),
                         description.getAllocation(WeightType.BOND),
@@ -397,19 +400,19 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
         mortalityDateInterpreter.setRow(lineNumber);
 
         /*
-         * Set the line number as the row in the monthly social security income
-         * interpreter, the other monthly income interpreter, and the CPI
-         * adjusted interpreter.
+         * Set the line number as the row in the Social Security income
+         * interpreter, the CPI income interpreter, and the non-CPI income
+         * interpreter.
          */
-        monthlySsiInterpreter.setRow(lineNumber);
-        otherMonthlyInterpreter.setRow(lineNumber);
-        cpiAdjustedInterpreter.setRow(lineNumber);
+        socialSecurityInterpreter.setRow(lineNumber);
+        cpiInterpreter.setRow(lineNumber);
+        nonCpiInterpreter.setRow(lineNumber);
 
         /*
-         * Set the line number as the row in the annual income interpreter.
+         * Set the line number as the row in the taxable income interpreter.
          * Cycle for each allocation processor.
          */
-        annualIncomeInterpreter.setRow(lineNumber);
+        taxableInterpreter.setRow(lineNumber);
         for (MyAllocationProcessor processor : allocationProcessors) {
 
             /*
@@ -429,25 +432,25 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
         }
 
         /*
-         * Set the target for the taxable annual income processor and the CPI
-         * adjusted flag processor.
+         * Set the target for the taxable income processor and the non-CPI
+         * income processor.
          */
-        taxableAnnualProcessor.setTarget(description);
-        cpiAdjustedProcessor.setTarget(description);
+        taxableProcessor.setTarget(description);
+        nonCpiProcessor.setTarget(description);
 
         /*
-         * Set the target for the other monthly annuity income processor and
-         * the monthly Social Security income processor.
+         * Set the target for the CPI income processor and the Social Security
+         * income processor.
          */
-        otherMonthlyProcessor.setTarget(description);
-        socialSecurityMonthlyProcessor.setTarget(description);
+        cpiProcessor.setTarget(description);
+        socialSecurityProcessor.setTarget(description);
 
         /*
          * Set the target for the mortality date processor, the birthdate
          * processor and the name processor.
          */
         mortalityDateProcessor.setTarget(description);
-        birthDateProcessor.setTarget(description);
+        birthdateProcessor.setTarget(description);
         nameProcessor.setTarget(description);
     }
 

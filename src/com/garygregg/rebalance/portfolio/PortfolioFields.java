@@ -10,20 +10,20 @@ enum PortfolioFields {
     // Name of the portfolio
     NAME(1, null),
 
-    // Birth date of the portfolio owner
+    // Birthdate of the portfolio owner
     BIRTH_DATE(2, null),
 
     // Projected mortality date of the portfolio owner
     MORTALITY_DATE(3, null),
 
-    // Monthly Social Security income starting at age 62
+    // Social Security monthly income starting at age 62
     SS_MONTHLY(4, null),
 
-    // Other current monthly annuity income
-    OTHER_MONTHLY(5, null),
+    // CPI adjusted monthly income
+    CPI_MONTHLY(5, null),
 
-    // Flag to indicate if OTHER_MONTHLY is CPI adjusted
-    CPI_ADJUSTED(6, null),
+    // Non-CPI adjusted monthly income
+    NON_CPI_MONTHLY(6, null),
 
     // Taxable annual income of the portfolio owner
     TAXABLE_ANNUAL(7, null),
