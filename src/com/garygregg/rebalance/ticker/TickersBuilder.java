@@ -451,7 +451,8 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
      * Checks a ticker description.
      *
      * @param description A ticker description
-     * @param types       Counts the types in this list that are contained in the ticker description
+     * @param types       Counts the types in this list that are contained in
+     *                    the ticker description
      * @param checker     A count checker for this method to use
      * @return True if the check passes, false otherwise
      */
