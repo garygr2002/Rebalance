@@ -24,10 +24,10 @@ public class DetailedsBuilder extends ElementReader<DetailedDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Long defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "account number '%s' at line number %d in " +
-                                    "detailed file; using %d.", string,
-                            getRow(), defaultValue));
+                    logMessage(Level.WARNING, String.format("Account " +
+                                    "number '%s' at line number %d in the " +
+                                    "detailed file cannot be parsed; using " +
+                                    "%d.", string, getRow(), defaultValue));
                 }
             };
 
@@ -39,10 +39,11 @@ public class DetailedsBuilder extends ElementReader<DetailedDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "allocation '%s' at line number %d and " +
-                                    "column %d in detailed file; using %f.",
-                            string, getRow(), getColumn(), defaultValue));
+                    logMessage(Level.WARNING, String.format("Allocation " +
+                                    "'%s' at line number %d and column %d " +
+                                    "in the detailed file cannot be parsed; " +
+                                    "using %f.", string, getRow(),
+                            getColumn(), defaultValue));
                 }
             };
 

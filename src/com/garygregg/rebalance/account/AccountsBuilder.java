@@ -23,9 +23,10 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Long defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable account " +
-                            "number '%s' at line number %d in account file; " +
-                            "using %d.", string, getRow(), defaultValue));
+                    logMessage(Level.WARNING, String.format("Account " +
+                            "number '%s' at line number %d in the account " +
+                                    "file cannot be parsed; using %d.", string,
+                            getRow(), defaultValue));
                 }
             };
 
@@ -37,10 +38,11 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "allocation '%s' at line number %d and " +
-                                    "column %d in account file; using %f.",
-                            string, getRow(), getColumn(), defaultValue));
+                    logMessage(Level.WARNING, String.format("Allocation " +
+                                    "'%s' at line number %d and column %d " +
+                                    "in the account file cannot be parsed; " +
+                                    "using %f.", string, getRow(), getColumn(),
+                            defaultValue));
                 }
             };
 
@@ -76,9 +78,9 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Long defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "re-balance order '%s' at line number " +
-                                    "%d in account file; using %d.",
+                    logMessage(Level.WARNING, String.format("Re-balance " +
+                                    "order '%s' at line number %d in " +
+                                    "account file cannot be parsed; using %d.",
                             string, getRow(), defaultValue));
                 }
             };
@@ -91,10 +93,10 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 RebalanceProcedure defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                            "account re-balance procedure '%s' at " +
-                            "line number %d in account file; using " +
-                            "%s.", string, getRow(), defaultValue));
+                    logMessage(Level.WARNING, String.format("Account " +
+                            "re-balance procedure '%s' at line number %d " +
+                            "in the account file cannot be parsed; using %s.",
+                            string, getRow(), defaultValue));
                 }
             };
 
@@ -106,9 +108,10 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 TaxType defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "account tax type '%s' at line number %d in " +
-                                    "account file; using %s.", string, getRow(),
+                    logMessage(Level.WARNING, String.format("Account tax " +
+                                    "type '%s' at line number %d in " +
+                                    "the account file cannot be parsed; " +
+                                    "using %s.", string, getRow(),
                             defaultValue));
                 }
             };

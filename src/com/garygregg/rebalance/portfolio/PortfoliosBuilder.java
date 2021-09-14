@@ -34,10 +34,10 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "annual income '%s' at line number %d " +
-                                    "in portfolio file; using %s.",
-                            string, getRow(), Currency.format(defaultValue)));
+                    logMessage(Level.WARNING, String.format("Annual income " +
+                                    "'%s' at line number %d in portfolio " +
+                                    "file cannot be parsed; using %s.", string,
+                            getRow(), Currency.format(defaultValue)));
                 }
             };
 
@@ -49,10 +49,10 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Date defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "birthdate '%s' at line number %d in " +
-                                    "portfolio file; using %s.",
-                            string, getRow(), defaultValue));
+                    logMessage(Level.WARNING, String.format("Birthdate " +
+                                    "'%s' at line number %d in portfolio " +
+                                    "file cannot be parsed; using %s.", string,
+                            getRow(), defaultValue));
                 }
             };
 
@@ -75,10 +75,11 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                                                 @NotNull String string,
                                                 Boolean defaultValue) {
 
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "CPI adjusted flag '%s' at line number " +
-                                    "%d in portfolio file; using %s.",
-                            string, getRow(), defaultValue));
+                    logMessage(Level.WARNING, String.format("CPI adjusted " +
+                                    "flag '%s' at line number %d in the " +
+                                    "portfolio file cannot be parsed; " +
+                                    "using %s.", string, getRow(),
+                            defaultValue));
                 }
             };
 
@@ -103,11 +104,11 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "monthly social security income '%s' at " +
-                                    "line number %d in portfolio file; " +
-                                    "using %s.",
-                            string, getRow(), Currency.format(defaultValue)));
+                    logMessage(Level.WARNING, String.format("Monthly " +
+                                    "social security income '%s' at line " +
+                                    "number %d in the portfolio file cannot " +
+                                    "be parsed; using %s.", string, getRow(),
+                            Currency.format(defaultValue)));
                 }
             };
 
@@ -119,10 +120,11 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Date defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "mortality date '%s' at line number %d " +
-                                    "in portfolio file; using %s.",
-                            string, getRow(), defaultValue));
+                    logMessage(Level.WARNING, String.format("Mortality " +
+                                    "date '%s' at line number %d in " +
+                                    "portfolio file cannot be parsed; " +
+                                    "using %s.", string, getRow(),
+                            defaultValue));
                 }
             };
 
@@ -154,11 +156,11 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "other monthly income '%s' at line " +
-                                    "number %d in portfolio file; using " +
-                                    "%s.",
-                            string, getRow(), Currency.format(defaultValue)));
+                    logMessage(Level.WARNING, String.format("Other monthly " +
+                                    "income '%s' at line number %d in " +
+                                    "portfolio file cannot be parsed; " +
+                                    "using %s.", string, getRow(),
+                            Currency.format(defaultValue)));
                 }
             };
 
@@ -470,10 +472,9 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
             protected void receiveException(@NotNull Exception exception,
                                             @NotNull String string,
                                             Double defaultValue) {
-                logMessage(Level.WARNING, String.format("Unparseable " +
-                                "allocation '%s' at line number %d, " +
-                                "column number %d in portfolio file; using " +
-                                "%s.",
+                logMessage(Level.WARNING, String.format("Allocation '%s' " +
+                                "at line number %d, column number %d in the " +
+                                "portfolio file cannot be parsed; using %s.",
                         string, getRow(), getColumn(), defaultValue));
             }
         };

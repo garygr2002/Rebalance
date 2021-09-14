@@ -20,10 +20,11 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "tax rate '%s' at line number %d in the " +
-                                    "%s tax file; using %s.", string, getRow(),
-                            getPrefix(), Percent.format(defaultValue)));
+                    logMessage(Level.WARNING, String.format("Tax rate '%s' " +
+                                    "at line number %d in the %s tax file " +
+                                    "cannot be parsed; using %s.", string,
+                            getRow(), getPrefix(),
+                            Percent.format(defaultValue)));
                 }
             };
 
@@ -34,10 +35,10 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "income threshold '%s' at line number " +
-                                    "%d in the %s tax file; using %s.",
-                            string, getRow(), getPrefix(),
+                    logMessage(Level.WARNING, String.format("Income " +
+                                    "threshold '%s' at line number %d in " +
+                                    "the %s tax file cannot be parsed; " +
+                                    "using %s.", string, getRow(), getPrefix(),
                             Currency.format(defaultValue)));
                 }
             };

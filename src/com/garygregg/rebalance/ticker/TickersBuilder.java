@@ -218,10 +218,10 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "ticker minimum '%s' at line number %d in " +
-                                    "ticker file; using %s.", string, getRow(),
-                            Currency.format(defaultValue)));
+                    logMessage(Level.WARNING, String.format("Ticker " +
+                                    "minimum '%s' at line number %d in " +
+                                    "ticker file cannot be parsed; using %s.",
+                            string, getRow(), Currency.format(defaultValue)));
                 }
             };
 
@@ -242,10 +242,10 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Integer defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "ticker number '%s' at line number %d in ticker " +
-                                    "file; using %s.",
-                            string, getRow(), defaultValue));
+                    logMessage(Level.WARNING, String.format("Ticker number " +
+                                    "'%s' at line number %d in ticker file " +
+                                    "cannot be parsed; using %s.", string,
+                            getRow(), defaultValue));
                 }
             };
 
@@ -298,9 +298,10 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "balance rounding '%s' at line number " +
-                                    "%d in ticker file; %s.", string, getRow(),
+                    logMessage(Level.WARNING, String.format("Balance " +
+                                    "rounding '%s' at line number %d in " +
+                                    "the ticker file cannot be parsed; " +
+                                    "using %s.", string, getRow(),
                             Shares.format(defaultValue)));
                 }
             };

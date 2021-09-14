@@ -172,7 +172,7 @@ public class CodesBuilder extends ElementReader<CodeDescription> {
              */
             logMessage(getExtraordinary(), String.format("Replacing " +
                             "description with code '%s' at line number %d " +
-                            "in code file.", description.getCode(),
+                            "in the code file.", description.getCode(),
                     lineNumber));
         }
 

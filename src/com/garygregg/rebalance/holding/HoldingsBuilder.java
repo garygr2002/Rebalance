@@ -37,11 +37,10 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "price '%s' at line number %d in " +
-                                    "holding file; using %s.",
-                            string, getRow(),
-                            Currency.format(defaultValue)));
+                    logMessage(Level.WARNING, String.format("Price '%s' at " +
+                                    "line number %d in the holding file " +
+                                    "cannot be parsed; using %s.", string,
+                            getRow(), Currency.format(defaultValue)));
                 }
             };
 
@@ -64,10 +63,10 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "shares '%s' at line number %d in " +
-                                    "holding file; using %s.",
-                            string, getRow(), Shares.format(defaultValue)));
+                    logMessage(Level.WARNING, String.format("Shares '%s' " +
+                                    "at line number %d in the holding file " +
+                                    "cannot be parsed; using %s.", string,
+                            getRow(), Shares.format(defaultValue)));
                 }
             };
 
@@ -93,11 +92,10 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 Double defaultValue) {
-                    logMessage(Level.WARNING, String.format("Unparseable " +
-                                    "value '%s' at line number %d in " +
-                                    "holding file; using %s.",
-                            string, getRow(),
-                            Currency.format(defaultValue)));
+                    logMessage(Level.WARNING, String.format("Value '%s' at " +
+                                    "line number %d in the holding file " +
+                                    "cannot be parsed; using %s.", string,
+                            getRow(), Currency.format(defaultValue)));
                 }
             };
 
@@ -246,8 +244,8 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
 
             // The line type is not know. Log a warning.
             logMessage(Level.WARNING, String.format("Line code '%s' is not " +
-                            "recognized at line number %d in holding file.",
-                    lineCode, lineNumber));
+                            "recognized at line number %d in the holding " +
+                            "file.", lineCode, lineNumber));
         }
 
         // Create a new holding description key.
@@ -275,8 +273,9 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
              * description occurs.
              */
             logMessage(getExtraordinary(), String.format("Replacing holding " +
-                            "with key '%s' at line number %d in holding file.",
-                    description.getKey(), lineNumber));
+                            "with key '%s' at line number %d in the " +
+                            "holding file.", description.getKey(),
+                    lineNumber));
         }
 
         /*
