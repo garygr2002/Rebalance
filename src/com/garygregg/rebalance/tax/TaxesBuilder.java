@@ -61,23 +61,16 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
 
         /*
          * Set the line number, and create a new tax description with the
-         * tax rate and threshold.
+         * threshold and tax rate.
          */
         setLineNumber(lineNumber);
         final TaxDescription description = new TaxDescription(
-                rateInterpreter.interpret(
-                        elements[TaxFields.TAX_RATE.getPosition()],
-                        Percent.getZero().getValue()),
                 thresholdInterpreter.interpret(
                         elements[TaxFields.THRESHOLD.getPosition()],
-                        Currency.getZero().getValue()));
-
-        // Get the tax rate, and format a message.
-        final Percent taxRate = description.getTaxRate();
-        final String taxMessage = (taxRate.compareTo(Percent.getZero()) < 0) ||
-                (Percent.getOneHundred().compareTo(taxRate) < 0) ?
-                String.format("tax rate is outside acceptable range, %s",
-                        taxRate) : "";
+                        Currency.getZero().getValue()),
+                rateInterpreter.interpret(
+                        elements[TaxFields.TAX_RATE.getPosition()],
+                        Percent.getZero().getValue()));
 
         // Get the threshold, and format a message.
         final Currency threshold = description.getThreshold();
@@ -86,14 +79,21 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
                         String.format("threshold is negative, %s",
                                 threshold) : "";
 
+        // Get the tax rate, and format a message.
+        final Percent taxRate = description.getTaxRate();
+        final String taxMessage = (taxRate.compareTo(Percent.getZero()) < 0) ||
+                (Percent.getOneHundred().compareTo(taxRate) < 0) ?
+                String.format("tax rate is outside acceptable range, %s",
+                        taxRate) : "";
+
         // Is either message not empty?
         if (!(taxMessage.isEmpty() && thresholdMessage.isEmpty())) {
 
             // Either the threshold, the tax rate, or both had a problem.
-            logMessage(Level.WARNING, String.format("Rate threshold at " +
-                            "line number %d in the %s tax file has the " +
-                            "following problem(s): %s%s%s.",
-                    lineNumber, getPrefix(), thresholdMessage,
+            logMessage(Level.WARNING, String.format("Tax rate at line " +
+                            "number %d in the %s tax file has the following " +
+                            "problem(s): %s%s%s.", lineNumber, getPrefix(),
+                    thresholdMessage,
                     (taxMessage.isEmpty() || thresholdMessage.isEmpty()) ?
                             "" : "; ", taxMessage));
         }
