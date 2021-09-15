@@ -16,6 +16,10 @@ import com.garygregg.rebalance.holding.HoldingsBuilder;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
 import com.garygregg.rebalance.portfolio.PortfoliosBuilder;
 import com.garygregg.rebalance.report.CurrentReportWriter;
+import com.garygregg.rebalance.tax.CapitalGainsTaxLibrary;
+import com.garygregg.rebalance.tax.CapitalGainsTaxesBuilder;
+import com.garygregg.rebalance.tax.IncomeTaxLibrary;
+import com.garygregg.rebalance.tax.IncomeTaxesBuilder;
 import com.garygregg.rebalance.ticker.TickerLibrary;
 import com.garygregg.rebalance.ticker.TickersBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -89,8 +93,14 @@ public class Conductor implements Dispatch<CommandLineId> {
     private final Factory distinguished =
             DistinguishedAccountLibrary::getInstance;
 
+    // Produces a capital gains tax library
+    private final Factory gains = CapitalGainsTaxLibrary::getInstance;
+
     // Produces a holding library
     private final Factory holding = HoldingLibrary::getInstance;
+
+    // Produces an income tax library
+    private final Factory income = IncomeTaxLibrary::getInstance;
 
     // Our local message logger
     private final MessageLogger messageLogger = new MessageLogger();
@@ -658,14 +668,25 @@ public class Conductor implements Dispatch<CommandLineId> {
 
             /*
              * Initialize the parent tracker instance. Build the 'holdings'
-             * library with no date floor. Get the date of the library, and use
-             * it to build the code library.
+             * library with no date floor.
              */
             initialize();
             result = buildLibrary(new HoldingsBuilder(), null, holding);
 
+            /*
+             * Get the date of the library, and use it to build the code
+             * library.
+             */
             final Date floor = HoldingLibrary.getInstance().getDate();
             result = buildLibrary(new CodesBuilder(), floor, code) && result;
+
+            // Use the date floor to build the capital gains tax library.
+            result = buildLibrary(new CapitalGainsTaxesBuilder(), floor, gains)
+                    && result;
+
+            // Use the date floor to build the income tax library.
+            result = buildLibrary(new IncomeTaxesBuilder(), floor, income) &&
+                    result;
 
             // Use the date floor to build the portfolio library.
             result = buildLibrary(new PortfoliosBuilder(), floor, portfolio) &&
