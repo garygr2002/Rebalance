@@ -524,7 +524,8 @@ public class Conductor implements Dispatch<CommandLineId> {
         /*
          * Catch any command line exception, and print the exception message
          * to the error stream.
-         */ catch (@NotNull CLAException exception) {
+         */
+        catch (@NotNull CLAException exception) {
 
             /*
              * Get the error stream and display the message of the exception.

@@ -21,7 +21,7 @@ public class PortfolioDescription implements Description<String> {
     private Date birthDate;
 
     // The monthly income that is CPI adjusted
-    private Currency cpiAdjusted;
+    private Currency cpiMonthly;
 
     // The projected mortality date of the portfolio owner
     private Date mortalityDate;
@@ -30,7 +30,7 @@ public class PortfolioDescription implements Description<String> {
     private String name;
 
     // The monthly income that is *not* CPI adjusted
-    private Currency nonCpiAdjusted;
+    private Currency nonCpiMonthly;
 
     // The monthly Social Security income starting at age 62
     private Currency socialSecurityMonthly;
@@ -81,8 +81,8 @@ public class PortfolioDescription implements Description<String> {
      *
      * @return CPI adjusted monthly income
      */
-    public Currency getCpiAdjusted() {
-        return cpiAdjusted;
+    public Currency getCpiMonthly() {
+        return cpiMonthly;
     }
 
     @Override
@@ -118,8 +118,8 @@ public class PortfolioDescription implements Description<String> {
      *
      * @return Non-CPI adjusted monthly income
      */
-    public Currency getNonCpiAdjusted() {
-        return nonCpiAdjusted;
+    public Currency getNonCpiMonthly() {
+        return nonCpiMonthly;
     }
 
     /**
@@ -152,10 +152,10 @@ public class PortfolioDescription implements Description<String> {
     /**
      * Sets CPI adjusted monthly income.
      *
-     * @param cpiAdjusted CPI adjusted monthly income
+     * @param cpiMonthly CPI adjusted monthly income
      */
-    void setCpiAdjusted(Currency cpiAdjusted) {
-        this.cpiAdjusted = cpiAdjusted;
+    void setCpiMonthly(Currency cpiMonthly) {
+        this.cpiMonthly = cpiMonthly;
     }
 
     /**
@@ -179,10 +179,10 @@ public class PortfolioDescription implements Description<String> {
     /**
      * Sets non-CPI adjusted monthly income.
      *
-     * @param nonCpiAdjusted Non-CPI adjusted monthly income
+     * @param nonCpiMonthly Non-CPI adjusted monthly income
      */
-    void setNonCpiAdjusted(Currency nonCpiAdjusted) {
-        this.nonCpiAdjusted = nonCpiAdjusted;
+    void setNonCpiMonthly(Currency nonCpiMonthly) {
+        this.nonCpiMonthly = nonCpiMonthly;
     }
 
     /**

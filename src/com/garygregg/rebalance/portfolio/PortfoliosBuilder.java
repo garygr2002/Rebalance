@@ -73,7 +73,7 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
             new FieldProcessor<>() {
                 @Override
                 public void processField(@NotNull String field) {
-                    getTarget().setCpiAdjusted(new Currency(
+                    getTarget().setCpiMonthly(new Currency(
                             cpiInterpreter.interpret(field, 0.)));
                 }
             };
@@ -139,7 +139,7 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
             new FieldProcessor<>() {
                 @Override
                 public void processField(@NotNull String field) {
-                    getTarget().setNonCpiAdjusted(new Currency(
+                    getTarget().setNonCpiMonthly(new Currency(
                             nonCpiInterpreter.interpret(field, 0.)));
                 }
             };
@@ -278,8 +278,8 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                         DateUtilities.format(description.getBirthdate()),
                         DateUtilities.format(description.getMortalityDate()),
                         description.getSocialSecurityMonthly(),
-                        description.getCpiAdjusted(),
-                        description.getNonCpiAdjusted(),
+                        description.getCpiMonthly(),
+                        description.getNonCpiMonthly(),
                         description.getTaxableAnnual(),
                         description.getAllocation(WeightType.STOCK),
                         description.getAllocation(WeightType.BOND),

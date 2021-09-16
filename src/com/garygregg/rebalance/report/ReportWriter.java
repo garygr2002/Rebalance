@@ -3,9 +3,12 @@ package com.garygregg.rebalance.report;
 import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementProcessor;
 import com.garygregg.rebalance.Library;
+import com.garygregg.rebalance.PreferenceManager;
 import com.garygregg.rebalance.account.AccountLibrary;
 import com.garygregg.rebalance.code.CodeLibrary;
+import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
+import com.garygregg.rebalance.countable.Percent;
 import com.garygregg.rebalance.detailed.DetailedLibrary;
 import com.garygregg.rebalance.hierarchy.Hierarchy;
 import com.garygregg.rebalance.hierarchy.Portfolio;
@@ -20,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -296,6 +300,104 @@ class ReportWriter extends ElementProcessor {
     }
 
     /**
+     * Writes a portfolio-specific description to a file writer.
+     *
+     * @param writer    The file writer to receive the description
+     * @param portfolio The portfolio to use
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private void writeDescription(@NotNull Writer writer,
+                                  @NotNull Portfolio portfolio)
+            throws IOException {
+
+        /*
+         * Declare and initialize investor birthdate and projected mortality
+         * date.
+         */
+        Date birthdate = null;
+        Date mortalityDate = null;
+
+        /*
+         * Declare and initialize CPI-adjusted, and non-CPI-adjusted monthly
+         * income.
+         */
+        Currency cpiMonthly = null;
+        Currency nonCpiMonthly = null;
+
+        /*
+         * Declare and initialize Social Security monthly and taxable annual
+         * income.
+         */
+        Currency socialSecurityMonthly = null;
+        Currency taxableAnnual = null;
+
+        // Get the expected inflation rate.
+        final Double inflation =
+                PreferenceManager.getInstance().getInflation();
+
+        // Get the description from the portfolio. Is the description not null?
+        final PortfolioDescription description = portfolio.getDescription();
+        if (null != description) {
+
+            /*
+             * The portfolio description is not null. Get the birthdate and
+             * projected mortality date.
+             */
+            birthdate = description.getBirthdate();
+            mortalityDate = description.getMortalityDate();
+
+            // Get the CPI-adjusted and non-CPI-adjusted monthly income.
+            cpiMonthly = description.getCpiMonthly();
+            nonCpiMonthly = description.getNonCpiMonthly();
+
+            // Get the Social Security monthly and taxable annual income.
+            socialSecurityMonthly = description.getSocialSecurityMonthly();
+            taxableAnnual = description.getTaxableAnnual();
+        }
+
+        // Declare needed string.
+        final String format = "%-37s %s.\n";
+        final String unavailable = "unavailable";
+
+        // Format and write the birthdate message.
+        writer.write(String.format(format, "Investor birthday is:", (null == birthdate) ?
+                unavailable : DateUtilities.format(birthdate)));
+
+        // Format and write the projected mortality date message.
+        writer.write(String.format(format, "Investor projected mortality " +
+                "date is:", (null == mortalityDate) ?
+                unavailable : DateUtilities.format(mortalityDate)));
+
+        // Format and write the CPI-adjusted monthly income.
+        writer.write(String.format(format, "CPI adjusted monthly income is:",
+                (null == cpiMonthly) ? unavailable : cpiMonthly));
+
+        // Format and write the non-CPI adjusted monthly income.
+        writer.write(String.format(format, "Non-CPI adjusted monthly " +
+                "income is:", (null == nonCpiMonthly) ?
+                unavailable : nonCpiMonthly));
+
+        // Format and write the Social Security monthly income.
+        writer.write(String.format(format, "Social Security monthly income " +
+                "is:", (null == socialSecurityMonthly) ? unavailable :
+                socialSecurityMonthly));
+
+        // Format and write the taxable annual income.
+        writer.write(String.format(format, "Taxable annual income is:",
+                (null == taxableAnnual) ? unavailable : taxableAnnual));
+
+        /*
+         * Format and write the expected annual rate of inflation. Finish by
+         * writing a newline.
+         */
+        writer.write(String.format(format, "Expected annual rate of " +
+                "inflation is:", (null == inflation) ?
+                unavailable :
+                String.format("%s%%", Percent.format(inflation))));
+        writer.write("\n");
+    }
+
+    /**
      * Writes a portfolio-specific header to a file writer.
      *
      * @param writer    The file writer to receive the header
@@ -396,11 +498,16 @@ class ReportWriter extends ElementProcessor {
                 portfolio.getKey(), date);
 
         /*
-         * Write a portfolio header using the file writer. Create a
-         * balance-able writer with the file writer and the valuator for
-         * balance-able assets.
+         * Write a portfolio header followed by a portfolio description. Use
+         * the file writer for this purpose.
          */
         writeHeader(fileWriter, portfolio, date);
+        writeDescription(fileWriter, portfolio);
+
+        /*
+         * Create a balance-able writer with the file writer, and the valuator
+         * for balance-able assets.
+         */
         final BalanceableWriter balanceableWriter =
                 new BalanceableWriter(fileWriter, getBalanceable());
 
