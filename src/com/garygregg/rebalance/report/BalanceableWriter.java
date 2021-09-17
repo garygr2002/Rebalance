@@ -217,26 +217,35 @@ class BalanceableWriter {
         );
 
         /*
-         * Create a reallocator around the weights list. Declare and initialize
-         * a new list of percentages.
+         * Declare and initialize a list of percentages. Get the size of the
+         * weights list.
          */
-        final Reallocator reallocator = new Reallocator(weights);
         final List<MutablePercent> percentages = new ArrayList<>();
-
-        // Get the size of the weights list. Cycle for each index in the list.
         final int weightSize = weights.size();
-        for (i = 0; i < weightSize; ++i) {
 
-            // Initialize the first/next percentage to zero.
+        /*
+         * Cycle for each index in the weights list, and initialize the
+         * corresponding percentage to zero.
+         */
+        for (i = 0; i < weightSize; ++i) {
             percentages.add(new MutablePercent(0.));
         }
 
-        /*
-         * Reset the first percentage to one hundred, and reallocate the
-         * percentages using the reallocator.
-         */
-        percentages.get(0).set(100.);
-        reallocator.reallocate(percentages);
+        // Try to reallocate the percentages based on the weights.
+        try {
+
+            /*
+             * Create a reallocator. Reset the first percentage to one hundred,
+             * and reallocate the percentages using the reallocator.
+             */
+            final Reallocator reallocator = new Reallocator(weights);
+            percentages.get(0).set(100.);
+            reallocator.reallocate(percentages);
+        }
+
+        // The percentages cannot be reallocated. Use the defaults.
+        catch (@NotNull IllegalArgumentException ignored) {
+        }
 
         /*
          * Create a map of weights to percentages. Cycle for each highest level
