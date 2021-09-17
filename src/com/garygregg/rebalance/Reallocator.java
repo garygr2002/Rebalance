@@ -23,6 +23,9 @@ public class Reallocator {
     // A list of weights
     private final List<Double> weights;
 
+    // The sum of the weights
+    private final double weightsSum;
+
     /**
      * Constructs the reallocator.
      *
@@ -30,7 +33,19 @@ public class Reallocator {
      *                this list may be modified by the caller before any subsequent reallocation
      */
     public Reallocator(@NotNull List<Double> weights) {
+
+        // Set the member variables. Is the sum of the weights zero?
         this.weights = weights;
+        this.weightsSum = sum(weights, forDoubles);
+        if (0. == weightsSum) {
+
+            /*
+             * The sum of the weights is zero. Throw a new illegal
+             * argument exception.
+             */
+            throw new IllegalArgumentException(
+                    "The sum of the weights may not be zero.");
+        }
     }
 
     /***
@@ -229,7 +244,7 @@ public class Reallocator {
          */
         final double countablesSum = sum(countables, forCountables);
         final ListBuilder builder =
-                new ListBuilder(countablesSum / sum(weights, forDoubles));
+                new ListBuilder(countablesSum / weightsSum);
 
         // Cycle for each countable that has a corresponding weight.
         int i;
