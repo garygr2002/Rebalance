@@ -34,9 +34,12 @@ public class Reallocator {
      */
     public Reallocator(@NotNull List<Double> weights) {
 
-        // Set the member variables. Is the sum of the weights zero?
+        /*
+         * Set the member variables. Is the absolute value of the sum of the
+         * weights zero?
+         */
         this.weights = weights;
-        this.weightsSum = sum(weights, forDoubles);
+        this.weightsSum = Math.abs(sum(weights, forDoubles));
         if (0. == weightsSum) {
 
             /*
