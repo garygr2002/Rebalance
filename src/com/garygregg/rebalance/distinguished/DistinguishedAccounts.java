@@ -5,6 +5,9 @@ public enum DistinguishedAccounts {
     // The brokerage account
     BROKERAGE,
 
+    // Capital gains tax on house sale
+    CAPITAL_GAINS_TAX,
+
     // The default (unused)
     DEFAULT,
 
@@ -48,5 +51,8 @@ public enum DistinguishedAccounts {
     SMALL_BENEFICIARY,
 
     // Social Security
-    SOCIAL_SECURITY
+    SOCIAL_SECURITY,
+
+    // State tax on house sale
+    STATE_TAX
 }
