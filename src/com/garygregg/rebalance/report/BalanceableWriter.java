@@ -5,6 +5,7 @@ import com.garygregg.rebalance.Reallocator;
 import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutablePercent;
+import com.garygregg.rebalance.countable.Percent;
 import com.garygregg.rebalance.hierarchy.Institution;
 import com.garygregg.rebalance.hierarchy.Portfolio;
 import com.garygregg.rebalance.hierarchy.Valuator;
@@ -224,27 +225,37 @@ class BalanceableWriter {
         final int weightSize = weights.size();
 
         /*
-         * Cycle for each index in the weights list, and initialize the
-         * corresponding percentage to zero.
+         * Declare and initialize a default percent. Cycle for each element in
+         * the weight list.
          */
+        final double defaultPercent = Percent.getZero().getValue();
         for (i = 0; i < weightSize; ++i) {
-            percentages.add(new MutablePercent(0.));
-        }
-
-        // Try to reallocate the percentages based on the weights.
-        try {
 
             /*
-             * Create a reallocator. Reset the first percentage to one hundred,
-             * and reallocate the percentages using the reallocator.
+             * Insert a percentage element corresponding to the first/next
+             * weight element using the default percentage.
              */
-            final Reallocator reallocator = new Reallocator(weights);
-            percentages.get(0).set(100.);
+            percentages.add(new MutablePercent(defaultPercent));
+        }
+
+        /*
+         * Reinitialize the first percentage to one hundred. Declare and
+         * initialize a reallocator.
+         */
+        percentages.get(0).set(Percent.getOneHundred().getValue());
+        final Reallocator reallocator = new Reallocator(weights);
+
+        // Try to reallocate the percentages.
+        try {
             reallocator.reallocate(percentages);
         }
 
-        // The percentages cannot be reallocated. Use the defaults.
-        catch (@NotNull IllegalArgumentException ignored) {
+        /*
+         * Catch any illegal argument exception that may occur, and
+         * reinitialize the first percentage to the default.
+         */
+        catch (@NotNull IllegalArgumentException exception) {
+            percentages.get(0).set(defaultPercent);
         }
 
         /*

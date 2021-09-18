@@ -23,9 +23,6 @@ public class Reallocator {
     // A list of weights
     private final List<Double> weights;
 
-    // The sum of the weights
-    private final double weightsSum;
-
     /**
      * Constructs the reallocator.
      *
@@ -33,22 +30,7 @@ public class Reallocator {
      *                this list may be modified by the caller before any subsequent reallocation
      */
     public Reallocator(@NotNull List<Double> weights) {
-
-        /*
-         * Set the member variables. Is the absolute value of the sum of the
-         * weights zero?
-         */
         this.weights = weights;
-        this.weightsSum = Math.abs(sum(weights, forDoubles));
-        if (0. == weightsSum) {
-
-            /*
-             * The sum of the weights is zero. Throw a new illegal
-             * argument exception.
-             */
-            throw new IllegalArgumentException(
-                    "The sum of the weights may not be zero.");
-        }
     }
 
     /***
@@ -78,6 +60,32 @@ public class Reallocator {
 
         // Return the result to our caller.
         return result;
+    }
+
+    /**
+     * Checks that no element in a double list is negative.
+     *
+     * @param list A double list
+     */
+    private static void checkNoNegatives(@NotNull List<Double> list) {
+
+        /*
+         * Declare a variable to receive list elements. Get the list size and
+         * cycle for each list element.
+         */
+        double element;
+        final int listSize = list.size();
+        for (int i = 0; i < listSize; ++i) {
+
+            /*
+             * Throw a new illegal argument exception if the first/next list
+             * element is negative.
+             */
+            if ((element = list.get(i)) < 0.) {
+                throw new IllegalArgumentException(String.format("Detected " +
+                        "negative element %f at index %d in list.", element, i));
+            }
+        }
     }
 
     /***
@@ -196,7 +204,7 @@ public class Reallocator {
     }
 
     /**
-     * Sums a collection given the collection an a value extractor.
+     * Sums a collection given the collection and a value extractor.
      *
      * @param collection The collection
      * @param extractor  A value extractor
@@ -225,29 +233,44 @@ public class Reallocator {
      * Reallocates amounts in a list of countables based on the weights
      * contained in the reallocator.
      *
-     * @param countables A list of countables, all of the same type
+     * @param countables A list of countables, all the same type
      * @param <T>        The type of the countables
      */
     public <T extends MutableCountable>
     void reallocate(@NotNull List<T> countables) {
 
         /*
-         * Determine the number of countables, the number of weights, and the
-         * difference between the two. Note: We recalculate the number of
-         * weights and their sums repeatedly because our caller may have access
-         * to the weight list, and may have modified it.
+         * Check that the weights array has no negatives. Note: We check this
+         * on every reallocation because our caller has access to the weight
+         * list, and may have modified it. Sum the weights. Is the sum of the
+         * weights zero?
          */
-        final int countablesSize = countables.size();
-        final int weightSize = weights.size();
-        final int smallerSize = Math.min(countablesSize, weightSize);
+        checkNoNegatives(weights);
+        final double weightsSum = sum(weights, forDoubles);
+        if (0. == weightsSum) {
+
+            /*
+             * The sum of the weights is zero. Throw a new illegal argument
+             * exception.
+             */
+            throw new IllegalArgumentException("The sum of weights may not " +
+                    "be zero.");
+        }
 
         /*
-         * Sum the value in the countables, and construct a list builder with
-         * the calculated sum divided by the sum of the weights.
+         * Determine the number of countables. Track the smallest of this and
+         * the number weights.
+         */
+        final int countablesSize = countables.size();
+        final int smallerSize = Math.min(countablesSize, weights.size());
+
+        /*
+         * Sum the countables, and construct a list builder with the
+         * sum of countables divided by the sum of weights.
          */
         final double countablesSum = sum(countables, forCountables);
-        final ListBuilder builder =
-                new ListBuilder(countablesSum / weightsSum);
+        final ListBuilder builder = new ListBuilder(countablesSum /
+                weightsSum);
 
         // Cycle for each countable that has a corresponding weight.
         int i;
