@@ -312,7 +312,7 @@ class BalanceableWriter {
         getWriter().write(String.format(getSummaryFormat(),
                 String.format(format, type.getSoftName(), ":"),
                 getValuator().getValue(portfolio, type),
-                String.format(format, map.get(type).getValue(), "%")));
+                String.format(format, map.get(type), "%")));
     }
 
     /**
