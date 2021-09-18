@@ -26,6 +26,9 @@ public enum DistinguishedAccounts {
     // The 2nd house estimate
     HOUSE_ESTIMATE_2,
 
+    // Costs required to sell the home at best price
+    HOUSE_SALES_COSTS,
+
     // The large beneficiary IRA
     LARGE_BENEFICIARY,
 
@@ -46,6 +49,9 @@ public enum DistinguishedAccounts {
 
     // The 2nd 401k
     SECOND_401K,
+
+    // The commission a sales agent will charge for selling the house
+    SELLER_AGENT_COMMISSION,
 
     // The small beneficiary IRA
     SMALL_BENEFICIARY,
