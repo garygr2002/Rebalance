@@ -259,7 +259,7 @@ public class Reallocator {
 
         /*
          * Determine the number of countables. Track the smallest of this and
-         * the number weights.
+         * the number of weights.
          */
         final int countablesSize = countables.size();
         final int smallerSize = Math.min(countablesSize, weights.size());
