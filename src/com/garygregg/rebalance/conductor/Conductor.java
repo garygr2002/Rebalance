@@ -501,13 +501,14 @@ public class Conductor implements Dispatch<CommandLineId> {
         dispatchList.add(new LevelPreferenceDispatch<>(CommandLineId.LEVEL,
                 preferences, outputStream));
 
-        // Add dispatches for backup and reset.
-        dispatchList.add(new Backup(outputStream));
-        dispatchList.add(new Reset(outputStream));
-
         // Add a preference dispatch for source data directory.
         dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.SOURCE,
                 preferences, outputStream));
+
+        // Add dispatches for backup, minimum settings, and reset.
+        dispatchList.add(new Backup(outputStream));
+        dispatchList.add(new Minimum(outputStream));
+        dispatchList.add(new Reset(outputStream));
 
         /*
          * Create a command line arguments object with an instance of the

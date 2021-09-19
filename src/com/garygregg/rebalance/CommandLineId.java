@@ -12,6 +12,10 @@ public enum CommandLineId {
     // Resets all preferences
     RESET("reset preferences to defaults", null, false),
 
+    // Minimum running settings using expected values
+    MINIMUM("minimum running settings using expected values", null,
+            false),
+
     // The logging level (valid Level values)
     LEVEL("ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE or WARNING",
             "lglv", true),

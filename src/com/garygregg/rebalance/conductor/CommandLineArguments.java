@@ -4,6 +4,7 @@ import com.garygregg.rebalance.CommandLineId;
 import com.garygregg.rebalance.Pair;
 import com.garygregg.rebalance.cla.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.prefs.Preferences;
@@ -259,7 +260,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      * @return The string representation of a recognized option, or null if
      * none is recognized.
      */
-    private String match(@NotNull String option) {
+    private @Nullable String match(@NotNull String option) {
 
         // Declare and initialize local variables.
         String candidate = null;
@@ -323,8 +324,8 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
             }
 
             // The option exists, but does it have an argument?
-            else if ((i < size &&
-                    ((token = tokens.get(i)).getId()).equals(CommandLineId.OTHER))) {
+            else if ((i < size && ((token =
+                    tokens.get(i)).getId()).equals(CommandLineId.OTHER))) {
 
                 /*
                  * The option has an argument. Increment the index to point to
