@@ -600,6 +600,10 @@ public class Conductor implements Dispatch<CommandLineId> {
                 "will not appear in the log file)...");
         configureLogging();
 
+        // Set inflation in the inflation caddy using the preference manager.
+        InflationCaddy.getInstance().setPercent(
+                PreferenceManager.getInstance().getInflation());
+
         /*
          * Get a conductor instance and build the libraries. Was the build not
          * successful?
