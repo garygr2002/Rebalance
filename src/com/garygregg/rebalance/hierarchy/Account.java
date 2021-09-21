@@ -26,8 +26,12 @@ public class Account extends
         Synthesizer synthesizer = new EstimateAveraging();
         synthesizerMap.put(synthesizer.getKey(), synthesizer);
 
-        // Put a 'my pension' synthesizer in the map.
-        synthesizer = new MyPension();
+        // Put a 'pension' synthesizer in the map.
+        synthesizer = new Pension();
+        synthesizerMap.put(synthesizer.getKey(), synthesizer);
+
+        // Put a 'Social Security' synthesizer in the map.
+        synthesizer = new SocialSecurity();
         synthesizerMap.put(synthesizer.getKey(), synthesizer);
     }
 
