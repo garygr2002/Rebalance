@@ -397,28 +397,29 @@ class BalanceableWriter {
         writer.write(delimiterLine);
         final List<Institution> institutions = getInstitutions(portfolio);
 
-        /*
-         * Declare and initialize more local variables used to write the table
-         * data lines.
-         */
-        Institution institution;
+        // Get the valuator, and get the value of zero.
         final Valuator valuator = getValuator();
-        final double zero = Currency.getZero().getValue();
+        final Currency zero = Currency.getZero();
 
-        /*
-         * Get an iterator for the institutions list. Cycle while institutions
-         * exist, and while their balanceable value is greater than zero.
-         */
-        final Iterator<Institution> iterator = institutions.iterator();
-        while (iterator.hasNext() && (zero < valuator.getValue(
-                institution = iterator.next()).getValue())) {
+        // Cycle while institutions exist.
+        for (Institution institution : institutions) {
 
-            // Write a data line for the first/next institution.
-            writer.write(String.format(numberFormat, institution.getKey(),
-                    valuator.getValue(institution, CategoryType.TAXABLE),
-                    valuator.getValue(institution, CategoryType.TAX_DEFERRED),
-                    valuator.getValue(institution, CategoryType.TAX_PAID),
-                    valuator.getValue(institution)));
+            /*
+             * Get the first/next institution. Is the value of the institution
+             * something other than zero?
+             */
+            if (zero.areNotEqual(valuator.getValue(institution).getValue())) {
+
+                /*
+                 * The value of the institution is something other than zero.
+                 * Write a data line for the institution.
+                 */
+                writer.write(String.format(numberFormat, institution.getKey(),
+                        valuator.getValue(institution, CategoryType.TAXABLE),
+                        valuator.getValue(institution, CategoryType.TAX_DEFERRED),
+                        valuator.getValue(institution, CategoryType.TAX_PAID),
+                        valuator.getValue(institution)));
+            }
         }
 
         /*
@@ -431,35 +432,5 @@ class BalanceableWriter {
                 valuator.getValue(portfolio, CategoryType.TAX_DEFERRED),
                 valuator.getValue(portfolio, CategoryType.TAX_PAID),
                 valuator.getValue(portfolio)));
-
-        /*
-         * Continue iterating and doing nothing with institutions that have
-         * zero balanceable value.
-         */
-        //noinspection StatementWithEmptyBody
-        while (iterator.hasNext() && (zero <= valuator.
-                getValue(iterator.next()).getValue())) ;
-
-        /*
-         * The remainder of the institutions, if any, have negative balances.
-         * This seems wrong. Only debts are negative, and debts are not
-         * balanceable.
-         */
-        if (iterator.hasNext()) {
-
-            // Write a newline for starters.
-            writer.write("\n");
-            do {
-
-                /*
-                 * Get the first/next institution (we know there is at least
-                 * one at this point), and warn about its negative balance.
-                 */
-                institution = iterator.next();
-                writer.write(String.format("Warning! Institution '%s' has " +
-                                "balance of %s!%n", institution.getKey(),
-                        valuator.getValue(institution).getValue()));
-            } while (iterator.hasNext());
-        }
     }
 }
