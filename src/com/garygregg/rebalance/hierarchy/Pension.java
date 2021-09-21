@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
-public class MyPension extends Synthesizer {
+public class Pension extends Synthesizer {
 
     @Override
     public @NotNull DistinguishedAccounts getAccount() {
@@ -19,7 +19,7 @@ public class MyPension extends Synthesizer {
         getLogger().logMessage(Level.INFO, String.format("The synthesizer " +
                         "for class '%s' intended for the distinguished account '%s' " +
                         "needs to be completed.",
-                MyPension.class.getSimpleName(), getAccount().name()));
+                Pension.class.getSimpleName(), getAccount().name()));
         return super.synthesize(account);
     }
 }
