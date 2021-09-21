@@ -158,11 +158,11 @@ public class Account extends
         if (result && !(hasValueBeenSet() || hasChildren())) {
 
             /*
-             * The superclass method succeeded, and the account neither has
+             * The superclass method succeeded, and the account has neither
              * existing value nor children. Get a synthesizer from the
              * synthesizer map, if any. Re-initialize the return value if
              * there is no synthesizer, or there is a synthesizer and the
-             * account was successful synthesized.
+             * account was successfully synthesized.
              */
             final Synthesizer synthesizer = synthesizerMap.get(getKey());
             result = (null == synthesizer) || synthesizer.synthesize(this);
