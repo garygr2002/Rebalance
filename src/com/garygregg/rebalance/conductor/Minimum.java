@@ -42,7 +42,7 @@ class Minimum extends Informer implements Dispatch<CommandLineId> {
     public void dispatch(String argument) throws CLAException {
 
         /*
-         * Throw a new CLA exception of the argument is not null. The minimum
+         * Throw a new CLA exception if the argument is not null. The minimum
          * option does not take an argument.
          */
         if (null != argument) {
