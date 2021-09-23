@@ -90,7 +90,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
 
         // Declare an 'on destination' dispatch action.
         final Dispatch<CommandLineId> onDestination =
-                new PathPreferenceDispatch<>(CommandLineId.DESTINATION, preferences,
+                new PreferenceDispatch<>(CommandLineId.DESTINATION, preferences,
                         System.out);
 
         // Declare an 'on high' dispatch action.
