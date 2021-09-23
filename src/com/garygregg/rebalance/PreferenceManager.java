@@ -2,6 +2,7 @@ package com.garygregg.rebalance;
 
 import com.garygregg.rebalance.cla.LevelPreferenceDispatch;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -115,7 +116,7 @@ public class PreferenceManager {
      * @return The integer value for the given preference ID
      */
     @SuppressWarnings("SameParameterValue")
-    private Integer getInt(@NotNull CommandLineId id) {
+    private @Nullable Integer getInt(@NotNull CommandLineId id) {
 
         /*
          * Get the default integer. Get a preference for name of the command
@@ -159,7 +160,7 @@ public class PreferenceManager {
      * @param id The ID for which to get a path preference
      * @return The path value for the given preference ID
      */
-    private Path getSource(@NotNull CommandLineId id) {
+    private @Nullable Path getSource(@NotNull CommandLineId id) {
 
         /*
          * Get the default path name. Get a preference for name of the command
