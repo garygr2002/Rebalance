@@ -486,7 +486,7 @@ public class Conductor implements Dispatch<CommandLineId> {
                 preferences, outputStream, false));
 
         // Add a preference dispatch for the data directory backup.
-        dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.DESTINATION,
+        dispatchList.add(new PreferenceDispatch<>(CommandLineId.DESTINATION,
                 preferences, outputStream));
 
         // Add a preference dispatch for the S&P 500 high value.
