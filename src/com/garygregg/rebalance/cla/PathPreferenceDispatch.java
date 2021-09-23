@@ -11,7 +11,7 @@ public class PathPreferenceDispatch<KeyType extends Enum<KeyType>>
         extends PreferenceDispatch<KeyType> {
 
     /**
-     * Constructs the path preferences dispatch.
+     * Constructs the path preference dispatch.
      *
      * @param key          The key for this dispatch
      * @param preferences  The preferences object to use
