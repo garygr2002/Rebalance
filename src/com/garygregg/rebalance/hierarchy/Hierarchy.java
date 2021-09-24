@@ -362,7 +362,7 @@ public class Hierarchy {
         try {
 
             // Create a holdings builder. Read available holding lines.
-            final ElementReader holdings = new HoldingsBuilder();
+            final ElementReader<?> holdings = new HoldingsBuilder();
             holdings.readLines();
 
             // The holding library should now be populated. Get its date.
