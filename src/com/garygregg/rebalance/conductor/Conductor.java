@@ -481,7 +481,6 @@ public class Conductor implements Dispatch<CommandLineId> {
         final PrintStream outputStream = getOutputStream();
 
         // Add a dispatch for the S&P 500 current value.
-        dispatchList.add(new Backup(outputStream));
         dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.CURRENT,
                 preferences, outputStream, false));
 
@@ -577,6 +576,7 @@ public class Conductor implements Dispatch<CommandLineId> {
      * @param commandLineId      A command line ID corresponding to the preference
      * @param preference         The preference object
      */
+    @SuppressWarnings("SameParameterValue")
     private static void test(@NotNull List<String> missingPreferences,
                              @NotNull CommandLineId commandLineId,
                              Object preference) {
@@ -741,8 +741,9 @@ public class Conductor implements Dispatch<CommandLineId> {
      * @return True if the build had no warnings or errors, false otherwise
      * @throws IOException Indicates an I/O exception occurred
      */
-    private boolean buildLibrary(@NotNull ElementReader processor, Date floor,
-                                 @NotNull Factory factory) throws IOException {
+    private boolean buildLibrary(@NotNull ElementReader<?> processor,
+                                 Date floor, @NotNull Factory factory)
+            throws IOException {
 
         /*
          * Read the data lines using the date floor. The floor can be null,
