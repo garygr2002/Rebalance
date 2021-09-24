@@ -17,121 +17,6 @@ public class DistinguishedsBuilder extends
     private final DistinguishedAccountLibrary accountLibrary =
             DistinguishedAccountLibrary.getInstance();
 
-    // The element processor for accounts
-    private final ElementProcessor<DistinguishedAccounts> accountProcessor =
-            new ElementProcessor<>(DistinguishedAccounts.class) {
-
-                @Override
-                public DistinguishedDescription<DistinguishedAccounts, ?>
-                process(@NotNull String keyString,
-                        @NotNull Pair<String, String> value,
-                        int lineNumber) {
-
-                    /*
-                     * Try to find the named distinguished account using the
-                     * key string. Does the string not represent any known
-                     * distinguished account key?
-                     */
-                    DistinguishedAccountDescription description = null;
-                    final DistinguishedAccounts distinguishedAccount =
-                            determineKey(keyString);
-                    if (null == distinguishedAccount) {
-
-                        /*
-                         * The key string does not represent any known
-                         * distinguished account. Log this as an error.
-                         */
-                        logMessage(Level.SEVERE, String.format("The account " +
-                                        "key '%s' named at line %d does not " +
-                                        "represent any known, distinguished account.",
-                                keyString, lineNumber));
-
-                    }
-
-                    // The string represents a known distinguished account key.
-                    else {
-
-                        /*
-                         * The distinguished account is recognized. But is it
-                         * the default distinguished account?
-                         */
-                        if (DistinguishedAccounts.DEFAULT.equals(
-                                distinguishedAccount)) {
-
-                            /*
-                             * The distinguished account is the default, which
-                             * is not meant to be set. Log a warning.
-                             */
-                            logMessage(Level.WARNING, String.format("The " +
-                                    "default distinguished account is not " +
-                                    "meant to be set at line %d; you may " +
-                                    "wish to check this.", lineNumber));
-                        }
-
-                        /*
-                         * Get the institution and account number from the
-                         * given value.
-                         */
-                        final String institution = value.getFirst();
-                        final String accountNumber = value.getSecond();
-
-                        /*
-                         * Are the key elements okay according to the distinguished
-                         * account library?
-                         */
-                        if (accountLibrary.areKeyElementsOkay(institution,
-                                accountNumber)) {
-
-                            /*
-                             * The key elements are okay according to the
-                             * distinguished account library. Create a new
-                             * distinguished account description using the
-                             * named institution, and account number converted
-                             * to a long integer.
-                             */
-                            description =
-                                    new DistinguishedAccountDescription(
-                                            distinguishedAccount, new AccountKey(
-                                            institution,
-                                            AccountKey.parseLong(
-                                                    accountNumber)));
-
-                            /*
-                             * Add the new description to the distinguished account
-                             * library. Log exit information.
-                             */
-                            accountLibrary.addDescription(description);
-                            logMessage(getOrdinary(),
-                                    String.format("Load of metadata for " +
-                                                    "distinguished account " +
-                                                    "with key '%s' and " +
-                                                    "value '%s' at line %d " +
-                                                    "was%s successful.",
-                                            description.getKey(),
-                                            description.getValue(), lineNumber,
-                                            hadLineProblem() ? " not" : ""));
-                        }
-
-                        /*
-                         * The key elements are not okay according to the
-                         * distinguished account library. There is something
-                         * wrong with the given value.
-                         */
-                        else {
-
-                            // Log an error message.
-                            logMessage(Level.SEVERE, String.format("There is " +
-                                    "something wrong with key '%s' in its " +
-                                    "distinguished account description " +
-                                    "at line %d.", value, lineNumber));
-                        }
-                    }
-
-                    // Return the description.
-                    return description;
-                }
-            };
-
     // The distinguished institution library instance
     private final DistinguishedInstitutionLibrary institutionLibrary =
             DistinguishedInstitutionLibrary.getInstance();
@@ -243,6 +128,173 @@ public class DistinguishedsBuilder extends
     private final DistinguishedPortfolioLibrary portfolioLibrary =
             DistinguishedPortfolioLibrary.getInstance();
 
+    // The processor map
+    private final Map<HoldingLineType, ElementProcessor<?>> processorMap =
+            new HashMap<>();
+
+    // The element processor for portfolios
+    private final ElementProcessor<DistinguishedTickers>
+            tickerProcessor = new ElementProcessor<>(
+            DistinguishedTickers.class) {
+
+        @Override
+        public DistinguishedDescription<DistinguishedTickers, ?>
+        process(@NotNull String keyString,
+                @NotNull Pair<String, String> value,
+                int lineNumber) {
+
+            /*
+             * We currently do not supported distinguished ticker symbols. Log
+             * a warning.
+             */
+            logMessage(Level.WARNING, String.format("Distinguished ticker " +
+                    "specification with key '%s' and value '%s' read at " +
+                    "line %d; I do not currently supported distinguished " +
+                    "ticker symbols.", keyString, value, lineNumber));
+            return null;
+        }
+    };
+    // The parent tracker
+    private final ParentTracker tracker = ParentTracker.getInstance();
+
+    // The most recent portfolio key
+    private String portfolioKey;
+
+    // The element processor for accounts
+    private final ElementProcessor<DistinguishedAccounts> accountProcessor =
+            new ElementProcessor<>(DistinguishedAccounts.class) {
+
+                @Override
+                public DistinguishedDescription<DistinguishedAccounts, ?>
+                process(@NotNull String keyString,
+                        @NotNull Pair<String, String> value,
+                        int lineNumber) {
+
+                    /*
+                     * Declare and initialize the return value. Get the most
+                     * recent portfolio key. Is the most recent portfolio key
+                     * null?
+                     */
+                    DistinguishedAccountDescription description = null;
+                    final String portfolioKey = getPortfolioKey();
+                    if (null == portfolioKey) {
+
+                        /*
+                         * The most recent portfolio key is null. Log this as
+                         * an error and return a null distinguished account
+                         * description.
+                         */
+                        logMessage(Level.SEVERE, String.format("Cannot " +
+                                "create a distinguished account without a " +
+                                "corresponding distinguished portfolio at " +
+                                "line %d.", lineNumber));
+                        return description;
+                    }
+
+                    /*
+                     * Try to find the named distinguished account using the
+                     * key string. Does the string not represent any known
+                     * distinguished account key?
+                     */
+                    final DistinguishedAccounts distinguishedAccount =
+                            determineKey(keyString);
+                    if (null == distinguishedAccount) {
+
+                        /*
+                         * The key string does not represent any known
+                         * distinguished account key. Log this as an error.
+                         */
+                        logMessage(Level.SEVERE, String.format("The account " +
+                                "key '%s' named at line %d does not " +
+                                "represent any known, distinguished " +
+                                "account.", keyString, lineNumber));
+
+                    }
+
+                    // The string represents a known distinguished account key.
+                    else {
+
+                        /*
+                         * The distinguished account is recognized. But is it
+                         * the default distinguished account?
+                         */
+                        if (DistinguishedAccounts.DEFAULT.equals(
+                                distinguishedAccount)) {
+
+                            /*
+                             * The distinguished account is the default, which
+                             * is not meant to be set. Log a warning.
+                             */
+                            logMessage(Level.WARNING, String.format("The " +
+                                    "default distinguished account is not " +
+                                    "meant to be set at line %d; you may " +
+                                    "wish to check this.", lineNumber));
+                        }
+
+                        /*
+                         * Get the institution and account number from the
+                         * given value.
+                         */
+                        final String institution = value.getFirst();
+                        final String accountNumber = value.getSecond();
+
+                        /*
+                         * Are the key elements okay according to the distinguished
+                         * account library?
+                         */
+                        if (accountLibrary.areKeyElementsOkay(institution,
+                                accountNumber)) {
+
+                            /*
+                             * The key elements are okay according to the
+                             * distinguished account library. Create a new
+                             * distinguished account description using the
+                             * named institution, and account number converted
+                             * to a long integer.
+                             */
+                            description =
+                                    new DistinguishedAccountDescription(
+                                            distinguishedAccount, new AccountKey(
+                                            institution,
+                                            AccountKey.parseLong(
+                                                    accountNumber)), portfolioKey);
+
+                            /*
+                             * Add the new description to the distinguished account
+                             * library. Log exit information.
+                             */
+                            accountLibrary.addDescription(description);
+                            logMessage(getOrdinary(),
+                                    String.format("Load of metadata for " +
+                                                    "distinguished account " +
+                                                    "with key '%s' and " +
+                                                    "value '%s' at line %d " +
+                                                    "was%s successful.",
+                                            description.getKey(),
+                                            description.getValue(), lineNumber,
+                                            hadLineProblem() ? " not" : ""));
+                        }
+
+                        /*
+                         * The key elements are not okay according to the
+                         * distinguished account library. There is something
+                         * wrong with the given value.
+                         */
+                        else {
+
+                            // Log an error message.
+                            logMessage(Level.SEVERE, String.format("There is " +
+                                    "something wrong with key '%s' in its " +
+                                    "distinguished account description " +
+                                    "at line %d.", value, lineNumber));
+                        }
+                    }
+
+                    // Return the description.
+                    return description;
+                }
+            };
+
     // The element processor for portfolios
     private final ElementProcessor<DistinguishedPortfolios>
             portfolioProcessor = new ElementProcessor<>(
@@ -298,8 +350,8 @@ public class DistinguishedsBuilder extends
                  * Get the name from the given value. Is the key element
                  * okay according to the distinguished portfolio library?
                  */
-                final String portfolio = value.getSecond();
-                if (portfolioLibrary.areKeyElementsOkay(portfolio)) {
+                portfolioKey = value.getSecond();
+                if (portfolioLibrary.areKeyElementsOkay(portfolioKey)) {
 
                     /*
                      * The key element is okay according to the distinguished
@@ -307,7 +359,7 @@ public class DistinguishedsBuilder extends
                      * portfolio description using the named portfolio.
                      */
                     description = new DistinguishedPortfolioDescription(
-                            distinguishedPortfolio, portfolio);
+                            distinguishedPortfolio, portfolioKey);
 
                     /*
                      * Add the new description to the distinguished portfolio
@@ -343,35 +395,6 @@ public class DistinguishedsBuilder extends
         }
     };
 
-    // The processor map
-    private final Map<HoldingLineType, ElementProcessor<?>> processorMap =
-            new HashMap<>();
-
-    // The element processor for portfolios
-    private final ElementProcessor<DistinguishedTickers>
-            tickerProcessor = new ElementProcessor<>(
-            DistinguishedTickers.class) {
-
-        @Override
-        public DistinguishedDescription<DistinguishedTickers, ?>
-        process(@NotNull String keyString,
-                @NotNull Pair<String, String> value,
-                int lineNumber) {
-
-            /*
-             * We currently do not supported distinguished ticker symbols. Log
-             * a warning.
-             */
-            logMessage(Level.WARNING, String.format("Distinguished ticker " +
-                    "specification with key '%s' and value '%s' read at " +
-                    "line %d; I do not currently supported distinguished " +
-                    "ticker symbols.", keyString, value, lineNumber));
-            return null;
-        }
-    };
-    // The parent tracker
-    private final ParentTracker tracker = ParentTracker.getInstance();
-
     {
 
         // Build out the processor map.
@@ -389,7 +412,7 @@ public class DistinguishedsBuilder extends
      * @param library The distinguished library
      */
     private static <T> void describeContents(@NotNull String type,
-                                             @NotNull T[] keys,
+                                             @NotNull T @NotNull [] keys,
                                              @NotNull DistinguishedLibrary<T, ?, ?>
                                                      library) {
 
@@ -524,6 +547,15 @@ public class DistinguishedsBuilder extends
         return DistinguishedFields.values().length;
     }
 
+    /**
+     * Gets the most recent portfolio key.
+     *
+     * @return The most recent portfolio key
+     */
+    private String getPortfolioKey() {
+        return portfolioKey;
+    }
+
     @Override
     @NotNull
     public String getPrefix() {
@@ -537,7 +569,8 @@ public class DistinguishedsBuilder extends
     }
 
     @Override
-    protected void processElements(@NotNull String[] elements, int lineNumber) {
+    protected void processElements(@NotNull String @NotNull [] elements,
+                                   int lineNumber) {
 
         // Set the line number and get the line code.
         setLineNumber(lineNumber);
@@ -575,6 +608,13 @@ public class DistinguishedsBuilder extends
         }
     }
 
+    /**
+     * Resets the most recent portfolio key.
+     */
+    private void reset() {
+        portfolioKey = null;
+    }
+
     @Override
     protected void setLineNumber(int lineNumber) {
         interpreter.setRow(lineNumber);
@@ -587,10 +627,16 @@ public class DistinguishedsBuilder extends
         super.startProcessing();
         tracker.reset();
 
-        // Set the date in each of the libraries.
+        // Set the date in account library and the institution library.
         setDate(accountLibrary);
         setDate(institutionLibrary);
+
+        /*
+         * Set the date in the portfolio library and reset the most recent
+         * portfolio key.
+         */
         setDate(portfolioLibrary);
+        reset();
     }
 
     private enum DistinguishedTickers {
