@@ -26,4 +26,12 @@ public class Informer {
     protected @NotNull PrintStream getStream() {
         return stream;
     }
+
+    /**
+     * Prints a no-exception completion message.
+     */
+    protected void printNoException(@NotNull String name) {
+        getStream().printf("The '%s' task has completed without exception.%n",
+                name.toLowerCase());
+    }
 }
