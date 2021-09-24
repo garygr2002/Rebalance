@@ -3,6 +3,7 @@ package com.garygregg.rebalance.cla;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
+import java.nio.file.Path;
 import java.util.prefs.Preferences;
 
 public class PreferenceDispatch<KeyType extends Enum<KeyType>>
@@ -47,8 +48,18 @@ public class PreferenceDispatch<KeyType extends Enum<KeyType>>
     public static void displayPreference(@NotNull String keyName,
                                          Object setting,
                                          @NotNull PrintStream stream) {
-        stream.printf("The current value for '%s' is set to '%s'.%n",
-                keyName.toLowerCase(), setting);
+
+        // Determine if the setting is quotable.
+        final boolean quotable = (setting instanceof String) ||
+                (setting instanceof Path);
+
+        /*
+         * Determine the quote character, and print the preference to the
+         * supplied print stream.
+         */
+        final String quote = quotable ? "'" : "";
+        stream.printf("The current value for '%s' is set to %s%s%s.%n",
+                keyName.toLowerCase(), quote, setting, quote);
     }
 
     @Override
