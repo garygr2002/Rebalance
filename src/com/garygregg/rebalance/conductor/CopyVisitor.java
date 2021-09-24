@@ -67,9 +67,27 @@ class CopyVisitor extends SimpleFileVisitor<Path> {
          * Get the destination directory. Return 'continue' if the destination
          * already exists or can be created, otherwise return 'skip subtree.'
          */
+
+        /*
+         * Get the destination directory. Does the destination directory not
+         * exist?
+         */
         final File destination = getDestination(source).toFile();
-        return (destination.exists() || destination.mkdir()) ?
-                FileVisitResult.CONTINUE : FileVisitResult.SKIP_SUBTREE;
+        if (!destination.exists()) {
+
+            /*
+             * The destination directory does not exist. Try to create it, and
+             * throw a new I/O exception if the attempt fails.
+             */
+            if (!destination.mkdir()) {
+                throw new IOException(String.format("The directory '%s' " +
+                                "does not exist and cannot be created.",
+                        destination.toString()));
+            }
+        }
+
+        // Ready to continue copying ordinary files.
+        return FileVisitResult.CONTINUE;
     }
 
     @Override
