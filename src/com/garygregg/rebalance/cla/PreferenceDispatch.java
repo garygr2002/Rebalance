@@ -37,6 +37,20 @@ public class PreferenceDispatch<KeyType extends Enum<KeyType>>
         this.preferences = preferences;
     }
 
+    /**
+     * Displays a preference setting.
+     *
+     * @param keyName The name of the preference key
+     * @param setting The setting of the preference
+     * @param stream  A print stream to receive the display
+     */
+    public static void displayPreference(@NotNull String keyName,
+                                         Object setting,
+                                         @NotNull PrintStream stream) {
+        stream.printf("The current value for '%s' is set to '%s'.%n",
+                keyName.toLowerCase(), setting);
+    }
+
     @Override
     public void dispatch(String argument) throws CLAException {
 
@@ -47,17 +61,19 @@ public class PreferenceDispatch<KeyType extends Enum<KeyType>>
         try {
 
             /*
-             * Output a message describing the current setting of the
+             * Display a message describing the current setting of the
              * preference if the argument is null...
              */
             if (null == argument) {
-                getStream().printf("The current value for '%s' is set to " +
-                        "'%s'.%n", getKeyName().toLowerCase(), get());
+                displayPreference(getKeyName(), get(), getStream());
             }
 
-            // ...otherwise set the non-null argument as the new preference.
+            // ...the argument is not null.
             else {
+
+                // Set the non-null argument as the new preference.
                 put(argument);
+                printNoException(getKeyName());
             }
         }
 

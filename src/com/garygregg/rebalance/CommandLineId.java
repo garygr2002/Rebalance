@@ -16,6 +16,9 @@ public enum CommandLineId {
     MINIMUM("minimum running settings using expected values", null,
             false),
 
+    // List the preference settings
+    PREFERENCE("list the preference settings", null, false),
+
     // The logging level (valid Level values)
     LEVEL("ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE or WARNING",
             "lglv", true),
