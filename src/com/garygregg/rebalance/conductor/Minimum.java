@@ -52,6 +52,7 @@ class Minimum extends Informer implements Dispatch<CommandLineId> {
 
         // Null argument, as expected. Set the minimum preferences.
         setMinimum();
+        printNoException(getKey().toString());
     }
 
     @Override

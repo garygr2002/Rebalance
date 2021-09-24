@@ -46,7 +46,7 @@ class Reset extends Informer implements Dispatch<CommandLineId> {
     public void dispatch(String argument) throws CLAException {
 
         /*
-         * Throw a new CLA exception of the argument is not null. The reset
+         * Throw a new CLA exception if the argument is not null. The reset
          * option does not take an argument.
          */
         if (null != argument) {
@@ -56,6 +56,7 @@ class Reset extends Informer implements Dispatch<CommandLineId> {
 
         // Null argument, as expected. Reset the preferences.
         resetPreferences();
+        printNoException(getKey().toString());
     }
 
     @Override
