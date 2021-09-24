@@ -242,10 +242,11 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
                 tracker.getAssociation(lineCode);
         if (null == lineType) {
 
-            // The line type is not know. Log a warning.
+            // The line type is not known. Log a warning and return.
             logMessage(Level.WARNING, String.format("Line code '%s' is not " +
                             "recognized at line number %d in the holding " +
                             "file.", lineCode, lineNumber));
+            return;
         }
 
         // Create a new holding description key.
