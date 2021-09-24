@@ -24,10 +24,7 @@ class CopyVisitor extends SimpleFileVisitor<Path> {
     public CopyVisitor(@NotNull String destinationDirectory,
                        @NotNull String sourceDirectory) {
 
-        /*
-         * Set the destination and source directories, and reset the
-         * recorded exception.
-         */
+        // Set the destination and source directories.
         this.destinationDirectory = destinationDirectory;
         this.sourceDirectory = sourceDirectory;
     }
@@ -67,8 +64,8 @@ class CopyVisitor extends SimpleFileVisitor<Path> {
             throws IOException {
 
         /*
-         * Get the destination directory. Return continue if the destination
-         * already exists or can be created, otherwise return skip subtree.
+         * Get the destination directory. Return 'continue' if the destination
+         * already exists or can be created, otherwise return 'skip subtree.'
          */
         final File destination = getDestination(source).toFile();
         return (destination.exists() || destination.mkdir()) ?
@@ -93,7 +90,7 @@ class CopyVisitor extends SimpleFileVisitor<Path> {
                     StandardCopyOption.REPLACE_EXISTING);
         }
 
-        // Return continue.
+        // Return 'continue.'
         return FileVisitResult.CONTINUE;
     }
 }
