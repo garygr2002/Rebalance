@@ -32,7 +32,7 @@ class Backup extends Informer implements Dispatch<CommandLineId> {
         final PreferenceManager manager = PreferenceManager.getInstance();
         final Path source = manager.getSource();
 
-        // Ensure the source path is not null.
+        // Ensure that the source path is not null.
         if (null == source) {
             throw new CLAException("Backup failed because the source " +
                     "directory is null.");
