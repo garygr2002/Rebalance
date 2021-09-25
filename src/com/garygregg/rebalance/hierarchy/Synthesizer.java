@@ -97,10 +97,13 @@ abstract class Synthesizer {
         final LocalDate localEnd = convert(end);
         if (localStart.isAfter(localEnd)) {
 
-            // The start date is after the end date. Log a warning.
-            getLogger().logMessage(Level.WARNING, String.format("Start " +
+            /*
+             * The start date is after the end date. Log an informational
+             * message; the result of the calculation is zero.
+             */
+            getLogger().logMessage(Level.INFO, String.format("Start " +
                             "date of '%s' occurs after end date of '%s'; " +
-                            "cannot calculate value of monthly payments.",
+                            "the value of the pension is zero.",
                     localStart, localEnd));
         }
 
@@ -123,19 +126,33 @@ abstract class Synthesizer {
                  */
                 getLogger().logMessage(Level.INFO, String.format("First " +
                                 "payment date of '%s' occurs after end " +
-                                "date of '%s'; value of pension is zero.",
+                                "date of '%s'; value of the pension is zero.",
                         localFirstPayment, localEnd));
             }
 
             // The first payment date is not after the end date.
             else {
 
-                // Adjust the first payment for daily inflation, as requested.
-                final Currency firstPayment = reduce ? inflate(monthly, daily,
-                        DAYS.between(localStart, localFirstPayment)) : monthly;
+                /*
+                 * Calculate the number of days till the next payment. We
+                 * assume that there will always be one day between the start
+                 * date and the first date of the next month. We would like to
+                 * reduce it by one so that there are no days till the next
+                 * payment if the payment occurs the next day.
+                 */
+                final long daysTillPayment =
+                        DAYS.between(localStart, localFirstPayment) - 1;
+
+                /*
+                 * Adjust the first payment for daily inflation, as requested
+                 * and as needed.
+                 */
+                final double payment = (reduce && (!(0L < daysTillPayment))) ?
+                        inflate(monthly, daily, daysTillPayment) :
+                        monthly.getValue();
 
                 // Calculate the geometric sum of the payments.
-                result = geometricSum(firstPayment, reduce ?
+                result = geometricSum(payment, reduce ?
                                 getInflation(Synthesizer.monthly, caddy) :
                                 getDefaultInflation(),
                         MONTHS.between(localFirstPayment, localEnd));
@@ -149,26 +166,20 @@ abstract class Synthesizer {
     /**
      * Calculates a geometric sum of currency.
      *
-     * @param currency The currency
-     * @param rate     The rate
-     * @param periods  The number of periods
-     * @return A geometric sum of the given currency
+     * @param payment The payments
+     * @param rate    The rate
+     * @param periods The number of periods
+     * @return A geometric sum of the payments for the number of periods
      */
-    private @NotNull Currency geometricSum(@NotNull Currency currency,
+    private @NotNull Currency geometricSum(double payment,
                                            double rate,
                                            long periods) {
-
-        /*
-         * Declare and initialize the forbidden rate. Get the payment from the
-         * currency.
-         */
-        final double forbiddenRate = 1.;
-        final double payment = currency.getValue();
 
         /*
          * Convert the geometric sum, and wrap the result in a new
          * currency object before returning it.
          */
+        final double forbiddenRate = 1.;
         return new Currency((forbiddenRate == rate) ? payment * periods :
                 (payment - payment * Math.pow(rate, periods + 1) /
                         (forbiddenRate - rate)));
@@ -210,11 +221,11 @@ abstract class Synthesizer {
      * @return The value of the currency reduced due to inflation
      */
     @SuppressWarnings("SameParameterValue")
-    private @NotNull Currency inflate(@NotNull Currency currency,
-                                      @NotNull Inflation inflation,
-                                      long periods) {
-        return new Currency(currency.getValue() /
-                Math.pow(getInflation(inflation, caddy), periods));
+    private double inflate(@NotNull Currency currency,
+                           @NotNull Inflation inflation,
+                           long periods) {
+        return currency.getValue() /
+                Math.pow(getInflation(inflation, caddy), periods);
     }
 
     /**
