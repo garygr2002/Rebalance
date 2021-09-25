@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
-public class Pension extends Synthesizer {
+public class Pension extends AnnuitySynthesizer {
 
     @Override
     public @NotNull DistinguishedAccounts getAccount() {
