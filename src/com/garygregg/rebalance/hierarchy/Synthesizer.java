@@ -99,8 +99,8 @@ abstract class Synthesizer {
 
             // The start date is after the end date. Log a warning.
             getLogger().logMessage(Level.WARNING, String.format("Start " +
-                            "date of '%s' occurs before end date of '%s'; cannot " +
-                            "calculate value of monthly payments.",
+                            "date of '%s' occurs after end date of '%s'; " +
+                            "cannot calculate value of monthly payments.",
                     localStart, localEnd));
         }
 
@@ -109,19 +109,40 @@ abstract class Synthesizer {
 
             /*
              * The date of the first payment is the first day of the month
-             * after the start date.
+             * after the start date. Does the first payment occur after the end
+             * date?
              */
             final LocalDate localFirstPayment =
                     localStart.with(TemporalAdjusters.firstDayOfNextMonth());
+            if (localFirstPayment.isAfter(localEnd)) {
 
-            // Adjust the first payment for daily inflation, as requested.
-            final Currency firstPayment = reduce ? inflate(monthly, daily,
-                    DAYS.between(localStart, localFirstPayment)) : monthly;
+                /*
+                 * The first payment occurs after the end date. Log an
+                 * informational message; the result of the calculation is
+                 * zero.
+                 */
+                getLogger().logMessage(Level.INFO, String.format("First " +
+                                "payment date of '%s' occurs after end " +
+                                "date of '%s'; value of pension is zero.",
+                        localFirstPayment, localEnd));
+            }
 
-            result = geometricSum(firstPayment, reduce ? getInflation(Synthesizer.monthly, caddy) : getDefaultInflation(),
-                    MONTHS.between(localFirstPayment, localEnd));
+            // The first payment date is not after the end date.
+            else {
+
+                // Adjust the first payment for daily inflation, as requested.
+                final Currency firstPayment = reduce ? inflate(monthly, daily,
+                        DAYS.between(localStart, localFirstPayment)) : monthly;
+
+                // Calculate the geometric sum of the payments.
+                result = geometricSum(firstPayment, reduce ?
+                                getInflation(Synthesizer.monthly, caddy) :
+                                getDefaultInflation(),
+                        MONTHS.between(localFirstPayment, localEnd));
+            }
         }
 
+        // Return the result.
         return result;
     }
 
