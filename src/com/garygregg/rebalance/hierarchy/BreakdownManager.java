@@ -50,7 +50,7 @@ abstract class BreakdownManager<EnumType extends Enum<EnumType>,
 
         /*
          * Create a new list to receive the proposed values, and the proposed
-         * values breakdown. Add the list to the breakdown lists for the
+         * breakdown of values. Add the list to the breakdown lists for the
          * proposed breakdown type.
          */
         list = new ArrayList<>();
