@@ -59,6 +59,6 @@ public enum DistinguishedAccounts {
     // Social Security
     SOCIAL_SECURITY,
 
-    // State tax on house sale
-    STATE_TAX
+    // Washington Real Estate Excise Tax
+    WASHINGTON_REET
 }

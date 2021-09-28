@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class AccountDescription implements Description<AccountKey> {
 
@@ -26,8 +28,14 @@ public class AccountDescription implements Description<AccountKey> {
     // The rebalance procedure of the account
     private final RebalanceProcedure rebalanceProcedure;
 
+    // The set of referenced accounts
+    private final Set<Long> referencedAccounts = new TreeSet<>();
+
     // The tax type of the account
     private final TaxType type;
+
+    // The synthesizer type to be used for the account value (if needed)
+    private SynthesizerType synthesizerType;
 
     /**
      * Constructs the account description.
@@ -52,6 +60,16 @@ public class AccountDescription implements Description<AccountKey> {
         this.rebalanceOrder = rebalanceOrder;
         this.rebalanceProcedure = rebalanceProcedure;
         this.type = type;
+    }
+
+    /**
+     * Adds a referenced account.
+     *
+     * @param accountNumber The number of the referenced account
+     * @return True if the account number had not already been added
+     */
+    boolean addReferencedAccount(@NotNull Long accountNumber) {
+        return referencedAccounts.add(accountNumber);
     }
 
     /**
@@ -121,11 +139,39 @@ public class AccountDescription implements Description<AccountKey> {
     }
 
     /**
+     * Gets the referenced accounts.
+     *
+     * @return The referenced accounts
+     */
+    public @NotNull Long @NotNull [] getReferencedAccounts() {
+        return referencedAccounts.toArray(new Long[0]);
+    }
+
+    /**
+     * Gets the synthesizer type to be used for the account value.
+     *
+     * @return The synthesizer type to be used for the account value
+     */
+    public SynthesizerType getSynthesizerType() {
+        return synthesizerType;
+    }
+
+    /**
      * Gets the tax type of the account.
      *
      * @return The tax type of the account
      */
     public TaxType getType() {
         return type;
+    }
+
+    /**
+     * Sets the synthesizer type to be used for the account value.
+     *
+     * @param synthesizerType The synthesizer type to be used for the account
+     *                        value
+     */
+    void setSynthesizerType(SynthesizerType synthesizerType) {
+        this.synthesizerType = synthesizerType;
     }
 }

@@ -2,6 +2,7 @@ package com.garygregg.rebalance.hierarchy;
 
 import com.garygregg.rebalance.AccountKey;
 import com.garygregg.rebalance.MessageLogger;
+import com.garygregg.rebalance.SynthesizerType;
 import com.garygregg.rebalance.distinguished.DistinguishedAccountLibrary;
 import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
 import org.jetbrains.annotations.NotNull;
@@ -10,15 +11,30 @@ import java.util.logging.Level;
 
 abstract class Synthesizer {
 
+    // The distinguished account associated with this synthesizer
+    private final DistinguishedAccounts account;
+
     // Our local message logger
     private final MessageLogger messageLogger = new MessageLogger();
+
+    /**
+     * Constructs a synthesizer.
+     *
+     * @param account The distinguished account associated with this
+     *                synthesizer
+     */
+    public Synthesizer(@NotNull DistinguishedAccounts account) {
+        this.account = account;
+    }
 
     /**
      * Gets the distinguished account for which this synthesizer is intended.
      *
      * @return The distinguished account for which this synthesizer is intended
      */
-    public abstract @NotNull DistinguishedAccounts getAccount();
+    public @NotNull DistinguishedAccounts getAccount() {
+        return account;
+    }
 
     /**
      * Gets the account key for which this synthesizer is intended.
@@ -38,6 +54,13 @@ abstract class Synthesizer {
     protected MessageLogger getLogger() {
         return messageLogger;
     }
+
+    /**
+     * Gets the type associated with this synthesizer class.
+     *
+     * @return The type associated with this synthesizer class
+     */
+    public abstract @NotNull SynthesizerType getType();
 
     /**
      * Synthesizes an account.

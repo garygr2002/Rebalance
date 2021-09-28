@@ -6,15 +6,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
-public class SocialSecurity extends CpiAnnuity {
+public class CpiAnnuity extends AnnuitySynthesizer {
 
     /**
-     * Constructs the Social Security synthesizer.
+     * Constructs the CPI adjustment synthesizer.
      *
      * @param account The distinguished account associated with this
      *                synthesizer
      */
-    public SocialSecurity(@NotNull DistinguishedAccounts account) {
+    public CpiAnnuity(@NotNull DistinguishedAccounts account) {
         super(account);
     }
 
@@ -25,7 +25,7 @@ public class SocialSecurity extends CpiAnnuity {
         getLogger().logMessage(Level.INFO, String.format("The synthesizer " +
                         "for class '%s' intended for the distinguished account '%s' " +
                         "needs to be completed.",
-                SocialSecurity.class.getSimpleName(), getAccount().name()));
+                CpiAnnuity.class.getSimpleName(), getAccount().name()));
         return super.synthesize(account);
     }
 }

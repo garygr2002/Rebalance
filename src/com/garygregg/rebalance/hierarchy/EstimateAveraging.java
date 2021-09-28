@@ -2,6 +2,7 @@ package com.garygregg.rebalance.hierarchy;
 
 import com.garygregg.rebalance.AccountKey;
 import com.garygregg.rebalance.MessageLogger;
+import com.garygregg.rebalance.SynthesizerType;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.distinguished.DistinguishedAccountLibrary;
 import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
@@ -21,6 +22,16 @@ public class EstimateAveraging extends Synthesizer {
     // Value by 'not considered'
     private final static Valuator byNotConsidered =
             ValueByNotConsidered.getInstance();
+
+    /**
+     * Constructs the estimate averaging synthesizer.
+     *
+     * @param account The distinguished account associated with this
+     *                synthesizer
+     */
+    public EstimateAveraging(@NotNull DistinguishedAccounts account) {
+        super(account);
+    }
 
     /**
      * Sums the value of a collection of hierarchy objects.
@@ -63,8 +74,8 @@ public class EstimateAveraging extends Synthesizer {
     }
 
     @Override
-    public @NotNull DistinguishedAccounts getAccount() {
-        return DistinguishedAccounts.ESTIMATE_AVERAGING;
+    public @NotNull SynthesizerType getType() {
+        return SynthesizerType.AVERAGER;
     }
 
     @Override

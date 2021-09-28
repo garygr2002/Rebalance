@@ -34,8 +34,11 @@ enum AccountFields {
     // The rebalance procedure for the account
     REBALANCE_PROCEDURE(5, null),
 
+    // The synthesizer type of the account
+    SYNTHESIZER_TYPE(10, null),
+
     // The tax type of the account
-    TYPE(4, null);
+    TAX_TYPE(4, null);
 
     // The position of the field in the data file
     final int position;

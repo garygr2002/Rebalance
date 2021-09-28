@@ -1,10 +1,7 @@
 package com.garygregg.rebalance.account;
 
 import com.garygregg.rebalance.*;
-import com.garygregg.rebalance.interpreter.DoubleInterpreter;
-import com.garygregg.rebalance.interpreter.LongInterpreter;
-import com.garygregg.rebalance.interpreter.RebalanceProcedureInterpreter;
-import com.garygregg.rebalance.interpreter.TaxTypeInterpreter;
+import com.garygregg.rebalance.interpreter.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -24,7 +21,7 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
                                                 @NotNull String string,
                                                 Long defaultValue) {
                     logMessage(Level.WARNING, String.format("Account " +
-                            "number '%s' at line number %d in the account " +
+                                    "number '%s' at line number %d in the account " +
                                     "file cannot be parsed; using %d.", string,
                             getRow(), defaultValue));
                 }
@@ -94,8 +91,23 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
                                                 @NotNull String string,
                                                 RebalanceProcedure defaultValue) {
                     logMessage(Level.WARNING, String.format("Account " +
-                            "re-balance procedure '%s' at line number %d " +
-                            "in the account file cannot be parsed; using %s.",
+                                    "re-balance procedure '%s' at line number %d " +
+                                    "in the account file cannot be parsed; using %s.",
+                            string, getRow(), defaultValue));
+                }
+            };
+
+    // Our synthesizer type interpreter
+    private final SynthesizerTypeInterpreter synthesizerTypeInterpreter =
+            new SynthesizerTypeInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                SynthesizerType defaultValue) {
+                    logMessage(Level.WARNING, String.format("Synthesizer " +
+                                    "type '%s' at line number %d in the " +
+                                    "account file cannot be parsed; using %s.",
                             string, getRow(), defaultValue));
                 }
             };
@@ -215,7 +227,7 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
                 // Name and tax type
                 elements[AccountFields.NAME.getPosition()],
                 taxTypeInterpreter.interpret(
-                        elements[AccountFields.TYPE.getPosition()]),
+                        elements[AccountFields.TAX_TYPE.getPosition()]),
 
                 // Re-balance procedure
                 rebalanceProcedureInterpreter.interpret(elements[
@@ -242,7 +254,8 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
 
         // Get the number of line elements and the number of account fields.
         final int elementsLength = elements.length;
-        final int numberOfAccountFields = AccountFields.values().length;
+        final int numberOfAccountFields =
+                AccountFields.PERCENTAGE_REAL_ESTATE.getPosition() + 1;
 
         /*
          * The fields-to-process is the minimum of the number of line elements
@@ -253,29 +266,19 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
 
         /*
          * Log a warning if the fields-to-process is less than the number of
-         * line elements.
+         * account fields.
          */
-        if (fieldsToProcess < elementsLength) {
-            logMessage(Level.WARNING, String.format("There are %d account " +
-                            "line elements but only %d account fields at " +
-                            "line number %d; you might want to check that.",
-                    elementsLength, numberOfAccountFields, lineNumber));
-        }
-
-        /*
-         * Or log a different warning if the fields-to-process is less than the
-         * number of account fields.
-         */
-        else if (fieldsToProcess < numberOfAccountFields) {
+        if (fieldsToProcess < numberOfAccountFields) {
             logMessage(Level.WARNING, String.format("There are %d account " +
                             "fields but only %d account line elements at " +
                             "line number %d; you might want to check that.",
                     numberOfAccountFields, elementsLength, lineNumber));
         }
 
-        // Cycle for each remaining fields-to-process.
+        // Cycle for each allocation field.
         AccountFields field;
-        for (int i = getMinimumFields(); i < fieldsToProcess; ++i) {
+        int i;
+        for (i = getMinimumFields(); i < fieldsToProcess; ++i) {
 
             /*
              * Set the column in the allocation interpreter. Get the field
@@ -287,6 +290,27 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
             // Adjust the allocation of the associated fund type.
             description.adjustAllocation(field.getType(),
                     allocationInterpreter.interpret(elements[i]));
+        }
+
+        // Is there at least one more element to process?
+        if (i < elementsLength) {
+
+            /*
+             * There is at least one more element to process. The next
+             * element - if supplied - is the synthesizer type. Interpret the
+             * element, set the synthesizer type, and increment the index.
+             */
+            description.setSynthesizerType(
+                    synthesizerTypeInterpreter.interpret(elements[i++]));
+        }
+
+        /*
+         * The remaining elements, if any, are referenced account numbers.
+         * Interpret the numbers and add them as referenced accounts.
+         */
+        for (; i < elementsLength; ++i) {
+            description.addReferencedAccount(
+                    accountNumberInterpreter.interpret(elements[i]));
         }
 
         // Log some exit information.
@@ -310,11 +334,16 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
 
         /*
          * Set the line number as the row in the re-balancer order
-         * interpreter, the re-balance procedure interpreter, and the tax type
-         * interpreter.
+         * interpreter and the re-balance procedure interpreter.
          */
         rebalanceOrderInterpreter.setRow(lineNumber);
         rebalanceProcedureInterpreter.setRow(lineNumber);
+
+        /*
+         * Set the line number as the row in the synthesizer type interpreter
+         * and the tax type interpreter.
+         */
+        synthesizerTypeInterpreter.setRow(lineNumber);
         taxTypeInterpreter.setRow(lineNumber);
     }
 

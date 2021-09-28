@@ -2,6 +2,7 @@ package com.garygregg.rebalance.hierarchy;
 
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountDescription;
+import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -23,15 +24,16 @@ public class Account extends
     static {
 
         // Put an estimate averaging synthesizer in the map.
-        Synthesizer synthesizer = new EstimateAveraging();
+        Synthesizer synthesizer =
+                new EstimateAveraging(DistinguishedAccounts.ESTIMATE_AVERAGING);
         synthesizerMap.put(synthesizer.getKey(), synthesizer);
 
         // Put a 'pension' synthesizer in the map.
-        synthesizer = new Pension();
+        synthesizer = new NoCpiAnnuity(DistinguishedAccounts.PENSION);
         synthesizerMap.put(synthesizer.getKey(), synthesizer);
 
         // Put a 'Social Security' synthesizer in the map.
-        synthesizer = new SocialSecurity();
+        synthesizer = new SocialSecurity(DistinguishedAccounts.SOCIAL_SECURITY);
         synthesizerMap.put(synthesizer.getKey(), synthesizer);
     }
 
