@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.MONTHS;
 
-abstract public class AnnuitySynthesizer extends Synthesizer {
+abstract class AnnuitySynthesizer extends Synthesizer {
 
     // The daily inflation getter
     private static final Inflation daily = InflationCaddy::getDaily;

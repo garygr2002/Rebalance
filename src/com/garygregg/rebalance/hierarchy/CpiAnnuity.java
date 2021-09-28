@@ -1,12 +1,11 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.SynthesizerType;
 import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
-public class CpiAnnuity extends AnnuitySynthesizer {
+class CpiAnnuity extends AnnuitySynthesizer {
 
     /**
      * Constructs the CPI adjustment synthesizer.
