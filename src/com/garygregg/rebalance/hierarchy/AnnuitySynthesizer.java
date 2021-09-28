@@ -55,11 +55,12 @@ abstract public class AnnuitySynthesizer extends Synthesizer {
                                        @NotNull InflationCaddy caddy) {
 
         /*
-         * Use the getter to access inflation from the caddy. Return a default
-         * if the result is null, otherwise return the result.
+         * Use the getter to access inflation from the caddy. Use a default
+         * value if the result is null, otherwise use the value from the caddy.
+         * Return the reciprocal of the result.
          */
         final Double result = inflation.getInflation(caddy);
-        return (null == result) ? getDefaultInflation() : result;
+        return 1. / ((null == result) ? getDefaultInflation() : result);
     }
 
     /**
@@ -221,9 +222,9 @@ abstract public class AnnuitySynthesizer extends Synthesizer {
 
             // The intended key does not equal the given key. Log a warning.
             getLogger().logMessage(Level.WARNING, String.format("Rejecting " +
-                            "attempt to synthesize account with key '%s' using a " +
-                            "synthesizer intended for key '%s'.", givenKey,
-                    intendedKey));
+                            "attempt to synthesize account with key '%s' " +
+                            "using a synthesizer intended for key '%s'.",
+                    givenKey, intendedKey));
         }
 
         /*
