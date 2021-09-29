@@ -75,13 +75,13 @@ abstract class AnnuitySynthesizer extends Synthesizer {
     }
 
     /**
-     * Calculates a pension value.
+     * Calculates an annuity value.
      *
      * @param monthly The monthly payment
      * @param start   The start date of the calculation
      * @param end     The end date of the calculation
      * @param reduce  Reduce the monthly payment for inflation
-     * @return The value of the pension
+     * @return The value of the annuity
      */
     protected @NotNull Currency calculateValue(@NotNull Currency monthly,
                                                Date start,
