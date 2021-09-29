@@ -1,15 +1,25 @@
 package com.garygregg.rebalance.hierarchy;
 
 import com.garygregg.rebalance.AccountKey;
+import com.garygregg.rebalance.MessageLogger;
 import com.garygregg.rebalance.SynthesizerType;
 import com.garygregg.rebalance.account.AccountDescription;
+import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.logging.Level;
 
 class Averaging extends Synthesizer {
+
+    // Value by 'considered'
+    private final static Valuator byConsidered =
+            ValueByConsidered.getInstance();
+
+    // Value by 'not considered'
+    private final static Valuator byNotConsidered =
+            ValueByNotConsidered.getInstance();
 
     /**
      * Constructs the averaging synthesizer.
@@ -64,9 +74,62 @@ class Averaging extends Synthesizer {
         return keys.toArray(new AccountKey[0]);
     }
 
+    /**
+     * Sums the value of a collection of hierarchy objects.
+     *
+     * @param hierarchyObjects A collection of hierarchy objects
+     * @param valuator         A valuator for hierarchy objects
+     * @return The sum of the values in the collection
+     */
+    private static double sum(@NotNull Collection<Common<?, ?, ?>> hierarchyObjects,
+                              @NotNull Valuator valuator) {
+
+        // Declare and initialize the sum. Are there any hierarchy objects?
+        double value = 0.;
+        if (!hierarchyObjects.isEmpty()) {
+
+            /*
+             * There are hierarchy objects. Declare and initialize mutable
+             * currency initialized with the empty sum. Cycle for each
+             * hierarchy object.
+             */
+            final MutableCurrency currency = new MutableCurrency(value);
+            for (Common<?, ?, ?> hierarchyObject : hierarchyObjects) {
+
+                // Add the value of the first/next hierarchy object to the sum.
+                currency.add(valuator.getValue(hierarchyObject));
+            }
+
+            /*
+             * Get the summed value, and divide by the number of hierarchy
+             * objects.
+             */
+            value = currency.getValue() / hierarchyObjects.size();
+        }
+
+        // Return the sum.
+        return value;
+    }
+
     @Override
     public @NotNull SynthesizerType getType() {
         return SynthesizerType.AVERAGING;
+    }
+
+    /**
+     * Sets the valuation of an account.
+     *
+     * @param account       The account to set
+     * @param considered    The considered valuation of the account
+     * @param notConsidered The not-considered valuation of the account
+     */
+    protected void setValuation(@NotNull Account account,
+                                double considered,
+                                double notConsidered) {
+
+        // Set the considered and not-considered valuation in the account.
+        account.setConsidered(considered);
+        account.setNotConsidered(notConsidered);
     }
 
     @Override
@@ -76,7 +139,51 @@ class Averaging extends Synthesizer {
         boolean result = super.synthesize(account);
         if (result) {
 
-            // TODO: Fill this out.
+            /*
+             * The referenced accounts are the estimates used by this
+             * synthesizer. Get their keys. Declare a variable to receive an
+             * estimate.
+             */
+            final AccountKey[] estimateKeys = getReferencedAccounts(account);
+            Account estimate;
+
+            // Get a hierarchy object and the message logger.
+            final Hierarchy hierarchy = Hierarchy.getInstance();
+            final MessageLogger logger = getLogger();
+
+            /*
+             * Declare a list to receive house price estimates. Cycle for each
+             * estimate account key.
+             */
+            final List<Common<?, ?, ?>> estimateList = new ArrayList<>();
+            for (AccountKey estimateKey : estimateKeys) {
+
+                /*
+                 * Get the estimate for the first/next key. Is the estimate
+                 * null?
+                 */
+                estimate = hierarchy.getAccount(estimateKey);
+                if (null == estimate) {
+
+                    // The estimate is null. Log a warning.
+                    logger.logMessage(Level.WARNING, String.format("Unable " +
+                            "to retrieve house estimate with key '%s'; its " +
+                            "account is missing.", estimateKey));
+                }
+
+                // The estimate is not null. Add it to the account list.
+                else {
+                    estimateList.add(estimate);
+                }
+            }
+
+            /*
+             * Set the 'considered' and 'not considered' values in the target
+             * account by average the estimates. Re-initialize the result.
+             */
+            setValuation(account, sum(estimateList, byConsidered),
+                    sum(estimateList, byNotConsidered));
+            result = !logger.hadProblem1();
         }
 
         // Return the result.

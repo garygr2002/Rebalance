@@ -23,9 +23,9 @@ public class Account extends
 
     static {
 
-        // Put an estimate averaging synthesizer in the map.
+        // Put an estimate negation synthesizer in the map.
         Synthesizer synthesizer =
-                new EstimateAveraging(DistinguishedAccounts.ESTIMATE_AVERAGING);
+                new Negation(DistinguishedAccounts.ESTIMATE_AVERAGING);
         synthesizerMap.put(synthesizer.getKey(), synthesizer);
 
         // Put a 'pension' synthesizer in the map.
