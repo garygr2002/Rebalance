@@ -20,6 +20,18 @@ class SocialSecurity extends CpiAnnuity {
     @Override
     public boolean synthesize(@NotNull Account account) {
 
+        /*
+         * From: https://stackoverflow.com/questions/11642701/adding-years-to-a-random-date-from-date-class
+         *
+         * Calendar c = Calendar.getInstance();
+         * c.setTime(randomDate);
+         * c.add(Calendar.YEAR, n);
+         * newDate = c.getTime();
+         *
+         * Try doing this same thing to add 62 years to portfolio holder
+         * birthdate.
+         */
+
         // TODO: Fill in this method.
         getLogger().logMessage(Level.INFO, String.format("The synthesizer " +
                         "for class '%s' intended for the distinguished account '%s' " +
