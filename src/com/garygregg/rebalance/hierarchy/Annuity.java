@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.MONTHS;
 
-abstract class AnnuitySynthesizer extends Synthesizer {
+abstract class Annuity extends Synthesizer {
 
     // The daily inflation getter
     private static final Inflation daily = InflationCaddy::getDaily;
@@ -32,7 +32,7 @@ abstract class AnnuitySynthesizer extends Synthesizer {
      * @param account The distinguished account associated with this
      *                synthesizer
      */
-    public AnnuitySynthesizer(@NotNull DistinguishedAccounts account) {
+    public Annuity(@NotNull DistinguishedAccounts account) {
         super(account);
     }
 
@@ -159,7 +159,7 @@ abstract class AnnuitySynthesizer extends Synthesizer {
 
                 // Calculate the geometric sum of the payments.
                 result = geometricSum(payment, reduce ?
-                                getInflation(AnnuitySynthesizer.monthly,
+                                getInflation(Annuity.monthly,
                                         caddy) : getDefaultInflation(),
                         MONTHS.between(localFirstPayment, localEnd));
             }

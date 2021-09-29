@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 import java.util.TreeSet;
 
-class AveragingSynthesizer extends Synthesizer {
+class Averaging extends Synthesizer {
 
     /**
      * Constructs the averaging synthesizer.
@@ -17,7 +17,7 @@ class AveragingSynthesizer extends Synthesizer {
      * @param account The distinguished account associated with this
      *                synthesizer
      */
-    public AveragingSynthesizer(@NotNull DistinguishedAccounts account) {
+    public Averaging(@NotNull DistinguishedAccounts account) {
         super(account);
     }
 

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Date;
 import java.util.logging.Level;
 
-class CpiAnnuity extends AnnuitySynthesizer {
+class CpiAnnuity extends Annuity {
 
     /**
      * Constructs the CPI adjustment synthesizer.
