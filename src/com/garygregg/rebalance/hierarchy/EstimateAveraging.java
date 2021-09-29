@@ -75,7 +75,7 @@ class EstimateAveraging extends Synthesizer {
 
     @Override
     public @NotNull SynthesizerType getType() {
-        return SynthesizerType.AVERAGER;
+        return SynthesizerType.AVERAGING;
     }
 
     @Override
