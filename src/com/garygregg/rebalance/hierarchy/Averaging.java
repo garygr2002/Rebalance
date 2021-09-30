@@ -32,6 +32,17 @@ class Averaging extends Synthesizer {
     }
 
     /**
+     * Divides a value.
+     *
+     * @param value       The value to divide
+     * @param denominator The denominator of the division
+     * @return The divided value
+     */
+    private static double divide(double value, int denominator) {
+        return (0 == denominator) ? 0. : value / denominator;
+    }
+
+    /**
      * Gets the keys of referenced accounts.
      *
      * @param account An account
@@ -85,7 +96,7 @@ class Averaging extends Synthesizer {
                               @NotNull Valuator valuator) {
 
         // Declare and initialize the sum. Are there any hierarchy objects?
-        double value = 0.;
+        double sum = 0.;
         if (!hierarchyObjects.isEmpty()) {
 
             /*
@@ -93,22 +104,19 @@ class Averaging extends Synthesizer {
              * currency initialized with the empty sum. Cycle for each
              * hierarchy object.
              */
-            final MutableCurrency currency = new MutableCurrency(value);
+            final MutableCurrency currency = new MutableCurrency(sum);
             for (Common<?, ?, ?> hierarchyObject : hierarchyObjects) {
 
                 // Add the value of the first/next hierarchy object to the sum.
                 currency.add(valuator.getValue(hierarchyObject));
             }
 
-            /*
-             * Get the summed value, and divide by the number of hierarchy
-             * objects.
-             */
-            value = currency.getValue() / hierarchyObjects.size();
+            // Get the summed value.
+            sum = currency.getValue();
         }
 
         // Return the sum.
-        return value;
+        return sum;
     }
 
     @Override
@@ -119,17 +127,20 @@ class Averaging extends Synthesizer {
     /**
      * Sets the valuation of an account.
      *
-     * @param account       The account to set
-     * @param considered    The considered valuation of the account
-     * @param notConsidered The not-considered valuation of the account
+     * @param account                The account to set
+     * @param considered             The considered valuation of the account
+     * @param notConsidered          The not-considered valuation of the account
+     * @param referencedAccountCount The number of referenced accounts
      */
     protected void setValuation(@NotNull Account account,
                                 double considered,
-                                double notConsidered) {
+                                double notConsidered,
+                                int referencedAccountCount) {
 
         // Set the considered and not-considered valuation in the account.
-        account.setConsidered(considered);
-        account.setNotConsidered(notConsidered);
+        account.setConsidered(divide(considered, referencedAccountCount));
+        account.setNotConsidered(divide(notConsidered,
+                referencedAccountCount));
     }
 
     @Override
@@ -179,10 +190,10 @@ class Averaging extends Synthesizer {
 
             /*
              * Set the 'considered' and 'not considered' values in the target
-             * account by average the estimates. Re-initialize the result.
+             * account by averaging the estimates. Re-initialize the result.
              */
             setValuation(account, sum(estimateList, byConsidered),
-                    sum(estimateList, byNotConsidered));
+                    sum(estimateList, byNotConsidered), estimateList.size());
             result = !logger.hadProblem1();
         }
 

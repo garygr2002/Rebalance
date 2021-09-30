@@ -24,14 +24,15 @@ class Negation extends Averaging {
     @Override
     protected void setValuation(@NotNull Account account,
                                 double considered,
-                                double notConsidered) {
+                                double notConsidered,
+                                int referencedAccountCount) {
 
         /*
-         * Negate both the considered and not-considered values before setting
-         * them.
+         * Calculate a negation factor before using the superclass to set the
+         * considered and non-considered values.
          */
-        final double negation = -1.;
-        super.setValuation(account, considered * negation,
-                notConsidered * negation);
+        final double factor = 1. - referencedAccountCount;
+        super.setValuation(account, considered * factor,
+                notConsidered * factor, referencedAccountCount);
     }
 }
