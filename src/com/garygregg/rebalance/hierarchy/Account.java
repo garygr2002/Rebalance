@@ -3,6 +3,7 @@ package com.garygregg.rebalance.hierarchy;
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
+import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -36,6 +37,9 @@ public class Account extends
         synthesizer = new SocialSecurity(DistinguishedAccounts.SOCIAL_SECURITY);
         synthesizerMap.put(synthesizer.getKey(), synthesizer);
     }
+
+    // The portfolio description associated with this account
+    private PortfolioDescription portfolioDescription;
 
     // Is this ticker synthesized (or programmatically modified)?
     private boolean synthesized;
@@ -94,6 +98,15 @@ public class Account extends
     }
 
     /**
+     * Gets the portfolio description associated with this account.
+     *
+     * @return The portfolio description associated with this account
+     */
+    public PortfolioDescription getPortfolioDescription() {
+        return portfolioDescription;
+    }
+
+    /**
      * Gets the tax type from the account description.
      *
      * @return The tax type from the account description
@@ -143,6 +156,16 @@ public class Account extends
      */
     public boolean isSynthesized() {
         return synthesized;
+    }
+
+    /**
+     * Sets the portfolio description associated with this account.
+     *
+     * @param portfolioDescription The portfolio description associated with
+     *                             this account
+     */
+    void setPortfolioDescription(PortfolioDescription portfolioDescription) {
+        this.portfolioDescription = portfolioDescription;
     }
 
     /**

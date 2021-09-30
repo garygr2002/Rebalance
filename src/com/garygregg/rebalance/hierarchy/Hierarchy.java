@@ -182,7 +182,7 @@ public class Hierarchy {
     // A stack of aggregates
     private final Stack<Aggregate<?, ?, ?>> aggregates = new Stack<>();
 
-    // All of the holding line types
+    // All the holding line types
     private final HoldingLineType[] lineTypes = HoldingLineType.values();
 
     // The message logger
@@ -193,34 +193,30 @@ public class Hierarchy {
 
     // Sets the 'considered' value of a hierarchy object given a non-null value
     private final TwoParameterAction<Common<?, ?, ?>, ICountable> setConsidered =
-            (argument1, argument2) -> argument1.setConsidered(argument2.getValue());
+            (argument1, argument2) ->
+                    argument1.setConsidered(argument2.getValue());
 
     // Sets the 'considered' shares of a ticker given a non-null value
     private final TwoParameterAction<Ticker, ICountable> setConsideredShares =
-            (argument1, argument2) -> argument1.setConsideredShares(argument2.getValue());
+            (argument1, argument2) ->
+                    argument1.setConsideredShares(argument2.getValue());
 
     /*
      * Sets the 'not considered' value of a hierarchy object given a non-null
      * value
      */
     private final TwoParameterAction<Common<?, ?, ?>, ICountable> setNotConsidered =
-            (argument1, argument2) -> argument1.setNotConsidered(argument2.getValue());
-
-    // An action to add an account
-    private final OneParameterAction<HoldingDescription> addAccountAction =
-            this::addAccount;
+            (argument1, argument2) ->
+                    argument1.setNotConsidered(argument2.getValue());
 
     // An action to add an institution
     private final OneParameterAction<HoldingDescription> addInstitutionAction =
             this::addInstitution;
 
-    // An action to add a portfolio
-    private final OneParameterAction<HoldingDescription> addPortfolioAction =
-            this::addPortfolio;
-
     // Sets the 'not considered' shares of a ticker given a non-null value
     private final TwoParameterAction<Ticker, ICountable> setNotConsideredShares =
-            (argument1, argument2) -> argument1.setNotConsideredShares(argument2.getValue());
+            (argument1, argument2) ->
+                    argument1.setNotConsideredShares(argument2.getValue());
 
     // Sets the price of a ticker given a non-null value
     private final TwoParameterAction<Ticker, ICountable> setPrice =
@@ -232,6 +228,17 @@ public class Hierarchy {
 
     // The date of the hierarchy
     private Date date;
+
+    // The most recent portfolio description encountered in the hierarchy
+    private PortfolioDescription mostRecentDescription;
+
+    // An action to add an account
+    private final OneParameterAction<HoldingDescription> addAccountAction =
+            this::addAccount;
+
+    // An action to add a portfolio
+    private final OneParameterAction<HoldingDescription> addPortfolioAction =
+            this::addPortfolio;
 
     {
 
@@ -576,7 +583,11 @@ public class Hierarchy {
             return;
         }
 
-        // Get any account description for the account.
+        /*
+         * Set the most recently encountered portfolio description in the
+         * account. Get a description for the account.
+         */
+        account.setPortfolioDescription(getMostRecentDescription());
         final AccountDescription accountDescription =
                 library.getDescription(accountKey);
 
@@ -779,9 +790,13 @@ public class Hierarchy {
             return;
         }
 
-        // Get any portfolio description for the portfolio.
+        /*
+         * Get a portfolio description for the portfolio. Set the most recently
+         * encountered portfolio description.
+         */
         final PortfolioDescription portfolioDescription =
                 library.getDescription(portfolioMnemonic);
+        setMostRecentDescription(portfolioDescription);
 
         /*
          * Set the portfolio description in the portfolio object. Was the
@@ -981,8 +996,9 @@ public class Hierarchy {
     /**
      * Checks to be certain the name in a holding description matches the
      * name in another description.
+     *
      * @param holding The holding description
-     * @param other The other description
+     * @param other   The other description
      */
     private void checkEqualNames(@NotNull HoldingDescription holding,
                                  @NotNull Description<?> other) {
@@ -1135,6 +1151,15 @@ public class Hierarchy {
     }
 
     /**
+     * Gets the most recent portfolio description.
+     *
+     * @return The most recent portfolio description
+     */
+    private PortfolioDescription getMostRecentDescription() {
+        return mostRecentDescription;
+    }
+
+    /**
      * Gets a portfolio.
      *
      * @param portfolioMnemonic The mnemonic of the portfolio
@@ -1254,6 +1279,16 @@ public class Hierarchy {
         // Lock the aggregate maps.
         lock(accounts.values());
         lock(portfolios.values());
+    }
+
+    /**
+     * Sets the most recent portfolio description.
+     *
+     * @param mostRecentDescription The most recent portfolio description
+     */
+    private void setMostRecentDescription(
+            PortfolioDescription mostRecentDescription) {
+        this.mostRecentDescription = mostRecentDescription;
     }
 
     /**
