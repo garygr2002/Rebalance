@@ -62,7 +62,7 @@ public class InflationCaddy {
         System.out.println();
 
         // Set average annual inflation, and print values.
-        caddy.setPercent(3.022);
+        caddy.setPercent(3.22);
         print(caddy);
         System.out.println();
     }
