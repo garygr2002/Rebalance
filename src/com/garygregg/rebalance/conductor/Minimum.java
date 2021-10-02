@@ -33,7 +33,7 @@ class Minimum extends Informer implements Dispatch<CommandLineId> {
          * to INFO, and the path for data files to 'data'.
          */
         final PreferenceManager manager = PreferenceManager.getInstance();
-        manager.setInflation(3.022);
+        manager.setInflation(3.22);
         manager.setLevel(Level.INFO);
         manager.setSource(Paths.get("data"));
     }
