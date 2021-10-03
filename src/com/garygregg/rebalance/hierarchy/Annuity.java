@@ -4,6 +4,7 @@ import com.garygregg.rebalance.InflationCaddy;
 import com.garygregg.rebalance.SynthesizerType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
+import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
@@ -75,6 +76,16 @@ abstract class Annuity extends Synthesizer {
     }
 
     /**
+     * Gets monthly income.
+     *
+     * @param monthlyIncome A monthly income value
+     * @return The argument itself, or a default if the argument is null
+     */
+    private static @NotNull Currency getMonthlyIncome(Currency monthlyIncome) {
+        return (null == monthlyIncome) ? Currency.getZero() : monthlyIncome;
+    }
+
+    /**
      * Calculates an annuity value.
      *
      * @param monthly The monthly payment
@@ -83,16 +94,15 @@ abstract class Annuity extends Synthesizer {
      * @param reduce  Reduce the monthly payment for inflation
      * @return The value of the annuity
      */
-    protected @NotNull Currency calculateValue(@NotNull Currency monthly,
-                                               Date start,
-                                               @NotNull Date end,
-                                               boolean reduce) {
+    private double calculateValue(@NotNull Currency monthly,
+                                  Date start, Date end,
+                                  boolean reduce) {
 
         /*
          * Declare the result, and initialize it to zero. Calculate the local
          * start date.
          */
-        Currency result = Currency.getZero();
+        double result = 0.;
         final LocalDate localStart = (null == start) ? LocalDate.now() :
                 convert(start);
 
@@ -100,7 +110,7 @@ abstract class Annuity extends Synthesizer {
          * Convert the end date to a local date. Is the start date after the
          * end date?
          */
-        final LocalDate localEnd = convert(end);
+        final LocalDate localEnd = (null == end) ? localStart : convert(end);
         if (localStart.isAfter(localEnd)) {
 
             /*
@@ -159,8 +169,8 @@ abstract class Annuity extends Synthesizer {
 
                 // Calculate the geometric sum of the payments.
                 result = geometricSum(payment, reduce ?
-                                getInflation(Annuity.monthly,
-                                        caddy) : getDefaultInflation(),
+                                getInflation(Annuity.monthly, caddy) :
+                                getDefaultInflation(),
                         MONTHS.between(localFirstPayment, localEnd));
             }
         }
@@ -177,19 +187,36 @@ abstract class Annuity extends Synthesizer {
      * @param periods The number of periods
      * @return A geometric sum of the payments for the number of periods
      */
-    private @NotNull Currency geometricSum(double payment,
-                                           double rate,
-                                           long periods) {
+    private double geometricSum(double payment, double rate, long periods) {
 
         /*
-         * Convert the geometric sum, and wrap the result in a new
-         * currency object before returning it.
+         * Declare and initialize the 'forbidden' rate, and calculate the
+         * geometric sum.
          */
         final double forbiddenRate = 1.;
-        return new Currency((forbiddenRate == rate) ? payment * periods :
-                (payment - payment * Math.pow(rate, periods + 1) /
-                        (forbiddenRate - rate)));
+        return (forbiddenRate == rate) ? payment * periods :
+                ((payment - payment * Math.pow(rate, periods + 1)) /
+                        (forbiddenRate - rate));
     }
+
+    /**
+     * Gets the monthly income of the annuity.
+     *
+     * @param description A portfolio description containing the monthly income
+     *                    data
+     * @return The monthly income of the annuity
+     */
+    protected abstract @NotNull Currency getMonthlyIncome(@NotNull PortfolioDescription
+                                                                  description);
+
+    /**
+     * Gets the start date of the annuity.
+     *
+     * @param referenceDate The reference date for calculating the annuity
+     *                      start date
+     * @return The start date of the annuity
+     */
+    protected abstract Date getStartDate(Date referenceDate);
 
     @Override
     public @NotNull SynthesizerType getType() {
@@ -211,6 +238,57 @@ abstract class Annuity extends Synthesizer {
                            long periods) {
         return currency.getValue() /
                 Math.pow(getInflation(inflation, caddy), periods);
+    }
+
+    /**
+     * Determines whether the value of the annuity is reduced for inflation.
+     *
+     * @return True if the annuity is reduced for inflation; false otherwise
+     */
+    protected abstract boolean isReduced();
+
+    @Override
+    public boolean synthesize(@NotNull Account account) {
+
+        // Call the superclass method. Was this successful?
+        boolean result = super.synthesize(account);
+        if (result) {
+
+            /*
+             * The superclass method was successful. Get the portfolio
+             * description from the account. Is the portfolio description null?
+             */
+            final PortfolioDescription description =
+                    account.getPortfolioDescription();
+            if (null == description) {
+
+                // The portfolio description is null. Log a warning.
+                getLogger().logMessage(Level.WARNING,
+                        String.format("Synthesis of annuity value for " +
+                                "account '%s' requires a non-null " +
+                                "portfolio description.", account.getKey()));
+            }
+
+            // The portfolio description is not null.
+            else {
+
+                /*
+                 * The annuity value cannot be rebalanced, so set its
+                 * considered value to zero. Calculate the not-considered value
+                 * using the monthly income from the annuity, its start date,
+                 * the projected participant mortality date, and whether the
+                 * annuity is reduced for inflation.
+                 */
+                account.setConsidered(0.);
+                account.setNotConsidered(calculateValue(
+                        getMonthlyIncome(getMonthlyIncome(description)),
+                        getStartDate(description.getBirthdate()),
+                        description.getMortalityDate(), isReduced()));
+            }
+        }
+
+        // Return the result of the synthesis.
+        return result;
     }
 
     private interface Inflation {

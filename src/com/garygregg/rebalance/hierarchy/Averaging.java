@@ -151,9 +151,9 @@ class Averaging extends Synthesizer {
         if (result) {
 
             /*
-             * The referenced accounts are the estimates used by this
-             * synthesizer. Get their keys. Declare a variable to receive an
-             * estimate.
+             * The superclass method succeeded. The referenced accounts are the
+             * estimates used by this synthesizer. Get their keys. Declare a
+             * variable to receive an estimate.
              */
             final AccountKey[] estimateKeys = getReferencedAccounts(account);
             Account estimate;

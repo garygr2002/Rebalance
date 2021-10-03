@@ -155,7 +155,7 @@ abstract class Common<KeyType,
 
         /*
          * Set the 'considered' and 'not considered' values to the same values
-         * as those contained in the passed queryable.
+         * as those contained in given queryable.
          */
         setConsidered(getValue(queryable.getConsidered()));
         setNotConsidered(getValue(queryable.getNotConsidered()));

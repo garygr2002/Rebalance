@@ -2,10 +2,10 @@ package com.garygregg.rebalance.hierarchy;
 
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
+import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
-import java.util.logging.Level;
 
 class CpiAnnuity extends Annuity {
 
@@ -19,28 +19,19 @@ class CpiAnnuity extends Annuity {
         super(account);
     }
 
-    /**
-     * Calculates an annuity value.
-     *
-     * @param monthly The monthly payment
-     * @param start   The start date of the calculation
-     * @param end     The end date of the calculation
-     * @return The value of the annuity
-     */
-    protected @NotNull Currency calculateValue(@NotNull Currency monthly,
-                                               Date start,
-                                               @NotNull Date end) {
-        return super.calculateValue(monthly, start, end, false);
+    @Override
+    protected @NotNull Currency getMonthlyIncome(@NotNull PortfolioDescription
+                                                             description) {
+        return description.getCpiMonthly();
     }
 
     @Override
-    public boolean synthesize(@NotNull Account account) {
+    protected Date getStartDate(Date referenceDate) {
+        return null;
+    }
 
-        // TODO: Fill in this method.
-        getLogger().logMessage(Level.INFO, String.format("The synthesizer " +
-                        "for class '%s' intended for the distinguished account '%s' " +
-                        "needs to be completed.",
-                CpiAnnuity.class.getSimpleName(), getAccount().name()));
-        return super.synthesize(account);
+    @Override
+    protected boolean isReduced() {
+        return false;
     }
 }
