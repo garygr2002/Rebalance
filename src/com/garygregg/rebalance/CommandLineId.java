@@ -23,7 +23,7 @@ public enum CommandLineId {
     LEVEL("ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE or WARNING",
             "lglv", true),
 
-    // The annual expected inflation (double, highest precision)
+    // The annual expected inflation (double, the highest precision)
     INFLATION("annual inflation rate", "fltn", true),
 
     // High S&P 500 value (double, 2 decimal precision)

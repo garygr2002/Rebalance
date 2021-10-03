@@ -186,7 +186,7 @@ public class AccountKey extends Pair<String, Long> implements
      * Parses a unique key into a standard format.
      *
      * @param string A unique key
-     * @return An standard format for the unique key
+     * @return A standard format for the unique key
      */
     public static @NotNull String toString(@NotNull String string) {
 

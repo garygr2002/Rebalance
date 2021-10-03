@@ -167,9 +167,9 @@ public interface ICountable {
     }
 
     /**
-     * Returns the common shares precision.
+     * Returns the precision of the common shares.
      *
-     * @return The common shares precision
+     * @return The precision of the common shares
      */
     static int getSharesPrecision() {
         return 3;

@@ -20,7 +20,7 @@ public class LazyBoy<T> {
     }
 
     /**
-     * Gets a the cached object, ensuring that it is not null.
+     * Gets the cached object, ensuring that it is not null.
      *
      * @return The non-null cached object
      */

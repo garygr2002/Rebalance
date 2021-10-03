@@ -32,7 +32,7 @@ class Container<T> {
     /**
      * Gets the contained object.
      *
-     * @return The contained object object
+     * @return The contained object
      */
     public @NotNull T get() {
 

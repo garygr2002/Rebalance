@@ -8,7 +8,7 @@ import java.util.List;
 
 class Conjunction<T> extends Condition<T> {
 
-    // A listed of nested conditions
+    // A list of nested conditions
     private final List<Condition<T>> conditions = new ArrayList<>();
 
     // The operation for the 'isSatisfied' method

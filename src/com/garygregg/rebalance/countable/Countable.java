@@ -6,7 +6,7 @@ public abstract class Countable implements ICountable {
     private final double value;
 
     /**
-     * Constructs a countable.
+     * Constructs a countable object.
      *
      * @param value     The value of the countable
      * @param precision The precision of the countable

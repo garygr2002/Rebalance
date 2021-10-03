@@ -2,7 +2,7 @@ package com.garygregg.rebalance;
 
 public enum HoldingLineType {
 
-    // Note: Order these Portfolio, Institution, Account, Ticker
+    // Note: Order these: Portfolio, Institution, Account, Ticker
 
     // A portfolio holding
     PORTFOLIO,

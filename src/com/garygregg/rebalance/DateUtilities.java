@@ -206,7 +206,7 @@ public class DateUtilities {
     private static @NotNull String getSeparator() {
 
         /*
-         * Note: This is different than either the file, or extension
+         * Note: This is different from either the file, or extension
          * separators!
          */
         return "_";

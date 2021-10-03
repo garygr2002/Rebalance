@@ -82,7 +82,7 @@ class CopyVisitor extends SimpleFileVisitor<Path> {
             if (!destination.mkdir()) {
                 throw new IOException(String.format("The directory '%s' " +
                                 "does not exist and cannot be created.",
-                        destination.toString()));
+                        destination));
             }
         }
 

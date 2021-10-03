@@ -43,7 +43,7 @@ class ReportWriter extends ElementProcessor {
     }
 
     /**
-     * Constructs the reports writer.
+     * Constructs the report writer.
      *
      * @param balanceable The valuator to for balanceable assets
      */
@@ -55,7 +55,7 @@ class ReportWriter extends ElementProcessor {
      * Checks that the date of a hierarchy - if provided - matches that in the
      * holdings library.
      *
-     * @param writer        A write to receive message
+     * @param writer        A writer to receive messages
      * @param hierarchyDate The date of a hierarchy
      * @throws IOException Indicates an I/O exception occurred
      */

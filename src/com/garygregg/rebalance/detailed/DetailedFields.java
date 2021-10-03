@@ -92,7 +92,7 @@ enum DetailedFields {
     final WeightType type;
 
     /**
-     * Constructs the detailed fields enumerator.
+     * Constructs the enumerator of the detailed fields.
      *
      * @param position The position of the field in the data file
      * @param type     The weight type associated with fields for desired

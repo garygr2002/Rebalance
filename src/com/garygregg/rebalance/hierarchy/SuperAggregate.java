@@ -15,7 +15,7 @@ abstract class SuperAggregate<KeyType,
     private final CategoryBreakdownManager<ChildType> categoryTypeManager =
             new CategoryBreakdownManager<>();
 
-    // Accumulates values by category type in each child
+    // Accumulate values by category type in each child
     private final Operation categoryTypeAccumulate = new Operation() {
 
         @Override

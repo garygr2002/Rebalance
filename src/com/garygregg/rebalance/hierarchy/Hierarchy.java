@@ -1058,8 +1058,8 @@ public class Hierarchy {
      * Dispatches an appropriate action for a holding line given the type of
      * the holding line.
      *
-     * @param map A map of holding line types to actions (these each take a
-     *            holding description as an argument)
+     * @param map A map of holding line types to action objects (these each
+     *            take holding descriptions as an argument)
      */
     private void dispatchAction(@NotNull Map<HoldingLineType,
             @NotNull OneParameterAction<HoldingDescription>> map) {

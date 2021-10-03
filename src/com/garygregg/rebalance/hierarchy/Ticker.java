@@ -367,8 +367,8 @@ public class Ticker extends
     }
 
     /**
-     * Sets the the number of shares of the ticker holding that is available
-     * for rebalancing.
+     * Sets the number of shares of the ticker holding that is available for
+     * rebalancing.
      *
      * @param shares The of shares of the ticker holding that is available for
      *               rebalancing
@@ -388,8 +388,8 @@ public class Ticker extends
     }
 
     /**
-     * Sets the the number of shares of the ticker holding that is not
-     * available for rebalancing.
+     * Sets the number of shares of the ticker holding that is not available
+     * for rebalancing.
      *
      * @param shares The of shares of the ticker holding that is not available
      *               for rebalancing
