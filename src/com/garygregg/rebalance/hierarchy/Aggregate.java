@@ -37,7 +37,7 @@ abstract class Aggregate<KeyType,
         }
     };
 
-    // Clears values in each child
+    // Clear values in each child
     private final Operation doClear = new Operation() {
 
         @Override
@@ -50,7 +50,7 @@ abstract class Aggregate<KeyType,
     private final WeightBreakdownManager<ChildType> weightTypeManager =
             new WeightBreakdownManager<>();
 
-    // Accumulates values by weight type in each child
+    // Accumulate values by weight type in each child
     private final Operation weightTypeAccumulate = new Operation() {
 
         @Override
