@@ -368,7 +368,7 @@ public class Hierarchy {
          */
         try {
 
-            // Create a holdings builder. Read available holding lines.
+            // Create a 'holdings' builder. Read available holding lines.
             final ElementReader<?> holdings = new HoldingsBuilder();
             holdings.readLines();
 
@@ -386,11 +386,11 @@ public class Hierarchy {
                     (holdings.hadFileProblem() ? "" : " not"));
 
             /*
-             * Create a portfolios builder. Read lines from a portfolio
+             * Create a 'portfolios' builder. Read lines from a portfolio
              * description file with date less than or equal to our holding
              * library date.
              */
-            final ElementReader portfolios = new PortfoliosBuilder();
+            final ElementReader<?> portfolios = new PortfoliosBuilder();
             portfolios.readLines(date);
 
             /*
@@ -404,11 +404,11 @@ public class Hierarchy {
                     (portfolios.hadFileProblem() ? "" : " not"));
 
             /*
-             * Create an accounts builder. Read lines from an account
+             * Create an 'accounts' builder. Read lines from an account
              * description file with date less than or equal to our holding
              * library date.
              */
-            final ElementReader accounts = new AccountsBuilder();
+            final ElementReader<?> accounts = new AccountsBuilder();
             accounts.readLines(date);
 
             /*
@@ -425,7 +425,7 @@ public class Hierarchy {
              * Create a ticker builder. Read lines from a ticker description
              * file with date less than or equal to our holding library date.
              */
-            final ElementReader tickers = new TickersBuilder();
+            final ElementReader<?> tickers = new TickersBuilder();
             tickers.readLines(date);
 
             /*
@@ -991,6 +991,27 @@ public class Hierarchy {
         // Check and report on the weight type.
         checkAndReport(allConsidered, weightConsidered, aggregate);
         checkAndReport(allNotConsidered, weightNotConsidered, aggregate);
+
+        /*
+         * Get the children of the aggregate, and cycle for each child.
+         */
+        final Collection<? extends Common<?, ?, ?>> children =
+                aggregate.getChildren();
+        for (Common<?, ?, ?> child : children) {
+
+            /*
+             * Check and report recursively with the first/next child if the
+             * child itself is an aggregate.
+             *
+             * TODO:
+             *
+             * Is there a better way to do this rather than checking if the
+             * child is an aggregate instance, then casting it if so?
+             */
+            if (child instanceof Aggregate) {
+                checkAndReport((Aggregate<?, ?, ?>) child);
+            }
+        }
     }
 
     /**
@@ -1092,7 +1113,7 @@ public class Hierarchy {
             }
         }
 
-        // Reflect the date of the holdings library in the hierarchy.
+        // Reflect the date of the 'holdings' library in the hierarchy.
         setDate(library.getDate());
     }
 
