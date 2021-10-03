@@ -3,7 +3,6 @@ package com.garygregg.rebalance.hierarchy;
 import com.garygregg.rebalance.InflationCaddy;
 import com.garygregg.rebalance.SynthesizerType;
 import com.garygregg.rebalance.countable.Currency;
-import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,16 +25,6 @@ abstract class Annuity extends Synthesizer {
 
     // An inflation caddy instance
     private final InflationCaddy caddy = InflationCaddy.getInstance();
-
-    /**
-     * Constructs the annuity synthesizer.
-     *
-     * @param account The distinguished account associated with this
-     *                synthesizer
-     */
-    public Annuity(@NotNull DistinguishedAccounts account) {
-        super(account);
-    }
 
     /**
      * Converts a date.

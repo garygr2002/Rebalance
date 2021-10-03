@@ -5,7 +5,6 @@ import com.garygregg.rebalance.MessageLogger;
 import com.garygregg.rebalance.SynthesizerType;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.countable.MutableCurrency;
-import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -20,16 +19,6 @@ class Averaging extends Synthesizer {
     // Value by 'not considered'
     private final static Valuator byNotConsidered =
             ValueByNotConsidered.getInstance();
-
-    /**
-     * Constructs the averaging synthesizer.
-     *
-     * @param account The distinguished account associated with this
-     *                synthesizer
-     */
-    public Averaging(@NotNull DistinguishedAccounts account) {
-        super(account);
-    }
 
     /**
      * Divides a value.

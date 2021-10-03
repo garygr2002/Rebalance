@@ -3,48 +3,14 @@ package com.garygregg.rebalance.hierarchy;
 import com.garygregg.rebalance.AccountKey;
 import com.garygregg.rebalance.MessageLogger;
 import com.garygregg.rebalance.SynthesizerType;
-import com.garygregg.rebalance.distinguished.DistinguishedAccountLibrary;
-import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
 abstract class Synthesizer {
 
-    // The distinguished account associated with this synthesizer
-    private final DistinguishedAccounts account;
-
     // Our local message logger
     private final MessageLogger messageLogger = new MessageLogger();
-
-    /**
-     * Constructs a synthesizer.
-     *
-     * @param account The distinguished account associated with this
-     *                synthesizer
-     */
-    public Synthesizer(@NotNull DistinguishedAccounts account) {
-        this.account = account;
-    }
-
-    /**
-     * Gets the distinguished account for which this synthesizer is intended.
-     *
-     * @return The distinguished account for which this synthesizer is intended
-     */
-    public @NotNull DistinguishedAccounts getAccount() {
-        return account;
-    }
-
-    /**
-     * Gets the account key for which this synthesizer is intended.
-     *
-     * @return The account key for which this synthesizer is intended
-     */
-    public AccountKey getKey() {
-        return DistinguishedAccountLibrary.getInstance().
-                getValue(getAccount());
-    }
 
     /**
      * Gets the message logger for the synthesizer.
@@ -74,30 +40,17 @@ abstract class Synthesizer {
         /*
          * Note: This method should be first called by any class overriding
          * it, and cancel its work if the result is false. Reset the logger
-         * for problems. Get the key of given account, and the intended key.
+         * for problems. Get the key of given account.
          */
         getLogger().resetProblem1();
         final AccountKey givenKey = account.getKey();
-        final AccountKey intendedKey = getKey();
-
-        // The intended key should equal the given key. Is this not so?
-        boolean result = (null != intendedKey) &&
-                (0 == intendedKey.compareTo(givenKey));
-        if (!result) {
-
-            // The intended key does not equal the given key. Log a warning.
-            getLogger().logMessage(Level.WARNING, String.format("Rejecting " +
-                            "attempt to synthesize account with key '%s' using a " +
-                            "synthesizer intended for key '%s'.", givenKey,
-                    intendedKey));
-        }
 
         /*
-         * The intended key equals the given key. Value must not have been set
-         * in the account for it to be synthesized. Has value already been set
-         * in the account?
+         * Value must not have been set in the account for it to be
+         * synthesized. Has value already been set in the account?
          */
-        else if (!(result = !account.hasValueBeenSet())) {
+        boolean result = !account.hasValueBeenSet();
+        if (!result) {
 
             // Value has already been set in the account. Log a warning.
             getLogger().logMessage(Level.WARNING, String.format("Rejecting " +

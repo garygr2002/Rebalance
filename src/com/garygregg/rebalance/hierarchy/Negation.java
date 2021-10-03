@@ -1,20 +1,9 @@
 package com.garygregg.rebalance.hierarchy;
 
 import com.garygregg.rebalance.SynthesizerType;
-import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
 import org.jetbrains.annotations.NotNull;
 
 class Negation extends Averaging {
-
-    /**
-     * Constructs the negation synthesizer.
-     *
-     * @param account The distinguished account associated with this
-     *                synthesizer
-     */
-    public Negation(@NotNull DistinguishedAccounts account) {
-        super(account);
-    }
 
     @Override
     public @NotNull SynthesizerType getType() {

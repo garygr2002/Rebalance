@@ -2,7 +2,6 @@ package com.garygregg.rebalance.hierarchy;
 
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountDescription;
-import com.garygregg.rebalance.distinguished.DistinguishedAccounts;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,24 +17,23 @@ public class Account extends
     // A lazy boy for an artificial account
     private static final LazyBoy<Account> lazyBoy = new LazyBoy<>(factory);
 
-    // A map of account synthesizers.
-    private static final Map<AccountKey, Synthesizer> synthesizerMap =
-            new HashMap<>();
+    // A map of synthesizer types to synthesizer instances
+    private static final Map<SynthesizerType, Synthesizer>
+            synthesizerMap = new HashMap<>();
 
     static {
 
-        // Put an estimate negation synthesizer in the map.
-        Synthesizer synthesizer =
-                new Negation(DistinguishedAccounts.ESTIMATE_AVERAGING);
-        synthesizerMap.put(synthesizer.getKey(), synthesizer);
-
-        // Put a 'pension' synthesizer in the map.
-        synthesizer = new NoCpiAnnuity(DistinguishedAccounts.PENSION);
-        synthesizerMap.put(synthesizer.getKey(), synthesizer);
-
-        // Put a 'Social Security' synthesizer in the map.
-        synthesizer = new SocialSecurity(DistinguishedAccounts.SOCIAL_SECURITY);
-        synthesizerMap.put(synthesizer.getKey(), synthesizer);
+        /*
+         * Load up the synthesizer map with the synthesizers that can be
+         * instantiated.
+         *
+         * TODO: Add new synthesizers to the map as they are developed.
+         */
+        synthesizerMap.put(SynthesizerType.AVERAGING, new Averaging());
+        synthesizerMap.put(SynthesizerType.CPI_ANNUITY, new CpiAnnuity());
+        synthesizerMap.put(SynthesizerType.NEGATION, new Negation());
+        synthesizerMap.put(SynthesizerType.NO_CPI_ANNUITY, new NoCpiAnnuity());
+        synthesizerMap.put(SynthesizerType.SOCIAL_SECURITY, new SocialSecurity());
     }
 
     // The portfolio description associated with this account
@@ -188,15 +186,25 @@ public class Account extends
 
             /*
              * The superclass method succeeded, and the account has neither
-             * existing value nor children. Get a synthesizer from the
-             * synthesizer map, if any. Re-initialize the return value if
-             * there is no synthesizer, or there is a synthesizer and the
-             * account was successfully synthesized.
+             * existing value nor children. Get the account description, and
+             * use the synthesizer type of the account description to get a
+             * synthesizer for the account. Is the synthesizer not null?
              */
-            final Synthesizer synthesizer = synthesizerMap.get(getKey());
-            result = (null == synthesizer) || synthesizer.synthesize(this);
+            AccountDescription description = getDescription();
+            Synthesizer synthesizer =
+                    synthesizerMap.get((null == description) ?
+                            null : description.getSynthesizerType());
+            if (null != synthesizer) {
+
+                /*
+                 * The synthesizer is not null. Use the synthesizer to
+                 * synthesize value for the account.
+                 */
+                result = synthesizer.synthesize(this);
+            }
         }
 
+        // Return the result of synthesis.
         return result;
     }
 }
