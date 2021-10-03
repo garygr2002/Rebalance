@@ -8,7 +8,7 @@ public class IncomeTaxesBuilder extends TaxesBuilder {
 
     @Override
     protected @NotNull TaxLibrary getLibrary() {
-        return IncomeTaxLibrary.getInstance();
+        return SingleTaxLibrary.getInstance();
     }
 
     @Override

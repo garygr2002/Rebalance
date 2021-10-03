@@ -18,8 +18,8 @@ import com.garygregg.rebalance.portfolio.PortfoliosBuilder;
 import com.garygregg.rebalance.report.CurrentReportWriter;
 import com.garygregg.rebalance.tax.CapitalGainsTaxLibrary;
 import com.garygregg.rebalance.tax.CapitalGainsTaxesBuilder;
-import com.garygregg.rebalance.tax.IncomeTaxLibrary;
 import com.garygregg.rebalance.tax.IncomeTaxesBuilder;
+import com.garygregg.rebalance.tax.SingleTaxLibrary;
 import com.garygregg.rebalance.ticker.TickerLibrary;
 import com.garygregg.rebalance.ticker.TickersBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -100,7 +100,7 @@ public class Conductor implements Dispatch<CommandLineId> {
     private final Factory holding = HoldingLibrary::getInstance;
 
     // Produces an income tax library
-    private final Factory income = IncomeTaxLibrary::getInstance;
+    private final Factory income = SingleTaxLibrary::getInstance;
 
     // Our local message logger
     private final MessageLogger messageLogger = new MessageLogger();

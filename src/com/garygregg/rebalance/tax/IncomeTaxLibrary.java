@@ -1,26 +1,14 @@
 package com.garygregg.rebalance.tax;
 
+import com.garygregg.rebalance.FilingStatus;
 import org.jetbrains.annotations.NotNull;
 
-public class IncomeTaxLibrary extends TaxLibrary {
-
-    // The singleton income tax library
-    private static final IncomeTaxLibrary library = new IncomeTaxLibrary();
+abstract class IncomeTaxLibrary extends TaxLibrary {
 
     /**
-     * Constructs the income tax library.
-     */
-    private IncomeTaxLibrary() {
-
-        // Nothing to do here not. Added only to make the constructor private.
-    }
-
-    /**
-     * Gets an income tax library instance.
+     * Gets the filing status of the library.
      *
-     * @return An income tax library instance
+     * @return The filing status of the library
      */
-    public static @NotNull IncomeTaxLibrary getInstance() {
-        return library;
-    }
+    public abstract @NotNull FilingStatus getFilingStatus();
 }
