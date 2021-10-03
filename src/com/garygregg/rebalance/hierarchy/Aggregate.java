@@ -117,7 +117,11 @@ abstract class Aggregate<KeyType,
     @Override
     void breakdown() {
 
-        // Break down child values, then accumulate values by weight type.
+        /*
+         * Clear breakdown values in the artificial child. Break down child
+         * values, then accumulate values by weight type.
+         */
+        getArtificialChild().clear();
         breakdownChildren();
         accumulateWeightType();
     }
