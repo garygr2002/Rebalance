@@ -8,6 +8,12 @@ public class SingleTaxLibrary extends IncomeTaxLibrary {
     // The singleton income tax library, filing single
     private static final SingleTaxLibrary library = new SingleTaxLibrary();
 
+    static {
+
+        // Add an instance of this class to the income tax library.
+        IncomeTaxLibrary.addLibrary(getInstance());
+    }
+
     /**
      * Constructs the income tax library, filing single.
      */
@@ -21,7 +27,7 @@ public class SingleTaxLibrary extends IncomeTaxLibrary {
      *
      * @return A filing single income tax library instance
      */
-    public static @NotNull SingleTaxLibrary getInstance() {
+    static @NotNull SingleTaxLibrary getInstance() {
         return library;
     }
 

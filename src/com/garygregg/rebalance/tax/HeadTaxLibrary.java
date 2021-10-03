@@ -8,6 +8,12 @@ public class HeadTaxLibrary extends IncomeTaxLibrary {
     // The singleton income tax library, file head-of-household
     private static final HeadTaxLibrary library = new HeadTaxLibrary();
 
+    static {
+
+        // Add an instance of this class to the income tax library.
+        IncomeTaxLibrary.addLibrary(getInstance());
+    }
+
     /**
      * Constructs the income tax library, filing head-of-household.
      */
@@ -21,7 +27,7 @@ public class HeadTaxLibrary extends IncomeTaxLibrary {
      *
      * @return A filing head-of-household income tax library instance
      */
-    public static @NotNull HeadTaxLibrary getInstance() {
+    static @NotNull HeadTaxLibrary getInstance() {
         return library;
     }
 

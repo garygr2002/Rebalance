@@ -8,6 +8,12 @@ public class JointTaxLibrary extends IncomeTaxLibrary {
     // The singleton income tax library, married filing jointly
     private static final JointTaxLibrary library = new JointTaxLibrary();
 
+    static {
+
+        // Add an instance of this class to the income tax library.
+        IncomeTaxLibrary.addLibrary(getInstance());
+    }
+
     /**
      * Constructs the income tax library, married filing jointly.
      */
@@ -21,7 +27,7 @@ public class JointTaxLibrary extends IncomeTaxLibrary {
      *
      * @return A married filing jointly income tax library instance
      */
-    public static @NotNull JointTaxLibrary getInstance() {
+    static @NotNull JointTaxLibrary getInstance() {
         return library;
     }
 

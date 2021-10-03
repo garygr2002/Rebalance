@@ -4,12 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Logger;
 
-public class IncomeTaxesBuilder extends TaxesBuilder {
-
-    @Override
-    protected @NotNull TaxLibrary getLibrary() {
-        return SingleTaxLibrary.getInstance();
-    }
+abstract class IncomeTaxesBuilder extends TaxesBuilder {
 
     @Override
     public @NotNull String getPrefix() {
