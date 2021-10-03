@@ -1,6 +1,7 @@
 package com.garygregg.rebalance.portfolio;
 
 import com.garygregg.rebalance.Description;
+import com.garygregg.rebalance.FilingStatus;
 import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
@@ -17,11 +18,17 @@ public class PortfolioDescription implements Description<String> {
     // The mnemonic of the portfolio
     private final String mnemonic;
 
+    // Adjust desired investment allocations for relative market valuation
+    private Boolean adjust;
+
     // The birthdate of the portfolio owner
     private Date birthDate;
 
     // The monthly income that is CPI adjusted
     private Currency cpiMonthly;
+
+    // The taxpayer filing status
+    private FilingStatus filingStatus;
 
     // The projected mortality date of the portfolio owner
     private Date mortalityDate;
@@ -85,6 +92,15 @@ public class PortfolioDescription implements Description<String> {
         return cpiMonthly;
     }
 
+    /**
+     * Gets the taxpayer filing status.
+     *
+     * @return The taxpayer filing status
+     */
+    public FilingStatus getFilingStatus() {
+        return filingStatus;
+    }
+
     @Override
     public @NotNull String getKey() {
         return getMnemonic();
@@ -141,6 +157,15 @@ public class PortfolioDescription implements Description<String> {
     }
 
     /**
+     * Sets the adjustment flag.
+     *
+     * @param adjust The adjustment flag
+     */
+    void setAdjust(Boolean adjust) {
+        this.adjust = adjust;
+    }
+
+    /**
      * Sets the birthdate of the portfolio owner.
      *
      * @param birthDate The birthdate of the portfolio owner
@@ -156,6 +181,15 @@ public class PortfolioDescription implements Description<String> {
      */
     void setCpiMonthly(Currency cpiMonthly) {
         this.cpiMonthly = cpiMonthly;
+    }
+
+    /**
+     * Sets the taxpayer filing status.
+     *
+     * @param filingStatus The taxpayer filing status
+     */
+    void setFilingStatus(FilingStatus filingStatus) {
+        this.filingStatus = filingStatus;
     }
 
     /**
@@ -202,5 +236,16 @@ public class PortfolioDescription implements Description<String> {
      */
     void setTaxableAnnual(Currency taxableAnnual) {
         this.taxableAnnual = taxableAnnual;
+    }
+
+    /**
+     * Indicates whether the desired investment allocations should be adjusted
+     * for relative market valuation.
+     *
+     * @return True if the desired investment allocations should be adjusted
+     * relative market valuation; false otherwise
+     */
+    public boolean shouldAdjust() {
+        return (null != adjust) && adjust;
     }
 }

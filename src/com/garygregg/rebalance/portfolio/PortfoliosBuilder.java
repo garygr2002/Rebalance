@@ -1,11 +1,10 @@
 package com.garygregg.rebalance.portfolio;
 
-import com.garygregg.rebalance.DateInterpreter;
-import com.garygregg.rebalance.DateUtilities;
-import com.garygregg.rebalance.ElementReader;
-import com.garygregg.rebalance.WeightType;
+import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.interpreter.BooleanInterpreter;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
+import com.garygregg.rebalance.interpreter.FilingStatusInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -16,6 +15,32 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
+
+    // Our adjustment interpreter
+    private final BooleanInterpreter adjustmentInterpreter =
+            new BooleanInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Boolean defaultValue) {
+                    logMessage(Level.WARNING, String.format("Adjustment " +
+                                    "flag '%s' at line number %d in portfolio file " +
+                                    "cannot be parsed; using %s.",
+                            string, getRow(), defaultValue));
+                }
+            };
+
+    // The adjustment processor
+    private final FieldProcessor<PortfolioDescription> adjustmentProcessor =
+            new FieldProcessor<>() {
+
+                @Override
+                public void processField(@NotNull String field) {
+                    getTarget().setAdjust(adjustmentInterpreter.interpret(
+                            field));
+                }
+            };
 
     // The allocation processors
     private final PortfoliosBuilder.MyAllocationProcessor[]
@@ -75,6 +100,31 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                 public void processField(@NotNull String field) {
                     getTarget().setCpiMonthly(new Currency(
                             cpiInterpreter.interpret(field, 0.)));
+                }
+            };
+
+    // Our filing status interpreter
+    private final FilingStatusInterpreter filingStatusInterpreter =
+            new FilingStatusInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                FilingStatus defaultValue) {
+                    logMessage(Level.WARNING, String.format("Filing status '%s' at " +
+                            "line number %d in portfolio file cannot be parsed; " +
+                            "using %s.", string, getRow(), defaultValue));
+                }
+            };
+
+    // The filing status processor
+    private final FieldProcessor<PortfolioDescription> filingStatusProcessor =
+            new FieldProcessor<>() {
+
+                @Override
+                public void processField(@NotNull String field) {
+                    getTarget().setFilingStatus(
+                            filingStatusInterpreter.interpret(field));
                 }
             };
 
@@ -212,9 +262,10 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
         int fieldIndex = 0;
         addFieldProcessor(++fieldIndex, nameProcessor);
 
-        // Add the birthdate and mortality date processors.
+        // Add the birthdate, mortality date, and filing status processors.
         addFieldProcessor(++fieldIndex, birthdateProcessor);
         addFieldProcessor(++fieldIndex, mortalityDateProcessor);
+        addFieldProcessor(++fieldIndex, filingStatusProcessor);
 
         // Add the Social Security and CPI adjusted income processors.
         addFieldProcessor(++fieldIndex, socialSecurityProcessor);
@@ -237,6 +288,9 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
             processor.setColumn(++fieldIndex);
             addFieldProcessor(fieldIndex, processor);
         }
+
+        // Add the adjustment processor.
+        addFieldProcessor(++fieldIndex, adjustmentProcessor);
     }
 
     /**
@@ -266,17 +320,19 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
 
                 // Display statistics for the first/next portfolio description.
                 System.out.printf("Portfolio (%d) '%s' with name '%s' now " +
-                                "loaded;%nBirth date: %s; " +
-                                "Mortality date: %s;%nMonthly Social " +
-                                "Security: %s; Other monthly annuity: %s; " +
-                                "Annuity CPI adjusted: %b;%nTaxable annual " +
-                                "income: %s;%nStock: %f, Bond: %f, " +
-                                "Cash: %f, Real estate: %f.%n%n",
+                                "loaded;%nBirth date: %s; Mortality date: " +
+                                "%s;%nFiling status: %s; Monthly Social " +
+                                "Security: %s;%nCPI adjusted monthly " +
+                                "annuity: %s; Non-CPI adjusted monthly " +
+                                "income: %s; Taxable annual income: %s;%n" +
+                                "Stock: %f, Bond: %f, Cash: %f, Real " +
+                                "estate: %f;%nAdjust: %s.%n%n",
                         ++portfolio,
                         description.getKey(),
                         description.getName(),
                         DateUtilities.format(description.getBirthdate()),
                         DateUtilities.format(description.getMortalityDate()),
+                        description.getFilingStatus(),
                         description.getSocialSecurityMonthly(),
                         description.getCpiMonthly(),
                         description.getNonCpiMonthly(),
@@ -284,7 +340,8 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                         description.getAllocation(WeightType.STOCK),
                         description.getAllocation(WeightType.BOND),
                         description.getAllocation(WeightType.CASH),
-                        description.getAllocation(WeightType.REAL_ESTATE));
+                        description.getAllocation(WeightType.REAL_ESTATE),
+                        description.shouldAdjust());
             }
 
             // Say whether the element processor had warning or error.
@@ -312,7 +369,7 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
     }
 
     @Override
-    protected void processElements(@NotNull String[] elements,
+    protected void processElements(@NotNull String @NotNull [] elements,
                                    int lineNumber) {
 
         /*
@@ -393,11 +450,13 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
     protected void setLineNumber(int lineNumber) {
 
         /*
-         * Set the line number as the row in the birthdate interpreter and the
-         * projected mortality date interpreter.
+         * Set the line number as the row in the birthdate interpreter, the
+         * projected mortality date interpreter, and the filing status
+         * interpreter.
          */
         birthdateInterpreter.setRow(lineNumber);
         mortalityDateInterpreter.setRow(lineNumber);
+        filingStatusInterpreter.setRow(lineNumber);
 
         /*
          * Set the line number as the row in the Social Security income
@@ -421,13 +480,22 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
              */
             processor.setRow(lineNumber);
         }
+
+        // Set the line number as the row in the adjustment interpreter.
+        adjustmentInterpreter.setRow(lineNumber);
     }
 
     @Override
     protected void setTarget(@NotNull PortfolioDescription description) {
 
-        // Cycle for each allocation processor and set its target.
+        /*
+         * Set the target for the adjustment processor. Cycle for each
+         * allocation processor.
+         */
+        adjustmentProcessor.setTarget(description);
         for (MyAllocationProcessor processor : allocationProcessors) {
+
+            // Set the target for the first/next allocation processor.
             processor.setTarget(description);
         }
 
@@ -446,10 +514,13 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
         socialSecurityProcessor.setTarget(description);
 
         /*
-         * Set the target for the mortality date processor, the birthdate
-         * processor and the name processor.
+         * Set the target for the filing status processor, and the mortality
+         * date processor.
          */
+        filingStatusProcessor.setTarget(description);
         mortalityDateProcessor.setTarget(description);
+
+        // Set the target for the birthday processor and the name processor.
         birthdateProcessor.setTarget(description);
         nameProcessor.setTarget(description);
     }
