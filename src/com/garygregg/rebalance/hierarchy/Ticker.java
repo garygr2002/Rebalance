@@ -219,8 +219,8 @@ public class Ticker extends
 
         /*
          * Get the ticker description. Return the minimum number of shares if
-         * the ticker description is null. Otherwise return the balance
-         * balance rounding of the ticker description.
+         * the ticker description is null. Otherwise, return the balance
+         * rounding of the ticker description.
          */
         final TickerDescription description = getDescription();
         return (null == description) ? Shares.getMinimum() :
