@@ -38,6 +38,10 @@ public enum CommandLineId {
     // Destination for data directory backup (string path)
     DESTINATION("backup destination", "dpth", true),
 
+    // Use expected prefix and suffix for data directory backup (string)
+    USE("use expected prefix and suffix for given backup destination",
+            "link", true),
+
     // The backup command
     BACKUP("perform backup now; dpth if no bpth specified (see above)", "bpth", false),
 

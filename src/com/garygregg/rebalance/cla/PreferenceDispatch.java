@@ -34,7 +34,7 @@ public class PreferenceDispatch<KeyType extends Enum<KeyType>>
         this.key = key;
 
         // Set the name of the key, and the preferences object.
-        this.keyName = getKey().name();
+        this.keyName = getKeyName(key);
         this.preferences = preferences;
     }
 
@@ -60,6 +60,16 @@ public class PreferenceDispatch<KeyType extends Enum<KeyType>>
         final String quote = quotable ? "'" : "";
         stream.printf("The current value for '%s' is set to %s%s%s.%n",
                 keyName.toLowerCase(), quote, setting, quote);
+    }
+
+    /**
+     * Gets a key name from a key.
+     *
+     * @param key A key
+     * @return The name of the key
+     */
+    protected static @NotNull String getKeyName(@NotNull Enum<?> key) {
+        return key.toString();
     }
 
     @Override

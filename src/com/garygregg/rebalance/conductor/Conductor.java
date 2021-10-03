@@ -504,6 +504,12 @@ public class Conductor implements Dispatch<CommandLineId> {
         dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.SOURCE,
                 preferences, outputStream));
 
+        /*
+         * Add a preference dispatch for use expected prefix and suffix for
+         * data directory backup.
+         */
+        dispatchList.add(new Use(preferences, outputStream));
+
         // Add dispatches for minimum settings and reset.
         dispatchList.add(new Minimum(outputStream));
         dispatchList.add(new Reset(outputStream));
