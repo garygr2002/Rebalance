@@ -88,12 +88,28 @@ abstract class Annuity extends Synthesizer {
                                   boolean reduce) {
 
         /*
-         * Declare the result, and initialize it to zero. Calculate the local
-         * start date.
+         * Declare the result, and initialize it to zero. Get the date of the
+         * hierarchy.
          */
         double result = 0.;
-        final LocalDate localStart = (null == start) ? LocalDate.now() :
-                convert(start);
+        final Date hierarchyDate = Hierarchy.getInstance().getDate();
+
+        /*
+         * 'Now' is the runtime date if the hierarchy date is null, otherwise
+         * it is the hierarchy date.
+         */
+        final LocalDate now = (null == hierarchyDate) ? LocalDate.now() :
+                convert(hierarchyDate);
+
+        /*
+         * The annuity start date has been supplied by the caller. Use 'now' if
+         * the start date is null. The local start date of the calculation is
+         * now if the annuity already started, otherwise it is an annuity start
+         * date that is in the future.
+         */
+        final LocalDate annuityStart = (null == start) ? now : convert(start);
+        final LocalDate localStart = annuityStart.isBefore(now) ? now :
+                annuityStart;
 
         /*
          * Convert the end date to a local date. Is the start date after the
