@@ -1066,10 +1066,16 @@ public class Hierarchy {
 
         /*
          * Declare a variable to contain a holding line type. Get the holding
-         * library and cycle for each holding.
+         * library.
          */
         HoldingLineType lineType;
         final HoldingLibrary library = HoldingLibrary.getInstance();
+
+        /*
+         * Reflect the date of the holding library in the hierarchy. Cycle for
+         * each holding.
+         */
+        setDate(library.getDate());
         for (HoldingDescription description : library.getCatalog()) {
 
             // Get the line type from the description. Is the line type null?
@@ -1112,9 +1118,6 @@ public class Hierarchy {
                 }
             }
         }
-
-        // Reflect the date of the 'holdings' library in the hierarchy.
-        setDate(library.getDate());
     }
 
     /**
