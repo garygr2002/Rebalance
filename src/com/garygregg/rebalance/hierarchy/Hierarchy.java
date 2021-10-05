@@ -571,10 +571,10 @@ public class Hierarchy {
                 AccountKey.parseLong(accountNumber));
 
         /*
-         * Create a new account with the account key. Try to add and push the
-         * account. Could this not be accomplished?
+         * Create a new account with the account key and the valuation date.
+         * Try to add and push the account. Could this not be accomplished?
          */
-        final Account account = new Account(accountKey);
+        final Account account = new Account(accountKey, getDate());
         if (!addAndPush(account)) {
 
             // The account could not be added and pushed. Do not continue.

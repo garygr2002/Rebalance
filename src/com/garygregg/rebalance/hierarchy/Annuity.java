@@ -77,46 +77,50 @@ abstract class Annuity extends Synthesizer {
     /**
      * Calculates an annuity value.
      *
-     * @param monthly The monthly payment
-     * @param start   The start date of the calculation
-     * @param end     The end date of the calculation
-     * @param reduce  Reduce the monthly payment for inflation
+     * @param monthly   The monthly payment
+     * @param start     The start date of the annuity
+     * @param end       The end date of the calculation (estimate participant
+     *                  mortality)
+     * @param valuation The valuation date of the annuity
+     * @param reduce    Reduce the monthly payment for inflation
      * @return The value of the annuity
      */
     private double calculateValue(@NotNull Currency monthly,
-                                  Date start, Date end,
+                                  Date start, Date end, Date valuation,
                                   boolean reduce) {
 
         /*
-         * Declare the result, and initialize it to zero. Get the date of the
-         * hierarchy.
+         * Declare the result, and initialize it to zero. Calculate the local
+         * valuation date, using 'now' if the given valuation date is null.
          */
         double result = 0.;
-        final Date hierarchyDate = Hierarchy.getInstance().getDate();
+        final LocalDate localValuation = (null == valuation) ? LocalDate.now() :
+                convert(valuation);
 
         /*
-         * 'Now' is the runtime date if the hierarchy date is null, otherwise
-         * it is the hierarchy date.
+         * Calculate the local annuity start date, using the valuation date if
+         * the given start date is null.
          */
-        final LocalDate now = (null == hierarchyDate) ? LocalDate.now() :
-                convert(hierarchyDate);
+        final LocalDate annuityStart = (null == start) ? localValuation :
+                convert(start);
 
         /*
-         * The annuity start date has been supplied by the caller. Use 'now' if
-         * the start date is null. The local start date of the calculation is
-         * now if the annuity already started, otherwise it is an annuity start
-         * date that is in the future.
+         * Declare and initialize the calculation start date, using the
+         * valuation date if the annuity has already started. Otherwise, use
+         * the future annuity start date.
          */
-        final LocalDate annuityStart = (null == start) ? now : convert(start);
-        final LocalDate localStart = annuityStart.isBefore(now) ? now :
-                annuityStart;
+        final LocalDate calculationStart =
+                annuityStart.isBefore(localValuation) ? localValuation :
+                        annuityStart;
 
         /*
-         * Convert the end date to a local date. Is the start date after the
-         * end date?
+         * Declare and initialize the calculation end date, using the
+         * calculation start date if the end date is null. Is the start date
+         * after the end date?
          */
-        final LocalDate localEnd = (null == end) ? localStart : convert(end);
-        if (localStart.isAfter(localEnd)) {
+        final LocalDate calculationEnd = (null == end) ? calculationStart :
+                convert(end);
+        if (calculationStart.isAfter(calculationEnd)) {
 
             /*
              * The start date is after the end date. Log an informational
@@ -125,7 +129,7 @@ abstract class Annuity extends Synthesizer {
             getLogger().logMessage(Level.INFO, String.format("Start " +
                             "date of '%s' occurs after end date of '%s'; " +
                             "the value of the pension is zero.",
-                    localStart, localEnd));
+                    calculationStart, calculationEnd));
         }
 
         // The start date is not after the end date.
@@ -136,9 +140,9 @@ abstract class Annuity extends Synthesizer {
              * after the start date. Does the first payment occur after the end
              * date?
              */
-            final LocalDate localFirstPayment =
-                    localStart.with(TemporalAdjusters.firstDayOfNextMonth());
-            if (localFirstPayment.isAfter(localEnd)) {
+            final LocalDate firstPayment =
+                    calculationStart.with(TemporalAdjusters.firstDayOfNextMonth());
+            if (firstPayment.isAfter(calculationEnd)) {
 
                 /*
                  * The first payment occurs after the end date. Log an
@@ -148,7 +152,7 @@ abstract class Annuity extends Synthesizer {
                 getLogger().logMessage(Level.INFO, String.format("First " +
                                 "payment date of '%s' occurs after end " +
                                 "date of '%s'; value of the pension is zero.",
-                        localFirstPayment, localEnd));
+                        firstPayment, calculationEnd));
             }
 
             // The first payment date is not after the end date.
@@ -162,7 +166,7 @@ abstract class Annuity extends Synthesizer {
                  * payment if the payment occurs the next day.
                  */
                 final long daysTillPayment =
-                        DAYS.between(localStart, localFirstPayment) - 1;
+                        DAYS.between(calculationStart, firstPayment) - 1;
 
                 /*
                  * Adjust the first payment for daily inflation, as requested
@@ -176,7 +180,7 @@ abstract class Annuity extends Synthesizer {
                 result = geometricSum(payment, reduce ?
                                 getInflation(Annuity.monthly, caddy) :
                                 getDefaultInflation(),
-                        MONTHS.between(localFirstPayment, localEnd));
+                        MONTHS.between(firstPayment, calculationEnd));
             }
         }
 
@@ -219,9 +223,12 @@ abstract class Annuity extends Synthesizer {
      *
      * @param referenceDate The reference date for calculating the annuity
      *                      start date
-     * @return The start date of the annuity
+     * @return The start date of the annuity (null means that the annuity has
+     * already unconditionally started)
      */
-    protected abstract Date getStartDate(Date referenceDate);
+    protected Date getStartDate(Date referenceDate) {
+        return null;
+    }
 
     @Override
     public @NotNull SynthesizerType getType() {
@@ -281,14 +288,16 @@ abstract class Annuity extends Synthesizer {
                  * The annuity value cannot be rebalanced, so set its
                  * considered value to zero. Calculate the not-considered value
                  * using the monthly income from the annuity, its start date,
-                 * the projected participant mortality date, and whether the
-                 * annuity is reduced for inflation.
+                 * the projected participant mortality date, the account
+                 * valuation date, and whether the annuity is reduced for
+                 * inflation.
                  */
                 account.setConsidered(0.);
                 account.setNotConsidered(calculateValue(
                         getMonthlyIncome(getMonthlyIncome(description)),
                         getStartDate(description.getBirthdate()),
-                        description.getMortalityDate(), isReduced()));
+                        description.getMortalityDate(), account.getDate(),
+                        isReduced()));
             }
         }
 

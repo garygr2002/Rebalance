@@ -5,6 +5,7 @@ import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,9 @@ public class Account extends
         synthesizerMap.put(SynthesizerType.SOCIAL_SECURITY, new SocialSecurity());
     }
 
+    // The date the account was valued
+    private final Date date;
+
     // The portfolio description associated with this account
     private PortfolioDescription portfolioDescription;
 
@@ -45,10 +49,14 @@ public class Account extends
     /**
      * Constructs the account hierarchy object.
      *
-     * @param key The key of the account hierarchy object
+     * @param key  The key of the account hierarchy object
+     * @param date The date the account was valued
      */
-    Account(@NotNull AccountKey key) {
+    Account(@NotNull AccountKey key, Date date) {
+
+        // Call the superclass method, and set the valuation date.
         super(key);
+        this.date = date;
     }
 
     /**
@@ -66,8 +74,13 @@ public class Account extends
      * @return A new artificial account
      */
     private static @NotNull Account getNewArtificial() {
+
+        /*
+         * Use the current date for valuation date, since nothing else is
+         * available.
+         */
         return new Account(new AccountKey(Library.getDefaultStringKey(),
-                AccountKeyLibrary.getDefaultAccountNumber()));
+                AccountKeyLibrary.getDefaultAccountNumber()), new Date());
     }
 
     @Override
@@ -88,6 +101,15 @@ public class Account extends
          */
         final TaxType type = getTaxType();
         return (null == type) ? null : type.getCategory();
+    }
+
+    /**
+     * Gets the date the account was valued.
+     *
+     * @return The date the account was valued
+     */
+    public Date getDate() {
+        return date;
     }
 
     @Override
