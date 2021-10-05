@@ -1,8 +1,10 @@
 package com.garygregg.rebalance.holding;
 
+import com.garygregg.rebalance.HoldingType;
 import com.garygregg.rebalance.Library;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -12,8 +14,17 @@ public class HoldingLibrary extends Library<Integer, HoldingDescription> {
     // The default key
     private static final int defaultKey = Integer.MIN_VALUE;
 
-    // The singleton holding library return null;
-    private static final HoldingLibrary library = new HoldingLibrary();
+    // The map of holding libraries
+    private static final Map<HoldingType, HoldingLibrary> libraryMap =
+            new HashMap<>();
+
+    static {
+
+        // Load a new holding library for each holding type.
+        for (HoldingType type : HoldingType.values()) {
+            libraryMap.put(type, new HoldingLibrary());
+        }
+    }
 
     // A map of line numbers to holding description objects
     private final Map<Integer, HoldingDescription> holdings = new TreeMap<>();
@@ -27,12 +38,23 @@ public class HoldingLibrary extends Library<Integer, HoldingDescription> {
     }
 
     /**
-     * Gets a holding library instance.
+     * Gets a holding library instance for a given holding type.
      *
-     * @return A holding library instance
+     * @param type The given holding type
+     * @return A holding library instance for the given holding type
+     */
+    public static @NotNull HoldingLibrary getInstance(
+            @NotNull HoldingType type) {
+        return libraryMap.get(type);
+    }
+
+    /**
+     * Gets a default holding library instance.
+     *
+     * @return A default holding library instance
      */
     public static @NotNull HoldingLibrary getInstance() {
-        return library;
+        return getInstance(HoldingType.VALUATION);
     }
 
     /**
