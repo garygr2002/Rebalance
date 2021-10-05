@@ -1,23 +1,22 @@
 package com.garygregg.rebalance.holding;
 
 import com.garygregg.rebalance.*;
+import com.garygregg.rebalance.account.AccountLibrary;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Shares;
 import com.garygregg.rebalance.interpreter.CodeInterpreter;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
+import com.garygregg.rebalance.portfolio.PortfolioLibrary;
+import com.garygregg.rebalance.ticker.TickerLibrary;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HoldingsBuilder extends ElementReader<HoldingDescription> {
+abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
 
     // Our code interpreter
     private final CodeInterpreter codeInterpreter = new CodeInterpreter();
-
-    // The holding library instance
-    private final HoldingLibrary library = HoldingLibrary.getInstance();
 
     // The name processor
     private final FieldProcessor<HoldingDescription> nameProcessor =
@@ -141,8 +140,8 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
      * @param description A holding description
      * @return A string representation of the holding description
      */
-    private static @NotNull String getParent(@NotNull HoldingDescription
-                                                     description) {
+    protected static @NotNull String getParent(@NotNull HoldingDescription
+                                                       description) {
 
         /*
          * TODO: Delete this whole method.
@@ -162,54 +161,46 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
     }
 
     /**
-     * Tests this class.
-     *
-     * @param arguments Command line arguments
+     * Initializes the parent tracker. TODO: Delete this method.
      */
-    public static void main(String[] arguments) {
+    protected static void initialize() {
+
+        // Get the parent tracker instance and clear its associations.
+        final ParentTracker tracker = ParentTracker.getInstance();
+        tracker.clearAssociations();
 
         /*
-         * TODO: Delete this method.
+         * Add line code associations for the portfolio library. Add the single
+         * line code for institutions.
          */
-        try {
+        tracker.addAssociations(PortfolioLibrary.getInstance(),
+                HoldingLineType.PORTFOLIO);
+        tracker.addAssociation('I', HoldingLineType.INSTITUTION);
 
-            // Create an element processor. Read lines from the file object.
-            final ElementReader<?> processor = new HoldingsBuilder();
-            processor.readLines();
+        /*
+         * Set the distinguished account library in the parent tracker
+         * with the account library instance. Add line code associations
+         * for the ticker library.
+         */
+        tracker.setAccountLibrary(AccountLibrary.getInstance());
+        tracker.addAssociations(TickerLibrary.getInstance(),
+                HoldingLineType.TICKER);
+    }
 
-            // The holding library should now be populated. Print its date.
-            final HoldingLibrary library = HoldingLibrary.getInstance();
-            System.out.printf("The date of the library is: %s.%n",
-                    DateUtilities.format(library.getDate()));
+    /**
+     * Gets the holding type of the builder.
+     *
+     * @return The holding type of the builder
+     */
+    protected abstract @NotNull HoldingType getHoldingType();
 
-            // Cycle for each holding description in the library.
-            HoldingKey key;
-            for (HoldingDescription description : library.getCatalog()) {
-
-                // Display statistics for the first/next holding description.
-                key = description.getHoldingParentChild();
-                System.out.printf("Line Code: %-12s; " +
-                                "Parent: %-32s; " +
-                                "Child: %-32s; " +
-                                "Name: %-45s; " +
-                                "Shares: %-15s; " +
-                                "Price: %-15s; " +
-                                "Value: %-15s%n",
-                        description.getLineType(),
-                        getParent(description), key.getSecond(),
-                        description.getName(),
-                        description.getShares(),
-                        description.getPrice(),
-                        description.getValue());
-            }
-
-            // Say whether the element processor had warning or error.
-            System.out.printf("The element processor " +
-                            "completed %s warning or error.%n",
-                    (processor.hadFileProblem() ? "with a" : "without"));
-        } catch (@NotNull IOException exception) {
-            System.err.println(exception.getMessage());
-        }
+    /**
+     * Gets the holding library.
+     *
+     * @return The holding library
+     */
+    protected @NotNull HoldingLibrary getLibrary() {
+        return HoldingLibrary.getInstance(getHoldingType());
     }
 
     @Override
@@ -220,7 +211,7 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
     @Override
     @NotNull
     public String getPrefix() {
-        return "holding";
+        return getHoldingType().toString().toLowerCase();
     }
 
     @Override
@@ -229,7 +220,7 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
     }
 
     @Override
-    protected void processElements(@NotNull String[] elements,
+    protected void processElements(@NotNull String @NotNull [] elements,
                                    int lineNumber) {
 
         // Set the line number and get the line code.
@@ -244,8 +235,8 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
 
             // The line type is not known. Log a warning and return.
             logMessage(Level.WARNING, String.format("Line code '%s' is not " +
-                            "recognized at line number %d in the holding " +
-                            "file.", lineCode, lineNumber));
+                    "recognized at line number %d in the %s file.", lineCode,
+                    lineNumber, getPrefix()));
             return;
         }
 
@@ -262,10 +253,11 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
         description.setLineType(lineType);
 
         /*
-         * Check the key of the description against the default key in the
-         * library. Try to add the new holding description, receiving any
-         * existing description with the same key.
+         * Get the holding library. Check the key of the description against
+         * the default key in the library. Try to add the new holding
+         * description, receiving any existing description with the same key.
          */
+        final HoldingLibrary library = getLibrary();
         checkKey(library, description, lineNumber);
         if (null != library.addDescription(description)) {
 
@@ -275,8 +267,8 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
              */
             logMessage(getExtraordinary(), String.format("Replacing holding " +
                             "with key '%s' at line number %d in the " +
-                            "holding file.", description.getKey(),
-                    lineNumber));
+                            "%s file.", description.getKey(), lineNumber,
+                    getPrefix()));
         }
 
         /*
@@ -367,6 +359,6 @@ public class HoldingsBuilder extends ElementReader<HoldingDescription> {
          */
         super.startProcessing();
         tracker.reset();
-        setDate(library);
+        setDate(getLibrary());
     }
 }

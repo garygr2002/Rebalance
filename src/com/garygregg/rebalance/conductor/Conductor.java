@@ -11,8 +11,9 @@ import com.garygregg.rebalance.detailed.DetailedsBuilder;
 import com.garygregg.rebalance.distinguished.DistinguishedAccountLibrary;
 import com.garygregg.rebalance.distinguished.DistinguishedsBuilder;
 import com.garygregg.rebalance.hierarchy.Hierarchy;
+import com.garygregg.rebalance.holding.BasesBuilder;
 import com.garygregg.rebalance.holding.HoldingLibrary;
-import com.garygregg.rebalance.holding.HoldingsBuilder;
+import com.garygregg.rebalance.holding.ValuationsBuilder;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
 import com.garygregg.rebalance.portfolio.PortfoliosBuilder;
 import com.garygregg.rebalance.report.CurrentReportWriter;
@@ -80,6 +81,10 @@ public class Conductor implements Dispatch<CommandLineId> {
     // Produces an account library
     private final Factory account = AccountLibrary::getInstance;
 
+    // Produces a basis library
+    private final Factory basis = () ->
+            HoldingLibrary.getInstance(HoldingType.BASIS);
+
     // Produces a code library
     private final Factory code = CodeLibrary::getInstance;
 
@@ -96,9 +101,6 @@ public class Conductor implements Dispatch<CommandLineId> {
     // Produces an income tax library for head-of-household filers
     private final Factory head = () ->
             IncomeTaxLibrary.getLibrary(FilingStatus.HEAD);
-
-    // Produces a holding library
-    private final Factory holding = HoldingLibrary::getInstance;
 
     // Produces an income tax library for married-filing-jointly filers
     private final Factory joint = () ->
@@ -120,6 +122,10 @@ public class Conductor implements Dispatch<CommandLineId> {
 
     // Produces a ticker library
     private final Factory ticker = TickerLibrary::getInstance;
+
+    // Produces a valuation library
+    private final Factory valuation = () ->
+            HoldingLibrary.getInstance(HoldingType.VALUATION);
 
     {
 
@@ -691,17 +697,23 @@ public class Conductor implements Dispatch<CommandLineId> {
         try {
 
             /*
-             * Initialize the parent tracker instance. Build the 'holdings'
+             * Initialize the parent tracker instance. Build the valuation
              * library with no date floor.
              */
             initialize();
-            result = buildLibrary(new HoldingsBuilder(), null, holding);
+            result = buildLibrary(new ValuationsBuilder(), null, valuation);
 
             /*
-             * Get the date of the library, and use it to build the code
-             * library. Next build the tax libraries.
+             * Get the date of the valuation library, and use it to build the
+             * basis library.
              */
             final Date floor = HoldingLibrary.getInstance().getDate();
+            result = buildLibrary(new BasesBuilder(), floor, basis) && result;
+
+            /*
+             * Use the date floor to build the code library and the tax
+             * libraries.
+             */
             result = buildLibrary(new CodesBuilder(), floor, code) && result;
             result = buildTaxLibraries(floor) && result;
 

@@ -9,7 +9,7 @@ import com.garygregg.rebalance.countable.ICountable;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.holding.HoldingDescription;
 import com.garygregg.rebalance.holding.HoldingLibrary;
-import com.garygregg.rebalance.holding.HoldingsBuilder;
+import com.garygregg.rebalance.holding.ValuationsBuilder;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
 import com.garygregg.rebalance.portfolio.PortfoliosBuilder;
@@ -368,8 +368,8 @@ public class Hierarchy {
          */
         try {
 
-            // Create a 'holdings' builder. Read available holding lines.
-            final ElementReader<?> holdings = new HoldingsBuilder();
+            // Create a valuation builder. Read available valuation lines.
+            final ElementReader<?> holdings = new ValuationsBuilder();
             holdings.readLines();
 
             // The holding library should now be populated. Get its date.
