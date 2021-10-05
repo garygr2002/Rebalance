@@ -1,7 +1,6 @@
 package com.garygregg.rebalance.interpreter;
 
 import com.garygregg.rebalance.FilingStatus;
-import com.garygregg.rebalance.TaxType;
 import org.jetbrains.annotations.NotNull;
 
 public class FilingStatusInterpreter extends Interpreter<FilingStatus> {
