@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Logger;
 
-public class SeparateTaxesBuilder extends TaxesBuilder {
+public class SeparateTaxesBuilder extends IncomeTaxesBuilder {
 
     @Override
     protected @NotNull TaxLibrary getLibrary() {

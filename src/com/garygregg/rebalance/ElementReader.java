@@ -1,5 +1,6 @@
 package com.garygregg.rebalance;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -31,8 +32,9 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
      * @param elements The elements to preprocess.
      * @return The preprocessed elements
      */
-    private static @NotNull String[] preprocessElements(
-            @NotNull String[] elements) {
+    @Contract("_ -> param1")
+    private static @NotNull String @NotNull [] preprocessElements(
+            @NotNull String @NotNull [] elements) {
 
         // Get the length of the element array, and cycle for each element.
         final int length = elements.length;
@@ -71,8 +73,8 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
      *                    occurs
      * @param <T>         The key type
      */
-    protected <T> void checkKey(Library<T, ?> library,
-                                Description<T> description,
+    protected <T> void checkKey(@NotNull Library<T, ?> library,
+                                @NotNull Description<T> description,
                                 int lineNumber) {
 
         /*

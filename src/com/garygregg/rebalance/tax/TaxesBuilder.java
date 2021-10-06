@@ -27,7 +27,6 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
                             Percent.format(defaultValue)));
                 }
             };
-
     // Our threshold interpreter
     private final DoubleInterpreter thresholdInterpreter =
             new DoubleInterpreter() {
@@ -55,8 +54,26 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
         return 2;
     }
 
+    /**
+     * Gets the rate interpreter.
+     *
+     * @return The rate interpreter
+     */
+    protected @NotNull DoubleInterpreter getRateInterpreter() {
+        return rateInterpreter;
+    }
+
+    /**
+     * Gets the threshold interpreter.
+     *
+     * @return The threshold interpreter
+     */
+    protected @NotNull DoubleInterpreter getThresholdInterpreter() {
+        return thresholdInterpreter;
+    }
+
     @Override
-    protected void processElements(@NotNull String[] elements,
+    protected void processElements(@NotNull String @NotNull [] elements,
                                    int lineNumber) {
 
         /*
@@ -65,10 +82,10 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
          */
         setLineNumber(lineNumber);
         final TaxDescription description = new TaxDescription(
-                thresholdInterpreter.interpret(
+                getThresholdInterpreter().interpret(
                         elements[TaxFields.THRESHOLD.getPosition()],
                         Currency.getZero().getValue()),
-                rateInterpreter.interpret(
+                getRateInterpreter().interpret(
                         elements[TaxFields.TAX_RATE.getPosition()],
                         Percent.getZero().getValue()));
 
@@ -128,7 +145,7 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
          * Set the line number as the row in both the rate interpreter and
          * the threshold interpreter.
          */
-        rateInterpreter.setRow(lineNumber);
-        thresholdInterpreter.setRow(lineNumber);
+        getRateInterpreter().setRow(lineNumber);
+        getThresholdInterpreter().setRow(lineNumber);
     }
 }
