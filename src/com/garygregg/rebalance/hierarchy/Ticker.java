@@ -569,7 +569,7 @@ public class Ticker extends
 
         /*
          * Call the superclass method, then set the proposed value to the same
-         * value as that contained in the passed queryable.
+         * value as that contained in the queryable.
          */
         super.transferValue(queryable);
         setProposed(getValue(queryable.getProposed()));

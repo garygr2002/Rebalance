@@ -423,12 +423,12 @@ abstract class Aggregate<KeyType,
     /**
      * Synthesizes the aggregate if conditions warrant.
      *
-     * @return False if conditions warranted synthesis and it could not be
-     * performed; true otherwise
+     * @return True if synthesis was successful, or not required; false
+     * otherwise
      */
     boolean synthesizeIf() {
 
-        // The default is that conditions do not warrant synthesis.
+        // The default is that synthesis was not required.
         return true;
     }
 
