@@ -200,6 +200,7 @@ public class Reallocator {
         }
 
         // Print the result of the test(s).
+        //noinspection SpellCheckingInspection
         System.out.printf("Things %slook good.\n", looksGood ? "" : "don't ");
     }
 

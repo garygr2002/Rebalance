@@ -20,22 +20,28 @@ public enum CommandLineId {
     PREFERENCE("list the preference settings", null, false),
 
     // The logging level (valid Level values)
+    @SuppressWarnings("SpellCheckingInspection")
     LEVEL("ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE or WARNING",
             "lglv", true),
 
     // The annual expected inflation (double, the highest precision)
+    @SuppressWarnings("SpellCheckingInspection")
     INFLATION("annual inflation rate", "fltn", true),
 
     // High S&P 500 value (double, 2 decimal precision)
+    @SuppressWarnings("SpellCheckingInspection")
     HIGH("S&P 500 high", "sphg", true),
 
     // Current S&P 500 value (double, 2 decimal precision)
+    @SuppressWarnings("SpellCheckingInspection")
     CURRENT("S&P 500 current", "spcr", true),
 
     // Source data directory (string path)
+    @SuppressWarnings("SpellCheckingInspection")
     SOURCE("data source", "spth", true),
 
     // Destination for data directory backup (string path)
+    @SuppressWarnings("SpellCheckingInspection")
     DESTINATION("backup destination", "dpth", true),
 
     // Use expected prefix and suffix for data directory backup (string)
@@ -43,7 +49,9 @@ public enum CommandLineId {
             "link", true),
 
     // The backup command
-    BACKUP("perform backup now; dpth if no bpth specified (see above)", "bpth", false),
+    @SuppressWarnings("SpellCheckingInspection")
+    BACKUP("perform backup now; dpth if no bpth specified (see above)", "bpth",
+            false),
 
     // Presumed to be an option argument (string)
     OTHER("other command argument", null, false);
