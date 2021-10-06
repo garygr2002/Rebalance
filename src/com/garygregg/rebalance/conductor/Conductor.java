@@ -645,31 +645,26 @@ public class Conductor implements Dispatch<CommandLineId> {
             return;
         }
 
-        // Create a hierarchy.
-        final Hierarchy hierarchy = Hierarchy.getInstance();
-        conductor.logMessage(Level.INFO, "I am building the hierarchy and " +
-                "synthesizing required accounts...");
-
-        // Build the hierarchy. Was the build not successful?
-        hierarchy.buildHierarchy();
-        if (hierarchy.hadProblem()) {
-
-            /*
-             * Building the hierarchy was not successful. Log information and
-             * return.
-             */
-            conductor.logMessage(Level.INFO, "I am canceling my work " +
-                    "because I could not successfully build the hierarchy...");
+        /*
+         * Return if either the valuation hierarchy or the basis hierarchy
+         * could not be built.
+         */
+        if (!(conductor.buildHierarchy(HoldingType.VALUATION) &&
+                conductor.buildHierarchy(HoldingType.BASIS))) {
             return;
         }
 
         try {
 
-            // Try to write a report for each portfolio in the hierarchy.
-            new CurrentReportWriter().writeLines(hierarchy, null);
+            /*
+             * Try to write a report for each portfolio in the default
+             * hierarchy.
+             */
+            new CurrentReportWriter().writeLines(Hierarchy.getInstance(),
+                    null);
         }
 
-        // Oops, I/O exception while trying to write the reports.
+        // Oops, an I/O exception occurred while trying to write the reports.
         catch (IOException exception) {
 
             // Log some information about the exception, and return.
@@ -682,6 +677,48 @@ public class Conductor implements Dispatch<CommandLineId> {
         // Log a success message if we get this far.
         conductor.logMessage(Level.INFO, "Congratulations; it seems I " +
                 "have completed my work correctly!");
+    }
+
+    /**
+     * Builds a hierarchy for a given holding type.
+     *
+     * @param holdingType The given holding type
+     * @return True if the hierarchy build was successful; false otherwise
+     */
+    private boolean buildHierarchy(@NotNull HoldingType holdingType) {
+
+        /*
+         * Declare and initialize the result to success. Create a hierarchy for
+         * the given holding type.
+         */
+        boolean result = true;
+        final Hierarchy hierarchy = Hierarchy.getInstance(holdingType);
+
+        // Get the name of the hierarchy holding type.
+        final String hierarchyName =
+                hierarchy.getHoldingType().toString().toLowerCase();
+
+        // Log a message about what is going on.
+        logMessage(Level.INFO, String.format("I am building the " +
+                        "%s hierarchy and synthesizing required accounts...",
+                hierarchyName));
+
+        // Build the hierarchy. Was the build not successful?
+        hierarchy.buildHierarchy();
+        if (hierarchy.hadProblem()) {
+
+            /*
+             * Building the hierarchy was not successful. Log information and
+             * reset the return value.
+             */
+            logMessage(Level.INFO, String.format("I am canceling my work " +
+                            "because I could not successfully build the %s hierarchy...",
+                    hierarchyName));
+            result = false;
+        }
+
+        // Return the result.
+        return result;
     }
 
     /**
@@ -707,7 +744,8 @@ public class Conductor implements Dispatch<CommandLineId> {
              * Get the date of the valuation library, and use it to build the
              * basis library.
              */
-            final Date floor = HoldingLibrary.getInstance().getDate();
+            final Date floor =
+                    HoldingLibrary.getInstance(HoldingType.VALUATION).getDate();
             result = buildLibrary(new BasesBuilder(), floor, basis) && result;
 
             /*

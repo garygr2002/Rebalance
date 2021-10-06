@@ -49,15 +49,6 @@ public class HoldingLibrary extends Library<Integer, HoldingDescription> {
     }
 
     /**
-     * Gets a default holding library instance.
-     *
-     * @return A default holding library instance
-     */
-    public static @NotNull HoldingLibrary getInstance() {
-        return getInstance(HoldingType.VALUATION);
-    }
-
-    /**
      * Adds a holding description to the library.
      *
      * @param description The holding description to add to the library

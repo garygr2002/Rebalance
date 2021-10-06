@@ -1,9 +1,6 @@
 package com.garygregg.rebalance.report;
 
-import com.garygregg.rebalance.DateUtilities;
-import com.garygregg.rebalance.ElementProcessor;
-import com.garygregg.rebalance.Library;
-import com.garygregg.rebalance.PreferenceManager;
+import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountLibrary;
 import com.garygregg.rebalance.code.CodeLibrary;
 import com.garygregg.rebalance.countable.Currency;
@@ -36,6 +33,9 @@ class ReportWriter extends ElementProcessor {
     // The valuator for balanceable assets ('considered' or proposed)
     private Valuator balanceable;
 
+    // The current holdings
+    private HoldingLibrary currentHoldings;
+
     {
 
         // Assign the logger based on class canonical name.
@@ -53,24 +53,28 @@ class ReportWriter extends ElementProcessor {
 
     /**
      * Checks that the date of a hierarchy - if provided - matches that in the
-     * holdings library.
+     * given holdings.
      *
      * @param writer        A writer to receive messages
+     * @param holdings      Holdings
      * @param hierarchyDate The date of a hierarchy
      * @throws IOException Indicates an I/O exception occurred
      */
     private static void checkDate(@NotNull FileWriter writer,
+                                  HoldingLibrary holdings,
                                   Date hierarchyDate) throws IOException {
 
         // Is the provided hierarchy date not null?
         if (null != hierarchyDate) {
 
+            // The hierarchy date is not null. Get the date from the holdings.
+            final Date holdingDate = (null == holdings) ? null :
+                    holdings.getDate();
+
             /*
-             * The hierarchy date is not null. Get the date from the holdings
-             * library. Is the date from the holdings library not null, and is
-             * this non-null date not equal to the provided hierarchy date?
+             * Is the date from the holdings not null, and is this non-null
+             * date not equal to the provided hierarchy date?
              */
-            final Date holdingDate = HoldingLibrary.getInstance().getDate();
             if (!((null == holdingDate) ||
                     holdingDate.equals(hierarchyDate))) {
 
@@ -225,6 +229,15 @@ class ReportWriter extends ElementProcessor {
         return balanceable;
     }
 
+    /**
+     * Gets the current holdings.
+     *
+     * @return The current holdings
+     */
+    private HoldingLibrary getCurrentHoldings() {
+        return currentHoldings;
+    }
+
     @Override
     protected String getFileType() {
         return "txt";
@@ -283,6 +296,15 @@ class ReportWriter extends ElementProcessor {
     }
 
     /**
+     * Sets the current holdings.
+     *
+     * @param currentHoldings The current holdings
+     */
+    private void setCurrentHoldings(HoldingLibrary currentHoldings) {
+        this.currentHoldings = currentHoldings;
+    }
+
+    /**
      * Writes dates for each known element reader.
      *
      * @param writer The file writer to receive the dates
@@ -290,12 +312,24 @@ class ReportWriter extends ElementProcessor {
      */
     private void writeDates(@NotNull FileWriter writer) throws IOException {
 
-        // Write the dates of each element reader.
-        writeDate(writer, HoldingLibrary.getInstance(), "holding");
-        writeDate(writer, AccountLibrary.getInstance(), "account");
+        // Write the date of the valuation library.
+        writeDate(writer, HoldingLibrary.getInstance(HoldingType.VALUATION),
+                "holding");
+
+        // Write the date of the basis library.
+        writeDate(writer, HoldingLibrary.getInstance(HoldingType.BASIS),
+                "basis");
+
+        // Write the dates of the code library, the portfolio library.
         writeDate(writer, CodeLibrary.getInstance(), "code");
-        writeDate(writer, DetailedLibrary.getInstance(), "detailed");
         writeDate(writer, PortfolioLibrary.getInstance(), "portfolio");
+
+        /*
+         * Write the dates of the account library, the detailed library, and
+         * the ticker library.
+         */
+        writeDate(writer, AccountLibrary.getInstance(), "account");
+        writeDate(writer, DetailedLibrary.getInstance(), "detailed");
         writeDate(writer, TickerLibrary.getInstance(), "ticker");
     }
 
@@ -424,7 +458,7 @@ class ReportWriter extends ElementProcessor {
          * Finally, check that the date of the hierarchy matches the date of
          * the holdings.
          */
-        checkDate(writer, date);
+        checkDate(writer, getCurrentHoldings(), date);
         writer.write("\n");
     }
 
@@ -452,6 +486,10 @@ class ReportWriter extends ElementProcessor {
     public boolean writeLines(@NotNull Hierarchy hierarchy, Date date)
             throws IOException {
 
+        // Set the current holdings from the given hierarchy.
+        setCurrentHoldings(HoldingLibrary.getInstance(
+                hierarchy.getHoldingType()));
+
         /*
          * Get a non-null date to use, preferring the argument first, the
          * date in the hierarchy second.
@@ -473,7 +511,8 @@ class ReportWriter extends ElementProcessor {
             result = writeLines(portfolio, dateToUse) && result;
         }
 
-        // Return the result.
+        // Clear the current holdings. Return the result.
+        setCurrentHoldings(null);
         return result;
     }
 

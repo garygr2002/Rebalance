@@ -7,6 +7,7 @@ import com.garygregg.rebalance.account.AccountsBuilder;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.ICountable;
 import com.garygregg.rebalance.countable.MutableCurrency;
+import com.garygregg.rebalance.holding.BasesBuilder;
 import com.garygregg.rebalance.holding.HoldingDescription;
 import com.garygregg.rebalance.holding.HoldingLibrary;
 import com.garygregg.rebalance.holding.ValuationsBuilder;
@@ -79,8 +80,9 @@ public class Hierarchy {
                 }
             };
 
-    // The singleton hierarchy
-    private static final Hierarchy instance = new Hierarchy();
+    // The map of hierarchies
+    private static final Map<HoldingType, Hierarchy> hierarchyMap =
+            new HashMap<>();
 
     // A function that returns 'considered' value for all tax types
     private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> taxConsidered =
@@ -143,34 +145,42 @@ public class Hierarchy {
             };
 
     // A function that returns 'not considered' value for all weight types
-    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> weightNotConsidered =
-            new OneParameterFunction<>() {
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>>
+            weightNotConsidered = new OneParameterFunction<>() {
 
-                @Override
-                public @NotNull String getDescription() {
-                    return "weight type not-considered";
-                }
+        @Override
+        public @NotNull String getDescription() {
+            return "weight type not-considered";
+        }
 
-                @Override
-                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
-                    return aggregate.getNotConsidered(WeightType.ALL);
-                }
-            };
+        @Override
+        public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+            return aggregate.getNotConsidered(WeightType.ALL);
+        }
+    };
 
     // A function that returns proposed value for all weight types
-    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> weightProposed =
-            new OneParameterFunction<>() {
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>>
+            weightProposed = new OneParameterFunction<>() {
 
-                @Override
-                public @NotNull String getDescription() {
-                    return "weight type proposed";
-                }
+        @Override
+        public @NotNull String getDescription() {
+            return "weight type proposed";
+        }
 
-                @Override
-                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
-                    return aggregate.getProposed(WeightType.ALL);
-                }
-            };
+        @Override
+        public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+            return aggregate.getProposed(WeightType.ALL);
+        }
+    };
+
+    static {
+
+        // Load a new hierarchy for each holding type.
+        for (HoldingType type : HoldingType.values()) {
+            hierarchyMap.put(type, new Hierarchy(type));
+        }
+    }
 
     // An account map
     private final Map<AccountKey, Account> accounts = new HashMap<>();
@@ -181,6 +191,9 @@ public class Hierarchy {
 
     // A stack of aggregates
     private final Stack<Aggregate<?, ?, ?>> aggregates = new Stack<>();
+
+    // The holding type in the hierarchy
+    private final HoldingType holdingType;
 
     // All the holding line types
     private final HoldingLineType[] lineTypes = HoldingLineType.values();
@@ -200,7 +213,6 @@ public class Hierarchy {
     private final TwoParameterAction<Ticker, ICountable> setConsideredShares =
             (argument1, argument2) ->
                     argument1.setConsideredShares(argument2.getValue());
-
     /*
      * Sets the 'not considered' value of a hierarchy object given a non-null
      * value
@@ -256,10 +268,11 @@ public class Hierarchy {
 
     /**
      * Constructs the hierarchy.
+     *
+     * @param holdingType The holding type in the hierarchy
      */
-    private Hierarchy() {
-
-        // Nothing to do here right now.
+    private Hierarchy(@NotNull HoldingType holdingType) {
+        this.holdingType = holdingType;
     }
 
     /**
@@ -316,6 +329,20 @@ public class Hierarchy {
     }
 
     /**
+     * Creates an element reader for test purposes.
+     *
+     * @param holdingType A holding type
+     * @return An element reader corresponding to the holding type
+     */
+    private static @NotNull ElementReader<?> createReader(
+            @NotNull HoldingType holdingType) {
+
+        // TODO: Delete this.
+        return (HoldingType.BASIS.equals(holdingType)) ?
+                new BasesBuilder() : new ValuationsBuilder();
+    }
+
+    /**
      * Gets the logging level for extraordinary, non-warning activity.
      *
      * @return The logging level for extraordinary, non-warning activity
@@ -325,12 +352,23 @@ public class Hierarchy {
     }
 
     /**
-     * Gets a hierarchy instance.
+     * Gets a hierarchy instance for a given holding type.
      *
-     * @return A hierarchy instance
+     * @param type The given holding type
+     * @return A hierarchy instance for the given holding type
+     */
+    public static @NotNull Hierarchy getInstance(
+            @NotNull HoldingType type) {
+        return hierarchyMap.get(type);
+    }
+
+    /**
+     * Gets a default hierarchy instance.
+     *
+     * @return A default hierarchy instance
      */
     public static @NotNull Hierarchy getInstance() {
-        return instance;
+        return getInstance(HoldingType.VALUATION);
     }
 
     /**
@@ -340,6 +378,33 @@ public class Hierarchy {
      */
     private static @NotNull Level getOrdinary() {
         return Level.FINEST;
+    }
+
+    /**
+     * Initializes the parent tracker. TODO: Delete this method.
+     */
+    private static void initialize() {
+
+        // Get the parent tracker instance and clear its associations.
+        final ParentTracker tracker = ParentTracker.getInstance();
+        tracker.clearAssociations();
+
+        /*
+         * Add line code associations for the portfolio library. Add the single
+         * line code for institutions.
+         */
+        tracker.addAssociations(PortfolioLibrary.getInstance(),
+                HoldingLineType.PORTFOLIO);
+        tracker.addAssociation('I', HoldingLineType.INSTITUTION);
+
+        /*
+         * Set the distinguished account library in the parent tracker
+         * with the account library instance. Add line code associations
+         * for the ticker library.
+         */
+        tracker.setAccountLibrary(AccountLibrary.getInstance());
+        tracker.addAssociations(TickerLibrary.getInstance(),
+                HoldingLineType.TICKER);
     }
 
     /**
@@ -368,12 +433,20 @@ public class Hierarchy {
          */
         try {
 
-            // Create a valuation builder. Read available valuation lines.
-            final ElementReader<?> holdings = new ValuationsBuilder();
+            /*
+             * Initialize the parent tracker. Declare and initialize the
+             * holding type.
+             */
+            initialize();
+            final HoldingType holdingType = HoldingType.VALUATION;
+
+            // Create a valuation builder and read available valuation lines.
+            final ElementReader<?> holdings = createReader(holdingType);
             holdings.readLines();
 
             // The holding library should now be populated. Get its date.
-            final HoldingLibrary library = HoldingLibrary.getInstance();
+            final HoldingLibrary library =
+                    HoldingLibrary.getInstance(holdingType);
             final Date date = library.getDate();
 
             /*
@@ -439,7 +512,7 @@ public class Hierarchy {
                     (tickers.hadFileProblem() ? "" : " not"));
 
             // Get a hierarchy instance and build it.
-            final Hierarchy hierarchy = Hierarchy.getInstance();
+            final Hierarchy hierarchy = Hierarchy.getInstance(holdingType);
             hierarchy.buildHierarchy();
 
             /*
@@ -1069,7 +1142,8 @@ public class Hierarchy {
          * library.
          */
         HoldingLineType lineType;
-        final HoldingLibrary library = HoldingLibrary.getInstance();
+        final HoldingLibrary library =
+                HoldingLibrary.getInstance(getHoldingType());
 
         /*
          * Reflect the date of the holding library in the hierarchy. Cycle for
@@ -1172,6 +1246,15 @@ public class Hierarchy {
      */
     private @NotNull HoldingLineType getHighestExpected() {
         return lineTypes[aggregates.size()];
+    }
+
+    /**
+     * Gets the holding type in the hierarchy.
+     *
+     * @return The holding type in the hierarchy
+     */
+    public HoldingType getHoldingType() {
+        return holdingType;
     }
 
     /**
