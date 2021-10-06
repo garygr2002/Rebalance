@@ -205,7 +205,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
     private final ConsistencyChecker bondChecker = this::checkBond;
 
     // The new-flair-out growth checker
-    private final ConsistencyChecker nflgChecker = this::checkNFOG;
+    private final ConsistencyChecker nfogChecker = this::checkNFOG;
 
     // The real estate checker
     private final ConsistencyChecker realEstateChecker = this::checkRealEstate;
@@ -334,7 +334,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
         // Populate the consistency checker map.
         consistencyCheckers.put(FundType.BOND, bondChecker);
         consistencyCheckers.put(FundType.CASH, cashChecker);
-        consistencyCheckers.put(FundType.NEW_FLAIR_OUT_GROWTH, nflgChecker);
+        consistencyCheckers.put(FundType.NEW_FLAIR_OUT_GROWTH, nfogChecker);
         consistencyCheckers.put(FundType.NOT_A_FUND, notAFundChecker);
         consistencyCheckers.put(FundType.REAL_ESTATE, realEstateChecker);
         consistencyCheckers.put(FundType.STOCK, stockChecker);
