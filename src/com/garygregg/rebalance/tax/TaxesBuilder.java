@@ -76,18 +76,18 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
     protected void processElements(@NotNull String @NotNull [] elements,
                                    int lineNumber) {
 
-        /*
-         * Set the line number, and create a new tax description with the
-         * threshold and tax rate.
-         */
+        // Get the default threshold and tax rate value. Set the line number.
+        final double defaultValue = Percent.getZero().getValue();
         setLineNumber(lineNumber);
+
+        // Create a new tax description with the threshold and tax rate.
         final TaxDescription description = new TaxDescription(
                 getThresholdInterpreter().interpret(
                         elements[TaxFields.THRESHOLD.getPosition()],
-                        Currency.getZero().getValue()),
+                        defaultValue),
                 getRateInterpreter().interpret(
                         elements[TaxFields.TAX_RATE.getPosition()],
-                        Percent.getZero().getValue()));
+                        defaultValue));
 
         // Get the threshold, and format a message.
         final Currency threshold = description.getThreshold();
