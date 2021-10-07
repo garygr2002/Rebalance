@@ -55,26 +55,32 @@ abstract class IncomeTaxesBuilder extends TaxesBuilder {
     protected void processElements(@NotNull String @NotNull [] elements,
                                    int lineNumber) {
 
-        // Get the rate. Is the rate not null, and is it zero or less?
+        /*
+         * Get the rate. Is the rate not null? If it is null, the rate
+         * interpreter will have warned of an unparseable value. No need to do
+         * it again.
+         */
         final Double rate = getRateInterpreter().interpret(
                 elements[TaxFields.TAX_RATE.getPosition()],
-                Double.MAX_VALUE);
-        if (!((null == rate) || (Percent.getZero().getValue() < rate))) {
+                null);
+        if (null != rate) {
 
             /*
-             * The standard deduction is not null, and it is zero or less.
-             * Interpret the threshold associated with the tax rate as the
-             * standard deduction for the library associated with this builder.
+             * The rate is not null. If the rate is zero or less, interpret the
+             * threshold associated with the tax rate as the standard deduction
+             * for the library associated with this builder.
              */
-            setStandardDeduction(elements, lineNumber);
-        }
+            if (rate <= Percent.getZero().getValue()) {
+                setStandardDeduction(elements, lineNumber);
+            }
 
-        /*
-         * The standard deduction is null, or greater than zero. The tax rate
-         * is an ordinary income threshold. Process it as such.
-         */
-        else {
-            super.processElements(elements, lineNumber);
+            /*
+             * The tax rate is positive. It is therefore an ordinary income tax
+             * threshold. Process it as such.
+             */
+            else {
+                super.processElements(elements, lineNumber);
+            }
         }
     }
 
