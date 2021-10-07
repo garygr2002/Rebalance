@@ -585,9 +585,12 @@ class ReportWriter extends ElementProcessor {
                               @NotNull Portfolio portfolio)
             throws IOException {
 
-        // Calculate the total value of the portfolio.
+        /*
+         * Calculate the total value of the portfolio. Use all weight types
+         * for the balanceable portion.
+         */
         final MutableCurrency total = new MutableCurrency();
-        total.add(getBalanceable().getValue(portfolio));
+        total.add(getBalanceable().getValue(portfolio, WeightType.ALL));
         total.add(getNotBalanceable().getValue(portfolio));
 
         // Report the value just calculated.

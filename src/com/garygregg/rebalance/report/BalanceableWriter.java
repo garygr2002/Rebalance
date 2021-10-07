@@ -406,19 +406,21 @@ class BalanceableWriter {
 
             /*
              * Get the first/next institution. Is the value of the institution
-             * something other than zero?
+             * for all category types something other than zero?
              */
-            if (zero.areNotEqual(valuator.getValue(institution).getValue())) {
+            if (zero.areNotEqual(valuator.getValue(institution,
+                    CategoryType.ALL).getValue())) {
 
                 /*
-                 * The value of the institution is something other than zero.
-                 * Write a data line for the institution.
+                 * The value of the institution for all category types is
+                 * something other than zero. Write a data line for the
+                 * institution.
                  */
                 writer.write(String.format(numberFormat, institution.getKey(),
                         valuator.getValue(institution, CategoryType.TAXABLE),
                         valuator.getValue(institution, CategoryType.TAX_DEFERRED),
                         valuator.getValue(institution, CategoryType.TAX_PAID),
-                        valuator.getValue(institution)));
+                        valuator.getValue(institution, CategoryType.ALL)));
             }
         }
 
@@ -431,6 +433,6 @@ class BalanceableWriter {
                 valuator.getValue(portfolio, CategoryType.TAXABLE),
                 valuator.getValue(portfolio, CategoryType.TAX_DEFERRED),
                 valuator.getValue(portfolio, CategoryType.TAX_PAID),
-                valuator.getValue(portfolio)));
+                valuator.getValue(portfolio, CategoryType.ALL)));
     }
 }
