@@ -9,7 +9,7 @@ import java.util.Map;
 
 public abstract class IncomeTaxLibrary extends TaxLibrary {
 
-    // The tax library vending map
+    // The income tax library vending map
     private static final Map<FilingStatus, IncomeTaxLibrary> map
             = new HashMap<>();
 

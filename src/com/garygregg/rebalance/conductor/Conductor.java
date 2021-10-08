@@ -20,6 +20,7 @@ import com.garygregg.rebalance.report.CurrentReportWriter;
 import com.garygregg.rebalance.tax.*;
 import com.garygregg.rebalance.ticker.TickerLibrary;
 import com.garygregg.rebalance.ticker.TickersBuilder;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -95,30 +96,45 @@ public class Conductor implements Dispatch<CommandLineId> {
     private final Factory distinguished =
             DistinguishedAccountLibrary::getInstance;
 
-    // Produces a capital gains tax library
-    private final Factory gains = CapitalGainsTaxLibrary::getInstance;
+    // Produces a capital gains tax library for head-of-household filers
+    private final Factory gainsHead = () ->
+            GainsTaxLibrary.getLibrary(FilingStatus.HEAD);
+
+    // Produces a capital gains tax library for married-filing-jointly filers
+    private final Factory gainsJoint = () ->
+            GainsTaxLibrary.getLibrary(FilingStatus.JOINT);
+    /*
+     * Produces a capital gains tax library for married-filing-separately
+     * filers
+     */
+    private final Factory gainsSeparate = () ->
+            GainsTaxLibrary.getLibrary(FilingStatus.SEPARATE);
+
+    // Produces a capital gains tax library for single filers
+    private final Factory gainsSingle = () ->
+            GainsTaxLibrary.getLibrary(FilingStatus.SINGLE);
 
     // Produces an income tax library for head-of-household filers
-    private final Factory head = () ->
+    private final Factory incomeHead = () ->
             IncomeTaxLibrary.getLibrary(FilingStatus.HEAD);
 
     // Produces an income tax library for married-filing-jointly filers
-    private final Factory joint = () ->
+    private final Factory incomeJoint = () ->
             IncomeTaxLibrary.getLibrary(FilingStatus.JOINT);
+
+    // Produces an income tax library for married-filing-separately filers
+    private final Factory incomeSeparate = () ->
+            IncomeTaxLibrary.getLibrary(FilingStatus.SEPARATE);
+
+    // Produces an income tax library for single filers
+    private final Factory incomeSingle = () ->
+            IncomeTaxLibrary.getLibrary(FilingStatus.SINGLE);
 
     // Our local message logger
     private final MessageLogger messageLogger = new MessageLogger();
 
     // Produces a portfolio library
     private final Factory portfolio = PortfolioLibrary::getInstance;
-
-    // Produces an income tax library for married-filing-separately filers
-    private final Factory separate = () ->
-            IncomeTaxLibrary.getLibrary(FilingStatus.SEPARATE);
-
-    // Produces an income tax library for single filers
-    private final Factory single = () ->
-            IncomeTaxLibrary.getLibrary(FilingStatus.SINGLE);
 
     // Produces a ticker library
     private final Factory ticker = TickerLibrary::getInstance;
@@ -682,6 +698,43 @@ public class Conductor implements Dispatch<CommandLineId> {
     }
 
     /**
+     * Builds the capital gains tax libraries.
+     *
+     * @return True if the build had no warnings or errors, false otherwise
+     */
+    private boolean buildGainsTaxLibraries(Date floor) throws IOException {
+
+        /*
+         * Use the date floor to build the capital gains tax builder for
+         * head-of-household filers, and...
+         */
+        boolean result = buildLibrary(new GainsHeadTaxesBuilder(), floor,
+                gainsHead);
+
+        /*
+         * ...the capital gains tax builder for married-filing-jointly filers,
+         * and...
+         */
+        result = buildLibrary(new GainsJointTaxesBuilder(), floor, gainsJoint)
+                && result;
+
+        /*
+         * ...the capital gains tax builder for married-filing-separate filers,
+         * and...
+         */
+        result = buildLibrary(new GainsSeparateTaxesBuilder(), floor,
+                gainsSeparate) && result;
+
+        /*
+         * ...the capital gains tax builder for single filers. Return the
+         * result.
+         */
+        result = buildLibrary(new GainsSingleTaxesBuilder(), floor,
+                gainsSingle) && result;
+        return result;
+    }
+
+    /**
      * Builds a hierarchy for a given holding type.
      *
      * @param holdingType The given holding type
@@ -724,6 +777,34 @@ public class Conductor implements Dispatch<CommandLineId> {
     }
 
     /**
+     * Builds the income tax libraries.
+     *
+     * @return True if the build had no warnings or errors, false otherwise
+     */
+    private boolean buildIncomeTaxLibraries(Date floor) throws IOException {
+
+        /*
+         * Use the date floor to build the income tax builder for
+         * head-of-household filers, and...
+         */
+        boolean result = buildLibrary(new IncomeHeadTaxesBuilder(), floor,
+                incomeHead);
+
+        // ...the income tax builder for married-filing-jointly filers, and...
+        result = buildLibrary(new IncomeJointTaxesBuilder(), floor,
+                incomeJoint) && result;
+
+        // ...the income tax builder for married-filing-separate filers, and...
+        result = buildLibrary(new IncomeSeparateTaxesBuilder(), floor,
+                incomeSeparate) && result;
+
+        // ...the income tax builder for single filers. Return the result.
+        result = buildLibrary(new IncomeSingleTaxesBuilder(), floor,
+                incomeSingle) && result;
+        return result;
+    }
+
+    /**
      * Builds the libraries.
      *
      * @return True if the build had no warnings or errors, false otherwise
@@ -751,11 +832,12 @@ public class Conductor implements Dispatch<CommandLineId> {
             result = buildLibrary(new BasesBuilder(), floor, basis) && result;
 
             /*
-             * Use the date floor to build the code library and the tax
-             * libraries.
+             * Use the date floor to build the code library, the income tax
+             * libraries, and the capital gains tax libraries.
              */
             result = buildLibrary(new CodesBuilder(), floor, code) && result;
-            result = buildTaxLibraries(floor) && result;
+            result = buildIncomeTaxLibraries(floor) && result;
+            result = buildGainsTaxLibraries(floor) && result;
 
             // Use the date floor to build the portfolio library.
             result = buildLibrary(new PortfoliosBuilder(), floor, portfolio) &&
@@ -821,35 +903,6 @@ public class Conductor implements Dispatch<CommandLineId> {
                 DateUtilities.format(factory.produce().getDate())));
 
         // Return the result of reading the data lines.
-        return result;
-    }
-
-    /**
-     * Builds the tax libraries.
-     *
-     * @return True if the build had no warnings or errors, false otherwise
-     */
-    private boolean buildTaxLibraries(Date floor) throws IOException {
-
-        // Use the date floor to build the capital gains tax library, and...
-        boolean result = buildLibrary(new CapitalGainsTaxesBuilder(), floor,
-                gains);
-
-        // ...the income tax builder for head-of-household filers, and...
-        result = buildLibrary(new IncomeHeadTaxesBuilder(), floor, head) &&
-                result;
-
-        // ...the income tax builder for married-filing-jointly filers, and...
-        result = buildLibrary(new IncomeJointTaxesBuilder(), floor, joint) &&
-                result;
-
-        // ...the income tax builder for married-filing-separate filers, and...
-        result = buildLibrary(new IncomeSeparateTaxesBuilder(), floor,
-                separate) && result;
-
-        // ...the income tax builder for single filers. Return the result.
-        result = buildLibrary(new IncomeSingleTaxesBuilder(), floor,
-                single) && result;
         return result;
     }
 
@@ -955,7 +1008,8 @@ public class Conductor implements Dispatch<CommandLineId> {
          *
          * @return The formatted usage line
          */
-        public String getBuffer() {
+        @Contract(pure = true)
+        public @NotNull String getBuffer() {
             return buffer.toString();
         }
 

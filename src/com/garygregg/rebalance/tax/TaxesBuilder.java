@@ -12,7 +12,6 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
 
     // The tax library instance
     private final TaxLibrary library = getLibrary();
-
     // Our rate interpreter
     private final DoubleInterpreter rateInterpreter =
             new DoubleInterpreter() {
@@ -147,5 +146,13 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
          */
         getRateInterpreter().setRow(lineNumber);
         getThresholdInterpreter().setRow(lineNumber);
+    }
+
+    @Override
+    protected void startProcessing() {
+
+        // Call the superclass method, and set the date in the library.
+        super.startProcessing();
+        setDate(getLibrary());
     }
 }
