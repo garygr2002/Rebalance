@@ -831,22 +831,25 @@ public class Conductor implements Dispatch<CommandLineId> {
      */
     private boolean buildTaxLibraries(Date floor) throws IOException {
 
-        /*
-         * Use the date floor to build the capital gains tax library, the
-         * income tax library for head-of-household filers, and the income tax
-         * library for married-filing-jointly filers.
-         */
-        boolean result = buildLibrary(new CapitalGainsTaxesBuilder(), floor, gains);
-        result = buildLibrary(new HeadTaxesBuilder(), floor, head) && result;
-        result = buildLibrary(new JointTaxesBuilder(), floor, joint) && result;
+        // Use the date floor to build the capital gains tax library, and...
+        boolean result = buildLibrary(new CapitalGainsTaxesBuilder(), floor,
+                gains);
 
-        /*
-         * Use the date floor to build the income tax library for
-         * married-filing-separately filers followed by that for single filers.
-         * Return the result.
-         */
-        result = buildLibrary(new SeparateTaxesBuilder(), floor, separate) && result;
-        result = buildLibrary(new SingleTaxesBuilder(), floor, single) && result;
+        // ...the income tax builder for head-of-household filers, and...
+        result = buildLibrary(new IncomeHeadTaxesBuilder(), floor, head) &&
+                result;
+
+        // ...the income tax builder for married-filing-jointly filers, and...
+        result = buildLibrary(new IncomeJointTaxesBuilder(), floor, joint) &&
+                result;
+
+        // ...the income tax builder for married-filing-separate filers, and...
+        result = buildLibrary(new IncomeSeparateTaxesBuilder(), floor,
+                separate) && result;
+
+        // ...the income tax builder for single filers. Return the result.
+        result = buildLibrary(new IncomeSingleTaxesBuilder(), floor,
+                single) && result;
         return result;
     }
 

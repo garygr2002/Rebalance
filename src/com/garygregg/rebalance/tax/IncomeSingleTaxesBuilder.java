@@ -4,20 +4,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Logger;
 
-public class HeadTaxesBuilder extends IncomeTaxesBuilder {
+public class IncomeSingleTaxesBuilder extends IncomeTaxesBuilder {
 
     @Override
     protected @NotNull TaxLibrary getLibrary() {
-        return HeadTaxLibrary.getInstance();
+        return IncomeSingleTaxLibrary.getInstance();
     }
 
     @Override
     public @NotNull String getPrefix() {
-        return "head";
+        return "income_single";
     }
 
     @Override
     protected @NotNull Logger getReadingLogger() {
-        return Logger.getLogger(HeadTaxesBuilder.class.getCanonicalName());
+        return Logger.getLogger(IncomeSingleTaxesBuilder.class.getCanonicalName());
     }
 }

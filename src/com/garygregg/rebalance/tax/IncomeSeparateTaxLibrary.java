@@ -3,10 +3,10 @@ package com.garygregg.rebalance.tax;
 import com.garygregg.rebalance.FilingStatus;
 import org.jetbrains.annotations.NotNull;
 
-public class SeparateTaxLibrary extends IncomeTaxLibrary {
+public class IncomeSeparateTaxLibrary extends IncomeTaxLibrary {
 
     // The singleton income tax library, married filing separately
-    private static final SeparateTaxLibrary library = new SeparateTaxLibrary();
+    private static final IncomeSeparateTaxLibrary library = new IncomeSeparateTaxLibrary();
 
     static {
 
@@ -17,7 +17,7 @@ public class SeparateTaxLibrary extends IncomeTaxLibrary {
     /**
      * Constructs the income tax library, married filing separately.
      */
-    private SeparateTaxLibrary() {
+    private IncomeSeparateTaxLibrary() {
 
         // Nothing to do here not. Added only to make the constructor private.
     }
@@ -27,7 +27,7 @@ public class SeparateTaxLibrary extends IncomeTaxLibrary {
      *
      * @return A married filing separately income tax library instance
      */
-    static @NotNull SeparateTaxLibrary getInstance() {
+    static @NotNull IncomeSeparateTaxLibrary getInstance() {
         return library;
     }
 
