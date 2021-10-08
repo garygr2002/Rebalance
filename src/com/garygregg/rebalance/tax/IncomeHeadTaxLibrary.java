@@ -6,7 +6,8 @@ import org.jetbrains.annotations.NotNull;
 public class IncomeHeadTaxLibrary extends IncomeTaxLibrary {
 
     // The singleton income tax library, file head-of-household
-    private static final IncomeHeadTaxLibrary library = new IncomeHeadTaxLibrary();
+    private static final IncomeHeadTaxLibrary library =
+            new IncomeHeadTaxLibrary();
 
     static {
 

@@ -6,7 +6,8 @@ import org.jetbrains.annotations.NotNull;
 public class IncomeSingleTaxLibrary extends IncomeTaxLibrary {
 
     // The singleton income tax library, filing single
-    private static final IncomeSingleTaxLibrary library = new IncomeSingleTaxLibrary();
+    private static final IncomeSingleTaxLibrary library =
+            new IncomeSingleTaxLibrary();
 
     static {
 

@@ -5,8 +5,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class IncomeJointTaxLibrary extends IncomeTaxLibrary {
 
-    // The singleton income tax library, married filing jointly
-    private static final IncomeJointTaxLibrary library = new IncomeJointTaxLibrary();
+    // The singleton income tax library, married-filing-jointly
+    private static final IncomeJointTaxLibrary library =
+            new IncomeJointTaxLibrary();
 
     static {
 
@@ -15,7 +16,7 @@ public class IncomeJointTaxLibrary extends IncomeTaxLibrary {
     }
 
     /**
-     * Constructs the income tax library, married filing jointly.
+     * Constructs the income tax library, married-filing-jointly.
      */
     private IncomeJointTaxLibrary() {
 
@@ -23,9 +24,9 @@ public class IncomeJointTaxLibrary extends IncomeTaxLibrary {
     }
 
     /**
-     * Gets a married filing jointly income tax library instance.
+     * Gets a married-filing-jointly income tax library instance.
      *
-     * @return A married filing jointly income tax library instance
+     * @return A married-filing-jointly income tax library instance
      */
     static @NotNull IncomeJointTaxLibrary getInstance() {
         return library;
