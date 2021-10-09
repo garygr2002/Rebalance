@@ -1,7 +1,6 @@
 package com.garygregg.rebalance.tax;
 
 import com.garygregg.rebalance.countable.Currency;
-import com.garygregg.rebalance.countable.Percent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,76 +51,31 @@ abstract class IncomeTaxesBuilder extends TaxesBuilder {
     }
 
     @Override
-    protected void processElements(@NotNull String @NotNull [] elements,
-                                   int lineNumber) {
-
-        /*
-         * Get the rate. Is the rate not null? If it is null, the rate
-         * interpreter will have warned of an unparseable value. No need to do
-         * it again.
-         */
-        final Double rate = getRateInterpreter().interpret(
-                elements[TaxFields.TAX_RATE.getPosition()],
-                null);
-        if (null != rate) {
-
-            /*
-             * The rate is not null. If the rate is zero or less, interpret the
-             * threshold associated with the tax rate as the standard deduction
-             * for the library associated with this builder.
-             */
-            if (rate <= Percent.getZero().getValue()) {
-                setStandardDeduction(elements, lineNumber);
-            }
-
-            /*
-             * The tax rate is positive. It is therefore an ordinary income tax
-             * threshold. Process it as such.
-             */
-            else {
-                super.processElements(elements, lineNumber);
-            }
-        }
-    }
-
-    /**
-     * Sets the standard deduction.
-     *
-     * @param elements   The line elements
-     * @param lineNumber The line number where the elements occur
-     */
-    private void setStandardDeduction(@NotNull String @NotNull [] elements,
-                                      int lineNumber) {
+    protected void processNotPositiveRate(@NotNull TaxDescription description,
+                                          int lineNumber) {
 
         // Get the income tax library. Is the income tax library not null?
-        final IncomeTaxLibrary library = getIncomeTaxLibrary();
-        if (null != library) {
+        final IncomeTaxLibrary incomeTaxLibrary = getIncomeTaxLibrary();
+        if (null != incomeTaxLibrary) {
 
-            // The income tax library is not null. Set its standard deduction.
-            setStandardDeduction(elements, lineNumber, library);
+            /*
+             * The income tax library is not null. Set its standard deduction
+             * using the threshold in the tax description.
+             */
+            setStandardDeduction(description.getThreshold(), lineNumber,
+                    incomeTaxLibrary);
         }
     }
 
     /**
      * Sets the standard deduction.
      *
-     * @param elements   The line elements
-     * @param lineNumber The line number where the elements occur
-     * @param library    An income tax library to receive the standard
-     *                   deduction
+     * @param standardDeduction The standard deduction
+     * @param lineNumber        The line number where the elements occur
      */
-    private void setStandardDeduction(@NotNull String @NotNull [] elements,
+    private void setStandardDeduction(@NotNull Currency standardDeduction,
                                       int lineNumber,
                                       @NotNull IncomeTaxLibrary library) {
-
-        /*
-         * Get the threshold from the elements. This will be interpreted as
-         * the standard deduction for the given tax library.
-         */
-        final Currency standardDeduction =
-                new Currency(getThresholdInterpreter().interpret(
-                        elements[TaxFields.THRESHOLD.getPosition()],
-                        Currency.getZero().getValue()));
 
         /*
          * Get any existing standard deduction from library. Is the deduction
