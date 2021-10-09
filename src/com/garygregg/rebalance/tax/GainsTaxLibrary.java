@@ -9,7 +9,7 @@ import java.util.Map;
 public abstract class GainsTaxLibrary extends TaxLibrary {
 
     // The capital gains tax library vending map
-    private static final Map<FilingStatus, GainsTaxLibrary> map
+    private static final Map<FilingStatus, GainsTaxLibrary> libraryMap
             = new HashMap<>();
 
     /**
@@ -21,7 +21,18 @@ public abstract class GainsTaxLibrary extends TaxLibrary {
      */
     @SuppressWarnings("UnusedReturnValue")
     static GainsTaxLibrary addLibrary(@NotNull GainsTaxLibrary library) {
-        return map.put(library.getFilingStatus(), library);
+        return libraryMap.put(library.getFilingStatus(), library);
+    }
+
+    /**
+     * Checks whether there is a capital gains tax library for each filing
+     * status.
+     *
+     * @return True if there is a capital gains tax library for each filing
+     * status; false otherwise
+     */
+    public static boolean checkContract() {
+        return TaxLibrary.checkContract(libraryMap);
     }
 
     /**
@@ -32,13 +43,6 @@ public abstract class GainsTaxLibrary extends TaxLibrary {
      * status, or null if there is no associated library
      */
     public static GainsTaxLibrary getLibrary(FilingStatus filingStatus) {
-        return map.get(filingStatus);
+        return libraryMap.get(filingStatus);
     }
-
-    /**
-     * Gets the filing status of the library.
-     *
-     * @return The filing status of the library
-     */
-    public abstract @NotNull FilingStatus getFilingStatus();
 }

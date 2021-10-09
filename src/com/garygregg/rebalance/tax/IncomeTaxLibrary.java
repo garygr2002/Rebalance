@@ -10,7 +10,7 @@ import java.util.Map;
 public abstract class IncomeTaxLibrary extends TaxLibrary {
 
     // The income tax library vending map
-    private static final Map<FilingStatus, IncomeTaxLibrary> map
+    private static final Map<FilingStatus, IncomeTaxLibrary> libraryMap
             = new HashMap<>();
 
     // The standard deduction for the library
@@ -32,7 +32,17 @@ public abstract class IncomeTaxLibrary extends TaxLibrary {
      */
     @SuppressWarnings("UnusedReturnValue")
     static IncomeTaxLibrary addLibrary(@NotNull IncomeTaxLibrary library) {
-        return map.put(library.getFilingStatus(), library);
+        return libraryMap.put(library.getFilingStatus(), library);
+    }
+
+    /**
+     * Checks whether there is an income tax library for each filing status.
+     *
+     * @return True if there is an income tax library for each filing status;
+     * false otherwise
+     */
+    public static boolean checkContract() {
+        return TaxLibrary.checkContract(libraryMap);
     }
 
     /**
@@ -42,8 +52,9 @@ public abstract class IncomeTaxLibrary extends TaxLibrary {
      * @return The income tax library most recently associated with the filing
      * status, or null if there is no associated library
      */
-    public static IncomeTaxLibrary getLibrary(FilingStatus filingStatus) {
-        return map.get(filingStatus);
+    public static IncomeTaxLibrary getLibrary(
+            @NotNull FilingStatus filingStatus) {
+        return libraryMap.get(filingStatus);
     }
 
     /**
@@ -52,13 +63,6 @@ public abstract class IncomeTaxLibrary extends TaxLibrary {
     void clearStandardDeduction() {
         this.standardDeduction = null;
     }
-
-    /**
-     * Gets the filing status of the library.
-     *
-     * @return The filing status of the library
-     */
-    public abstract @NotNull FilingStatus getFilingStatus();
 
     /**
      * Gets the standard deduction for the library.

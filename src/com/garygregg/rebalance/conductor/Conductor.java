@@ -62,6 +62,10 @@ public class Conductor implements Dispatch<CommandLineId> {
     private static final MaxLengthAction maxLengthAction =
             new MaxLengthAction();
 
+    // A template message for a missing tax library
+    private static final String missingTaxLibrary = "%s tax libraries are " +
+            "missing for one or more filing statuses!";
+
     // The command line option list
     private static final List<Pair<String, String>> optionList =
             buildOptionList();
@@ -103,6 +107,7 @@ public class Conductor implements Dispatch<CommandLineId> {
     // Produces a capital gains tax library for married-filing-jointly filers
     private final Factory gainsJoint = () ->
             GainsTaxLibrary.getLibrary(FilingStatus.JOINT);
+
     /*
      * Produces a capital gains tax library for married-filing-separately
      * filers
@@ -725,12 +730,17 @@ public class Conductor implements Dispatch<CommandLineId> {
         result = buildLibrary(new GainsSeparateTaxesBuilder(), floor,
                 gainsSeparate) && result;
 
-        /*
-         * ...the capital gains tax builder for single filers. Return the
-         * result.
-         */
+        // ...the capital gains tax builder for single filers.
         result = buildLibrary(new GainsSingleTaxesBuilder(), floor,
                 gainsSingle) && result;
+
+        // It is a horrible problem if a capital gains tax library is missing.
+        if (result && (!(result = GainsTaxLibrary.checkContract()))) {
+            logMessage(Level.SEVERE, String.format(missingTaxLibrary,
+                    "Capital gains"));
+        }
+
+        // Return the result.
         return result;
     }
 
@@ -798,9 +808,17 @@ public class Conductor implements Dispatch<CommandLineId> {
         result = buildLibrary(new IncomeSeparateTaxesBuilder(), floor,
                 incomeSeparate) && result;
 
-        // ...the income tax builder for single filers. Return the result.
+        // ...the income tax builder for single filers.
         result = buildLibrary(new IncomeSingleTaxesBuilder(), floor,
                 incomeSingle) && result;
+
+        // It is a horrible problem if an income tax library is missing.
+        if (result && (!(result = IncomeTaxLibrary.checkContract()))) {
+            logMessage(Level.SEVERE, String.format(missingTaxLibrary,
+                    "Income"));
+        }
+
+        // Return the result.
         return result;
     }
 

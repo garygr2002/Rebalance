@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.tax;
 
+import com.garygregg.rebalance.FilingStatus;
 import com.garygregg.rebalance.Library;
 import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,38 @@ abstract class TaxLibrary extends Library<Currency, TaxDescription> {
 
     // A map of thresholds to tax description objects
     private final Map<Currency, TaxDescription> brackets = new TreeMap<>();
+
+    /**
+     * Checks whether a library map fulfills the contract of there being a
+     * non-null library for each filing status.
+     *
+     * @param libraryMap A library map
+     * @param <T>        A tax library type
+     * @return True if the map fulfills the contract; false otherwise
+     */
+    protected static <T extends TaxLibrary> boolean checkContract(
+            @NotNull Map<FilingStatus, T> libraryMap) {
+
+        // Get the filing statuses and their number.
+        final FilingStatus[] status = FilingStatus.values();
+        final int length = status.length;
+
+        // Are there as many entries in the map as there are filing status?
+        boolean contractFulfilled = !(libraryMap.size() < length);
+        if (contractFulfilled) {
+
+            /*
+             * There are as many entries in the map as there are filing status.
+             * Now make sure each entry is non-null.
+             */
+            for (int i = 0; (i < length) && contractFulfilled; ++i) {
+                contractFulfilled = (null != libraryMap.get(status[i]));
+            }
+        }
+
+        // Return whether the contract is fulfilled.
+        return contractFulfilled;
+    }
 
     /**
      * Adds a tax description to the library.
@@ -53,4 +86,11 @@ abstract class TaxLibrary extends Library<Currency, TaxDescription> {
     public int getElementCount() {
         return TaxFields.values().length;
     }
+
+    /**
+     * Gets the filing status of the library.
+     *
+     * @return The filing status of the library
+     */
+    public abstract @NotNull FilingStatus getFilingStatus();
 }
