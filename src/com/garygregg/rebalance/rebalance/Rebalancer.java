@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 public class Rebalancer implements Ticker.WeightEnumerator {
@@ -126,28 +127,11 @@ public class Rebalancer implements Ticker.WeightEnumerator {
 
         /*
          * Load the collection of accounts into a list. Sort the list by
-         * rebalance order.
+         * rebalance order. Return the sorted list of accounts.
          */
         final List<Account> accounts = new ArrayList<>(collection);
-        accounts.sort((first, second) ->
-                compare(extract(getRebalanceOrder(first)),
-                        extract(getRebalanceOrder(second))));
-
-        // Return the sorted list of accounts.
+        accounts.sort(Comparator.comparingLong(Rebalancer::getRebalanceOrder));
         return accounts;
-    }
-
-    /**
-     * Extracts the upper and lower order bits of a long, and returns them as a
-     * pair of integers.
-     *
-     * @param value The long value
-     * @return The upper and lower order bits of the long, returned as a pair
-     * of integers
-     */
-    private static @NotNull Pair<Integer, Integer> extract(long value) {
-        return new Pair<>(((int) (value & 0xFFFFFFFF00000000L)),
-                ((int) (value & 0x00000000FFFFFFFFL)));
     }
 
     /**
