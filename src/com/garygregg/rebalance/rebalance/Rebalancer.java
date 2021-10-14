@@ -1,6 +1,5 @@
 package com.garygregg.rebalance.rebalance;
 
-import com.garygregg.rebalance.Pair;
 import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.hierarchy.*;
@@ -94,27 +93,6 @@ public class Rebalancer implements Ticker.WeightEnumerator {
      */
     private Rebalancer() {
         initialize();
-    }
-
-    /**
-     * Compares two pairs of integers.
-     *
-     * @param pairOne The first of the pair
-     * @param pairTwo The second of the pair
-     * @return Positive if the first is greater, negative if the first is less,
-     * zero if the first is equal to the second
-     */
-    private static int compare(@NotNull Pair<Integer, Integer> pairOne,
-                               @NotNull Pair<Integer, Integer> pairTwo) {
-
-        /*
-         * Compare the first element of the pairs. Return the comparison of the
-         * second element if the first elements are equal. Otherwise, return
-         * the comparison of the first elements.
-         */
-        final int result = pairOne.getFirst() - pairTwo.getFirst();
-        return (0 == result) ? pairOne.getSecond() - pairTwo.getSecond() :
-                result;
     }
 
     /**
