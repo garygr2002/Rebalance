@@ -211,6 +211,32 @@ public class Ticker extends
     }
 
     /**
+     * Enumerates the weight types.
+     *
+     * @param enumerator The enumerator receiving the weight types
+     */
+    public void enumerate(@NotNull WeightEnumerator enumerator) {
+
+        /*
+         * Inform the enumerator of the start of enumeration. Perform the
+         * enumeration, then inform the enumerator of enumeration stop.
+         */
+        enumerator.start();
+        enumerate(WeightType.ALL, enumerator);
+        enumerator.stop();
+    }
+
+    /**
+     * Enumerates the weight types.
+     *
+     * @param enumerator The enumerator receiving the weight types
+     */
+    private void enumerate(@NotNull WeightType type,
+                           @NotNull WeightEnumerator enumerator) {
+        associationMap.get(type).enumerate(enumerator);
+    }
+
+    /**
      * Gets the preferred balance rounding.
      *
      * @return The preferred balance rounding
@@ -358,7 +384,7 @@ public class Ticker extends
      * @param type The given weight type
      */
     private void performActivity(@NotNull WeightType type) {
-        associationMap.get(type).perform();
+        associationMap.get(type).performActivity();
     }
 
     @Override
@@ -433,6 +459,41 @@ public class Ticker extends
         proposed.setShares(shares);
     }
 
+    /**
+     * Transfers value from a passed queryable to this object.
+     *
+     * @param queryable The queryable from which to obtain value
+     */
+    protected void transferValue(@NotNull Queryable<?, ?> queryable) {
+
+        /*
+         * Call the superclass method, then set the proposed value to the same
+         * value as that contained in the queryable.
+         */
+        super.transferValue(queryable);
+        setProposed(getValue(queryable.getProposed()));
+    }
+
+    public interface WeightEnumerator {
+
+        /**
+         * Receives a weight type.
+         *
+         * @param type A weight type
+         */
+        void receive(@NotNull WeightType type);
+
+        /**
+         * Indicates that the enumeration has started.
+         */
+        void start();
+
+        /**
+         * Indicates that the enumeration has stopped.
+         */
+        void stop();
+    }
+
     private static class Association extends Pair<FundType, WeightType> {
 
         /**
@@ -467,7 +528,7 @@ public class Ticker extends
          * @param association  Associations of contained fund type to weight
          *                     types
          */
-        public Activity(WeightType weightType,
+        public Activity(@NotNull WeightType weightType,
                         WeightType defaultChild,
                         @NotNull Association... association) {
 
@@ -475,6 +536,29 @@ public class Ticker extends
             this.associations = association;
             this.defaultChild = defaultChild;
             this.weightType = weightType;
+        }
+
+        /**
+         * Enumerates the weight types of a ticker.
+         *
+         * @param enumerator The enumerator receiving the weight types
+         */
+        public void enumerate(@NotNull WeightEnumerator enumerator) {
+
+            /*
+             * Tell the enumerator about the current weight type. Get a child
+             * weight type. Is the child weight type not null?
+             */
+            enumerator.receive(getWeightType());
+            WeightType child = getChild();
+            if (null != child) {
+
+                /*
+                 * The child weight type is not null. Perform the enumeration
+                 * for the non-null child weight type.
+                 */
+                Ticker.this.enumerate(child, enumerator);
+            }
         }
 
         /**
@@ -487,29 +571,11 @@ public class Ticker extends
         }
 
         /**
-         * Gets the default child weight type if there are no fund type
-         * matches.
+         * Gets a child weight type.
          *
-         * @return The default child weight type if there are no fund type
-         * matches
+         * @return A child weight type
          */
-        public WeightType getDefaultChild() {
-            return defaultChild;
-        }
-
-        /**
-         * Gets the weight type associated with the activity.
-         *
-         * @return The weight type associated with the activity
-         */
-        public WeightType getWeightType() {
-            return weightType;
-        }
-
-        /**
-         * Performs the activity.
-         */
-        public void perform() {
+        private WeightType getChild() {
 
             /*
              * Declare a variable to hold an association. Get the variable
@@ -550,28 +616,48 @@ public class Ticker extends
                 child = getDefaultChild();
             }
 
-            // Perform an activity for the child weight type if it is not null.
+            // Return the child weight type.
+            return child;
+        }
+
+        /**
+         * Gets the default child weight type if there are no fund type
+         * matches.
+         *
+         * @return The default child weight type if there are no fund type
+         * matches
+         */
+        public WeightType getDefaultChild() {
+            return defaultChild;
+        }
+
+        /**
+         * Gets the weight type associated with the activity.
+         *
+         * @return The weight type associated with the activity
+         */
+        public @NotNull WeightType getWeightType() {
+            return weightType;
+        }
+
+        /**
+         * Performs the activity.
+         */
+        public void performActivity() {
+
+            // Get a child weight type. Is the child weight type not null?
+            WeightType child = getChild();
             if (null != child) {
-                performActivity(child);
+
+                /*
+                 * The child weight type is not null. Perform an activity for
+                 * the non-null child weight type.
+                 */
+                Ticker.this.performActivity(child);
             }
 
             // Add value for the weight type.
             getFullValueManager().add(getWeightType(), Ticker.this);
         }
-    }
-
-    /**
-     * Transfers value from a passed queryable to this object.
-     *
-     * @param queryable The queryable from which to obtain value
-     */
-    protected void transferValue(@NotNull Queryable<?, ?> queryable) {
-
-        /*
-         * Call the superclass method, then set the proposed value to the same
-         * value as that contained in the queryable.
-         */
-        super.transferValue(queryable);
-        setProposed(getValue(queryable.getProposed()));
     }
 }
