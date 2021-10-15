@@ -1,18 +1,21 @@
 package com.garygregg.rebalance.rebalance;
 
 import com.garygregg.rebalance.account.AccountDescription;
-import com.garygregg.rebalance.hierarchy.*;
+import com.garygregg.rebalance.distinguished.DistinguishedAccountLibrary;
+import com.garygregg.rebalance.distinguished.DistinguishedAccount;
+import com.garygregg.rebalance.hierarchy.Account;
+import com.garygregg.rebalance.hierarchy.Hierarchy;
+import com.garygregg.rebalance.hierarchy.Institution;
+import com.garygregg.rebalance.hierarchy.Portfolio;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class PortfolioRebalancer extends Rebalancer {
 
     // A rebalancer instance
-    private static final PortfolioRebalancer instance = new PortfolioRebalancer();
+    private static final PortfolioRebalancer instance =
+            new PortfolioRebalancer();
 
     // A rebalance action for accounts
     private final Action<Hierarchy, Account> accountAction =
@@ -30,6 +33,10 @@ public class PortfolioRebalancer extends Rebalancer {
                 }
             };
 
+    // A default rebalancer instance
+    private final AccountRebalancer defaultRebalancer =
+            new DoNothingRebalancer();
+
     // A rebalance action for an institution
     private final Action<Institution, Account> institutionAction =
             new Action<>() {
@@ -45,6 +52,10 @@ public class PortfolioRebalancer extends Rebalancer {
                     return rebalance(child);
                 }
             };
+
+    // A distinguished account library instance
+    private final DistinguishedAccountLibrary library =
+            DistinguishedAccountLibrary.getInstance();
 
     // A rebalance action for a portfolio
     private final Action<Portfolio, Institution> portfolioAction =
@@ -77,6 +88,10 @@ public class PortfolioRebalancer extends Rebalancer {
                     return rebalance(child);
                 }
             };
+
+    // A map of distinguished accounts to account rebalancers
+    private final Map<DistinguishedAccount, AccountRebalancer> rebalancerMap =
+            new HashMap<>();
 
     /**
      * Creates an account list from an account collection.
@@ -121,6 +136,19 @@ public class PortfolioRebalancer extends Rebalancer {
         final AccountDescription description = account.getDescription();
         return (null == description) ? Long.MIN_VALUE :
                 description.getRebalanceOrder();
+    }
+
+    /**
+     * Gets a rebalancer given a distinguished account.
+     *
+     * @param account The distinguished account
+     * @return A rebalancer for the distinguished account
+     */
+    private @NotNull AccountRebalancer getRebalancer(
+            @NotNull DistinguishedAccount account) {
+
+        // TODO: Search for a rebalancer from the map.
+        return defaultRebalancer;
     }
 
     /**

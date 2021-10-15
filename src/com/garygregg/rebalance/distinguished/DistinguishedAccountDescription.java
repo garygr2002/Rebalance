@@ -4,7 +4,7 @@ import com.garygregg.rebalance.AccountKey;
 import org.jetbrains.annotations.NotNull;
 
 public class DistinguishedAccountDescription extends
-        DistinguishedDescription<DistinguishedAccounts, AccountKey> {
+        DistinguishedDescription<DistinguishedAccount, AccountKey> {
 
     // The corresponding portfolio key
     private final String portfolioKey;
@@ -16,7 +16,7 @@ public class DistinguishedAccountDescription extends
      * @param value        The value assigned to the key
      * @param portfolioKey The corresponding portfolio key
      */
-    public DistinguishedAccountDescription(@NotNull DistinguishedAccounts key,
+    public DistinguishedAccountDescription(@NotNull DistinguishedAccount key,
                                            @NotNull AccountKey value,
                                            @NotNull String portfolioKey) {
 

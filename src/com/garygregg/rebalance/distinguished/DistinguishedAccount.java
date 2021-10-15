@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.distinguished;
 
-public enum DistinguishedAccounts {
+public enum DistinguishedAccount {
 
     // The brokerage account
     BROKERAGE,

@@ -22,12 +22,12 @@ public class DistinguishedsBuilder extends
             DistinguishedInstitutionLibrary.getInstance();
 
     // The element processor for institutions
-    private final ElementProcessor<DistinguishedInstitutions>
+    private final ElementProcessor<DistinguishedInstitution>
             institutionProcessor = new ElementProcessor<>(
-            DistinguishedInstitutions.class) {
+            DistinguishedInstitution.class) {
 
         @Override
-        public DistinguishedDescription<DistinguishedInstitutions, ?>
+        public DistinguishedDescription<DistinguishedInstitution, ?>
         process(@NotNull String keyString,
                 @NotNull Pair<String, String> value,
                 int lineNumber) {
@@ -38,7 +38,7 @@ public class DistinguishedsBuilder extends
              * institution key?
              */
             DistinguishedInstitutionDescription description = null;
-            final DistinguishedInstitutions distinguishedInstitution =
+            final DistinguishedInstitution distinguishedInstitution =
                     determineKey(keyString);
             if (null == distinguishedInstitution) {
 
@@ -59,7 +59,7 @@ public class DistinguishedsBuilder extends
                  * The distinguished institution is recognized. But is it
                  * the default distinguished institution?
                  */
-                if (DistinguishedInstitutions.DEFAULT.equals(
+                if (DistinguishedInstitution.DEFAULT.equals(
                         distinguishedInstitution)) {
 
                     /*
@@ -161,11 +161,11 @@ public class DistinguishedsBuilder extends
     private String portfolioKey;
 
     // The element processor for accounts
-    private final ElementProcessor<DistinguishedAccounts> accountProcessor =
-            new ElementProcessor<>(DistinguishedAccounts.class) {
+    private final ElementProcessor<DistinguishedAccount> accountProcessor =
+            new ElementProcessor<>(DistinguishedAccount.class) {
 
                 @Override
-                public DistinguishedDescription<DistinguishedAccounts, ?>
+                public DistinguishedDescription<DistinguishedAccount, ?>
                 process(@NotNull String keyString,
                         @NotNull Pair<String, String> value,
                         int lineNumber) {
@@ -196,7 +196,7 @@ public class DistinguishedsBuilder extends
                      * key string. Does the string not represent any known
                      * distinguished account key?
                      */
-                    final DistinguishedAccounts distinguishedAccount =
+                    final DistinguishedAccount distinguishedAccount =
                             determineKey(keyString);
                     if (null == distinguishedAccount) {
 
@@ -218,7 +218,7 @@ public class DistinguishedsBuilder extends
                          * The distinguished account is recognized. But is it
                          * the default distinguished account?
                          */
-                        if (DistinguishedAccounts.DEFAULT.equals(
+                        if (DistinguishedAccount.DEFAULT.equals(
                                 distinguishedAccount)) {
 
                             /*
@@ -296,12 +296,12 @@ public class DistinguishedsBuilder extends
             };
 
     // The element processor for portfolios
-    private final ElementProcessor<DistinguishedPortfolios>
+    private final ElementProcessor<DistinguishedPortfolio>
             portfolioProcessor = new ElementProcessor<>(
-            DistinguishedPortfolios.class) {
+            DistinguishedPortfolio.class) {
 
         @Override
-        public DistinguishedDescription<DistinguishedPortfolios, ?>
+        public DistinguishedDescription<DistinguishedPortfolio, ?>
         process(@NotNull String keyString,
                 @NotNull Pair<String, String> value,
                 int lineNumber) {
@@ -312,7 +312,7 @@ public class DistinguishedsBuilder extends
              * portfolio key?
              */
             DistinguishedPortfolioDescription description = null;
-            final DistinguishedPortfolios distinguishedPortfolio =
+            final DistinguishedPortfolio distinguishedPortfolio =
                     determineKey(keyString);
             if (null == distinguishedPortfolio) {
 
@@ -333,7 +333,7 @@ public class DistinguishedsBuilder extends
                  * The distinguished portfolio is recognized. But is it
                  * the default distinguished portfolio?
                  */
-                if (DistinguishedPortfolios.DEFAULT.equals(
+                if (DistinguishedPortfolio.DEFAULT.equals(
                         distinguishedPortfolio)) {
 
                     /*
@@ -450,15 +450,15 @@ public class DistinguishedsBuilder extends
             processor.readLines();
 
             // Describe the contents of the distinguished portfolio library.
-            describeContents("portfolio", DistinguishedPortfolios.values(),
+            describeContents("portfolio", DistinguishedPortfolio.values(),
                     DistinguishedPortfolioLibrary.getInstance());
 
             // Describe the contents of the distinguished institution library.
-            describeContents("institution", DistinguishedInstitutions.values(),
+            describeContents("institution", DistinguishedInstitution.values(),
                     DistinguishedInstitutionLibrary.getInstance());
 
             // Describe the contents of the distinguished account library.
-            describeContents("account", DistinguishedAccounts.values(),
+            describeContents("account", DistinguishedAccount.values(),
                     DistinguishedAccountLibrary.getInstance());
 
             // Say whether the element processor had warning or error.

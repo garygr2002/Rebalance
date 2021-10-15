@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.distinguished;
 
-public enum DistinguishedPortfolios {
+public enum DistinguishedPortfolio {
 
     // The default (unused)
     DEFAULT,

@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.distinguished;
 
-public enum DistinguishedInstitutions {
+public enum DistinguishedInstitution {
 
     /*
      * In the values that follow, "first" applies in a temporal sense. The

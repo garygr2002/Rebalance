@@ -7,14 +7,14 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class DistinguishedInstitutionLibrary extends
-        DistinguishedLibrary<DistinguishedInstitutions, DistinguishedInstitutionDescription, String> {
+        DistinguishedLibrary<DistinguishedInstitution, DistinguishedInstitutionDescription, String> {
 
     // The singleton distinguished institution library
     private static final DistinguishedInstitutionLibrary library =
             new DistinguishedInstitutionLibrary();
 
     // A map of distinguished institutions to their descriptions
-    private final Map<DistinguishedInstitutions, DistinguishedInstitutionDescription>
+    private final Map<DistinguishedInstitution, DistinguishedInstitutionDescription>
             distinguishedInstitutions = new TreeMap<>();
 
     /**
@@ -65,12 +65,12 @@ public class DistinguishedInstitutionLibrary extends
     }
 
     @Override
-    public @NotNull DistinguishedInstitutions getDefaultKey() {
-        return DistinguishedInstitutions.DEFAULT;
+    public @NotNull DistinguishedInstitution getDefaultKey() {
+        return DistinguishedInstitution.DEFAULT;
     }
 
     @Override
-    public DistinguishedInstitutionDescription getDescription(DistinguishedInstitutions
+    public DistinguishedInstitutionDescription getDescription(DistinguishedInstitution
                                                              key) {
         return distinguishedInstitutions.get(key);
     }
@@ -81,7 +81,7 @@ public class DistinguishedInstitutionLibrary extends
     }
 
     @Override
-    public String getValue(@NotNull DistinguishedInstitutions key) {
+    public String getValue(@NotNull DistinguishedInstitution key) {
 
         /*
          * Get the description mapped to the key. Return null if there is no

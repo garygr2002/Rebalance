@@ -8,14 +8,14 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class DistinguishedPortfolioLibrary extends
-        DistinguishedLibrary<DistinguishedPortfolios, DistinguishedPortfolioDescription, String> {
+        DistinguishedLibrary<DistinguishedPortfolio, DistinguishedPortfolioDescription, String> {
 
     // The singleton distinguished portfolio library
     private static final DistinguishedPortfolioLibrary library =
             new DistinguishedPortfolioLibrary();
 
     // A map of distinguished portfolios to their descriptions
-    private final Map<DistinguishedPortfolios, DistinguishedPortfolioDescription>
+    private final Map<DistinguishedPortfolio, DistinguishedPortfolioDescription>
             distinguishedPortfolios = new TreeMap<>();
 
     /**
@@ -71,12 +71,12 @@ public class DistinguishedPortfolioLibrary extends
     }
 
     @Override
-    public @NotNull DistinguishedPortfolios getDefaultKey() {
-        return DistinguishedPortfolios.DEFAULT;
+    public @NotNull DistinguishedPortfolio getDefaultKey() {
+        return DistinguishedPortfolio.DEFAULT;
     }
 
     @Override
-    public DistinguishedPortfolioDescription getDescription(DistinguishedPortfolios key) {
+    public DistinguishedPortfolioDescription getDescription(DistinguishedPortfolio key) {
         return distinguishedPortfolios.get(key);
     }
 
@@ -86,7 +86,7 @@ public class DistinguishedPortfolioLibrary extends
     }
 
     @Override
-    public String getValue(@NotNull DistinguishedPortfolios key) {
+    public String getValue(@NotNull DistinguishedPortfolio key) {
 
         /*
          * Get the description mapped to the key. Return null if there is no

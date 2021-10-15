@@ -9,14 +9,14 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class DistinguishedAccountLibrary extends
-        DistinguishedLibrary<DistinguishedAccounts, DistinguishedAccountDescription, AccountKey> {
+        DistinguishedLibrary<DistinguishedAccount, DistinguishedAccountDescription, AccountKey> {
 
     // The singleton distinguished account library
     private static final DistinguishedAccountLibrary library =
             new DistinguishedAccountLibrary();
 
     // A map of distinguished accounts to their descriptions
-    private final Map<DistinguishedAccounts, DistinguishedAccountDescription>
+    private final Map<DistinguishedAccount, DistinguishedAccountDescription>
             distinguishedAccounts = new TreeMap<>();
 
     /**
@@ -72,12 +72,12 @@ public class DistinguishedAccountLibrary extends
     }
 
     @Override
-    public @NotNull DistinguishedAccounts getDefaultKey() {
-        return DistinguishedAccounts.DEFAULT;
+    public @NotNull DistinguishedAccount getDefaultKey() {
+        return DistinguishedAccount.DEFAULT;
     }
 
     @Override
-    public DistinguishedAccountDescription getDescription(DistinguishedAccounts key) {
+    public DistinguishedAccountDescription getDescription(DistinguishedAccount key) {
         return distinguishedAccounts.get(key);
     }
 
@@ -87,7 +87,7 @@ public class DistinguishedAccountLibrary extends
     }
 
     @Override
-    public AccountKey getValue(@NotNull DistinguishedAccounts key) {
+    public AccountKey getValue(@NotNull DistinguishedAccount key) {
 
         /*
          * Get the description mapped to the key. Return null if there is no
