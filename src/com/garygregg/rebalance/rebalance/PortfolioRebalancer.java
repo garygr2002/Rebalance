@@ -1,12 +1,15 @@
 package com.garygregg.rebalance.rebalance;
 
+import com.garygregg.rebalance.AccountKey;
 import com.garygregg.rebalance.account.AccountDescription;
+import com.garygregg.rebalance.distinguished.DistinguishedAccountDescription;
 import com.garygregg.rebalance.distinguished.DistinguishedAccountLibrary;
 import com.garygregg.rebalance.distinguished.DistinguishedAccount;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Hierarchy;
 import com.garygregg.rebalance.hierarchy.Institution;
 import com.garygregg.rebalance.hierarchy.Portfolio;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -16,6 +19,18 @@ public class PortfolioRebalancer extends Rebalancer {
     // A rebalancer instance
     private static final PortfolioRebalancer instance =
             new PortfolioRebalancer();
+
+    // A map of account keys to distinguished accounts
+    private final Map<AccountKey, DistinguishedAccount> accountMap =
+            createAccountMap();
+
+    // A default rebalancer instance
+    private final AccountRebalancer defaultRebalancer =
+            new DoNothingRebalancer();
+
+    // A map of distinguished accounts to account rebalancers
+    private final Map<DistinguishedAccount, AccountRebalancer> rebalancerMap =
+            new HashMap<>();
 
     // A rebalance action for accounts
     private final Action<Hierarchy, Account> accountAction =
@@ -33,10 +48,6 @@ public class PortfolioRebalancer extends Rebalancer {
                 }
             };
 
-    // A default rebalancer instance
-    private final AccountRebalancer defaultRebalancer =
-            new DoNothingRebalancer();
-
     // A rebalance action for an institution
     private final Action<Institution, Account> institutionAction =
             new Action<>() {
@@ -52,10 +63,6 @@ public class PortfolioRebalancer extends Rebalancer {
                     return rebalance(child);
                 }
             };
-
-    // A distinguished account library instance
-    private final DistinguishedAccountLibrary library =
-            DistinguishedAccountLibrary.getInstance();
 
     // A rebalance action for a portfolio
     private final Action<Portfolio, Institution> portfolioAction =
@@ -89,9 +96,29 @@ public class PortfolioRebalancer extends Rebalancer {
                 }
             };
 
-    // A map of distinguished accounts to account rebalancers
-    private final Map<DistinguishedAccount, AccountRebalancer> rebalancerMap =
-            new HashMap<>();
+    {
+
+        /*
+         * Explicitly create, and assign rebalancers to distinguished accounts
+         * here.
+         */
+        rebalancerMap.put(DistinguishedAccount.HEALTH_SAVINGS_ACCOUNT,
+                new PassThroughRebalancer());
+
+        // Cycle for each distinguished account.
+        for (DistinguishedAccount distinguishedAccount :
+                DistinguishedAccount.values()) {
+
+            /*
+             * Add the default rebalancer to the rebalancer map if the map does
+             * not already contain an entry for the first/next distinguished
+             * account.
+             */
+            if (!rebalancerMap.containsKey(distinguishedAccount)) {
+                rebalancerMap.put(distinguishedAccount, defaultRebalancer);
+            }
+        }
+    }
 
     /**
      * Creates an account list from an account collection.
@@ -109,6 +136,36 @@ public class PortfolioRebalancer extends Rebalancer {
         accounts.sort(Comparator.comparingLong(
                 PortfolioRebalancer::getRebalanceOrder));
         return accounts;
+    }
+
+    /**
+     * Creates, builds and returns a map of account keys to distinguished
+     * accounts.
+     *
+     * @return A map of account keys to distinguished accounts
+     */
+    @Contract(pure = true)
+    private static @NotNull Map<AccountKey, DistinguishedAccount>
+    createAccountMap() {
+
+        // Get the catalog of distinguished accounts.
+        final DistinguishedAccountDescription[] catalog =
+                DistinguishedAccountLibrary.getInstance().getCatalog();
+
+        /*
+         * Declare and initialize the return value. Cycle for each
+         * distinguished account description.
+         */
+        final Map<AccountKey, DistinguishedAccount> accountMap =
+                new HashMap<>();
+        for (DistinguishedAccountDescription description : catalog) {
+
+            // Put the first/next description in the map.
+            accountMap.put(description.getValue(), description.getKey());
+        }
+
+        // Return the map.
+        return accountMap;
     }
 
     /**
@@ -139,16 +196,22 @@ public class PortfolioRebalancer extends Rebalancer {
     }
 
     /**
-     * Gets a rebalancer given a distinguished account.
+     * Gets a rebalancer given an account.
      *
-     * @param account The distinguished account
-     * @return A rebalancer for the distinguished account
+     * @param account The account
+     * @return A rebalancer for the account
      */
     private @NotNull AccountRebalancer getRebalancer(
-            @NotNull DistinguishedAccount account) {
+            @NotNull Account account) {
 
-        // TODO: Search for a rebalancer from the map.
-        return defaultRebalancer;
+        /*
+         * Get a distinguished account from the account map using the account
+         * key. Use the distinguished account to get an account rebalancer.
+         * Return the default rebalancer if there is no explicit rebalancer.
+         */
+        AccountRebalancer rebalancer =
+                rebalancerMap.get(accountMap.get(account.getKey()));
+        return (null == rebalancer) ? defaultRebalancer : rebalancer;
     }
 
     /**
@@ -181,9 +244,7 @@ public class PortfolioRebalancer extends Rebalancer {
      * otherwise
      */
     private boolean rebalance(@NotNull Account account) {
-
-        // TODO: Figure this out.
-        return true;
+        return getRebalancer(account).rebalance(account);
     }
 
     /**
