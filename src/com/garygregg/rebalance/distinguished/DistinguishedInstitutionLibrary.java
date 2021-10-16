@@ -3,7 +3,8 @@ package com.garygregg.rebalance.distinguished;
 import org.jetbrains.annotations.NotNull;
 
 public class DistinguishedInstitutionLibrary extends
-        DistinguishedLibrary<DistinguishedInstitution, DistinguishedInstitutionDescription, String> {
+        DistinguishedLibrary<DistinguishedInstitution,
+                DistinguishedInstitutionDescription, String> {
 
     // The singleton distinguished institution library
     private static final DistinguishedInstitutionLibrary library =

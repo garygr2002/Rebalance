@@ -4,7 +4,8 @@ import com.garygregg.rebalance.portfolio.PortfolioLibrary;
 import org.jetbrains.annotations.NotNull;
 
 public class DistinguishedPortfolioLibrary extends
-        DistinguishedLibrary<DistinguishedPortfolio, DistinguishedPortfolioDescription, String> {
+        DistinguishedLibrary<DistinguishedPortfolio,
+                DistinguishedPortfolioDescription, String> {
 
     // The singleton distinguished portfolio library
     private static final DistinguishedPortfolioLibrary library =
