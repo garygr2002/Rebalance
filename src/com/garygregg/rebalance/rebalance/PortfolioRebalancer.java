@@ -2,9 +2,9 @@ package com.garygregg.rebalance.rebalance;
 
 import com.garygregg.rebalance.AccountKey;
 import com.garygregg.rebalance.account.AccountDescription;
+import com.garygregg.rebalance.distinguished.DistinguishedAccount;
 import com.garygregg.rebalance.distinguished.DistinguishedAccountDescription;
 import com.garygregg.rebalance.distinguished.DistinguishedAccountLibrary;
-import com.garygregg.rebalance.distinguished.DistinguishedAccount;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Hierarchy;
 import com.garygregg.rebalance.hierarchy.Institution;
