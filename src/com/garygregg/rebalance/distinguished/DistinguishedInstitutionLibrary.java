@@ -45,7 +45,14 @@ public class DistinguishedInstitutionLibrary extends
     @SuppressWarnings("UnusedReturnValue")
     DistinguishedInstitutionDescription addDescription(
             @NotNull DistinguishedInstitutionDescription description) {
-        return distinguishedInstitutions.put(description.getKey(), description);
+
+        /*
+         * Get the key from the description. Map the value to the key, and add
+         * the description to the distinguished institutions.
+         */
+        final DistinguishedInstitution institution = description.getKey();
+        addValue(institution, description.getValue());
+        return distinguishedInstitutions.put(institution, description);
     }
 
     @Override
@@ -71,7 +78,7 @@ public class DistinguishedInstitutionLibrary extends
 
     @Override
     public DistinguishedInstitutionDescription getDescription(DistinguishedInstitution
-                                                             key) {
+                                                                      key) {
         return distinguishedInstitutions.get(key);
     }
 

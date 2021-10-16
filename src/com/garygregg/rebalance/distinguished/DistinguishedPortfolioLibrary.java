@@ -46,7 +46,14 @@ public class DistinguishedPortfolioLibrary extends
     @SuppressWarnings("UnusedReturnValue")
     DistinguishedPortfolioDescription addDescription(
             @NotNull DistinguishedPortfolioDescription description) {
-        return distinguishedPortfolios.put(description.getKey(), description);
+
+        /*
+         * Get the key from the description. Map the value to the key, and add
+         * the description to the distinguished portfolios.
+         */
+        final DistinguishedPortfolio portfolio = description.getKey();
+        addValue(portfolio, description.getValue());
+        return distinguishedPortfolios.put(portfolio, description);
     }
 
     @Override

@@ -1,15 +1,12 @@
 package com.garygregg.rebalance.rebalance;
 
-import com.garygregg.rebalance.AccountKey;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.distinguished.DistinguishedAccount;
-import com.garygregg.rebalance.distinguished.DistinguishedAccountDescription;
 import com.garygregg.rebalance.distinguished.DistinguishedAccountLibrary;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Hierarchy;
 import com.garygregg.rebalance.hierarchy.Institution;
 import com.garygregg.rebalance.hierarchy.Portfolio;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -19,10 +16,6 @@ public class PortfolioRebalancer extends Rebalancer {
     // A rebalancer instance
     private static final PortfolioRebalancer instance =
             new PortfolioRebalancer();
-
-    // A map of account keys to distinguished accounts
-    private final Map<AccountKey, DistinguishedAccount> accountMap =
-            createAccountMap();
 
     // A default rebalancer instance
     private final AccountRebalancer defaultRebalancer =
@@ -139,36 +132,6 @@ public class PortfolioRebalancer extends Rebalancer {
     }
 
     /**
-     * Creates, builds and returns a map of account keys to distinguished
-     * accounts.
-     *
-     * @return A map of account keys to distinguished accounts
-     */
-    @Contract(pure = true)
-    private static @NotNull Map<AccountKey, DistinguishedAccount>
-    createAccountMap() {
-
-        // Get the catalog of distinguished accounts.
-        final DistinguishedAccountDescription[] catalog =
-                DistinguishedAccountLibrary.getInstance().getCatalog();
-
-        /*
-         * Declare and initialize the return value. Cycle for each
-         * distinguished account description.
-         */
-        final Map<AccountKey, DistinguishedAccount> accountMap =
-                new HashMap<>();
-        for (DistinguishedAccountDescription description : catalog) {
-
-            // Put the first/next description in the map.
-            accountMap.put(description.getValue(), description.getKey());
-        }
-
-        // Return the map.
-        return accountMap;
-    }
-
-    /**
      * Gets an instance of the rebalancer.
      *
      * @return An instance of the rebalancer
@@ -205,12 +168,14 @@ public class PortfolioRebalancer extends Rebalancer {
             @NotNull Account account) {
 
         /*
-         * Get a distinguished account from the account map using the account
-         * key. Use the distinguished account to get an account rebalancer.
-         * Return the default rebalancer if there is no explicit rebalancer.
+         * Get a distinguished account from the distinguished account library
+         * using the account key. Use the distinguished account to get an
+         * account rebalancer. Return the default rebalancer if there is no
+         * explicit rebalancer.
          */
-        AccountRebalancer rebalancer =
-                rebalancerMap.get(accountMap.get(account.getKey()));
+        final AccountRebalancer rebalancer =
+                rebalancerMap.get(DistinguishedAccountLibrary.getInstance().
+                        getKey(account.getKey()));
         return (null == rebalancer) ? defaultRebalancer : rebalancer;
     }
 

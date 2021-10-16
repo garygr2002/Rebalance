@@ -47,7 +47,14 @@ public class DistinguishedAccountLibrary extends
     @SuppressWarnings("UnusedReturnValue")
     DistinguishedAccountDescription addDescription(
             @NotNull DistinguishedAccountDescription description) {
-        return distinguishedAccounts.put(description.getKey(), description);
+
+        /*
+         * Get the key from the description. Map the value to the key, and add
+         * the description to the distinguished accounts.
+         */
+        final DistinguishedAccount account = description.getKey();
+        addValue(account, description.getValue());
+        return distinguishedAccounts.put(account, description);
     }
 
     @Override
@@ -93,7 +100,8 @@ public class DistinguishedAccountLibrary extends
          * Get the description mapped to the key. Return null if there is no
          * such description, otherwise return the value of the description.
          */
-        final DistinguishedAccountDescription description = getDescription(key);
+        final DistinguishedAccountDescription description =
+                getDescription(key);
         return (null == description) ? null : description.getValue();
     }
 }
