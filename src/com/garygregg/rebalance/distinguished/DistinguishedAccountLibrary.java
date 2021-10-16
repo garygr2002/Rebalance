@@ -4,20 +4,13 @@ import com.garygregg.rebalance.AccountKey;
 import com.garygregg.rebalance.account.AccountLibrary;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 public class DistinguishedAccountLibrary extends
-        DistinguishedLibrary<DistinguishedAccount, DistinguishedAccountDescription, AccountKey> {
+        DistinguishedLibrary<DistinguishedAccount,
+                DistinguishedAccountDescription, AccountKey> {
 
     // The singleton distinguished account library
     private static final DistinguishedAccountLibrary library =
             new DistinguishedAccountLibrary();
-
-    // A map of distinguished accounts to their descriptions
-    private final Map<DistinguishedAccount, DistinguishedAccountDescription>
-            distinguishedAccounts = new TreeMap<>();
 
     /**
      * Constructs the distinguished account library.
@@ -36,56 +29,20 @@ public class DistinguishedAccountLibrary extends
         return library;
     }
 
-    /**
-     * Adds a distinguished account description to the library.
-     *
-     * @param description The distinguished account description to add to the
-     *                    library
-     * @return An existing distinguished account description that was displaced
-     * in the library because it had the same key
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    DistinguishedAccountDescription addDescription(
-            @NotNull DistinguishedAccountDescription description) {
-
-        /*
-         * Get the key from the description. Map the value to the key, and add
-         * the description to the distinguished accounts.
-         */
-        final DistinguishedAccount account = description.getKey();
-        addValue(account, description.getValue());
-        return distinguishedAccounts.put(account, description);
-    }
-
     @Override
     public boolean areKeyElementsOkay(String @NotNull ... elements) {
         return AccountLibrary.getInstance().areKeyElementsOkay(elements);
     }
 
     @Override
-    public boolean areKeysSorted() {
-        return (distinguishedAccounts instanceof SortedMap);
-    }
-
-    @Override
-    protected void clearDescriptions() {
-        distinguishedAccounts.clear();
-    }
-
-    @Override
     public DistinguishedAccountDescription[] getCatalog() {
-        return distinguishedAccounts.values().toArray(
+        return getDescriptions().toArray(
                 new DistinguishedAccountDescription[0]);
     }
 
     @Override
     public @NotNull DistinguishedAccount getDefaultKey() {
         return DistinguishedAccount.DEFAULT;
-    }
-
-    @Override
-    public DistinguishedAccountDescription getDescription(DistinguishedAccount key) {
-        return distinguishedAccounts.get(key);
     }
 
     @Override

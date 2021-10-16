@@ -411,10 +411,9 @@ public class DistinguishedsBuilder extends
      * @param keys    The keys to describe
      * @param library The distinguished library
      */
-    private static <T> void describeContents(@NotNull String type,
-                                             @NotNull T @NotNull [] keys,
-                                             @NotNull DistinguishedLibrary<T, ?, ?>
-                                                     library) {
+    private static <T extends Comparable<T>>
+    void describeContents(@NotNull String type, @NotNull T @NotNull [] keys,
+                          @NotNull DistinguishedLibrary<T, ?, ?> library) {
 
         /*
          * TODO: Delete this method.

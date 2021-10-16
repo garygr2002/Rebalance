@@ -3,20 +3,12 @@ package com.garygregg.rebalance.distinguished;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 public class DistinguishedPortfolioLibrary extends
         DistinguishedLibrary<DistinguishedPortfolio, DistinguishedPortfolioDescription, String> {
 
     // The singleton distinguished portfolio library
     private static final DistinguishedPortfolioLibrary library =
             new DistinguishedPortfolioLibrary();
-
-    // A map of distinguished portfolios to their descriptions
-    private final Map<DistinguishedPortfolio, DistinguishedPortfolioDescription>
-            distinguishedPortfolios = new TreeMap<>();
 
     /**
      * Constructs the distinguished portfolio library.
@@ -35,56 +27,20 @@ public class DistinguishedPortfolioLibrary extends
         return library;
     }
 
-    /**
-     * Adds a distinguished portfolio description to the library.
-     *
-     * @param description The distinguished portfolio description to add to
-     *                    the library
-     * @return An existing distinguished portfolio description that was
-     * displaced in the library because it had the same key
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    DistinguishedPortfolioDescription addDescription(
-            @NotNull DistinguishedPortfolioDescription description) {
-
-        /*
-         * Get the key from the description. Map the value to the key, and add
-         * the description to the distinguished portfolios.
-         */
-        final DistinguishedPortfolio portfolio = description.getKey();
-        addValue(portfolio, description.getValue());
-        return distinguishedPortfolios.put(portfolio, description);
-    }
-
     @Override
     public boolean areKeyElementsOkay(String @NotNull ... elements) {
         return PortfolioLibrary.getInstance().areKeyElementsOkay(elements);
     }
 
     @Override
-    public boolean areKeysSorted() {
-        return (distinguishedPortfolios instanceof SortedMap);
-    }
-
-    @Override
-    protected void clearDescriptions() {
-        distinguishedPortfolios.clear();
-    }
-
-    @Override
     public DistinguishedPortfolioDescription[] getCatalog() {
-        return distinguishedPortfolios.values().toArray(
+        return getDescriptions().toArray(
                 new DistinguishedPortfolioDescription[0]);
     }
 
     @Override
     public @NotNull DistinguishedPortfolio getDefaultKey() {
         return DistinguishedPortfolio.DEFAULT;
-    }
-
-    @Override
-    public DistinguishedPortfolioDescription getDescription(DistinguishedPortfolio key) {
-        return distinguishedPortfolios.get(key);
     }
 
     @Override
