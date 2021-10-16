@@ -51,7 +51,7 @@ public class DistinguishedAccountLibrary extends
     }
 
     @Override
-    public boolean areKeyElementsOkay(String... elements) {
+    public boolean areKeyElementsOkay(String @NotNull ... elements) {
         return AccountLibrary.getInstance().areKeyElementsOkay(elements);
     }
 

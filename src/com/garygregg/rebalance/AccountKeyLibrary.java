@@ -33,7 +33,7 @@ public abstract class AccountKeyLibrary<ContainerType> extends
     }
 
     @Override
-    public boolean areKeyElementsOkay(String... elements) {
+    public boolean areKeyElementsOkay(String @NotNull ... elements) {
 
         /*
          * There must be exactly two elements. The second element must be

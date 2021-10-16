@@ -41,7 +41,7 @@ public abstract class Library<KeyType, DescriptionType> {
      * @return True if the string representations of key elements are okay,
      * false otherwise
      */
-    public boolean areKeyElementsOkay(String... elements) {
+    public boolean areKeyElementsOkay(String @NotNull ... elements) {
 
         /*
          * There must be exactly one element. The element must not be null, and

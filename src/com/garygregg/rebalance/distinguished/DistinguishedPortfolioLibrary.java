@@ -50,7 +50,7 @@ public class DistinguishedPortfolioLibrary extends
     }
 
     @Override
-    public boolean areKeyElementsOkay(String... elements) {
+    public boolean areKeyElementsOkay(String @NotNull ... elements) {
         return PortfolioLibrary.getInstance().areKeyElementsOkay(elements);
     }
 
