@@ -1,9 +1,6 @@
 package com.garygregg.rebalance.rebalance;
 
-import com.garygregg.rebalance.Description;
-import com.garygregg.rebalance.FundType;
-import com.garygregg.rebalance.Pair;
-import com.garygregg.rebalance.WeightType;
+import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.countable.Percent;
 import com.garygregg.rebalance.detailed.DetailedDescription;
@@ -64,20 +61,54 @@ abstract class AccountRebalancer extends Rebalancer {
      *
      * @param weightMap A weight map
      */
-    @SuppressWarnings("unused")
     private static void adjust(@NotNull Map<WeightType, Double> weightMap) {
+
+        /*
+         * Get the preference manager, and the current S&P 500 setting from the
+         * manager. Is the current S&P 500 value set?
+         */
+        final PreferenceManager manager = PreferenceManager.getInstance();
+        final Double current = manager.getCurrent();
+        if (null != current) {
+
+            /*
+             * The current S&P 500 value is set. Get the high S&P 500 setting
+             * from the manager. Is the high S&P 500 value set, and is its
+             * value not zero?
+             */
+            final Double high = manager.getHigh();
+            if (!((null == high) || (0. == high))) {
+
+                /*
+                 * The current S&P 500 value is set, and its value is not zero.
+                 * Divide the current value by the high value and adjust the
+                 * weights in the map with this ratio.
+                 */
+                adjust(weightMap, current / high);
+            }
+        }
+    }
+
+    /**
+     * Adjust a weight map for relative market valuation.
+     *
+     * @param weightMap A weight map
+     * @param ratio     The ratio for adjustment
+     */
+    @SuppressWarnings("unused")
+    private static void adjust(@NotNull Map<WeightType, Double> weightMap,
+                               double ratio) {
 
         /*
          * TODO: Fill this out.
          *
-         * Get the current and high values of the S&P from the preference
-         * manager. If both are set: 1) Sum bond, cash and real-estate weights
-         * and save as other_sum; 2) Add stock weight and save as total_sum; 3)
-         * multiply stock weight by S&P current, and divide by high; save as
-         * stock weight; 4) subtract stock weight from total_sum and save as
-         * modified_other; 5) Multiply bond, cash and real-estate weights by
-         * modified_other, and divide by other_sum, saving the result in each
-         * non-stock weight.
+         * 1) Sum bond, cash and real-estate weights and save as other_sum;
+         * 2) Add stock weight and save as total_sum;
+         * 3) multiply stock weight by S&P current, and divide by high; save as
+         * stock weight;
+         * 4) subtract stock weight from total_sum and save as modified_other;
+         * 5) Multiply bond, cash and real-estate weights by modified_other,
+         * and divide by other_sum, saving the result in each non-stock weight.
          */
     }
 
