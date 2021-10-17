@@ -64,27 +64,27 @@ abstract class AccountRebalancer extends Rebalancer {
     private static void adjust(@NotNull Map<WeightType, Double> weightMap) {
 
         /*
-         * Get the preference manager, and the current S&P 500 setting from the
+         * Get the preference manager, and the high S&P 500 setting from the
          * manager. Is the current S&P 500 value set?
          */
         final PreferenceManager manager = PreferenceManager.getInstance();
-        final Double current = manager.getCurrent();
-        if (null != current) {
+        final Double high = manager.getHigh();
+        if (null != high) {
 
             /*
-             * The current S&P 500 value is set. Get the high S&P 500 setting
-             * from the manager. Is the high S&P 500 value set, and is its
+             * The high S&P 500 value is set. Get the current S&P 500 setting
+             * from the manager. Is the current S&P 500 value set, and is its
              * value not zero?
              */
-            final Double high = manager.getHigh();
-            if (!((null == high) || (0. == high))) {
+            final Double current = manager.getCurrent();
+            if (!((null == current) || (0. == current))) {
 
                 /*
                  * The current S&P 500 value is set, and its value is not zero.
-                 * Divide the current value by the high value and adjust the
+                 * Divide the high value by the current value and adjust the
                  * weights in the map with this ratio.
                  */
-                adjust(weightMap, current / high);
+                adjust(weightMap, high / current);
             }
         }
     }
