@@ -27,7 +27,8 @@ public class Reallocator {
      * Constructs the reallocator.
      *
      * @param weights A list of weights to apply to any reallocation operation;
-     *                this list may be modified by the caller before any subsequent reallocation
+     *                this list may be modified by the caller before any
+     *                subsequent reallocation
      */
     public Reallocator(@NotNull List<Double> weights) {
         this.weights = weights;
