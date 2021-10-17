@@ -6,6 +6,7 @@ import com.garygregg.rebalance.countable.Percent;
 import com.garygregg.rebalance.detailed.DetailedDescription;
 import com.garygregg.rebalance.detailed.DetailedLibrary;
 import com.garygregg.rebalance.hierarchy.Account;
+import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,8 +38,80 @@ abstract class AccountRebalancer extends Rebalancer {
     private static final double everything =
             Percent.getOneHundred().getValue();
 
+    // The level zero weight types
+    private static final WeightType[] levelZero = {WeightType.BOND,
+            WeightType.CASH, WeightType.REAL_ESTATE, WeightType.STOCK};
+
     // The distinguished value for nothing
     private static final double nothing = Percent.getZero().getValue();
+
+    // The percentage overlay procedure
+    private static final OverlayProcedure percentage =
+            new OverlayProcedure() {
+
+                @Override
+                public double adjustEquity(double ratio) {
+                    return (ratio - 1.) * 5. / 8. + 1.;
+                }
+
+                @Override
+                public void overlay(@NotNull Map<WeightType, Double> weightMap,
+                                    @NotNull Account account) {
+
+                    /*
+                     * Set the descriptions in the account list, and overlay the weight
+                     * map.
+                     */
+                    setDescription(accountList, account.getDescription());
+                    AccountRebalancer.overlay(weightMap, accountList);
+
+                    /*
+                     * Set the descriptions in the detailed list, and overlay the weight
+                     * map a second time.
+                     */
+                    setDescription(detailedList, DetailedLibrary.getInstance().
+                            getDescription(account.getKey()));
+                    AccountRebalancer.overlay(weightMap, detailedList);
+                }
+            };
+
+    // A list of weight types to portfolio valuation pairs
+    private final static List<Pair<WeightType, ValueFromPortfolio>>
+            portfolioList = new ArrayList<>();
+
+    // The closure overlay procedure
+    private static final OverlayProcedure closure =
+            new OverlayProcedure() {
+
+                @Override
+                public double adjustEquity(double ratio) {
+
+                    /*
+                     * Currently, we perform no adjustment at all here.
+                     * Consider changing as follows (1 percent higher for every
+                     * 4 percent drop in equities):
+                     *
+                     * return (ratio - 1.) / 4. + 1.;
+                     */
+                    return 1.;
+                }
+
+                @Override
+                public void overlay(@NotNull Map<WeightType, Double> weightMap,
+                                    @NotNull Account account) {
+
+                    /*
+                     * set the descriptions in the portfolio list, and overlay the
+                     * weight map.
+                     */
+                    setDescription(portfolioList, account.getPortfolioDescription());
+                    AccountRebalancer.overlay(weightMap, portfolioList);
+                }
+            };
+
+    // Our factory for creating value-from-portfolio objects
+    private static final Factory<WeightType, ValueFromPortfolio>
+            portfolioValueFactory = ValueFromPortfolio::new;
 
     // A map of fund types to account description valuation objects
     private static final Map<FundType, ValueFromAccount> valueFromAccountMap =
@@ -49,19 +122,27 @@ abstract class AccountRebalancer extends Rebalancer {
             valueFromDetailedMap = createMap(WeightType.values(),
             detailedValueFactory);
 
+    // A map of weight types to portfolio description valuation objects
+    private static final Map<WeightType, ValueFromPortfolio>
+            valueFromPortfolioMap = createMap(WeightType.values(),
+            portfolioValueFactory);
+
     static {
 
-        // Build the account list and detailed list.
+        // Build the account list, the detailed list, and the portfolio list.
         buildAccountList();
         buildDetailedList();
+        buildPortfolioList();
     }
 
     /**
      * Adjust a weight map for relative market valuation.
      *
      * @param weightMap A weight map
+     * @param procedure An overlay procedure
      */
-    private static void adjust(@NotNull Map<WeightType, Double> weightMap) {
+    private static void adjust(@NotNull Map<WeightType, Double> weightMap,
+                               @NotNull OverlayProcedure procedure) {
 
         /*
          * Get the preference manager, and the high S&P 500 setting from the
@@ -84,7 +165,7 @@ abstract class AccountRebalancer extends Rebalancer {
                  * Divide the high value by the current value and adjust the
                  * weights in the map with this ratio.
                  */
-                adjust(weightMap, high / current);
+                adjust(weightMap, procedure.adjustEquity(high / current));
             }
         }
     }
@@ -95,21 +176,48 @@ abstract class AccountRebalancer extends Rebalancer {
      * @param weightMap A weight map
      * @param ratio     The ratio for adjustment
      */
-    @SuppressWarnings("unused")
     private static void adjust(@NotNull Map<WeightType, Double> weightMap,
                                double ratio) {
 
         /*
-         * TODO: Fill this out.
-         *
-         * 1) Sum bond, cash and real-estate weights and save as other_sum;
-         * 2) Add stock weight and save as total_sum;
-         * 3) multiply stock weight by S&P current, and divide by high; save as
-         * stock weight;
-         * 4) subtract stock weight from total_sum and save as modified_other;
-         * 5) Multiply bond, cash and real-estate weights by modified_other,
-         * and divide by other_sum, saving the result in each non-stock weight.
+         * Declare and initialize a sum for all the level zero weight types.
+         * Cycle for each level zero weight type.
          */
+        double all = 0.;
+        for (WeightType type : levelZero) {
+
+            // Add the first/next weight type to the sum.
+            all += weightMap.get(type);
+        }
+
+        // Get the old stock weight. Calculate the old non-stock weight.
+        WeightType type = WeightType.STOCK;
+        final double oldStock = weightMap.get(type);
+        final double oldNonStock = all - oldStock;
+
+        /*
+         * Calculate the new stock weight and the new non-stock weight. Put the
+         * new stock weight in the weight map.
+         */
+        final double newStock = oldStock * ratio;
+        final double newNonStock = all - newStock;
+        weightMap.put(type, weightMap.get(type) * newStock);
+
+        /*
+         * Calculate the non-stock ratio. Put the new bond weight in the weight
+         * map.
+         */
+        final double nonStockRatio = newNonStock / oldNonStock;
+        type = WeightType.BOND;
+        weightMap.put(type, weightMap.get(type) * nonStockRatio);
+
+        // Put the new cash weight in the weight map.
+        type = WeightType.CASH;
+        weightMap.put(type, weightMap.get(type) * nonStockRatio);
+
+        // Put the new real-estate weight in the weight map.
+        type = WeightType.REAL_ESTATE;
+        weightMap.put(type, weightMap.get(type) * nonStockRatio);
     }
 
     /**
@@ -229,6 +337,21 @@ abstract class AccountRebalancer extends Rebalancer {
     }
 
     /**
+     * Builds the portfolio list.
+     */
+    private static void buildPortfolioList() {
+
+        /*
+         * Cycle for each level zero weight type, and add a new pair to the
+         * portfolio list.
+         */
+        for (WeightType type : levelZero) {
+            portfolioList.add(new Pair<>(type,
+                    valueFromPortfolioMap.get(type)));
+        }
+    }
+
+    /**
      * Creates a map of identifier types to description valuation objects.
      *
      * @param values           An array of all possible identifier values
@@ -261,41 +384,57 @@ abstract class AccountRebalancer extends Rebalancer {
     /**
      * Creates a weight map for an account.
      *
+     * @param account   The account for which to create a weight map
+     * @param procedure The overlay procedure for the map
+     * @param adjust    True if the map should be adjusted for relative market
+     *                  valuation; false otherwise
+     * @return A weight map for the account
+     */
+    private static @NotNull Map<WeightType, Double> getWeights(
+            @NotNull Account account, @NotNull OverlayProcedure procedure,
+            boolean adjust) {
+
+        /*
+         * Declare an empty weight map, and initialize it. Perform the given
+         * overlay procedure with the initialized weight map and the account.
+         */
+        final Map<WeightType, Double> weightMap = new HashMap<>();
+        initializeMap(weightMap);
+        procedure.overlay(weightMap, account);
+
+        // Adjust the weight map for market valuation if so indicated.
+        if (adjust) {
+            adjust(weightMap, procedure);
+        }
+
+        // Return the weight map.
+        return weightMap;
+    }
+
+    /**
+     * Creates a weight map for a closure rebalance.
+     *
      * @param account The account for which to create a weight map
      * @param adjust  True if the map should be adjusted for relative market
      *                valuation; false otherwise
      * @return A weight map for the account
      */
-    @SuppressWarnings("unused")
-    protected static @NotNull Map<WeightType, Double> getWeights(
+    public static @NotNull Map<WeightType, Double> getWeightsForClosure(
             @NotNull Account account, boolean adjust) {
+        return getWeights(account, closure, adjust);
+    }
 
-        // Declare an empty weight map, and initialize it.
-        final Map<WeightType, Double> weightMap = new HashMap<>();
-        initializeMap(weightMap);
-
-        /*
-         * Set the descriptions in the account list, and overlay the weight
-         * map.
-         */
-        setDescription(accountList, account.getDescription());
-        overlay(weightMap, accountList);
-
-        /*
-         * Set the descriptions in the detailed list, and overlay the weight
-         * map a second time.
-         */
-        setDescription(detailedList, DetailedLibrary.getInstance().
-                getDescription(account.getKey()));
-        overlay(weightMap, detailedList);
-
-        // Adjust the weight map for market valuation if so indicated.
-        if (adjust) {
-            adjust(weightMap);
-        }
-
-        // Return the weight map.
-        return weightMap;
+    /**
+     * Creates a weight map for a percentage rebalance.
+     *
+     * @param account The account for which to create a weight map
+     * @param adjust  True if the map should be adjusted for relative market
+     *                valuation; false otherwise
+     * @return A weight map for the account
+     */
+    public static @NotNull Map<WeightType, Double> getWeightsForPercentage(
+            @NotNull Account account, boolean adjust) {
+        return getWeights(account, percentage, adjust);
     }
 
     /**
@@ -413,6 +552,26 @@ abstract class AccountRebalancer extends Rebalancer {
         @NotNull ProductType produce(@NotNull IdentifierType identifierType);
     }
 
+    private interface OverlayProcedure {
+
+        /**
+         * Adjusts an equity ratio.
+         *
+         * @param ratio The given equity ratio
+         * @return An adjusted equity ratio
+         */
+        double adjustEquity(double ratio);
+
+        /**
+         * Overlays values in a weight map.
+         *
+         * @param weightMap The weight map in which to overlay values
+         * @param account   An account object that supplies descriptors
+         */
+        void overlay(@NotNull Map<WeightType, Double> weightMap,
+                     @NotNull Account account);
+    }
+
     private static class ValueFromAccount extends
             ValueWrapper<FundType, AccountDescription> {
 
@@ -461,6 +620,33 @@ abstract class AccountRebalancer extends Rebalancer {
              * identifier.
              */
             final DetailedDescription description = getDescription();
+            return (null == description) ? null :
+                    description.getAllocation(getIdentifier());
+        }
+    }
+
+    private static class ValueFromPortfolio extends ValueWrapper<WeightType,
+            PortfolioDescription> {
+
+        /**
+         * Constructs the value-from-portfolio valuator.
+         *
+         * @param type A weight type for the valuator
+         */
+        protected ValueFromPortfolio(@NotNull WeightType type) {
+            super(type);
+        }
+
+        @Contract(pure = true)
+        @Override
+        public @Nullable Double getValue() {
+
+            /*
+             * Get the portfolio description. Return null if the description is
+             * null. Otherwise, return the allocation indicated by the
+             * identifier.
+             */
+            final PortfolioDescription description = getDescription();
             return (null == description) ? null :
                     description.getAllocation(getIdentifier());
         }
