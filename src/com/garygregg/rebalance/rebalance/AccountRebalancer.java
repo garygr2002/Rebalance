@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-abstract class AccountRebalancer extends Rebalancer {
+public abstract class AccountRebalancer extends Rebalancer {
 
     // A list of weight types to account valuation pairs
     private final static List<Pair<WeightType, ValueFromAccount>> accountList =
@@ -60,18 +60,22 @@ abstract class AccountRebalancer extends Rebalancer {
 
                     /*
                      * Set the descriptions in the account list, and overlay the weight
-                     * map.
+                     * map if the description is not null.
                      */
-                    setDescription(accountList, account.getDescription());
-                    AccountRebalancer.overlay(weightMap, accountList);
+                    if (setDescription(accountList,
+                            account.getDescription())) {
+                        AccountRebalancer.overlay(weightMap, accountList);
+                    }
 
                     /*
                      * Set the descriptions in the detailed list, and overlay the weight
-                     * map a second time.
+                     * map a second time if the description is not null.
                      */
-                    setDescription(detailedList, DetailedLibrary.getInstance().
-                            getDescription(account.getKey()));
-                    AccountRebalancer.overlay(weightMap, detailedList);
+                    if (setDescription(detailedList,
+                            DetailedLibrary.getInstance().
+                                    getDescription(account.getKey()))) {
+                        AccountRebalancer.overlay(weightMap, detailedList);
+                    }
                 }
             };
 
@@ -101,11 +105,13 @@ abstract class AccountRebalancer extends Rebalancer {
                                     @NotNull Account account) {
 
                     /*
-                     * set the descriptions in the portfolio list, and overlay the
-                     * weight map.
+                     * Set the descriptions in the portfolio list, and overlay the
+                     * weight map if the description is not null.
                      */
-                    setDescription(portfolioList, account.getPortfolioDescription());
-                    AccountRebalancer.overlay(weightMap, portfolioList);
+                    if (setDescription(portfolioList,
+                            account.getPortfolioDescription())) {
+                        AccountRebalancer.overlay(weightMap, portfolioList);
+                    }
                 }
             };
 
@@ -520,16 +526,20 @@ abstract class AccountRebalancer extends Rebalancer {
      * @param pairs             A list of weight type to value wrapper pairs
      * @param <DescriptionType> The description type
      * @param <WrapperType>     The wrapper type
+     * @return True if the given description was not null; false otherwise
      */
     private static <DescriptionType extends Description<?>,
             WrapperType extends ValueWrapper<?, DescriptionType>>
-    void setDescription(@NotNull List<Pair<WeightType, WrapperType>> pairs,
-                        DescriptionType description) {
+    boolean setDescription(@NotNull List<Pair<WeightType, WrapperType>> pairs,
+                           DescriptionType description) {
 
         // Set the description in the second element of each pair.
         for (Pair<WeightType, WrapperType> pair : pairs) {
             pair.getSecond().setDescription(description);
         }
+
+        // Return if the description was not null.
+        return (null != description);
     }
 
     /**
