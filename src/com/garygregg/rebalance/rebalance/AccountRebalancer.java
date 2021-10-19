@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class AccountRebalancer extends Rebalancer {
+abstract class AccountRebalancer extends Rebalancer {
 
     // A list of weight types to account valuation pairs
     private final static List<Pair<WeightType, ValueFromAccount>> accountList =
@@ -546,6 +546,15 @@ class AccountRebalancer extends Rebalancer {
     }
 
     /**
+     * Rebalances an account.
+     *
+     * @param account The account to rebalance
+     * @return True if the account was successfully rebalanced; false
+     * otherwise
+     */
+    protected abstract boolean doRebalance(@NotNull Account account);
+
+    /**
      * Gets the message logger for the synthesizer.
      *
      * @return The message logger for the synthesizer
@@ -570,15 +579,12 @@ class AccountRebalancer extends Rebalancer {
      * @return True if the account was successfully rebalanced; false
      * otherwise
      */
-    public boolean rebalance(@NotNull Account account) {
+    public final boolean rebalance(@NotNull Account account) {
 
-        /*
-         * Subclasses should call this method and check the status before
-         * continuing with an override.
-         */
+        // Reset the problem flags in the logger and rebalance the account.
         getLogger().resetProblem1();
         getLogger().resetProblem2();
-        return true;
+        return doRebalance(account);
     }
 
     private interface Factory<IdentifierType, ProductType> {

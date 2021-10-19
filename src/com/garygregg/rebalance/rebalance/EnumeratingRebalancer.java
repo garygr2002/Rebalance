@@ -14,7 +14,7 @@ abstract class EnumeratingRebalancer extends AccountRebalancer {
     protected abstract @NotNull Action<Account, Ticker> getTickerAction();
 
     @Override
-    public boolean rebalance(@NotNull Account account) {
-        return super.rebalance(account) && perform(account, getTickerAction());
+    public boolean doRebalance(@NotNull Account account) {
+        return perform(account, getTickerAction());
     }
 }

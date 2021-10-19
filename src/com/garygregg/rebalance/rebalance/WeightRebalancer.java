@@ -80,24 +80,8 @@ class WeightRebalancer extends AccountRebalancer
         return isRoot;
     }
 
-    /**
-     * Initializes member variables.
-     */
-    private void initialize() {
-
-        // Clear the current node and current ticker.
-        currentNode = null;
-        currentTicker = null;
-    }
-
-    /**
-     * Rebalances an account.
-     *
-     * @param account The account to rebalance
-     * @return True if the account was successfully rebalanced; false
-     * otherwise
-     */
-    public boolean rebalance(@NotNull Account account) {
+    @Override
+    protected boolean doRebalance(@NotNull Account account) {
 
         // Cycle for each ticker in the account.
         for (Ticker ticker : account.getChildren()) {
@@ -118,6 +102,16 @@ class WeightRebalancer extends AccountRebalancer
          */
         initialize();
         return true;
+    }
+
+    /**
+     * Initializes member variables.
+     */
+    private void initialize() {
+
+        // Clear the current node and current ticker.
+        currentNode = null;
+        currentTicker = null;
     }
 
     @Override
