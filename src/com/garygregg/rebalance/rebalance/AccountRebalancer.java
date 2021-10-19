@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AccountRebalancer extends Rebalancer {
+class AccountRebalancer extends Rebalancer {
 
     // A list of weight types to account valuation pairs
     private final static List<Pair<WeightType, ValueFromAccount>> accountList =
@@ -140,6 +140,9 @@ public abstract class AccountRebalancer extends Rebalancer {
         buildDetailedList();
         buildPortfolioList();
     }
+
+    // Our local message logger
+    private final MessageLogger messageLogger = new MessageLogger();
 
     /**
      * Adjust a weight map for relative market valuation.
@@ -543,13 +546,40 @@ public abstract class AccountRebalancer extends Rebalancer {
     }
 
     /**
+     * Gets the message logger for the synthesizer.
+     *
+     * @return The message logger for the synthesizer
+     */
+    protected MessageLogger getLogger() {
+        return messageLogger;
+    }
+
+    /**
+     * Returns whether there was a problem with a rebalance.
+     *
+     * @return True if there was a problem with a rebalance, false otherwise
+     */
+    public boolean hadProblem() {
+        return messageLogger.hadProblem1() || messageLogger.hadProblem2();
+    }
+
+    /**
      * Rebalances an account.
      *
      * @param account The account to rebalance
      * @return True if the account was successfully rebalanced; false
      * otherwise
      */
-    public abstract boolean rebalance(@NotNull Account account);
+    public boolean rebalance(@NotNull Account account) {
+
+        /*
+         * Subclasses should call this method and check the status before
+         * continuing with an override.
+         */
+        getLogger().resetProblem1();
+        getLogger().resetProblem2();
+        return true;
+    }
 
     private interface Factory<IdentifierType, ProductType> {
 
