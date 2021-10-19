@@ -4,7 +4,7 @@ import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Ticker;
 import org.jetbrains.annotations.NotNull;
 
-abstract class EnumeratingAccountRebalancer extends AccountRebalancer {
+abstract class EnumeratingRebalancer extends AccountRebalancer {
 
     /**
      * Gets the ticker action for the account.
@@ -15,6 +15,6 @@ abstract class EnumeratingAccountRebalancer extends AccountRebalancer {
 
     @Override
     public boolean rebalance(@NotNull Account account) {
-        return perform(account, getTickerAction());
+        return super.rebalance(account) && perform(account, getTickerAction());
     }
 }

@@ -4,7 +4,7 @@ import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Ticker;
 import org.jetbrains.annotations.NotNull;
 
-public class PassThroughRebalancer extends EnumeratingAccountRebalancer {
+public class PassThroughRebalancer extends EnumeratingRebalancer {
 
     // A ticker action that passes considered value through to proposed value
     private final TickerAction action = new TickerAction() {

@@ -4,7 +4,7 @@ import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Ticker;
 import org.jetbrains.annotations.NotNull;
 
-class DoNothingRebalancer extends EnumeratingAccountRebalancer {
+class DoNothingRebalancer extends EnumeratingRebalancer {
 
     // A ticker action that does nothing
     private final TickerAction action = new TickerAction() {
