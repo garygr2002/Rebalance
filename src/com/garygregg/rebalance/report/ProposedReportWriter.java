@@ -1,6 +1,7 @@
 package com.garygregg.rebalance.report;
 
 import com.garygregg.rebalance.hierarchy.ValueByProposed;
+import org.jetbrains.annotations.NotNull;
 
 public class ProposedReportWriter extends ReportWriter {
 
@@ -9,5 +10,10 @@ public class ProposedReportWriter extends ReportWriter {
      */
     public ProposedReportWriter() {
         super(ValueByProposed.getInstance());
+    }
+
+    @Override
+    protected @NotNull String getPrefix() {
+        return "proposed";
     }
 }

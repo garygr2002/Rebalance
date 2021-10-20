@@ -25,7 +25,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.logging.Logger;
 
-class ReportWriter extends ElementProcessor {
+abstract class ReportWriter extends ElementProcessor {
 
     // The valuator for not balanceable assets
     private final Valuator notBalanceable = ValueByNotConsidered.getInstance();
@@ -250,11 +250,6 @@ class ReportWriter extends ElementProcessor {
      */
     public @NotNull Valuator getNotBalanceable() {
         return notBalanceable;
-    }
-
-    @Override
-    protected @NotNull String getPrefix() {
-        return "report";
     }
 
     /**
