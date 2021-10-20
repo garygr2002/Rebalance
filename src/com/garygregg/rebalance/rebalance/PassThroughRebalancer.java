@@ -10,7 +10,7 @@ public class PassThroughRebalancer extends EnumeratingRebalancer {
     private final TickerAction action = new TickerAction() {
 
         @Override
-        public boolean perform(@NotNull Ticker child) {
+        public boolean perform(@NotNull Ticker child, boolean isLast) {
 
             /*
              * Set the proposed shares the same as the considered shares, and
