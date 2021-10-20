@@ -9,28 +9,42 @@ import com.garygregg.rebalance.hierarchy.Institution;
 import com.garygregg.rebalance.hierarchy.Portfolio;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
+@SuppressWarnings("EmptyClassInitializer")
 public class PortfolioRebalancer extends Rebalancer {
+
+    // The default rebalancer
+    private static final AccountRebalancer defaultRebalancer =
+            new PassThroughRebalancer();
 
     // A rebalancer instance
     private static final PortfolioRebalancer instance =
             new PortfolioRebalancer();
 
     // The rebalancer for an account that is last
-    private final AccountRebalancer lastRebalancer = new DoNothingRebalancer();
+    private static final AccountRebalancer lastRebalancer = defaultRebalancer;
 
     // The rebalancer for an account that is not last
-    private final AccountRebalancer notLastRebalancer =
-            new DoNothingRebalancer();
+    private static final AccountRebalancer notLastRebalancer = defaultRebalancer;
 
     /*
-     * The rebalancer for test purposes. TODO: Delete this.
+     * A map of distinguished accounts to account rebalancers
+     *
+     * TODO: Delete this.
      */
-    private final AccountRebalancer testRebalancer = new WeightRebalancer();
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private static final Map<DistinguishedAccount, AccountRebalancer> rebalancerMap =
+            new HashMap<>();
+
+    static {
+
+        /*
+         * TODO: Put test rebalancers in this static block...
+         *
+         * ...but delete the block later, as well as all the other test code.
+         */
+    }
 
     // A rebalance action for accounts
     private final Action<Hierarchy, Account> accountAction =
@@ -177,26 +191,23 @@ public class PortfolioRebalancer extends Rebalancer {
      */
     private boolean rebalance(@NotNull Account account, boolean isLast) {
 
-        // Get the default rebalancer based on the 'isLast' flag.
-        AccountRebalancer rebalancer = isLast ? lastRebalancer :
-                notLastRebalancer;
+        /*
+         * Try to get an explicit rebalancer from the rebalancer map.
+         *
+         * TODO: Remove this logic when testing is complete.
+         */
+        AccountRebalancer rebalancer = rebalancerMap.get(
+                DistinguishedAccountLibrary.getInstance().getKey(
+                        account.getKey()));
 
         /*
-         * TODO: Remove this logic when testing is complete.
-         *
-         * Declare a distinguished account to be used for test purposes. Is the
-         * distinguished account not null, and does the distinguished account
-         * match the key of the incoming account?
+         * Use either the default 'last' rebalancer or the default 'not last'
+         * rebalancer if there is no explicit rebalancer.
          */
-        final DistinguishedAccount distinguishedAccount = null;
-        //noinspection ConstantConditions
-        if ((null != distinguishedAccount) && (distinguishedAccount.equals(
-                DistinguishedAccountLibrary.getInstance().getKey(
-                        account.getKey())))) {
-
-            // Accounts match. Reset the rebalancer to the test rebalancer.
-            rebalancer = testRebalancer;
+        if (null == rebalancer) {
+            rebalancer = isLast ? lastRebalancer : notLastRebalancer;
         }
+
 
         // Rebalance the account with the designated account rebalancer.
         return rebalancer.rebalance(account);
