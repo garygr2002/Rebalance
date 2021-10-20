@@ -74,8 +74,8 @@ class BalanceableWriter {
      * @param valueColumns The number of value columns
      * @return A table format
      */
-    private static String constructFormat(boolean rightJustify,
-                                          int valueColumns) {
+    private static @NotNull String constructFormat(boolean rightJustify,
+                                                   int valueColumns) {
 
         // Get the field length and construct the format string.
         final int fieldLength = getFieldLength();
