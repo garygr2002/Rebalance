@@ -6,6 +6,7 @@ import com.garygregg.rebalance.TaxType;
 import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -43,6 +44,24 @@ abstract class Aggregate<KeyType,
         @Override
         public void perform(@NotNull ChildType child) {
             child.clear();
+        }
+    };
+
+    // Set current values in each child
+    private final Operation doSetCurrent = new Operation() {
+
+        @Override
+        public void perform(@NotNull ChildType child) {
+            child.setCurrent();
+        }
+    };
+
+    // Set proposed values in each child
+    private final Operation doSetProposed = new Operation() {
+
+        @Override
+        public void perform(@NotNull ChildType child) {
+            child.setProposed();
         }
     };
 
@@ -153,7 +172,8 @@ abstract class Aggregate<KeyType,
      *
      * @return A modifiable child map
      */
-    private Map<Object, ChildType> createModifiableMap() {
+    @Contract(value = " -> new", pure = true)
+    private @NotNull Map<Object, ChildType> createModifiableMap() {
         return new TreeMap<>();
     }
 
@@ -395,7 +415,13 @@ abstract class Aggregate<KeyType,
 
     @Override
     void setCurrent() {
+
+        /*
+         * Set the weight type manager to use current values, then cause all
+         * the children to use current values.
+         */
         getWeightTypeManager().setCurrent();
+        doOperation(doSetCurrent);
     }
 
     @Override
@@ -417,7 +443,13 @@ abstract class Aggregate<KeyType,
 
     @Override
     void setProposed() {
+
+        /*
+         * Set the weight type manager to use proposed values, then cause all
+         * the children to use proposed values.
+         */
         getWeightTypeManager().setProposed();
+        doOperation(doSetProposed);
     }
 
     /**
