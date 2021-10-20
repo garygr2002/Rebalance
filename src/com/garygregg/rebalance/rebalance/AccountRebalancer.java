@@ -51,7 +51,7 @@ abstract class AccountRebalancer extends Rebalancer {
 
                 @Override
                 public double adjustEquity(double ratio) {
-                    return (ratio - 1.) * 5. / 8. + 1.;
+                    return ratio * 5. / 8.;
                 }
 
                 @Override
@@ -95,9 +95,9 @@ abstract class AccountRebalancer extends Rebalancer {
                      * Consider changing as follows (1 percent higher for every
                      * 4 percent drop in equities):
                      *
-                     * return (ratio - 1.) / 4. + 1.;
+                     * return ratio / 4.;
                      */
-                    return 1.;
+                    return 0.;
                 }
 
                 @Override
@@ -171,10 +171,10 @@ abstract class AccountRebalancer extends Rebalancer {
 
                 /*
                  * The current S&P 500 value is set, and its value is not zero.
-                 * Divide the high value by the current value and adjust the
-                 * weights in the map with this ratio.
+                 * Divide the high value by the current value, subtract one and
+                 * adjust the weights in the map with this ratio.
                  */
-                adjust(weightMap, procedure.adjustEquity(high / current));
+                adjust(weightMap, procedure.adjustEquity(high / current - 1.));
             }
         }
     }
@@ -208,7 +208,7 @@ abstract class AccountRebalancer extends Rebalancer {
          * Calculate the new stock weight and the new non-stock weight. Put the
          * new stock weight in the weight map.
          */
-        final double newStock = oldStock * ratio;
+        final double newStock = (oldStock / all + ratio) * all;
         final double newNonStock = all - newStock;
         weightMap.put(type, weightMap.get(type) * newStock);
 
