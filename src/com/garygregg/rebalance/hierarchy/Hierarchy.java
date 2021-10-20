@@ -1514,11 +1514,16 @@ public class Hierarchy {
         if (HoldingLineType.PORTFOLIO.equals(aggregate.getLineType())) {
 
             /*
-             * The aggregate is a portfolio. Set the aggregate to work with
-             * current values, then breakdown the holdings by category: weight
-             * type and tax type. Check on the resulting valuations.
+             * The aggregate is a portfolio. Clear the breakdown managers in
+             * the aggregate, then set them to work with current values.
              */
+            aggregate.clear();
             aggregate.setCurrent();
+
+            /*
+             * Breakdown the holdings by category: weight type and tax type.
+             * Check and report on the resulting valuations.
+             */
             aggregate.breakdown();
             checkAndReport(aggregate);
         }
