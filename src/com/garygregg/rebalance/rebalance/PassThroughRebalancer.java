@@ -15,7 +15,8 @@ public class PassThroughRebalancer extends EnumeratingRebalancer {
 
             // Get the value of the considered shares. Is the value not null?
             final Shares considered = child.getConsideredShares();
-            final Double value = (null == considered) ? null : considered.getValue();
+            final Double value = (null == considered) ? null :
+                    considered.getValue();
             if (null != value) {
 
                 /*
