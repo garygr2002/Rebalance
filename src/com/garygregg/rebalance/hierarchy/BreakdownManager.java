@@ -18,7 +18,8 @@ abstract class BreakdownManager<EnumType extends Enum<EnumType>,
             new ArrayList<>();
 
     // Our operation to clear a breakdown
-    private final Operation<EnumType, HierarchyType> clearOperation = IBreakdown::clear;
+    private final Operation<EnumType, HierarchyType> clearOperation =
+            IBreakdown::clear;
 
     // A breakdown for 'considered' values
     private final Breakdown<EnumType, HierarchyType> considered;
