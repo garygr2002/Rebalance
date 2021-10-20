@@ -231,7 +231,7 @@ abstract class SuperAggregate<KeyType,
          * Set the tax type manager to work with proposed values, then call the
          * superclass method.
          */
-        getTaxTypeManager().setCurrent();
-        super.setCurrent();
+        getTaxTypeManager().setProposed();
+        super.setProposed();
     }
 }
