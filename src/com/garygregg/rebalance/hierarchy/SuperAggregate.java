@@ -215,9 +215,10 @@ abstract class SuperAggregate<KeyType,
     public void setCurrent() {
 
         /*
-         * Set the tax type manager to work with current values, then call the
-         * superclass method.
+         * Set the category type manager and the tax type manager to work with
+         * current values, then call the superclass method.
          */
+        getCategoryTypeManager().setCurrent();
         getTaxTypeManager().setCurrent();
         super.setCurrent();
     }
@@ -228,9 +229,10 @@ abstract class SuperAggregate<KeyType,
     public void setProposed() {
 
         /*
-         * Set the tax type manager to work with proposed values, then call the
-         * superclass method.
+         * Set the category type manager and the tax type manager to work with
+         * proposed values, then call the superclass method.
          */
+        getCategoryTypeManager().setProposed();
         getTaxTypeManager().setProposed();
         super.setProposed();
     }
