@@ -10,7 +10,7 @@ class DoNothingRebalancer extends EnumeratingRebalancer {
     private final TickerAction action = new TickerAction() {
 
         @Override
-        public boolean perform(@NotNull Ticker child) {
+        public boolean perform(@NotNull Ticker child, boolean isLast) {
             return true;
         }
     };

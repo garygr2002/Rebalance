@@ -2,6 +2,8 @@ package com.garygregg.rebalance.rebalance;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
+
 class Rebalancer {
 
     /**
@@ -17,12 +19,35 @@ class Rebalancer {
             @NotNull ParentType parent,
             @NotNull Action<ParentType, ChildType> action) {
 
-        // Declare and initialize the result. Cycle for each child.
+        /*
+         * Declare and initialize the result. Declare a variable to hold a
+         * child.
+         */
         boolean result = true;
-        for (ChildType child : action.getChildren(parent)) {
+        ChildType child;
 
-            // Perform the action and re-initialize the result.
-            result = action.perform(child) && result;
+        // Get an iterator for the children. Is there at least one child?
+        final Iterator<ChildType> iterator =
+                action.getChildren(parent).iterator();
+        if (iterator.hasNext()) {
+
+            /*
+             * There is at least one child. Get the first child and cycle
+             * while additional children exist.
+             */
+            child = iterator.next();
+            while (iterator.hasNext()) {
+
+                /*
+                 * Perform the action on the current, non-last child, and get
+                 * the next child.
+                 */
+                result = action.perform(child, false) && result;
+                child = iterator.next();
+            }
+
+            // Perform the action on the last child.
+            result = action.perform(child, true) && result;
         }
 
         // Return the result.

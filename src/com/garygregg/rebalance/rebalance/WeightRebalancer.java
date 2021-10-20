@@ -20,7 +20,7 @@ class WeightRebalancer extends AccountRebalancer
     /**
      * Constructs an account rebalancer.
      */
-    private WeightRebalancer() {
+    public WeightRebalancer() {
         initialize();
     }
 

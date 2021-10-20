@@ -9,7 +9,10 @@ import com.garygregg.rebalance.hierarchy.Institution;
 import com.garygregg.rebalance.hierarchy.Portfolio;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 public class PortfolioRebalancer extends Rebalancer {
 
@@ -17,13 +20,17 @@ public class PortfolioRebalancer extends Rebalancer {
     private static final PortfolioRebalancer instance =
             new PortfolioRebalancer();
 
-    // A default rebalancer instance
-    private final AccountRebalancer defaultRebalancer =
+    // The rebalancer for an account that is last
+    private final AccountRebalancer lastRebalancer = new DoNothingRebalancer();
+
+    // The rebalancer for an account that is not last
+    private final AccountRebalancer notLastRebalancer =
             new DoNothingRebalancer();
 
-    // A map of distinguished accounts to account rebalancers
-    private final Map<DistinguishedAccount, AccountRebalancer> rebalancerMap =
-            new HashMap<>();
+    /*
+     * The rebalancer for test purposes. TODO: Delete this.
+     */
+    private final AccountRebalancer testRebalancer = new WeightRebalancer();
 
     // A rebalance action for accounts
     private final Action<Hierarchy, Account> accountAction =
@@ -36,8 +43,9 @@ public class PortfolioRebalancer extends Rebalancer {
                 }
 
                 @Override
-                public boolean perform(@NotNull Account child) {
-                    return rebalance(child);
+                public boolean perform(@NotNull Account child,
+                                       boolean isLast) {
+                    return rebalance(child, isLast);
                 }
             };
 
@@ -52,8 +60,9 @@ public class PortfolioRebalancer extends Rebalancer {
                 }
 
                 @Override
-                public boolean perform(@NotNull Account child) {
-                    return rebalance(child);
+                public boolean perform(@NotNull Account child,
+                                       boolean isLast) {
+                    return rebalance(child, isLast);
                 }
             };
 
@@ -68,7 +77,8 @@ public class PortfolioRebalancer extends Rebalancer {
                 }
 
                 @Override
-                public boolean perform(@NotNull Institution child) {
+                public boolean perform(@NotNull Institution child,
+                                       boolean isLast) {
                     return rebalance(child);
                 }
             };
@@ -84,34 +94,11 @@ public class PortfolioRebalancer extends Rebalancer {
                 }
 
                 @Override
-                public boolean perform(@NotNull Portfolio child) {
+                public boolean perform(@NotNull Portfolio child,
+                                       boolean isLast) {
                     return rebalance(child);
                 }
             };
-
-    {
-
-        /*
-         * Explicitly create, and assign rebalancers to distinguished accounts
-         * here.
-         */
-        rebalancerMap.put(DistinguishedAccount.HEALTH_SAVINGS_ACCOUNT,
-                new PassThroughRebalancer());
-
-        // Cycle for each distinguished account.
-        for (DistinguishedAccount distinguishedAccount :
-                DistinguishedAccount.values()) {
-
-            /*
-             * Add the default rebalancer to the rebalancer map if the map does
-             * not already contain an entry for the first/next distinguished
-             * account.
-             */
-            if (!rebalancerMap.containsKey(distinguishedAccount)) {
-                rebalancerMap.put(distinguishedAccount, defaultRebalancer);
-            }
-        }
-    }
 
     /**
      * Creates an account list from an account collection.
@@ -159,27 +146,6 @@ public class PortfolioRebalancer extends Rebalancer {
     }
 
     /**
-     * Gets a rebalancer given an account.
-     *
-     * @param account The account
-     * @return A rebalancer for the account
-     */
-    private @NotNull AccountRebalancer getRebalancer(
-            @NotNull Account account) {
-
-        /*
-         * Get a distinguished account from the distinguished account library
-         * using the account key. Use the distinguished account to get an
-         * account rebalancer. Return the default rebalancer if there is no
-         * explicit rebalancer.
-         */
-        final AccountRebalancer rebalancer =
-                rebalancerMap.get(DistinguishedAccountLibrary.getInstance().
-                        getKey(account.getKey()));
-        return (null == rebalancer) ? defaultRebalancer : rebalancer;
-    }
-
-    /**
      * Rebalances each institution in a portfolio
      *
      * @param portfolio The portfolio to rebalance
@@ -205,11 +171,35 @@ public class PortfolioRebalancer extends Rebalancer {
      * Rebalances an account.
      *
      * @param account The account to rebalance
+     * @param isLast  True if this is the last child; false otherwise
      * @return True if the account was successfully rebalanced; false
      * otherwise
      */
-    private boolean rebalance(@NotNull Account account) {
-        return getRebalancer(account).rebalance(account);
+    private boolean rebalance(@NotNull Account account, boolean isLast) {
+
+        // Get the default rebalancer based on the 'isLast' flag.
+        AccountRebalancer rebalancer = isLast ? lastRebalancer :
+                notLastRebalancer;
+
+        /*
+         * TODO: Remove this logic when testing is complete.
+         *
+         * Declare a distinguished account to be used for test purposes. Is the
+         * distinguished account not null, and does the distinguished account
+         * match the key of the incoming account?
+         */
+        final DistinguishedAccount distinguishedAccount = null;
+        //noinspection ConstantConditions
+        if ((null != distinguishedAccount) && (distinguishedAccount.equals(
+                DistinguishedAccountLibrary.getInstance().getKey(
+                        account.getKey())))) {
+
+            // Accounts match. Reset the rebalancer to the test rebalancer.
+            rebalancer = testRebalancer;
+        }
+
+        // Rebalance the account with the designated account rebalancer.
+        return rebalancer.rebalance(account);
     }
 
     /**
