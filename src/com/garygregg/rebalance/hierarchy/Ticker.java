@@ -268,7 +268,12 @@ public class Ticker extends
         return considered.getValue();
     }
 
-    public @NotNull Shares getConsideredShares() {
+    /**
+     * Gets the shares of the queryable that can be considered for rebalance.
+     *
+     * @return The shares of the queryable that can be considered for rebalance
+     */
+    public Shares getConsideredShares() {
         return considered.getShares();
     }
 
