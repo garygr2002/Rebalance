@@ -26,7 +26,8 @@ public class PortfolioRebalancer extends Rebalancer {
     private static final AccountRebalancer lastRebalancer = defaultRebalancer;
 
     // The rebalancer for an account that is not last
-    private static final AccountRebalancer notLastRebalancer = defaultRebalancer;
+    private static final AccountRebalancer notLastRebalancer =
+            defaultRebalancer;
 
     /*
      * A map of distinguished accounts to account rebalancers
@@ -51,7 +52,7 @@ public class PortfolioRebalancer extends Rebalancer {
             new Action<>() {
 
                 @Override
-                public @NotNull Collection<Account> getChildren(
+                public @NotNull Collection<Account> doGetChildren(
                         @NotNull Hierarchy hierarchy) {
                     return createAccountList(hierarchy.getAccounts());
                 }
@@ -68,7 +69,7 @@ public class PortfolioRebalancer extends Rebalancer {
             new Action<>() {
 
                 @Override
-                public @NotNull Collection<Account> getChildren(
+                public @NotNull Collection<Account> doGetChildren(
                         @NotNull Institution institution) {
                     return createAccountList(institution.getChildren());
                 }
@@ -85,9 +86,14 @@ public class PortfolioRebalancer extends Rebalancer {
             new Action<>() {
 
                 @Override
-                public @NotNull Collection<Institution> getChildren(
+                public @NotNull Collection<Institution> doGetChildren(
                         @NotNull Portfolio portfolio) {
                     return portfolio.getChildren();
+                }
+
+                @Override
+                public void onComplete() {
+                    breakdownPortfolio(getParent());
                 }
 
                 @Override
@@ -102,7 +108,7 @@ public class PortfolioRebalancer extends Rebalancer {
             new Action<>() {
 
                 @Override
-                public @NotNull Collection<Portfolio> getChildren(
+                public @NotNull Collection<Portfolio> doGetChildren(
                         @NotNull Hierarchy hierarchy) {
                     return hierarchy.getPortfolios();
                 }
@@ -113,6 +119,27 @@ public class PortfolioRebalancer extends Rebalancer {
                     return rebalance(child);
                 }
             };
+
+    /**
+     * Breaks down a portfolio by proposed values.
+     *
+     * @param portfolio A portfolio to break down
+     */
+    private static void breakdownPortfolio(Portfolio portfolio) {
+
+        // Is the portfolio not null?
+        if (null != portfolio) {
+
+            /*
+             * The portfolio is not null. Clear the breakdown managers in the
+             * portfolio, then set them to work with proposed values. Break
+             * down the portfolio.
+             */
+            portfolio.clear();
+            portfolio.setProposed();
+            portfolio.breakdown();
+        }
+    }
 
     /**
      * Creates an account list from an account collection.
@@ -221,7 +248,21 @@ public class PortfolioRebalancer extends Rebalancer {
      * otherwise
      */
     public boolean rebalanceByAccount(@NotNull Hierarchy hierarchy) {
-        return perform(hierarchy, accountAction);
+
+        /*
+         * Perform the account rebalancing action for each account in the
+         * hierarchy and save the result. Cycle for each portfolio in the
+         * hierarchy.
+         */
+        final boolean result = perform(hierarchy, accountAction);
+        for (Portfolio portfolio : hierarchy.getPortfolios()) {
+
+            // Break down the first/next portfolio.
+            breakdownPortfolio(portfolio);
+        }
+
+        // Return the result of the rebalance action.
+        return result;
     }
 
     /**

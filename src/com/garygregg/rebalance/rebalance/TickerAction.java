@@ -6,10 +6,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-abstract class TickerAction implements Action<Account, Ticker> {
+abstract class TickerAction extends Action<Account, Ticker> {
 
     @Override
-    public @NotNull Collection<Ticker> getChildren(@NotNull Account account) {
+    public @NotNull Collection<Ticker> doGetChildren(
+            @NotNull Account account) {
         return account.getChildren();
     }
 }
