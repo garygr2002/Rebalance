@@ -98,12 +98,12 @@ abstract class SuperAggregate<KeyType,
     void clear() {
 
         /*
-         * Call the superclass method, then clear both the category and tax
-         * type managers.
+         * Call the superclass method, then clear both the tax type
+         * and category type managers.
          */
         super.clear();
-        getCategoryTypeManager().clear();
         getTaxTypeManager().clear();
+        getCategoryTypeManager().clear();
     }
 
     /**
@@ -215,12 +215,12 @@ abstract class SuperAggregate<KeyType,
     public void setCurrent() {
 
         /*
-         * Set the category type manager and the tax type manager to work with
-         * current values, then call the superclass method.
+         * Call the superclass method, then set the tax type and category type
+         * managers to work with current values.
          */
-        getCategoryTypeManager().setCurrent();
-        getTaxTypeManager().setCurrent();
         super.setCurrent();
+        getTaxTypeManager().setCurrent();
+        getCategoryTypeManager().setCurrent();
     }
 
     /**
@@ -229,11 +229,11 @@ abstract class SuperAggregate<KeyType,
     public void setProposed() {
 
         /*
-         * Set the category type manager and the tax type manager to work with
-         * proposed values, then call the superclass method.
+         * Call the superclass method, then set the tax type and category type
+         * managers to work with proposed values.
          */
-        getCategoryTypeManager().setProposed();
-        getTaxTypeManager().setProposed();
         super.setProposed();
+        getTaxTypeManager().setProposed();
+        getCategoryTypeManager().setProposed();
     }
 }
