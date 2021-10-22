@@ -22,7 +22,7 @@ public class MutableCurrency extends MutableCountable
     private final Container<Currency> container = new Container<>(this);
 
     /**
-     * Constructs currency.
+     * Constructs mutable currency.
      *
      * @param value    The value of the currency
      * @param truncate True if the value should be truncated, false if rounded
@@ -33,7 +33,7 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Constructs currency with a default truncate flag.
+     * Constructs mutable currency with a default truncate flag.
      *
      * @param value The value of the currency
      */
@@ -42,7 +42,7 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Constructs currency from other mutable currency.
+     * Constructs mutable currency from other mutable currency.
      *
      * @param currency Other mutable currency
      */
@@ -51,7 +51,7 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Constructs currency from immutable currency.
+     * Constructs mutable currency from immutable currency.
      *
      * @param currency Immutable currency
      */
@@ -60,16 +60,16 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Constructs currency with zero initial value.
+     * Constructs mutable currency with zero initial value.
      */
     public MutableCurrency() {
         this(Currency.getZero());
     }
 
     /**
-     * Adds a currency value.
+     * Adds currency to mutable currency.
      *
-     * @param currency Another currency value
+     * @param currency A currency
      * @return The value that was set
      */
     public double add(@NotNull Currency currency) {
@@ -80,9 +80,9 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Adds a currency value.
+     * Adds mutable currency to mutable currency.
      *
-     * @param currency Another currency value
+     * @param currency A mutable currency
      * @return The value that was set
      */
     public double add(@NotNull MutableCurrency currency) {
@@ -115,9 +115,9 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Divides a currency value.
+     * Divides mutable currency with currency.
      *
-     * @param currency Another currency value
+     * @param currency A currency
      * @return The value that was set
      */
     public double divide(@NotNull Currency currency) {
@@ -133,9 +133,9 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Divides a currency value.
+     * Divides mutable currency with mutable currency.
      *
-     * @param currency Another currency value
+     * @param currency A mutable currency
      * @return The value that was set
      */
     public double divide(@NotNull MutableCurrency currency) {
@@ -193,9 +193,9 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Multiplies a currency value.
+     * Multiplies mutable currency with currency.
      *
-     * @param currency Another currency value
+     * @param currency A currency
      * @return The value that was set
      */
     public double multiply(@NotNull Currency currency) {
@@ -206,9 +206,9 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Multiplies a currency value.
+     * Multiplies mutable currency with mutable currency.
      *
-     * @param currency Another currency value
+     * @param currency A currency
      * @return The value that was set
      */
     public double multiply(@NotNull MutableCurrency currency) {
@@ -224,9 +224,9 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Sets a currency value.
+     * Sets mutable currency with currency.
      *
-     * @param currency Another currency value
+     * @param currency A currency
      * @return The value that was set
      */
     public double set(@NotNull Currency currency) {
@@ -237,9 +237,9 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Sets a currency value.
+     * Sets mutable currency with mutable currency.
      *
-     * @param currency Another currency value
+     * @param currency A mutable currency
      * @return The value that was set
      */
     public double set(@NotNull MutableCurrency currency) {
@@ -250,9 +250,9 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Subtracts a currency value.
+     * Subtracts currency from mutable currency.
      *
-     * @param currency Another currency value
+     * @param currency A currency
      * @return The value that was set
      */
     public double subtract(@NotNull Currency currency) {
@@ -263,9 +263,9 @@ public class MutableCurrency extends MutableCountable
     }
 
     /**
-     * Subtracts a currency value.
+     * Subtracts mutable currency from mutable currency.
      *
-     * @param currency Another currency value
+     * @param currency A mutable currency
      * @return The value that was set
      */
     public double subtract(@NotNull MutableCurrency currency) {

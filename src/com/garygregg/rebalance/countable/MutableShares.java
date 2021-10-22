@@ -22,7 +22,7 @@ public class MutableShares extends MutableCountable
     private final Container<Shares> container = new Container<>(this);
 
     /**
-     * Constructs shares.
+     * Constructs mutable shares.
      *
      * @param value    The value of the shares
      * @param truncate True if the value should be truncated, false if rounded
@@ -33,7 +33,7 @@ public class MutableShares extends MutableCountable
     }
 
     /**
-     * Constructs shares with a default truncate flag.
+     * Constructs mutable shares with a default truncate flag.
      *
      * @param value The value of the shares
      */
@@ -42,7 +42,7 @@ public class MutableShares extends MutableCountable
     }
 
     /**
-     * Constructs shares from other mutable shares.
+     * Constructs mutable shares from other mutable shares.
      *
      * @param shares Other mutable shares
      */
@@ -51,7 +51,7 @@ public class MutableShares extends MutableCountable
     }
 
     /**
-     * Constructs shares from immutable shares.
+     * Constructs mutable shares from immutable shares.
      *
      * @param shares Immutable shares
      */
@@ -67,9 +67,9 @@ public class MutableShares extends MutableCountable
     }
 
     /**
-     * Adds a shares value.
+     * Adds shares to mutable shares.
      *
-     * @param shares Another shares value
+     * @param shares A shares
      * @return The value that was set
      */
     public double add(@NotNull Shares shares) {
@@ -80,9 +80,9 @@ public class MutableShares extends MutableCountable
     }
 
     /**
-     * Adds a shares value.
+     * Adds mutable shares to mutable shares.
      *
-     * @param shares Another shares value
+     * @param shares A mutable shares
      * @return The value that was set
      */
     public double add(@NotNull MutableShares shares) {
@@ -162,9 +162,9 @@ public class MutableShares extends MutableCountable
     }
 
     /**
-     * Sets a shares value.
+     * Sets mutable shares with shares.
      *
-     * @param shares Another shares value
+     * @param shares A shares
      * @return The value that was set
      */
     public double set(@NotNull MutableShares shares) {
@@ -175,9 +175,9 @@ public class MutableShares extends MutableCountable
     }
 
     /**
-     * Subtracts a shares value.
+     * Subtracts shares from mutable shares.
      *
-     * @param shares Another shares value
+     * @param shares A shares
      * @return The value that was set
      */
     public double subtract(@NotNull Shares shares) {
@@ -188,9 +188,9 @@ public class MutableShares extends MutableCountable
     }
 
     /**
-     * Subtracts a shares value.
+     * Subtracts mutable shares from mutable shares.
      *
-     * @param shares Another shares value
+     * @param shares A mutable shares
      * @return The value that was set
      */
     public double subtract(@NotNull MutableShares shares) {

@@ -22,7 +22,7 @@ public class MutablePercent extends MutableCountable
     private final Container<Percent> container = new Container<>(this);
 
     /**
-     * Constructs percent.
+     * Constructs mutable percent.
      *
      * @param value    The value of the percent
      * @param truncate True if the value should be truncated, false if rounded
@@ -33,7 +33,7 @@ public class MutablePercent extends MutableCountable
     }
 
     /**
-     * Constructs percent with a default truncate flag.
+     * Constructs mutable percent with a default truncate flag.
      *
      * @param value The value of the percent
      */
@@ -42,7 +42,7 @@ public class MutablePercent extends MutableCountable
     }
 
     /**
-     * Constructs percent from other mutable percent.
+     * Constructs mutable percent from other mutable percent.
      *
      * @param percent Other mutable percent
      */
@@ -51,7 +51,7 @@ public class MutablePercent extends MutableCountable
     }
 
     /**
-     * Constructs percent from immutable percent.
+     * Constructs mutable percent from immutable percent.
      *
      * @param percent Immutable percent
      */
@@ -67,9 +67,9 @@ public class MutablePercent extends MutableCountable
     }
 
     /**
-     * Adds a percent value.
+     * Adds percent to mutable percent.
      *
-     * @param percent Another percent value
+     * @param percent A percent
      * @return The value that was set
      */
     public double add(@NotNull Percent percent) {
@@ -80,9 +80,9 @@ public class MutablePercent extends MutableCountable
     }
 
     /**
-     * Adds a percent value.
+     * Adds mutable percent to mutable percent.
      *
-     * @param percent Another percent value
+     * @param percent A mutable percent
      * @return The value that was set
      */
     public double add(@NotNull MutablePercent percent) {
@@ -162,9 +162,9 @@ public class MutablePercent extends MutableCountable
     }
 
     /**
-     * Sets a percent value.
+     * Sets mutable percent with mutable percent.
      *
-     * @param percent Another percent value
+     * @param percent A mutable percent
      * @return The value that was set
      */
     public double set(@NotNull MutablePercent percent) {
@@ -175,9 +175,9 @@ public class MutablePercent extends MutableCountable
     }
 
     /**
-     * Subtracts a percent value.
+     * Subtracts percent from mutable percent.
      *
-     * @param percent Another percent value
+     * @param percent A percent
      * @return The value that was set
      */
     public double subtract(@NotNull Percent percent) {
@@ -188,9 +188,9 @@ public class MutablePercent extends MutableCountable
     }
 
     /**
-     * Subtracts a percent value.
+     * Subtracts mutable percent from mutable percent.
      *
-     * @param percent Another percent value
+     * @param percent A mutable percent
      * @return The value that was set
      */
     public double subtract(@NotNull MutablePercent percent) {
