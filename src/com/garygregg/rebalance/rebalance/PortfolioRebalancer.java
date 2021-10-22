@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.rebalance;
 
+import com.garygregg.rebalance.BreakdownType;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.distinguished.DistinguishedAccount;
 import com.garygregg.rebalance.distinguished.DistinguishedAccountLibrary;
@@ -131,13 +132,10 @@ public class PortfolioRebalancer extends Rebalancer {
         if (null != portfolio) {
 
             /*
-             * The portfolio is not null. Clear the breakdown managers in the
-             * portfolio, then set them to work with proposed values. Break
-             * down the portfolio.
+             * The portfolio is not null. Break down the portfolio according to
+             * proposed valuations.
              */
-            portfolio.clear();
-            portfolio.setProposed();
-            portfolio.breakdown();
+            portfolio.breakdown(BreakdownType.PROPOSED);
         }
     }
 
