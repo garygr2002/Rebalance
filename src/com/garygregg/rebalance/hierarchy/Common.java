@@ -45,7 +45,8 @@ abstract class Common<KeyType,
     }
 
     /**
-     * Breaks down the hierarchy object valuation by category.
+     * Breaks down the hierarchy object valuation by category type, tax type
+     * and weight type using current or proposed valuations.
      */
     abstract void breakdown();
 
