@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.hierarchy;
 
+import com.garygregg.rebalance.BreakdownType;
 import com.garygregg.rebalance.FundType;
 import com.garygregg.rebalance.HoldingLineType;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
@@ -17,11 +18,38 @@ public class Portfolio
         super(mnemonic);
     }
 
-    @Override
-    public void breakdown() {
+    /**
+     * Breaks down the portfolio valuation by category type, tax type and
+     * weight type, using a given valuation type (current or proposed)
+     *
+     * @param type Indicates the valuation type (current or proposed)
+     */
+    public void breakdown(@NotNull BreakdownType type) {
 
-        // Made public here, that is all.
-        super.breakdown();
+        /*
+         * Clear the existing breakdown values. Is the indicated valuation type
+         * proposed?
+         */
+        clear();
+        if (BreakdownType.PROPOSED.equals(type)) {
+
+            /*
+             * The indicated valuation type is proposed, so set proposed
+             * values.
+             */
+            setProposed();
+        }
+
+        /*
+         * The indicated valuation type is not proposed, so assume current
+         * values are intended. Set current values.
+         */
+        else {
+            setCurrent();
+        }
+
+        // Break down the portfolio object.
+        breakdown();
     }
 
     @Override
@@ -44,19 +72,5 @@ public class Portfolio
     @Override
     public boolean hasFundType(@NotNull FundType type) {
         return type.equals(FundType.NOT_A_FUND);
-    }
-
-    @Override
-    public void setCurrent() {
-
-        // Made public here, that is all.
-        super.setCurrent();
-    }
-
-    @Override
-    public void setProposed() {
-
-        // Made public here, that is all.
-        super.setProposed();
     }
 }
