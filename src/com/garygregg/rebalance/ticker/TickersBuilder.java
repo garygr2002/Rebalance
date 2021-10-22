@@ -258,10 +258,12 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
                                         Double defaultValue) {
 
                     /*
-                     * Use the superclass to interpret the string, then get the
-                     * minimum number of shares.
+                     * Use the default value if the string is empty, otherwise
+                     * use superclass to interpret the string. Get the minimum
+                     * number of shares.
                      */
-                    Double result = super.interpret(string, defaultValue);
+                    Double result = string.isEmpty() ? defaultValue :
+                            super.interpret(string, defaultValue);
                     final Shares minimum = Shares.getMinimum();
 
                     /*
