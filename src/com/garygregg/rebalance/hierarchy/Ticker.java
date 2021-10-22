@@ -2,6 +2,7 @@ package com.garygregg.rebalance.hierarchy;
 
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.countable.Price;
 import com.garygregg.rebalance.countable.Purse;
 import com.garygregg.rebalance.countable.Shares;
 import com.garygregg.rebalance.ticker.TickerDescription;
@@ -306,7 +307,7 @@ public class Ticker extends
         return notConsidered.getShares();
     }
 
-    public @NotNull Currency getPrice() {
+    public @NotNull Price getPrice() {
         return considered.getPrice();
     }
 

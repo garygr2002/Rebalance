@@ -4,6 +4,7 @@ import com.garygregg.rebalance.Description;
 import com.garygregg.rebalance.HoldingKey;
 import com.garygregg.rebalance.HoldingLineType;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.countable.Price;
 import com.garygregg.rebalance.countable.Purse;
 import com.garygregg.rebalance.countable.Shares;
 import org.jetbrains.annotations.NotNull;
@@ -79,7 +80,7 @@ public class HoldingDescription implements Description<Integer> {
      *
      * @return The price of the holding
      */
-    public Currency getPrice() {
+    public Price getPrice() {
         return purse.getPrice();
     }
 

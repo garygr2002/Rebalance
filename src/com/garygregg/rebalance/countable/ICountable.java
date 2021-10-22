@@ -172,7 +172,7 @@ public interface ICountable {
      * @return The common price precision
      */
     static int getPricePrecision() {
-        return 3;
+        return 6;
     }
 
     /**
@@ -181,7 +181,7 @@ public interface ICountable {
      * @return The precision of the common shares
      */
     static int getSharesPrecision() {
-        return 3;
+        return 5;
     }
 
     /**

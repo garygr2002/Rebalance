@@ -8,6 +8,10 @@ public class Purse {
     private static final Factory<MutableCurrency> currencyFactory =
             MutableCurrency::new;
 
+    // A price factory
+    private static final Factory<MutablePrice> priceFactory =
+            MutablePrice::new;
+
     // The default price
     private static final double defaultPrice = 1.;
 
@@ -19,7 +23,7 @@ public class Purse {
             MutableShares::new;
 
     // The price of the purse
-    private MutableCurrency price;
+    private MutablePrice price;
 
     // The shares of the purse
     private MutableShares shares;
@@ -41,7 +45,7 @@ public class Purse {
             // Make sure there is at least one share, then set the price.
             shares = set(shares, defaultShares, sharesFactory, false);
             price = set(price, value.getValue() / shares.getValue(),
-                    currencyFactory, true);
+                    priceFactory, true);
         }
     };
 
@@ -60,7 +64,7 @@ public class Purse {
              * Make sure there is a price of at least 1.00, then set the
              * shares.
              */
-            price = set(price, defaultPrice, currencyFactory, false);
+            price = set(price, defaultPrice, priceFactory, false);
             shares = set(shares, value.getValue() / price.getValue(),
                     sharesFactory, true);
         }
@@ -103,7 +107,7 @@ public class Purse {
      *
      * @return The price
      */
-    public Currency getPrice() {
+    public Price getPrice() {
         return (null == price) ? null : price.getImmutable();
     }
 
@@ -150,7 +154,7 @@ public class Purse {
     public void setPrice(double newPrice) {
 
         // Set the price, then reset the value.
-        price = set(price, newPrice, currencyFactory, true);
+        price = set(price, newPrice, priceFactory, true);
         resetValue();
     }
 
