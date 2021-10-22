@@ -313,7 +313,7 @@ public class Hierarchy {
      * value by tax type, false otherwise
      */
     public static boolean checkTaxType(@NotNull Aggregate<?, ?, ?> aggregate) {
-        return check(allProposed, weightProposed, aggregate);
+        return check(allProposed, taxProposed, aggregate);
     }
 
     /**
@@ -1506,7 +1506,7 @@ public class Hierarchy {
 
         /*
          * Synthesize this aggregate, as necessary, and receive a status of
-         * that activity. Sum the aggregate if it has children.
+         * that activity. Sum the aggregate if it has children. Is the
          * aggregate a portfolio?
          */
         final boolean result = aggregate.synthesizeIf() &&
@@ -1514,17 +1514,11 @@ public class Hierarchy {
         if (HoldingLineType.PORTFOLIO.equals(aggregate.getLineType())) {
 
             /*
-             * The aggregate is a portfolio. Clear the breakdown managers in
-             * the aggregate, then set them to work with current values.
+             * The aggregate is a portfolio. Cast the aggregate to a portfolio,
+             * and break down the portfolio according to current values. Check
+             * and report on the resulting valuations.
              */
-            aggregate.clear();
-            aggregate.setCurrent();
-
-            /*
-             * Breakdown the holdings by category: weight type and tax type.
-             * Check and report on the resulting valuations.
-             */
-            aggregate.breakdown();
+            ((Portfolio) aggregate).breakdown(BreakdownType.CURRENT);
             checkAndReport(aggregate);
         }
 
