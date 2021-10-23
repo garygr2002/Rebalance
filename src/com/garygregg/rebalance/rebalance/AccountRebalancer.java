@@ -51,7 +51,15 @@ abstract class AccountRebalancer extends Rebalancer {
 
                 @Override
                 public double adjustEquity(double ratio) {
-                    return ratio * 5. / 8.;
+
+                    /*
+                     * Currently, we perform no adjustment at all here.
+                     * Consider changing as follows (1 percent higher for every
+                     * 4 percent drop in equities):
+                     *
+                     * return ratio / 4.;
+                     */
+                    return 0.;
                 }
 
                 @Override
@@ -89,15 +97,7 @@ abstract class AccountRebalancer extends Rebalancer {
 
                 @Override
                 public double adjustEquity(double ratio) {
-
-                    /*
-                     * Currently, we perform no adjustment at all here.
-                     * Consider changing as follows (1 percent higher for every
-                     * 4 percent drop in equities):
-                     *
-                     * return ratio / 4.;
-                     */
-                    return 0.;
+                    return ratio * 5. / 8.;
                 }
 
                 @Override
@@ -154,27 +154,29 @@ abstract class AccountRebalancer extends Rebalancer {
                                @NotNull OverlayProcedure procedure) {
 
         /*
-         * Get the preference manager, and the high S&P 500 setting from the
+         * Get the preference manager, and the current S&P 500 setting from the
          * manager. Is the current S&P 500 value set?
          */
         final PreferenceManager manager = PreferenceManager.getInstance();
-        final Double high = manager.getHigh();
-        if (null != high) {
+        final Double current = manager.getCurrent();
+        if (null != current) {
 
             /*
-             * The high S&P 500 value is set. Get the current S&P 500 setting
-             * from the manager. Is the current S&P 500 value set, and is its
+             * The current S&P 500 value is set. Get the high S&P 500 setting
+             * from the manager. Is the high S&P 500 value set, and is its
              * value not zero?
              */
-            final Double current = manager.getCurrent();
-            if (!((null == current) || (0. == current))) {
+            final Double high = manager.getHigh();
+            if (!((null == high) || (0. == high))) {
 
                 /*
-                 * The current S&P 500 value is set, and its value is not zero.
-                 * Divide the high value by the current value, subtract one and
-                 * adjust the weights in the map with this ratio.
+                 * The high S&P 500 value is set, and its value is not zero.
+                 * Subtract the current value from the high value and divide
+                 * the result by the high value. Adjust the weights in the
+                 * weight map with this ratio.
                  */
-                adjust(weightMap, procedure.adjustEquity(high / current - 1.));
+                adjust(weightMap,
+                        procedure.adjustEquity((high - current) / high));
             }
         }
     }
@@ -210,7 +212,7 @@ abstract class AccountRebalancer extends Rebalancer {
          */
         final double newStock = (oldStock / all + ratio) * all;
         final double newNonStock = all - newStock;
-        weightMap.put(type, weightMap.get(type) * newStock);
+        weightMap.put(type, newStock);
 
         /*
          * Calculate the non-stock ratio. Put the new bond weight in the weight
