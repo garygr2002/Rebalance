@@ -1,6 +1,7 @@
 package com.garygregg.rebalance;
 
 import com.garygregg.rebalance.cla.LevelPreferenceDispatch;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,7 +43,8 @@ public class PreferenceManager {
      *
      * @return The default path name
      */
-    private static String getDefaultPathName() {
+    @Contract(pure = true)
+    private static @NotNull String getDefaultPathName() {
         return "";
     }
 
@@ -79,7 +81,7 @@ public class PreferenceManager {
      * @param id The ID for which to get a double preference
      * @return The double value for the given preference ID
      */
-    private Double getDouble(@NotNull CommandLineId id) {
+    private @Nullable Double getDouble(@NotNull CommandLineId id) {
 
         /*
          * Get the default double. Get a preference for name of the command
