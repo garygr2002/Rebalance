@@ -6,6 +6,7 @@ import com.garygregg.rebalance.cla.CLAException;
 import com.garygregg.rebalance.cla.Dispatch;
 import com.garygregg.rebalance.cla.Informer;
 import com.garygregg.rebalance.cla.PreferenceDispatch;
+import com.garygregg.rebalance.countable.Percent;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
@@ -49,7 +50,7 @@ class Preference extends Informer implements Dispatch<CommandLineId> {
 
         // Display the preference for inflation.
         displayPreference(CommandLineId.INFLATION,
-                formatPreference(manager.getInflation()));
+                Percent.format(manager.getInflation()));
 
         // Display the preference for S&P 500 high.
         displayPreference(CommandLineId.HIGH,
