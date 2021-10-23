@@ -3,7 +3,10 @@ package com.garygregg.rebalance.rebalance;
 import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Ticker;
+import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
 
 class WeightRebalancer extends AccountRebalancer
         implements Ticker.WeightEnumerator {
@@ -17,11 +20,33 @@ class WeightRebalancer extends AccountRebalancer
     // The current ticker
     private Ticker currentTicker;
 
+    // A map of weight types to weights
+    private Map<WeightType, Double> weightMap;
+
     /**
      * Constructs an account rebalancer.
      */
     public WeightRebalancer() {
         initialize();
+    }
+
+    /**
+     * Determines whether an account should have an equity weight adjustment.
+     *
+     * @param account An account
+     * @return True if the account should have an equity weight adjustment;
+     * false otherwise
+     */
+    private static boolean shouldAdjust(@NotNull Account account) {
+
+        /*
+         * Get the portfolio description from the account. Return true if the
+         * portfolio description is not null, and it indicates that the
+         * adjustment should occur.
+         */
+        final PortfolioDescription description =
+                account.getPortfolioDescription();
+        return ((null != description) && description.shouldAdjust());
     }
 
     /**
@@ -40,12 +65,14 @@ class WeightRebalancer extends AccountRebalancer
         if (null == node) {
 
             /*
-             * There is no existing child for the incoming weight type. Create
-             * a new child with the weight type and weight.
-             *
-             * TODO: Get the weight from a table.
+             * There is no existing child for the incoming weight type. Get the
+             * weight map. Create a new child with the weight type and weight
+             * from the weight map if the weight map is not null. Otherwise use
+             * a default weight.
              */
-            currentNode.addChild(node = new RebalanceNode(type, 0.));
+            final Map<WeightType, Double> weightMap = getWeightMap();
+            currentNode.addChild(node = new RebalanceNode(type,
+                    (null == weightMap) ? 1. : weightMap.get(type)));
         }
 
         // Set the new current node, and return it.
@@ -83,7 +110,11 @@ class WeightRebalancer extends AccountRebalancer
     @Override
     protected boolean doRebalance(@NotNull Account account) {
 
-        // Cycle for each ticker in the account.
+        /*
+         * Set the weight map based on the given account, and cycle for each
+         * ticker in the account.
+         */
+        setWeightMap(getWeightsForPercentage(account, shouldAdjust(account)));
         for (Ticker ticker : account.getChildren()) {
 
             /*
@@ -102,6 +133,15 @@ class WeightRebalancer extends AccountRebalancer
          */
         initialize();
         return true;
+    }
+
+    /**
+     * Gets the map of weight types to weight.
+     *
+     * @return The map of weight types to weight
+     */
+    private Map<WeightType, Double> getWeightMap() {
+        return weightMap;
     }
 
     /**
@@ -124,6 +164,15 @@ class WeightRebalancer extends AccountRebalancer
         final RebalanceNode node = checkRoot(type) ? root :
                 adjustCurrent(type);
         node.addTicker(currentTicker);
+    }
+
+    /**
+     * Sets the map of weight types to weight.
+     *
+     * @param weightMap The map of weight type to weight
+     */
+    private void setWeightMap(Map<WeightType, Double> weightMap) {
+        this.weightMap = weightMap;
     }
 
     @Override
