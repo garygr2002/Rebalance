@@ -402,6 +402,27 @@ public class Ticker extends
     }
 
     /**
+     * Passes the number of considered shares through to the number of
+     * proposed shares.
+     */
+    public void passThrough() {
+
+        /*
+         * Get the number of considered shares. Is the number of considered
+         * shares not null?
+         */
+        final Shares consideredShares = getConsideredShares();
+        if (null != consideredShares) {
+
+            /*
+             * The number of considered shares is not null. Set the number of
+             * proposed shares to the same value.
+             */
+            proposed.setShares(consideredShares.getValue());
+        }
+    }
+
+    /**
      * Performs an activity for a weight type.
      *
      * @param type The given weight type
@@ -471,7 +492,7 @@ public class Ticker extends
      * @param value The proposed value of the ticker, relative to the value of
      *              the ticker that is considered for rebalance
      */
-    void setProposed(double value) {
+    private void setProposed(double value) {
         proposed.setValueAdjustShares(value);
     }
 
