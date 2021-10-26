@@ -303,11 +303,23 @@ public class Ticker extends
         return notConsidered.getValue();
     }
 
+    /**
+     * Gets the shares of the queryable that cannot be considered for
+     * rebalance.
+     *
+     * @return The shares of the queryable that cannot be considered for
+     * rebalance
+     */
     public @NotNull Shares getNotConsideredShares() {
         return notConsidered.getShares();
     }
 
-    public @NotNull Price getPrice() {
+    /**
+     * Gets the price of the ticker.
+     *
+     * @return The price of the ticker
+     */
+    public Price getPrice() {
         return considered.getPrice();
     }
 
@@ -321,6 +333,11 @@ public class Ticker extends
         return proposed.getValue();
     }
 
+    /**
+     * Gets the proposed shares of the ticker.
+     *
+     * @return The proposed shares of the ticker
+     */
     public Shares getProposedShares() {
         return proposed.getShares();
     }
@@ -462,7 +479,55 @@ public class Ticker extends
      * Sets the proposed number of shares of the ticker holding.
      */
     public void setProposedShares(double shares) {
-        proposed.setShares(shares);
+
+        /*
+         * Get the round number of shares called out by the balance rounding
+         * for this ticker.
+         */
+        final double balanceRounding = getBalanceRounding().getValue();
+        double roundShares = Math.round(shares / balanceRounding) *
+                balanceRounding;
+
+        /*
+         * Declare a variable to receive a minimum number of shares. Get the
+         * price of the ticker. Is the price null, or does it equal zero?
+         */
+        final double minimumShares;
+        final Price price = getPrice();
+        if ((null == price) || (Price.getZero().equals(price))) {
+
+            /*
+             * The price is null or equals zero. The minimum number of shares
+             * is assumed to be maximum.
+             */
+            minimumShares = Double.MAX_VALUE;
+        }
+
+        // The price is non-zero.
+        else {
+
+            /*
+             * Get the ticker description and the minimum value from the
+             * description.
+             */
+            final TickerDescription description = getDescription();
+            final Currency minimumFromDescription = (null == description) ?
+                    null : description.getMinimum();
+
+            /*
+             * Calculate the minimum value and minimum shares from the minimum
+             * value of the ticker description.
+             */
+            final Currency minimumValue = (null == minimumFromDescription) ?
+                    Currency.getZero() : minimumFromDescription;
+            minimumShares = minimumValue.getValue() / price.getValue();
+        }
+
+        /*
+         * Set zero as the proposed shares if the rounded share value is less
+         * than the minimum shares. Otherwise, set the rounded share value.
+         */
+        proposed.setShares(roundShares < minimumShares ? 0. : roundShares);
     }
 
     /**
