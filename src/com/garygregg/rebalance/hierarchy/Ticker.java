@@ -188,7 +188,7 @@ public class Ticker extends
      *
      * @return An artificial ticker
      */
-    public static @NotNull Ticker getArtificial() {
+    static @NotNull Ticker getArtificial() {
         return lazyBoy.getLazily();
     }
 
@@ -492,7 +492,7 @@ public class Ticker extends
      * @param value The proposed value of the ticker, relative to the value of
      *              the ticker that is considered for rebalance
      */
-    private void setProposed(double value) {
+    void setProposed(double value) {
         proposed.setValueAdjustShares(value);
     }
 
@@ -551,11 +551,7 @@ public class Ticker extends
         proposed.setShares(roundShares < minimumShares ? 0. : roundShares);
     }
 
-    /**
-     * Transfers value from a passed queryable to this object.
-     *
-     * @param queryable The queryable from which to obtain value
-     */
+    @Override
     protected void transferValue(@NotNull Queryable<?, ?> queryable) {
 
         /*
