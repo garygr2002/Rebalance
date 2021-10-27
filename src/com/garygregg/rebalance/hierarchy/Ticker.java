@@ -228,6 +228,42 @@ public class Ticker extends
         return new Ticker(Library.getDefaultStringKey());
     }
 
+    /**
+     * Determines if the ticker can accept any positive number of shares or
+     * currency value.
+     *
+     * @return True if the ticker can accept any positive number of shares or
+     * currency value; false otherwise
+     */
+    public boolean acceptAnyPositiveValue() {
+
+        // Return true if the description is not null, and...
+        final TickerDescription description = getDescription();
+        boolean result = (null != description);
+        if (result) {
+
+            /*
+             * ...the balance rounding is less than or equal to the minimum
+             * number of shares.
+             */
+            final Shares balanceRounding = description.getBalanceRounding();
+            result = (null != balanceRounding) && (balanceRounding.getValue()
+                    <= Shares.getMinimum().getValue());
+
+            // One more check if things are still okay...
+            if (result) {
+
+                // ...the minimum must be less than or equal to zero.
+                final Currency minimum = description.getMinimum();
+                result = (null != minimum) &&
+                        (minimum.getValue() <= Currency.getZero().getValue());
+            }
+        }
+
+        // Return the result.
+        return result;
+    }
+
     @Override
     void breakdown() {
         performActivity(WeightType.ALL);
