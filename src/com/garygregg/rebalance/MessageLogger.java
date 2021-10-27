@@ -85,14 +85,24 @@ public class MessageLogger {
     }
 
     /**
-     * Resets the problem flag.
+     * Resets all problem flags.
+     */
+    public void resetProblem() {
+
+        // Reset both the 1st and the 2nd problem flags.
+        resetProblem1();
+        resetProblem2();
+    }
+
+    /**
+     * Resets the 1st problem flag.
      */
     public void resetProblem1() {
         monitors.getFirst().reset();
     }
 
     /**
-     * Resets the problem flag.
+     * Resets the 2nd problem flag.
      */
     public void resetProblem2() {
         monitors.getSecond().reset();
