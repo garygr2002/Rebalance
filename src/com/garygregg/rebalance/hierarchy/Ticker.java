@@ -233,6 +233,18 @@ public class Ticker extends
         performActivity(WeightType.ALL);
     }
 
+    /**
+     * Calculates the proposed number of shares required to result in a given
+     * value, considering the current price.
+     *
+     * @param value The given value
+     * @return The proposed number of shares required to result in a given
+     * value considering the current price
+     */
+    public Double calculateShares(@NotNull Currency value) {
+        return proposed.calculateShares(value);
+    }
+
     @Override
     void clear() {
         getFullValueManager().clear();

@@ -8,15 +8,15 @@ public class Purse {
     private static final Factory<MutableCurrency> currencyFactory =
             MutableCurrency::new;
 
-    // A price factory
-    private static final Factory<MutablePrice> priceFactory =
-            MutablePrice::new;
-
     // The default price
     private static final double defaultPrice = 1.;
 
     // The default number of shares
     private static final double defaultShares = 1.;
+
+    // A price factory
+    private static final Factory<MutablePrice> priceFactory =
+            MutablePrice::new;
 
     // A shares factory
     private static final Factory<MutableShares> sharesFactory =
@@ -49,7 +49,37 @@ public class Purse {
         }
     };
 
-    // The reset for shares
+    /**
+     * Produces a new countable with a given value if the existing countable is
+     * null, or optionally sets an existing countable with the given value if
+     * the existing countable is <i>not</i> null.
+     *
+     * @param countable    The existing countable
+     * @param newValue     The value to use
+     * @param factory      A factory for producing a new countable, if necessary
+     * @param setIfNotNull True to set an existing countable, false otherwise
+     * @param <T>          Any type that extends mutable countable
+     * @return The existing countable if it had not been null, or the newly
+     * created countable
+     */
+    private static <T extends MutableCountable>
+    @NotNull T set(T countable, double newValue,
+                   @NotNull Factory<? extends T> factory,
+                   boolean setIfNotNull) {
+
+        // Produce a new countable if the existing countable is null...
+        if (null == countable) {
+            countable = factory.produce(newValue);
+        }
+
+        // ...otherwise set the existing countable if the flag so indicates.
+        else if (setIfNotNull) {
+            countable.set(newValue);
+        }
+
+        // Return the countable.
+        return countable;
+    }    // The reset for shares
     private final Reset forShares = new Reset() {
 
         @Override
@@ -65,41 +95,22 @@ public class Purse {
              * shares.
              */
             price = set(price, defaultPrice, priceFactory, false);
-            shares = set(shares, value.getValue() / price.getValue(),
+            shares = set(shares, calculateShares(value.getImmutable()),
                     sharesFactory, true);
         }
     };
 
     /**
-     * Produces a new countable with a given value if the existing countable is
-     * null, or optionally sets an existing countable with the given value if
-     * the existing countable is <i>not</i> null.
+     * Calculates the number of shares required to result in a given value,
+     * considering the current price.
      *
-     * @param countable    The existing countable
-     * @param newValue     The value to use
-     * @param factory      A factory for producing a new countable, if necessary
-     * @param setIfNotNull True to set an existing countable, false otherwise
-     * @param <T>          Any type that extends mutable countable
-     * @return The existing countable if it had not been null, or the newly
-     * created countable
+     * @param value The given value
+     * @return The number of shares required to result in a given value,
+     * considering the current price
      */
-    private static <T extends MutableCountable> T set(T countable,
-                                                      double newValue,
-                                                      @NotNull Factory<? extends T> factory,
-                                                      boolean setIfNotNull) {
-
-        // Produce a new countable if the existing countable is null...
-        if (null == countable) {
-            countable = factory.produce(newValue);
-        }
-
-        // ...otherwise set the existing countable if the flag so indicates.
-        else if (setIfNotNull) {
-            countable.set(newValue);
-        }
-
-        // Return the countable.
-        return countable;
+    public Double calculateShares(@NotNull Currency value) {
+        return forShares.okayToReset() ?
+                (value.getValue() / price.getValue()) : null;
     }
 
     /**
@@ -236,4 +247,6 @@ public class Purse {
          */
         void performReset();
     }
+
+
 }
