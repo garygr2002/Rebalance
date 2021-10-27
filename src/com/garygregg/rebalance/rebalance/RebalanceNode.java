@@ -11,6 +11,13 @@ class RebalanceNode {
 
     // The children of the node
     private final Map<WeightType, RebalanceNode> children = new HashMap<>();
+    // The can-accept for tickers
+    private final CanAccept<Ticker> forTickers =
+            Ticker::acceptAnyPositiveValue;
+
+    // The can-accept for nodes
+    private final CanAccept<RebalanceNode> forNodes =
+            RebalanceNode::acceptAnyPositiveValue;
 
     // The tickers in the node
     private final Set<Ticker> tickerSet =
@@ -21,7 +28,7 @@ class RebalanceNode {
 
     // The weight of the node (set once, accessed by the parent node)
     private final double weight;
-
+    
     // The value assigned to the node (set by the parent node, accessed here)
     private Currency value;
 
@@ -36,6 +43,51 @@ class RebalanceNode {
         // Set the weight type and weight.
         this.type = type;
         this.weight = weight;
+    }
+
+    /**
+     * Determines if any iterated object can accept any positive value.
+     *
+     * @param iterator  An iterator
+     * @param canAccept A can-accept
+     * @param <T>       An arbitrary type
+     * @return True if any iterated object can accept any positive value;
+     * false otherwise
+     */
+    private static <T>
+    boolean canAcceptAnyPositiveValue(@NotNull Iterator<T> iterator,
+                                      @NotNull CanAccept<T> canAccept) {
+
+        /*
+         * Declare and initialize the return value. Cycle while iterators
+         * exist, and while one has not indicated that it can accept any
+         * positive value.
+         */
+        boolean result = false;
+        while (iterator.hasNext() && (!result)) {
+
+            // Reset the result according to the first/next iterated object.
+            result = canAccept.acceptAnyPositiveValue(iterator.next());
+        }
+
+        // Return the result.
+        return true;
+    }
+
+    /**
+     * Determines if the node can accept any positive currency value.
+     *
+     * @return True if the ticker can accept any positive currency value;
+     * false otherwise
+     */
+    private boolean acceptAnyPositiveValue() {
+
+        // Return true if any child can accept a positive value, or...
+        return canAcceptAnyPositiveValue(children.values().iterator(),
+                forNodes) ||
+
+                // ...any ticker can accept a positive value.
+                canAcceptAnyPositiveValue(tickerSet.iterator(), forTickers);
     }
 
     /**
@@ -116,4 +168,20 @@ class RebalanceNode {
     public void setValue(Currency value) {
         this.value = value;
     }
+
+    private interface CanAccept<T> {
+
+        /**
+         * Determines whether its argument can accept any positive value.
+         *
+         * @param object The argument
+         * @return True if the argument can accept any positive value; false
+         * otherwise
+         */
+        boolean acceptAnyPositiveValue(@NotNull T object);
+    }
+
+
+
+
 }
