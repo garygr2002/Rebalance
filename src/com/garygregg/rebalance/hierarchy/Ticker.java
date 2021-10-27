@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Ticker extends
         Common<String, Common<?, ?, ?>, TickerDescription> {
@@ -21,8 +23,24 @@ public class Ticker extends
     // A lazy boy for an artificial ticker
     private static final LazyBoy<Ticker> lazyBoy = new LazyBoy<>(factory);
 
+    // Our message logger
+    private static final MessageLogger logger = new MessageLogger();
+
+    static {
+        logger.setLogger(Logger.getLogger(Ticker.class.getCanonicalName()));
+    }
+
     // The map of weight type to activities
     private final Map<WeightType, Activity> associationMap = new HashMap<>();
+
+    // Our ceiling function
+    private final SharesFunction ceiling = new SharesFunction() {
+
+        @Override
+        public double perform(@NotNull Double argument) {
+            return Math.ceil(argument);
+        }
+    };
 
     // The considered value of the ticker
     private final Purse considered = new Purse();
@@ -36,6 +54,15 @@ public class Ticker extends
 
     // The proposed value of the ticker
     private final Purse proposed = new Purse();
+
+    // Our round function
+    private final SharesFunction round = new SharesFunction() {
+
+        @Override
+        public double perform(@NotNull Double argument) {
+            return Math.round(argument);
+        }
+    };
 
     {
 
@@ -502,29 +529,65 @@ public class Ticker extends
     public void setProposedShares(double shares) {
 
         /*
-         * Get the round number of shares called out by the balance rounding
-         * for this ticker.
+         * Declare and initialize a logging level for ordinary messages. Format
+         * a prefix for logger messages. Round the given number of shares based
+         * on the preference rounding.
          */
-        final double balanceRounding = getBalanceRounding().getValue();
-        double roundShares = Math.round(shares / balanceRounding) *
-                balanceRounding;
+        final Level ordinary = Level.FINE;
+        final String prefix = String.format("Ticker '%s': ", getKey());
+        final double rounded = round.getRoundedShares(shares);
+
+        /*
+         * Are the rounded number of shares not equal to the given number of
+         * shares?
+         */
+        final Shares roundedShares = new Shares(rounded);
+        if (roundedShares.areNotEqual(shares)) {
+
+            /*
+             * The rounded number of shares are not equal to the given number
+             * of shares. Log this finding.
+             */
+            logger.logMessage(ordinary, String.format("%s%s shares were " +
+                            "requested, but I needed to round it to %s " +
+                            "shares.", prefix, Shares.format(shares),
+                    roundedShares));
+        }
 
         /*
          * Declare a variable to receive a minimum number of shares. Get the
-         * price of the ticker. Is the price null, or does it equal zero?
+         * price of the ticker. Is the price null?
          */
-        final double minimumShares;
+        double minimumShares;
         final Price price = getPrice();
-        if ((null == price) || (Price.getZero().equals(price))) {
+        if (null == price) {
 
             /*
-             * The price is null or equals zero. The minimum number of shares
-             * is assumed to be maximum.
+             * The price is null. Take a chance by setting the minimum required
+             * number of shares to zero. Log a warning.
              */
-            minimumShares = Double.MAX_VALUE;
+            minimumShares = 0.;
+            logger.logMessage(Level.WARNING, String.format("%sCannot " +
+                    "calculate whether the minimum value requirement is " +
+                    "met with a null price; taking a chance by assuming %s " +
+                    "minimum shares.", prefix, minimumShares));
         }
 
-        // The price is non-zero.
+        // The price is not null, but is it zero?
+        else if (Price.getZero().equals(price)) {
+
+            /*
+             * The price is zero. Set the minimum number of shares to the
+             * maximum possible value. Warn that there is no way to meet a
+             * minimum value requirement with zero value price.
+             */
+            minimumShares = Double.MAX_VALUE;
+            logger.logMessage(Level.WARNING, String.format("%sNo way to " +
+                            "meet minimum value requirements with zero price.",
+                    prefix));
+        }
+
+        // The price is non-null and non-zero.
         else {
 
             /*
@@ -536,19 +599,50 @@ public class Ticker extends
                     null : description.getMinimum();
 
             /*
-             * Calculate the minimum value and minimum shares from the minimum
-             * value of the ticker description.
+             * Calculate the minimum value from the minimum value of the ticker
+             * description.
              */
             final Currency minimumValue = (null == minimumFromDescription) ?
                     Currency.getZero() : minimumFromDescription;
-            minimumShares = minimumValue.getValue() / price.getValue();
+
+            // Now calculate the minimum number of shares.
+            minimumShares = ceiling.getRoundedShares(minimumValue.getValue() /
+                    price.getValue());
         }
 
         /*
-         * Set zero as the proposed shares if the rounded share value is less
-         * than the minimum shares. Otherwise, set the rounded share value.
+         * We now have our minimum shares. Assume the rounded number of shares
+         * are what we will set as the proposed number of shares. But is this
+         * less than the minimum?
          */
-        proposed.setShares(roundShares < minimumShares ? 0. : roundShares);
+        shares = rounded;
+        if (shares < minimumShares) {
+
+            /*
+             * The rounded number of shares is less than the minimum. Set zero
+             * shares if the rounded number of shares is less than half the
+             * minimum. Otherwise, use the minimum number of shares.
+             */
+            shares = (shares < (minimumShares / 2.)) ?
+                    Shares.getZero().getValue() : minimumShares;
+
+            /*
+             * Log a message about adjusting the requested number of shares
+             * because of the minimum.
+             */
+            logger.logMessage(ordinary, String.format("%s The rounded " +
+                            "number of shares, %s, is less than the minimum " +
+                            "required, %s; using %s.", prefix,
+                    Shares.format(rounded), Shares.format(minimumShares),
+                    Shares.format(shares)));
+        }
+
+        /*
+         * Reset any problems noted by the logger, and set the (possibly
+         * modified) number of shares.
+         */
+        logger.resetProblem();
+        proposed.setShares(shares);
     }
 
     @Override
@@ -560,6 +654,17 @@ public class Ticker extends
          */
         super.transferValue(queryable);
         setProposed(getValue(queryable.getProposed()));
+    }
+
+    private interface Function<T> {
+
+        /**
+         * Performs the function.
+         *
+         * @param argument The argument to the function
+         * @return The result of the function
+         */
+        double perform(@NotNull T argument);
     }
 
     public interface WeightEnumerator {
@@ -593,6 +698,29 @@ public class Ticker extends
         public Association(@NotNull FundType fundType,
                            @NotNull WeightType weightType) {
             super(fundType, weightType);
+        }
+    }
+
+    private abstract class SharesFunction implements Function<Double> {
+
+        /**
+         * Gets the rounded number of shares.
+         *
+         * @param shares The input number of shares
+         * @return The rounded number of shares
+         */
+        public double getRoundedShares(double shares) {
+
+            /*
+             * Get the balance rounding. Use one if the balance rounding is
+             * null. Otherwise, use the given balance rounding.
+             */
+            final Shares balanceRounding = getBalanceRounding();
+            final double roundingValue = (null == balanceRounding) ?
+                    Shares.getOne().getValue() : balanceRounding.getValue();
+
+            // Perform the shares function, and return the result.
+            return perform(shares / roundingValue) * roundingValue;
         }
     }
 
