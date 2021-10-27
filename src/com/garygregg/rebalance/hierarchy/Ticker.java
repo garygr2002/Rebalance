@@ -536,6 +536,22 @@ public class Ticker extends
     }
 
     /**
+     * Sets the proposed value of the ticker.
+     *
+     * @param currency The proposed value of the ticker
+     */
+    public void setProposed(@NotNull Currency currency) {
+
+        // Calculate the proposed shares. Are the proposed shares not null?
+        final Double proposedShares = calculateShares(currency);
+        if (null != proposedShares) {
+
+            // The proposed shares are not null. Set them.
+            setProposedShares(proposedShares);
+        }
+    }
+
+    /**
      * Sets the proposed number of shares of the ticker holding.
      */
     public void setProposedShares(double shares) {
