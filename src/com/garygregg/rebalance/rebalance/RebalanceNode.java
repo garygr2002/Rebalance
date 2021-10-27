@@ -11,24 +11,25 @@ class RebalanceNode {
 
     // The children of the node
     private final Map<WeightType, RebalanceNode> children = new HashMap<>();
+
     // The can-accept for tickers
     private final CanAccept<Ticker> forTickers =
             Ticker::acceptAnyPositiveValue;
 
-    // The can-accept for nodes
-    private final CanAccept<RebalanceNode> forNodes =
-            RebalanceNode::acceptAnyPositiveValue;
-
     // The tickers in the node
     private final Set<Ticker> tickerSet =
             new TreeSet<>(Comparator.comparing(Ticker::getKey));
+
+    // The can-accept for nodes
+    private final CanAccept<RebalanceNode> forNodes =
+            RebalanceNode::acceptAnyPositiveValue;
 
     // The weight type assigned to the node
     private final WeightType type;
 
     // The weight of the node (set once, accessed by the parent node)
     private final double weight;
-    
+
     // The value assigned to the node (set by the parent node, accessed here)
     private Currency value;
 
@@ -180,8 +181,4 @@ class RebalanceNode {
          */
         boolean acceptAnyPositiveValue(@NotNull T object);
     }
-
-
-
-
 }
