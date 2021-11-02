@@ -45,6 +45,15 @@ public class Ticker extends
     // The considered value of the ticker
     private final Purse considered = new Purse();
 
+    // Our floor function
+    private final SharesFunction floor = new SharesFunction() {
+
+        @Override
+        public double perform(@NotNull Double argument) {
+            return Math.floor(argument);
+        }
+    };
+
     // Our breakdown manager for the weight type
     private final FullValueBreakdownManager<Ticker> fullValueManager =
             new FullValueBreakdownManager<>();
@@ -574,32 +583,50 @@ public class Ticker extends
     /**
      * Sets the proposed value of the ticker.
      *
-     * @param currency The proposed value of the ticker
+     * @param currency       The proposed value of the ticker
+     * @param okayToTakeMore True if it is okay for this ticker holding to take
+     *                       more than the proposed number of value (based on
+     *                       preferred balance rounding of shares, and minimum
+     *                       balance); false otherwise
      */
-    public void setProposed(@NotNull Currency currency) {
+    public void setProposed(@NotNull Currency currency,
+                            boolean okayToTakeMore) {
 
         // Calculate the proposed shares. Are the proposed shares not null?
         final Double proposedShares = calculateShares(currency);
         if (null != proposedShares) {
 
             // The proposed shares are not null. Set them.
-            setProposedShares(proposedShares);
+            setProposedShares(proposedShares, okayToTakeMore);
         }
     }
 
-    /**
+    /***
      * Sets the proposed number of shares of the ticker holding.
+     *
+     * @param shares The proposed number of shares of the ticker holding
+     * @param okayToTakeMore True if it is okay for this ticker holding to take
+     *                       more than the proposed number of shares (based on
+     *                       preferred balance rounding and minimum balance);
+     *                       false otherwise
      */
-    public void setProposedShares(double shares) {
+    public void setProposedShares(double shares, boolean okayToTakeMore) {
 
         /*
          * Declare and initialize a logging level for ordinary messages. Format
-         * a prefix for logger messages. Round the given number of shares based
-         * on the preference rounding.
+         * a prefix for logger messages.
          */
         final Level ordinary = Level.FINE;
         final String prefix = String.format("Ticker '%s': ", getKey());
-        final double rounded = round.getRoundedShares(shares);
+
+        /*
+         * Round the given number of shares based on the preference rounding.
+         * Round to the nearest balance rounding (possibly up) if it is okay to
+         * take more. Otherwise, unconditionally round down.
+         */
+        final double rounded = okayToTakeMore ?
+                round.getRoundedShares(shares) :
+                floor.getRoundedShares(shares);
 
         /*
          * Are the rounded number of shares not equal to the given number of
@@ -684,11 +711,21 @@ public class Ticker extends
 
             /*
              * The rounded number of shares is less than the minimum. Set zero
-             * shares if the rounded number of shares is less than half the
-             * minimum. Otherwise, use the minimum number of shares.
+             * shares if it is not okay to take more, or if the number of
+             * shares is less than half the minimum...
              */
-            shares = (shares < (minimumShares / 2.)) ?
-                    Shares.getZero().getValue() : minimumShares;
+            if ((!okayToTakeMore) || (shares < (minimumShares / 2.))) {
+                shares = Shares.getZero().getValue();
+            }
+
+            /*
+             * ...or set the minimum number of shares if it is okay to take
+             * more, and the number of shares is greater than or equal to half
+             * the minimum.
+             */
+            else {
+                shares = minimumShares;
+            }
 
             /*
              * Log a message about adjusting the requested number of shares
