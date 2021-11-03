@@ -15,7 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Ticker extends
-        Common<String, Common<?, ?, ?>, TickerDescription> {
+        Common<String, Common<?, ?, ?>, TickerDescription>
+        implements CurrencyReceiver {
 
     // A factory for producing artificial tickers
     private static final Factory<Ticker> factory = Ticker::getNewArtificial;
@@ -580,15 +581,7 @@ public class Ticker extends
         proposed.setValueAdjustShares(value);
     }
 
-    /**
-     * Sets the proposed value of the ticker.
-     *
-     * @param currency       The proposed value of the ticker
-     * @param okayToTakeMore True if it is okay for this ticker holding to take
-     *                       more than the proposed number of value (based on
-     *                       preferred balance rounding of shares, and minimum
-     *                       balance); false otherwise
-     */
+    @Override
     public void setProposed(@NotNull Currency currency,
                             boolean okayToTakeMore) {
 
