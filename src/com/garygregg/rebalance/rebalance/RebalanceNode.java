@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.rebalance;
 
+import com.garygregg.rebalance.CurrencyReceiver;
 import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.hierarchy.Ticker;
@@ -7,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-class RebalanceNode {
+class RebalanceNode implements CurrencyReceiver {
 
     // The children of the node
     private final Map<WeightType, RebalanceNode> children = new HashMap<>();
@@ -98,7 +99,7 @@ class RebalanceNode {
      * @return Any child previously mapped to the weight type of the node
      */
     @SuppressWarnings("UnusedReturnValue")
-    RebalanceNode addChild(@NotNull RebalanceNode child) {
+    public RebalanceNode addChild(@NotNull RebalanceNode child) {
         return children.put(child.getType(), child);
     }
 
@@ -109,7 +110,7 @@ class RebalanceNode {
      * @return True if the group did not already contain the specified ticker
      */
     @SuppressWarnings("UnusedReturnValue")
-    boolean addTicker(@NotNull Ticker ticker) {
+    public boolean addTicker(@NotNull Ticker ticker) {
         return tickerSet.add(ticker);
     }
 
@@ -159,6 +160,13 @@ class RebalanceNode {
      */
     public double getWeight() {
         return weight;
+    }
+
+    @Override
+    public void setProposed(@NotNull Currency currency,
+                            boolean okayToTakeMore) {
+
+        // TODO: Fill this in.
     }
 
     /**
