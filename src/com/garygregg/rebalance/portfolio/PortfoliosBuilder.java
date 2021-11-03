@@ -5,6 +5,7 @@ import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.interpreter.BooleanInterpreter;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import com.garygregg.rebalance.interpreter.FilingStatusInterpreter;
+import com.garygregg.rebalance.interpreter.PositiveInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -540,7 +541,8 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
             FieldProcessor<PortfolioDescription> {
 
         // Our allocation interpreter
-        private final DoubleInterpreter interpreter = new DoubleInterpreter() {
+        private final DoubleInterpreter interpreter =
+                new PositiveInterpreter() {
 
             @Override
             protected void receiveException(@NotNull Exception exception,

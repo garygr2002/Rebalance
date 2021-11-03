@@ -4,6 +4,7 @@ import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Percent;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
+import com.garygregg.rebalance.interpreter.PositiveInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
@@ -18,7 +19,8 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
 
     // Our rate interpreter
     private final DoubleInterpreter rateInterpreter =
-            new DoubleInterpreter() {
+            new PositiveInterpreter() {
+
                 @Override
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
@@ -33,7 +35,8 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
 
     // Our threshold interpreter
     private final DoubleInterpreter thresholdInterpreter =
-            new DoubleInterpreter() {
+            new PositiveInterpreter() {
+
                 @Override
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,

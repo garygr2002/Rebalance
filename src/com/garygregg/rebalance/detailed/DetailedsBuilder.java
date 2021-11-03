@@ -6,6 +6,7 @@ import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import com.garygregg.rebalance.interpreter.LongInterpreter;
+import com.garygregg.rebalance.interpreter.PositiveInterpreter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class DetailedsBuilder extends ElementReader<DetailedDescription> {
 
     // Our allocation interpreter
     private final DoubleInterpreter allocationInterpreter =
-            new DoubleInterpreter() {
+            new PositiveInterpreter() {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,

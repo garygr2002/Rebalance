@@ -5,10 +5,7 @@ import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.FundType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Shares;
-import com.garygregg.rebalance.interpreter.CodeInterpreter;
-import com.garygregg.rebalance.interpreter.DoubleInterpreter;
-import com.garygregg.rebalance.interpreter.IntegerInterpreter;
-import com.garygregg.rebalance.interpreter.TickerInterpreter;
+import com.garygregg.rebalance.interpreter.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -251,7 +248,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
 
     // Our balance rounding interpreter
     private final DoubleInterpreter roundingInterpreter =
-            new DoubleInterpreter() {
+            new PositiveInterpreter() {
 
                 @Override
                 public Double interpret(@NotNull String string,

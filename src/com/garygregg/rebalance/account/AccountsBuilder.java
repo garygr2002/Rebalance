@@ -29,7 +29,7 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
 
     // Our allocation interpreter
     private final DoubleInterpreter allocationInterpreter =
-            new DoubleInterpreter() {
+            new PositiveInterpreter() {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,

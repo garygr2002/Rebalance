@@ -6,6 +6,7 @@ import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Shares;
 import com.garygregg.rebalance.interpreter.CodeInterpreter;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
+import com.garygregg.rebalance.interpreter.PositiveInterpreter;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
 import com.garygregg.rebalance.ticker.TickerLibrary;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +57,7 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
 
     // Our shares interpreter
     private final DoubleInterpreter sharesInterpreter =
-            new DoubleInterpreter() {
+            new PositiveInterpreter() {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
