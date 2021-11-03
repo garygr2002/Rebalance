@@ -11,19 +11,13 @@ import java.util.*;
 class RebalanceNode implements CurrencyReceiver {
 
     // The children of the node
-    private final Map<WeightType, RebalanceNode> children = new HashMap<>();
-
-    // The can-accept for tickers
-    private final CanAccept<Ticker> forTickers =
-            Ticker::acceptAnyPositiveValue;
+    private final SortedMap<WeightType, NodeDelegate> children =
+            new TreeMap<>();
 
     // The tickers in the node
-    private final Set<Ticker> tickerSet =
-            new TreeSet<>(Comparator.comparing(Ticker::getKey));
-
-    // The can-accept for nodes
-    private final CanAccept<RebalanceNode> forNodes =
-            RebalanceNode::acceptAnyPositiveValue;
+    private final SortedSet<TickerDelegate> tickerSet =
+            new TreeSet<>(Comparator.comparing(tickerDelegate ->
+                    tickerDelegate.getReceiver().getKey()));
 
     // The weight type assigned to the node
     private final WeightType type;
@@ -48,48 +42,15 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Determines if any iterated object can accept any positive value.
+     * Interprets a receiver delegate.
      *
-     * @param iterator  An iterator
-     * @param canAccept A can-accept
-     * @param <T>       An arbitrary type
-     * @return True if any iterated object can accept any positive value;
-     * false otherwise
+     * @param delegate A receiver delegate
+     * @param <T>      A currency receiver type
+     * @return The interpretation of the receiver delegate
      */
-    private static <T>
-    boolean canAcceptAnyPositiveValue(@NotNull Iterator<T> iterator,
-                                      @NotNull CanAccept<T> canAccept) {
-
-        /*
-         * Declare and initialize the return value. Cycle while iterators
-         * exist, and while one has not indicated that it can accept any
-         * positive value.
-         */
-        boolean result = false;
-        while (iterator.hasNext() && (!result)) {
-
-            // Reset the result according to the first/next iterated object.
-            result = canAccept.acceptAnyPositiveValue(iterator.next());
-        }
-
-        // Return the result.
-        return true;
-    }
-
-    /**
-     * Determines if the node can accept any positive currency value.
-     *
-     * @return True if the ticker can accept any positive currency value;
-     * false otherwise
-     */
-    private boolean acceptAnyPositiveValue() {
-
-        // Return true if any child can accept a positive value, or...
-        return canAcceptAnyPositiveValue(children.values().iterator(),
-                forNodes) ||
-
-                // ...any ticker can accept a positive value.
-                canAcceptAnyPositiveValue(tickerSet.iterator(), forTickers);
+    private static <T extends CurrencyReceiver> T interpret(
+            ReceiverDelegate<T> delegate) {
+        return (null == delegate) ? null : delegate.getReceiver();
     }
 
     /**
@@ -100,7 +61,15 @@ class RebalanceNode implements CurrencyReceiver {
      */
     @SuppressWarnings("UnusedReturnValue")
     public RebalanceNode addChild(@NotNull RebalanceNode child) {
-        return children.put(child.getType(), child);
+
+        /*
+         * Add a new node delegate for the child, receiving any delegate
+         * previously mapped to the weight type. Return the interpretation of
+         * the old delegate.
+         */
+        final NodeDelegate delegate = children.put(child.getType(),
+                new NodeDelegate(child));
+        return interpret(delegate);
     }
 
     /**
@@ -111,7 +80,7 @@ class RebalanceNode implements CurrencyReceiver {
      */
     @SuppressWarnings("UnusedReturnValue")
     public boolean addTicker(@NotNull Ticker ticker) {
-        return tickerSet.add(ticker);
+        return tickerSet.add(new TickerDelegate(ticker));
     }
 
     /**
@@ -132,7 +101,7 @@ class RebalanceNode implements CurrencyReceiver {
      * mapped to the weight type
      */
     public RebalanceNode getChild(@NotNull WeightType type) {
-        return children.get(type);
+        return children.get(type).getReceiver();
     }
 
     /**
@@ -175,17 +144,5 @@ class RebalanceNode implements CurrencyReceiver {
      */
     public void setValue(Currency value) {
         this.value = value;
-    }
-
-    private interface CanAccept<T> {
-
-        /**
-         * Determines whether its argument can accept any positive value.
-         *
-         * @param object The argument
-         * @return True if the argument can accept any positive value; false
-         * otherwise
-         */
-        boolean acceptAnyPositiveValue(@NotNull T object);
     }
 }
