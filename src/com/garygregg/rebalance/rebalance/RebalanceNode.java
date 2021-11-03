@@ -163,8 +163,7 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     @Override
-    public void setProposed(@NotNull Currency currency,
-                            boolean okayToTakeMore) {
+    public void setProposed(@NotNull Currency currency) {
 
         // TODO: Fill this in.
     }

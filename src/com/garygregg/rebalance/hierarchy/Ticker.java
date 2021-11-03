@@ -582,15 +582,14 @@ public class Ticker extends
     }
 
     @Override
-    public void setProposed(@NotNull Currency currency,
-                            boolean okayToTakeMore) {
+    public void setProposed(@NotNull Currency currency) {
 
         // Calculate the proposed shares. Are the proposed shares not null?
         final Double proposedShares = calculateShares(currency);
         if (null != proposedShares) {
 
             // The proposed shares are not null. Set them.
-            setProposedShares(proposedShares, okayToTakeMore);
+            setProposedShares(proposedShares, true);
         }
     }
 

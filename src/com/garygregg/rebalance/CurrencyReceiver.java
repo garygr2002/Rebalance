@@ -9,8 +9,6 @@ public interface CurrencyReceiver {
      * Sets the proposed value of the receiver.
      *
      * @param currency       The proposed value of the receiver
-     * @param okayToTakeMore True if it is okay for this receiver to take more
-     *                       than the proposed value; false otherwise
      */
-    void setProposed(@NotNull Currency currency, boolean okayToTakeMore);
+    void setProposed(@NotNull Currency currency);
 }

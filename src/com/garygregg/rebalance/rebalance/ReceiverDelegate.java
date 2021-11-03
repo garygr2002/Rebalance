@@ -47,11 +47,10 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
 
         /*
          * Add the given value to the last value that was commanded set, and
-         * pass the proposed value on to our receiver along with an indication
-         * that it is *not* okay to take more.
+         * pass the proposed value on to our receiver.
          */
         last.add(currency);
-        setProposed(last.getImmutable(), false);
+        setProposed(last.getImmutable());
     }
 
     /**
@@ -146,24 +145,13 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
     }
 
     @Override
-    public void setProposed(@NotNull Currency currency,
-                            boolean okayToTakeMore) {
-        getReceiver().setProposed(last.getImmutable(), okayToTakeMore);
-    }
-
-    /**
-     * Gets the proposed value of the receiver.
-     *
-     * @param currency The proposed value of the receiver
-     */
     public void setProposed(@NotNull Currency currency) {
 
         /*
          * Set the last value that was commanded set, and pass the proposed
-         * value on to our receiver along with an indication that it is okay to
-         * take more.
+         * value on to our receiver.
          */
         last = new MutableCurrency(currency);
-        setProposed(last.getImmutable(), true);
+        getReceiver().setProposed(last.getImmutable());
     }
 }
