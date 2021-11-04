@@ -1,10 +1,8 @@
 package com.garygregg.rebalance.hierarchy;
 
+import com.garygregg.rebalance.Factory;
 import com.garygregg.rebalance.*;
-import com.garygregg.rebalance.countable.Currency;
-import com.garygregg.rebalance.countable.Price;
-import com.garygregg.rebalance.countable.Purse;
-import com.garygregg.rebalance.countable.Shares;
+import com.garygregg.rebalance.countable.*;
 import com.garygregg.rebalance.ticker.TickerDescription;
 import org.jetbrains.annotations.NotNull;
 
@@ -546,7 +544,7 @@ public class Ticker extends
     }
 
     @Override
-    public void setProposed(@NotNull Currency currency) {
+    public @NotNull Currency setProposed(@NotNull Currency currency) {
 
         // Calculate the proposed shares. Are the proposed shares not null?
         final Double proposedShares = calculateShares(currency);
@@ -555,6 +553,20 @@ public class Ticker extends
             // The proposed shares are not null. Set them.
             setProposedShares(proposedShares, true);
         }
+
+        /*
+         * Get the proposed value that was set. Create a new mutable currency
+         * with the desired value.
+         */
+        final Currency valueSet = getProposed();
+        final MutableCurrency mutableCurrency = new MutableCurrency(currency);
+
+        /*
+         * Subtract the value that was set from the desired value, and return
+         * it.
+         */
+        mutableCurrency.subtract((null == valueSet) ? currency : valueSet);
+        return mutableCurrency.getImmutable();
     }
 
     /***

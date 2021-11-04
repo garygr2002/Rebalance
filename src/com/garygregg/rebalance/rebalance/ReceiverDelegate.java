@@ -171,25 +171,34 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
     }
 
     /**
+     * Performs an action if explicit value cannot be set in the receiver
+     * delegate.
+     */
+    public void onCannotSet() {
+
+        // The default is to do nothing.
+    }
+
+    /**
      * Sets whether this delegate is to be considered to receive additional
      * value.
      *
      * @param considerMe True if this delegate is to be considered to receive
      *                   additional value; false otherwise
      */
-    public void setConsiderMe(boolean considerMe) {
+    public void setConsidered(boolean considerMe) {
         this.considerMe = considerMe;
     }
 
     @Override
-    public void setProposed(@NotNull Currency currency) {
+    public @NotNull Currency setProposed(@NotNull Currency currency) {
 
         /*
          * Set the last value that was commanded set, and pass the proposed
          * value on to our receiver.
          */
         last = new MutableCurrency(currency);
-        getReceiver().setProposed(last.getImmutable());
+        return getReceiver().setProposed(last.getImmutable());
     }
 
     /**
