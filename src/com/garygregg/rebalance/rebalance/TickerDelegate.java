@@ -19,4 +19,15 @@ class TickerDelegate extends ReceiverDelegate<Ticker> {
     public Currency getProposed() {
         return getReceiver().getProposed();
     }
+
+    @Override
+    public void onCannotSet() {
+
+        /*
+         * Call the superclass method, then pass through proposed value in
+         * the ticker.
+         */
+        super.onCannotSet();
+        getReceiver().passThrough();
+    }
 }
