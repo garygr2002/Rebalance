@@ -17,8 +17,14 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
     // The weight of the delegate
     private final double weight;
 
+    // Consider this delegate to receive additional value
+    private boolean considerMe;
+
     // The last value that was commanded as set
     private MutableCurrency last;
+
+    // A snapshot of the current value
+    private Currency snapshot;
 
     /**
      * Constructs the receiver delegate.
@@ -124,12 +130,32 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
     }
 
     /**
+     * Gets the snapshot of the current value.
+     *
+     * @return The snapshot of the current value
+     */
+    public Currency getSnapshot() {
+        return snapshot;
+    }
+
+    /**
      * Gets the weight of the delegate.
      *
      * @return The weight of the delegate
      */
     public double getWeight() {
         return weight;
+    }
+
+    /**
+     * Determines if this delegate is to be considered to receive additional
+     * value.
+     *
+     * @return True if this delegate is to be considered to receive additional
+     * value; false otherwise
+     */
+    public boolean isConsidered() {
+        return considerMe;
     }
 
     /**
@@ -144,6 +170,17 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
         return zero.equals(getDifference());
     }
 
+    /**
+     * Sets whether this delegate is to be considered to receive additional
+     * value.
+     *
+     * @param considerMe True if this delegate is to be considered to receive
+     *                   additional value; false otherwise
+     */
+    public void setConsiderMe(boolean considerMe) {
+        this.considerMe = considerMe;
+    }
+
     @Override
     public void setProposed(@NotNull Currency currency) {
 
@@ -153,5 +190,12 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
          */
         last = new MutableCurrency(currency);
         getReceiver().setProposed(last.getImmutable());
+    }
+
+    /**
+     * Takes a snapshot of the current value.
+     */
+    public void takeSnapshot() {
+        this.snapshot = getProposed();
     }
 }
