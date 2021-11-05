@@ -382,7 +382,12 @@ class RebalanceNode implements CurrencyReceiver {
      * Rebalances a collection of receiver delegates.
      *
      * @param delegates A collection of receiver delegates
-     * @param proposed  The proposed value of this receiver
+     * @param proposed  The proposed value of this receiver - this value should
+     *                  be interpreted as a relative amount from what the
+     *                  receiver already has set. On first call, the proposed
+     *                  value set in the receiver is null and interpreted as
+     *                  zero. Thus, <em>this</em> proposed value is then
+     *                  absolute as well as relative
      * @param <T>       A receiver delegate type
      * @return The difference between proposed value and the value that this
      * receiver set
