@@ -450,22 +450,26 @@ public class Ticker extends
 
     /**
      * Passes the number of considered shares through to the number of
-     * proposed shares.
+     * proposed shares if the number of proposed shares is not yet set.
      */
     public void passThrough() {
 
-        /*
-         * Get the number of considered shares. Is the number of considered
-         * shares not null?
-         */
-        final Shares consideredShares = getConsideredShares();
-        if (null != consideredShares) {
+        // Is the proposed value not yet set?
+        if (null == proposed.getValue()) {
 
             /*
-             * The number of considered shares is not null. Set the number of
-             * proposed shares to the same value.
+             * The proposed value is not yet set. Get the number of considered
+             * shares. Is the number of considered shares not null?
              */
-            proposed.setShares(consideredShares.getValue());
+            final Shares consideredShares = getConsideredShares();
+            if (null != consideredShares) {
+
+                /*
+                 * The number of considered shares is not null. Set the number
+                 * of proposed shares to the same value.
+                 */
+                proposed.setShares(consideredShares.getValue());
+            }
         }
     }
 
