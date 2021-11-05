@@ -17,19 +17,19 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
     static {
 
         // Load up the level map.
-        put(Level.ALL);
-        put(Level.CONFIG);
-        put(Level.FINE);
-        put(Level.FINER);
-        put(Level.FINEST);
-        put(Level.INFO);
-        put(Level.OFF);
-        put(Level.SEVERE);
-        put(Level.WARNING);
+        putAndCheck(Level.ALL);
+        putAndCheck(Level.CONFIG);
+        putAndCheck(Level.FINE);
+        putAndCheck(Level.FINER);
+        putAndCheck(Level.FINEST);
+        putAndCheck(Level.INFO);
+        putAndCheck(Level.OFF);
+        putAndCheck(Level.SEVERE);
+        putAndCheck(Level.WARNING);
     }
 
     /**
-     * Constructs the level preferences dispatch.
+     * Constructs the level preference dispatch.
      *
      * @param key         The key for this dispatch
      * @param preferences The preferences object to use
@@ -39,6 +39,21 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
                                    @NotNull Preferences preferences,
                                    @NotNull PrintStream stream) {
         super(key, preferences, stream, false);
+    }
+
+    /**
+     * Checks to ensure that a level argument is not null.
+     *
+     * @param level A level argument
+     */
+    private static void checkNotNull(Level level) {
+
+        // Throw a new illegal argument exception if the argument is not null.
+        if (null != level) {
+            throw new IllegalArgumentException(String.format("An attempt " +
+                    "has been made to insert duplicate level '%s' in the " +
+                    "level map.", level));
+        }
     }
 
     /**
@@ -58,20 +73,28 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
      * @param level The level to put in the level map
      * @return Any level previously in the map using the same integer value
      */
-    @SuppressWarnings("UnusedReturnValue")
     private static Level put(@NotNull Level level) {
         return levelMap.put(level.intValue(), level);
     }
 
     /**
-     * Gets the level associated with a value.
+     * Puts a level in the level map, and checks to ensure that the level
+     * is not a duplicate.
      *
-     * @param value The level associated with the given value
-     * @return The level associated with the given value, or null if there is
-     * no such associated level
+     * @param level The level to put in the level map
      */
-    private Level get(int value) {
-        return getLevel(value);
+    private static void putAndCheck(@NotNull Level level) {
+        checkNotNull(put(level));
+    }
+
+    /**
+     * Checks a level to ensure it is acceptable.
+     *
+     * @param level A level to check
+     */
+    protected void checkLevel(@NotNull Level level) {
+
+        // Any level will do for this parent class. Override as needed.
     }
 
     @Override
@@ -98,6 +121,17 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
         return result;
     }
 
+    /**
+     * Gets the level associated with a value.
+     *
+     * @param value The level associated with the given value
+     * @return The level associated with the given value, or null if there is
+     * no such associated level
+     */
+    private Level get(int value) {
+        return getLevel(value);
+    }
+
     @Override
     protected void put(@NotNull String value) throws CLAException {
 
@@ -105,8 +139,11 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
         Level level;
         try {
 
-            // Try to parse the given value as a logging level.
-            level = Level.parse(value.toUpperCase());
+            /*
+             * Try to parse the given value as a logging level, then check the
+             * result.
+             */
+            checkLevel(level = Level.parse(value.toUpperCase()));
         }
 
         /*
