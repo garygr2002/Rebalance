@@ -2,14 +2,10 @@ package com.garygregg.rebalance.rebalance;
 
 import com.garygregg.rebalance.CurrencyReceiver;
 import com.garygregg.rebalance.countable.Currency;
-import com.garygregg.rebalance.countable.MutableCurrency;
 import org.jetbrains.annotations.NotNull;
 
 abstract class ReceiverDelegate<T extends CurrencyReceiver>
         implements CurrencyReceiver {
-
-    // What is zero?
-    private static final Currency zero = Currency.getZero();
 
     // The receiver from whom we are delegated
     private final T receiver;
@@ -19,9 +15,6 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
 
     // Consider this delegate to receive additional value
     private boolean considerMe;
-
-    // The last value that was commanded as set
-    private MutableCurrency last;
 
     // A snapshot of the current value
     private Currency snapshot;
@@ -40,80 +33,6 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
     }
 
     /**
-     * Adds proposed value to the receiver.
-     *
-     * @param currency The additional value to add
-     */
-    public void add(@NotNull Currency currency) {
-
-        // Set the proposed value to zero if it is currently null.
-        if (null == last) {
-            last = new MutableCurrency(zero);
-        }
-
-        /*
-         * Add the given value to the last value that was commanded set, and
-         * pass the proposed value on to our receiver.
-         */
-        last.add(currency);
-        setProposed(last.getImmutable());
-    }
-
-    /**
-     * Gets the difference between the last value that was commanded as set
-     * and the current value set in the receiver.
-     *
-     * @return Negative if the current value is greater than the last value,
-     * zero if the values are the same, positive if the current value is less
-     * than the last value
-     */
-    public MutableCurrency getDifference() {
-
-        // Declare the result. Is the last value null?
-        final MutableCurrency result;
-        if (null == last) {
-
-            // The last value is null, so the result is null too.
-            result = null;
-        }
-
-        // The last value is not null.
-        else {
-
-            // Get the current value. Is the current value null?
-            final Currency current = getProposed();
-            if (null == current) {
-
-                // The current value is null, so the result is null too.
-                result = null;
-            }
-
-            // The last value is not null and the current value is not null.
-            else {
-
-                /*
-                 * Create a new mutable result with the last value, and
-                 * subtract the current value.
-                 */
-                result = new MutableCurrency(last);
-                result.subtract(current);
-            }
-        }
-
-        // Return the result.
-        return result;
-    }
-
-    /**
-     * Gets the weight of the delegate.
-     *
-     * @return The weight of the delegate
-     */
-    public MutableCurrency getLast() {
-        return last;
-    }
-
-    /**
      * Gets the proposed value of the receiver.
      *
      * @return The proposed value of the receiver
@@ -127,15 +46,6 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
      */
     protected @NotNull T getReceiver() {
         return receiver;
-    }
-
-    /**
-     * Gets the snapshot of the current value.
-     *
-     * @return The snapshot of the current value
-     */
-    public Currency getSnapshot() {
-        return snapshot;
     }
 
     /**
@@ -159,24 +69,19 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
     }
 
     /**
-     * Determines if there is no difference between the last value that was
-     * commanded set and the current value set in the receiver.
-     *
-     * @return True if there is no difference between the last value that was
-     * commanded set and the current value set in the receiver
-     */
-    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
-    public boolean noDifference() {
-        return zero.equals(getDifference());
-    }
-
-    /**
      * Performs an action if explicit value cannot be set in the receiver
      * delegate.
      */
     public void onCannotSet() {
 
         // The default is to do nothing.
+    }
+
+    /**
+     * Recovers the last snapshot.
+     */
+    public void recover() {
+        setProposed(snapshot);
     }
 
     /**
@@ -192,13 +97,7 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
 
     @Override
     public @NotNull Currency setProposed(@NotNull Currency currency) {
-
-        /*
-         * Set the last value that was commanded set, and pass the proposed
-         * value on to our receiver.
-         */
-        last = new MutableCurrency(currency);
-        return getReceiver().setProposed(last.getImmutable());
+        return getReceiver().setProposed(currency);
     }
 
     /**
