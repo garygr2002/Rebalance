@@ -111,6 +111,13 @@ class WeightRebalancer extends AccountRebalancer
     protected boolean doRebalance(@NotNull Account account) {
 
         /*
+         * Set the account key in the rebalance node class. Clear the root
+         * node.
+         */
+        RebalanceNode.setAccountKey(account.getKey());
+        root.clear();
+
+        /*
          * Set the weight map based on the given account, and cycle for each
          * ticker in the account.
          */
@@ -118,21 +125,21 @@ class WeightRebalancer extends AccountRebalancer
         for (Ticker ticker : account.getChildren()) {
 
             /*
-             * Clear the root node, and set the current ticker. Enumerate the
-             * weight types of the ticker.
+             * Set the current ticker, and enumerate the weight types of the
+             * ticker.
              */
-            root.clear();
             currentTicker = ticker;
             ticker.enumerate(this);
         }
 
         /*
-         * Reinitialize the rebalancer member variables.
-         *
-         * TODO: Rebalance the node tree.
+         * Reinitialize the rebalancer member variables. Set the proposed value
+         * of the root node the same as that of the account. Return whether the
+         * rebalance node class had a problem.
          */
         initialize();
-        return true;
+        root.setProposed(account.getProposed());
+        return RebalanceNode.hadProblem();
     }
 
     /**
