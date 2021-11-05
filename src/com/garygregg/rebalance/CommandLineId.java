@@ -19,10 +19,23 @@ public enum CommandLineId {
     // List the preference settings
     PREFERENCE("list the preference settings", null, false),
 
-    // The logging level (valid Level values)
+    /*
+     * The logging level (valid Level values) at which logging messages begin to
+     * appear
+     */
     @SuppressWarnings("SpellCheckingInspection")
     LEVEL("ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF, SEVERE or WARNING",
             "lglv", true),
+
+    // The logging level for ordinary informational messages
+    @SuppressWarnings("SpellCheckingInspection")
+    ORDINARY("CONFIG, FINE, FINER, FINEST, INFO, OFF,", "rdnr",
+            true),
+
+    // The logging level for extraordinary informational messages
+    @SuppressWarnings("SpellCheckingInspection")
+    EXTRAORDINARY("CONFIG, FINE, FINER, FINEST, INFO, OFF,", "xtrd",
+            true),
 
     // The annual expected inflation (double, the highest precision)
     @SuppressWarnings("SpellCheckingInspection")
@@ -35,6 +48,10 @@ public enum CommandLineId {
     // Current S&P 500 value (double, 2 decimal precision)
     @SuppressWarnings("SpellCheckingInspection")
     CURRENT("S&P 500 current", "spcr", true),
+
+    // The limit of allowed receiver delegates
+    @SuppressWarnings("SpellCheckingInspection")
+    X("Rebalance limit of funds per account", "ncnt", true),
 
     // Source data directory (string path)
     @SuppressWarnings("SpellCheckingInspection")
