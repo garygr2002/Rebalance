@@ -241,13 +241,13 @@ class RebalanceNode implements CurrencyReceiver {
         // The argument cannot be negative.
         if (0 > n) {
             throw new IllegalArgumentException(
-                    String.format("Negative argument %d not allowed.", n));
+                    String.format("Negative argument %d not allowed", n));
         }
 
         // The argument cannot be larger than the size of an integer.
         else if (Integer.SIZE <= n) {
             throw new IllegalArgumentException(
-                    String.format("Argument %d is too big.", n));
+                    String.format("Argument %d is too big", n));
         }
 
         // Create the sorted set.
@@ -382,18 +382,18 @@ class RebalanceNode implements CurrencyReceiver {
      * Rebalances a collection of receiver delegates.
      *
      * @param delegates A collection of receiver delegates
-     * @param currency  The proposed value of this receiver
+     * @param proposed  The proposed value of this receiver
      * @param <T>       A receiver delegate type
      * @return The value that could not be set
      */
     private <T extends ReceiverDelegate<?>> @NotNull Currency rebalance(
-            @NotNull Collection<T> delegates, @NotNull Currency currency) {
+            @NotNull Collection<T> delegates, @NotNull Currency proposed) {
 
         /*
-         * Declare a variable to hold the best difference from the desired
-         * value. Initialize it to the proposed value. Try to do the rebalance.
+         * Declare a variable to hold the best accumulated difference.
+         * Initialize it to the proposed value. Try to do the rebalance.
          */
-        Currency bestDifference = currency;
+        Currency bestDifference = proposed;
         try {
 
             /*
@@ -416,7 +416,7 @@ class RebalanceNode implements CurrencyReceiver {
              * difference, and initialize it to the accumulated difference in
              * the value setter action.
              */
-            valueSetterAction.setAccumulated(currency);
+            valueSetterAction.setAccumulated(proposed);
             Currency accumulatedDifference =
                     valueSetterAction.getAccumulated();
 
@@ -468,7 +468,10 @@ class RebalanceNode implements CurrencyReceiver {
                 doAction(delegates, valueSetterAction);
                 accumulatedDifference = valueSetterAction.getAccumulated();
 
-                // Log a message about this current combination of account key, consideration
+                /*
+                 * Log a message about this current combination of account key,
+                 * weight type and consideration pattern.
+                 */
                 logMessage(getOrdinary(), String.format("For account key " +
                                 "%s, weight type %s, and consideration " +
                                 "pattern 0x%08x.: Found accumulated " +
@@ -507,18 +510,20 @@ class RebalanceNode implements CurrencyReceiver {
         catch (@NotNull Exception exception) {
 
             // Log a warning saying a rebalance cannot be accomplished.
-            logMessage(Level.WARNING, String.format("Rebalance cannot be " +
-                            "accomplished because for account key %s and " +
-                            "weight type %s for the following reason: %s",
+            logMessage(Level.WARNING, String.format("A rebalance cannot be " +
+                            "accomplished for account key %s and weight " +
+                            "type %s because of an exception containing the " +
+                            "following message: '%s'.",
                     getAccountKey(), getWeight(),
                     exception.getMessage()));
 
             /*
              * Let each receiver delegate know that explicit values cannot be
-             * set. Reset the accumulated differences.
+             * set. Reset the accumulated differences and set the best
+             * difference to zero.
              */
             doAction(delegates, cannotSetAction);
-            bestDifference = Currency.getZero();
+            bestDifference = zero;
         }
 
         // Do this unconditionally.
@@ -526,13 +531,13 @@ class RebalanceNode implements CurrencyReceiver {
 
             // Log a message identifying the best difference.
             logMessage(getExtraordinary(), String.format("For account key " +
-                            "%s and weight type %s: A best difference of %s was " +
-                            "identified.", getAccountKey(), getWeight(),
+                            "%s and weight type %s: I identified a best " +
+                            "difference of %s.", getAccountKey(), getWeight(),
                     bestDifference));
         }
 
         // Calculate the new value of this node.
-        final MutableCurrency newValue = new MutableCurrency(currency);
+        final MutableCurrency newValue = new MutableCurrency(proposed);
         newValue.add(bestDifference);
 
         // Set the current value of this node, and return the best difference.
@@ -654,10 +659,7 @@ class RebalanceNode implements CurrencyReceiver {
 
     private static class SetValueUtility {
 
-        /*
-         * The accumulated difference between proposed values and the set
-         * values
-         */
+        // The accumulated difference between proposed values and set values
         private final MutableCurrency accumulated = new MutableCurrency();
 
         // The user interpreted flag
@@ -694,7 +696,7 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Gets user interpreted flag.
+         * Gets the user interpreted flag.
          *
          * @return The user interpreted flag
          */
@@ -766,6 +768,9 @@ class RebalanceNode implements CurrencyReceiver {
         // The value of minus one as currency
         private static final Currency minusOne = new Currency(-1.);
 
+        // The value of one as currency
+        private static final Currency one = Currency.getOne();
+
         @Override
         public void doAction(@NotNull ReceiverDelegate<?> delegate) {
 
@@ -786,16 +791,11 @@ class RebalanceNode implements CurrencyReceiver {
                      * utility as an indication that the values in the utility
                      * are meant to be interpreted as negative numbers, and a
                      * clear flag as an indication that they are meant to be
-                     * interpreted as positive number. Apply a suitable factor
-                     * to the value.
+                     * interpreted as non-negative numbers. Apply a suitable
+                     * factor to the value. Get any existing value from the
+                     * delegate. Is the existing value not null?
                      */
-                    value.multiply(utility.getFlag() ? minusOne :
-                            Currency.getOne());
-
-                    /*
-                     * Get any existing value from the delegate. Is the
-                     * existing value not null?
-                     */
+                    value.multiply(utility.getFlag() ? minusOne : one);
                     final Currency existingValue = delegate.getProposed();
                     if (null != existingValue) {
 
@@ -808,8 +808,8 @@ class RebalanceNode implements CurrencyReceiver {
 
                     /*
                      * Reset the proposed value of the delegate with the new
-                     * value. Receive any returned difference, and add it to
-                     * the utility.
+                     * value. Receive any returned difference, and add the
+                     * difference to the difference in the utility.
                      */
                     utility.addDifference(
                             delegate.setProposed(value.getImmutable()));
