@@ -384,7 +384,8 @@ class RebalanceNode implements CurrencyReceiver {
      * @param delegates A collection of receiver delegates
      * @param proposed  The proposed value of this receiver
      * @param <T>       A receiver delegate type
-     * @return The value that could not be set
+     * @return The difference between proposed value and the value that this
+     * receiver set
      */
     private <T extends ReceiverDelegate<?>> @NotNull Currency rebalance(
             @NotNull Collection<T> delegates, @NotNull Currency proposed) {
@@ -474,7 +475,7 @@ class RebalanceNode implements CurrencyReceiver {
                  */
                 logMessage(getOrdinary(), String.format("For account key " +
                                 "%s, weight type %s, and consideration " +
-                                "pattern 0x%08x.: Found accumulated " +
+                                "pattern 0x%08x: Found accumulated " +
                                 "difference of %s.", getAccountKey(),
                         getWeight(), considerationPattern,
                         accumulatedDifference));
