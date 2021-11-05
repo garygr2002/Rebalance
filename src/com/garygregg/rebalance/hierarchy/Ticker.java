@@ -533,16 +533,6 @@ public class Ticker extends
         getFullValueManager().setProposed();
     }
 
-    /**
-     * Sets the proposed value of the ticker.
-     *
-     * @param value The proposed value of the ticker, relative to the value of
-     *              the ticker that is considered for rebalance
-     */
-    void setProposed(double value) {
-        proposed.setValueAdjustShares(value);
-    }
-
     @Override
     public @NotNull Currency setProposed(@NotNull Currency currency) {
 
@@ -722,7 +712,7 @@ public class Ticker extends
          * value as that contained in the queryable.
          */
         super.transferValue(queryable);
-        setProposed(getValue(queryable.getProposed()));
+        proposed.setValueAdjustShares(getValue(queryable.getProposed()));
     }
 
     private interface Function<T> {
