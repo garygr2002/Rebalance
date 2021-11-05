@@ -1,9 +1,6 @@
 package com.garygregg.rebalance.rebalance;
 
-import com.garygregg.rebalance.CurrencyReceiver;
-import com.garygregg.rebalance.MessageLogger;
-import com.garygregg.rebalance.Reallocator;
-import com.garygregg.rebalance.WeightType;
+import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.hierarchy.Ticker;
@@ -11,6 +8,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,45 +16,36 @@ import java.util.logging.Logger;
 class RebalanceNode implements CurrencyReceiver {
 
     // For use when a rebalance cannot occur
-    private static final OneParameterAction<ReceiverDelegate<?>>
-            cannotSetAction = ReceiverDelegate::onCannotSet;
+    private static final Action<ReceiverDelegate<?>> cannotSetAction =
+            ReceiverDelegate::onCannotSet;
 
-    // For adding value to a delegate
-    private static final TwoParameterAction<ReceiverDelegate<?>,
-            MutableCurrency> forAdd = (delegate, currency) ->
-            delegate.add(currency.getImmutable());
-
-    // For proposing value to a delegate
-    private static final TwoParameterAction<ReceiverDelegate<?>,
-            MutableCurrency> forProposed = (delegate, currency) ->
-            delegate.setProposed(currency.getImmutable());
+    // The error stream we will use
+    private static final PrintStream errorStream = System.err;
 
     // Our local message logger
     private static final MessageLogger messageLogger = new MessageLogger();
 
-    // For use when setting whether a receiver delegate is to be considered
-    private static final ConsiderationSetter setConsideredAction =
-            new ConsiderationSetter();
+    // The output stream we will use
+    private static final PrintStream outputStream = System.out;
 
-    // For use when setting value in a receiver delegate
-    private static final ValueSetter valueSetterAction =
-            new ValueSetter(forAdd);
+    // For use when a snapshot recovery is needed
+    private static final Action<ReceiverDelegate<?>> recoverAction =
+            ReceiverDelegate::recover;
 
-    // For use when counting weight in considered receiver delegates
-    private static final WeightCounter weightCounterAction =
-            new WeightCounter();
+    // For use when a snapshot is needed
+    private static final Action<ReceiverDelegate<?>> takeSnapshotAction =
+            ReceiverDelegate::takeSnapshot;
 
-    // For use when building a weight list.
-    private static final WeightList weightListAction = new WeightList();
-
-    static {
-        getLogger().setLogger(Logger.getLogger(
-                RebalanceNode.class.getCanonicalName()));
-    }
+    // The key of the account that is being rebalanced
+    private static AccountKey accountKey;
 
     // The children of the node
     private final SortedMap<WeightType, NodeDelegate> children =
             new TreeMap<>();
+
+    // The consideration setter action
+    private final ConsiderationSetterAction considerationSetterAction =
+            new ConsiderationSetterAction();
 
     // The tickers in the node
     private final SortedSet<TickerDelegate> tickerSet =
@@ -66,10 +55,21 @@ class RebalanceNode implements CurrencyReceiver {
     // The weight type assigned to the node
     private final WeightType type;
 
-    // The weight of the node (set once, accessed by the parent node)
+    // The value setter action
+    private final ValueSetterAction valueSetterAction =
+            new ValueSetterAction();
+
+    // The weight of the node
     private final double weight;
 
-    // The value assigned to the node (set by the parent node, accessed here)
+    // The weight accumulator action
+    private final WeightAccumulatorAction weightAccumulatorAction =
+            new WeightAccumulatorAction();
+
+    // The value of zero currency
+    private final Currency zero = Currency.getZero();
+
+    // The value assigned to the node
     private Currency value;
 
     /**
@@ -83,6 +83,10 @@ class RebalanceNode implements CurrencyReceiver {
         // Set the weight type and weight.
         this.type = type;
         this.weight = weight;
+
+        // Set the logger inside the message logger.
+        getLogger().setLogger(Logger.getLogger(
+                RebalanceNode.class.getCanonicalName()));
     }
 
     /**
@@ -93,7 +97,7 @@ class RebalanceNode implements CurrencyReceiver {
      * @param <T>        An arbitrary type
      */
     private static <T> void doAction(@NotNull Collection<? extends T> collection,
-                                     @NotNull OneParameterAction<T> action) {
+                                     @NotNull Action<T> action) {
 
         // Cycle for each object in the collection, and perform the action.
         for (T object : collection) {
@@ -102,30 +106,30 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Performs a two-parameter action on each object in a collection.
+     * Gets the key of the account being rebalanced.
      *
-     * @param collection   The collection
-     * @param action       The action to perform on each object in the
-     *                     collection
-     * @param <FirstType>> An arbitrary type
+     * @return The key of the account being rebalanced
      */
-    private static <FirstType> void doAction(
-            @NotNull Collection<? extends FirstType> collection,
-            @NotNull TwoParameterAction<FirstType, Integer> action) {
+    public static AccountKey getAccountKey() {
+        return accountKey;
+    }
 
-        /*
-         * Initialize a position counter, and cycle for each object in the
-         * collection.
-         */
-        int i = 0;
-        for (FirstType object : collection) {
+    /**
+     * The error stream we will use.
+     *
+     * @return The error stream we will use
+     */
+    private static @NotNull PrintStream getErrorStream() {
+        return errorStream;
+    }
 
-            /*
-             * Call the action using the position counter as the second
-             * argument.
-             */
-            action.doAction(object, i++);
-        }
+    /**
+     * Gets the logging level for extraordinary, non-warning activity.
+     *
+     * @return The logging level for extraordinary, non-warning activity
+     */
+    private static @NotNull Level getExtraordinary() {
+        return Level.INFO;
     }
 
     /**
@@ -151,8 +155,12 @@ class RebalanceNode implements CurrencyReceiver {
                 list.add(zero);
             }
 
-            // Reset the first element to the value to distribute.
-            list.set(firstIndex, new MutableCurrency(valueToDistribute));
+            /*
+             * Reset the first element to absolute value of the value to
+             * distribute.
+             */
+            list.set(firstIndex, new MutableCurrency(
+                    Math.abs(valueToDistribute.getValue())));
         }
 
         // Return the list.
@@ -164,8 +172,26 @@ class RebalanceNode implements CurrencyReceiver {
      *
      * @return The message logger for the node
      */
-    private static MessageLogger getLogger() {
+    private static @NotNull MessageLogger getLogger() {
         return messageLogger;
+    }
+
+    /**
+     * Gets the logging level for ordinary, non-warning activity.
+     *
+     * @return The logging level for ordinary, non-warning activity
+     */
+    private static @NotNull Level getOrdinary() {
+        return Level.FINE;
+    }
+
+    /**
+     * Gets the output stream we will use.
+     *
+     * @return The output stream we will use
+     */
+    private static @NotNull PrintStream getOutputStream() {
+        return outputStream;
     }
 
     /**
@@ -184,15 +210,23 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Interprets a receiver delegate.
+     * Logs a message.
      *
-     * @param delegate A receiver delegate
-     * @param <T>      A currency receiver type
-     * @return The interpretation of the receiver delegate
+     * @param level   The level of the message
+     * @param message The message to log
      */
-    private static <T extends CurrencyReceiver> T interpret(
-            ReceiverDelegate<T> delegate) {
-        return (null == delegate) ? null : delegate.getReceiver();
+    @SuppressWarnings("SameParameterValue")
+    private static void logMessage(@NotNull Level level,
+                                   @NotNull String message) {
+
+        // Identify the proper print stream for the message.
+        final PrintStream printStream = (level.intValue() <
+                Level.SEVERE.intValue()) ? getOutputStream() :
+                getErrorStream();
+
+        // Print the message to the print stream, then log the message.
+        printStream.println(message);
+        messageLogger.logMessage(level, message);
     }
 
     /**
@@ -202,7 +236,7 @@ class RebalanceNode implements CurrencyReceiver {
      * @return A set of integers sorted by descending count of set bits
      */
     @Contract(pure = true)
-    public static @NotNull SortedSet<Integer> produce(int n) {
+    private static @NotNull SortedSet<Integer> produce(int n) {
 
         // The argument cannot be negative.
         if (0 > n) {
@@ -246,8 +280,24 @@ class RebalanceNode implements CurrencyReceiver {
     /**
      * Resets the message logger.
      */
-    public static void reset() {
+    private static void reset() {
         getLogger().resetProblem();
+    }
+
+    /**
+     * Sets the key of the account being rebalanced.
+     *
+     * @param accountKey The key of the account being rebalanced
+     */
+    public static void setAccountKey(AccountKey accountKey) {
+
+        // Set the account key, and reset the message logger.
+        RebalanceNode.accountKey = accountKey;
+        reset();
+
+        // Log an informational message about the incoming account key.
+        logMessage(getExtraordinary(), String.format("Account key %s has " +
+                "been set for rebalance...", getAccountKey()));
     }
 
     /**
@@ -261,12 +311,12 @@ class RebalanceNode implements CurrencyReceiver {
 
         /*
          * Add a new node delegate for the child, receiving any delegate
-         * previously mapped to the weight type. Return the interpretation of
-         * the old delegate.
+         * previously mapped to the weight type. Return null if the delegate
+         * is null. Otherwise, return the receiver of the delegate.
          */
         final NodeDelegate delegate = children.put(child.getType(),
                 new NodeDelegate(child));
-        return interpret(delegate);
+        return (null == delegate) ? null : delegate.getReceiver();
     }
 
     /**
@@ -306,7 +356,7 @@ class RebalanceNode implements CurrencyReceiver {
      *
      * @return The weight type assigned to the node
      */
-    public @NotNull WeightType getType() {
+    public WeightType getType() {
         return type;
     }
 
@@ -320,9 +370,9 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Gets the weight of the node.
+     * Gets the weight assigned to the node.
      *
-     * @return The weight of the node
+     * @return The weight assigned to the node
      */
     public double getWeight() {
         return weight;
@@ -331,81 +381,78 @@ class RebalanceNode implements CurrencyReceiver {
     /**
      * Rebalances a collection of receiver delegates.
      *
-     * @param receivers A collection of receiver delegates
+     * @param delegates A collection of receiver delegates
+     * @param currency  The proposed value of this receiver
      * @param <T>       A receiver delegate type
      * @return The value that could not be set
      */
     private <T extends ReceiverDelegate<?>> @NotNull Currency rebalance(
-            @NotNull Collection<T> receivers) {
+            @NotNull Collection<T> delegates, @NotNull Currency currency) {
 
-        // First reset the message logger, then try to do the rebalance.
-        reset();
+        /*
+         * Declare a variable to hold the best difference from the desired
+         * value. Initialize it to the proposed value. Try to do the rebalance.
+         */
+        Currency bestDifference = currency;
         try {
 
             /*
-             * Produce a sorted set of receiver consideration patterns. Set the
-             * initial action for the value setter.
+             * Declare a variable to hold a consideration pattern and a
+             * variable to hold a reallocator.
              */
-            final SortedSet<Integer> patterns = produce(receivers.size());
-            valueSetterAction.setAction(forProposed);
-
-            /*
-             * Declare a variable to receive accumulated weight, a variable to
-             * receive a reallocator, and a variable to receive a value list.
-             */
-            double accumulatedWeight;
+            int considerationPattern;
             Reallocator reallocator;
+
+            /*
+             * Declare a variable hold a value list. Get the weight list from
+             * the weight allocator.
+             */
             List<MutableCurrency> valueList;
+            final List<Double> weightList = weightAccumulatorAction.getList();
 
             /*
-             * Declare and initialize the value to distribute. Get the weight
-             * list from the weight list action. Declare and initialize a flag
-             * indicating zero difference.
+             * Set the proposed value as the accumulated difference in the
+             * value setter action. Declare a variable to hold the accumulated
+             * difference, and initialize it to the accumulated difference in
+             * the value setter action.
              */
-            Currency valueToDistribute = getValue();
-            final List<Double> weightList = weightListAction.getList();
-            boolean zeroDifference = false;
+            valueSetterAction.setAccumulated(currency);
+            Currency accumulatedDifference =
+                    valueSetterAction.getAccumulated();
 
             /*
-             * Get an iterator of consideration patterns. Cycle until there is
-             * zero difference, or until each consideration pattern has been
-             * exhausted.
+             * Produce a sorted set of receiver consideration patterns. Get an
+             * iterator for the patterns. Cycle while the accumulated
+             * difference is not zero, and patterns exist.
              */
+            final SortedSet<Integer> patterns = produce(delegates.size());
             final Iterator<Integer> iterator = patterns.iterator();
-            while ((!zeroDifference) && iterator.hasNext()) {
+            while (accumulatedDifference.isNotZero() && iterator.hasNext()) {
 
                 /*
-                 * Set the first/next consideration pattern in the 'set
-                 * considered' action. Perform the setter action on each
+                 * Set the first/next consideration pattern in the
+                 * consideration setter action. Perform the action on each
                  * receiver delegate.
                  */
-                setConsideredAction.setConsiderationPattern(iterator.next());
-                doAction(receivers, setConsideredAction);
+                considerationSetterAction.setConsiderationPattern(
+                        considerationPattern = iterator.next());
+                doAction(delegates, considerationSetterAction);
 
                 /*
-                 * Clear the weight list, then rebuild it using each receiver
-                 * delegate.
+                 * Set the negation flag in the value setter action based on
+                 * the sign of the accumulated difference.
                  */
-                weightList.clear();
-                doAction(receivers, weightListAction);
-
-                /*
-                 * Reset the weight counter action, and accumulate the weight
-                 * for each element of the weight list. Retrieve the
-                 * accumulated weight from the weight counter action.
-                 */
-                weightCounterAction.resetWeight();
-                doAction(weightList, weightCounterAction);
-                accumulatedWeight = weightCounterAction.getWeight();
+                valueSetterAction.setNegation(
+                        accumulatedDifference.compareTo(zero) < 0);
 
                 /*
                  * Create a new reallocator with the weight list. Create a
-                 * value list using the size of the weight list and the value
-                 * to distribute.
+                 * value list using the size of the weight list and the
+                 * accumulated difference.
                  */
                 reallocator = new Reallocator(weightList);
                 valueList = getInitialList(weightList.size(),
-                        valueToDistribute);
+                        accumulatedDifference);
 
                 /*
                  * Reallocate the value list and set the value list in the
@@ -416,71 +463,97 @@ class RebalanceNode implements CurrencyReceiver {
 
                 /*
                  * Perform the value setter action on each receiver delegate.
-                 * Reset the action in the value setter action.
+                 * Reset the accumulated difference.
                  */
-                doAction(receivers, valueSetterAction);
-                valueSetterAction.setAction(forAdd);
+                doAction(delegates, valueSetterAction);
+                accumulatedDifference = valueSetterAction.getAccumulated();
+
+                // Log a message about this current combination of account key, consideration
+                logMessage(getOrdinary(), String.format("For account key " +
+                                "%s, weight type %s, and consideration " +
+                                "pattern 0x%08x.: Found accumulated " +
+                                "difference of %s.", getAccountKey(),
+                        getWeight(), considerationPattern,
+                        accumulatedDifference));
 
                 /*
-                 * TODO:
-                 *
-                 * 1. Accumulate differences from each delegate
-                 *
-                 * 2. Take a snapshot if first iteration, or if
-                 * differences were less than on the last iteration
-                 *
-                 * 3. Set the differences in value-to-distribute
-                 *
-                 * 4. Set the zero difference flag if the difference is
-                 * zero.
-                 *
-                 * 5. Find some way to return non-zero difference upward
-                 * in the call stack.
+                 * Does the absolute value of the accumulated difference
+                 * compare less than that of the best difference?
                  */
+                if (Double.compare(
+                        Math.abs(accumulatedDifference.getValue()),
+                        Math.abs(bestDifference.getValue())) < 0) {
 
-                // Reset the zero-difference flag.
-                zeroDifference = true;
+                    /*
+                     * The absolute value of the accumulated difference
+                     * compares less than that of the best difference. Ask
+                     * each receiver delegate to take a snapshot, and set the
+                     * best difference as the accumulated difference.
+                     */
+                    doAction(delegates, takeSnapshotAction);
+                    bestDifference = accumulatedDifference;
+                }
             }
+
+            /*
+             * Either we ended because the accumulated difference dropped to
+             * zero, or because we ran out of consideration patterns. Recover
+             * the best snapshot.
+             */
+            doAction(delegates, recoverAction);
         }
 
         // Catch any exception that may occur.
         catch (@NotNull Exception exception) {
 
             // Log a warning saying a rebalance cannot be accomplished.
-            getLogger().logMessage(Level.WARNING,
-                    String.format("Rebalance cannot be accomplished " +
-                                    "because for the following reason: %s",
-                            exception.getMessage()));
+            logMessage(Level.WARNING, String.format("Rebalance cannot be " +
+                            "accomplished because for account key %s and " +
+                            "weight type %s for the following reason: %s",
+                    getAccountKey(), getWeight(),
+                    exception.getMessage()));
 
             /*
              * Let each receiver delegate know that explicit values cannot be
-             * set.
+             * set. Reset the accumulated differences.
              */
-            doAction(receivers, cannotSetAction);
+            doAction(delegates, cannotSetAction);
+            bestDifference = Currency.getZero();
         }
 
-        // TODO: Fix this.
-        return Currency.getZero();
+        // Do this unconditionally.
+        finally {
+
+            // Log a message identifying the best difference.
+            logMessage(getExtraordinary(), String.format("For account key " +
+                            "%s and weight type %s: A best difference of %s was " +
+                            "identified.", getAccountKey(), getWeight(),
+                    bestDifference));
+        }
+
+        // Calculate the new value of this node.
+        final MutableCurrency newValue = new MutableCurrency(currency);
+        newValue.add(bestDifference);
+
+        // Set the current value of this node, and return the best difference.
+        setValue(newValue.getImmutable());
+        return bestDifference;
     }
 
     @Override
     public @NotNull Currency setProposed(@NotNull Currency currency) {
 
-        /*
-         * Declare the return value. Set the value assigned to the group. Are
-         * there no children?
-         */
+        // Declare the return value. Are there children?
         Currency result;
-        setValue(currency);
         if (children.isEmpty()) {
 
             // There are no children. Rebalance the tickers.
-            result = rebalance(tickerSet);
+            result = rebalance(tickerSet, currency);
         }
 
         // ...otherwise rebalance the children.
         else {
-            result = rebalance(children.values());
+            result = rebalance(children.values(), currency);
         }
 
         // Return the result.
@@ -488,15 +561,15 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Sets the value assigned to the group.
+     * Sets the value assigned to the node.
      *
-     * @param value The value assigned to the group
+     * @param value The new value assigned to the node
      */
-    private void setValue(Currency value) {
+    private void setValue(@NotNull Currency value) {
         this.value = value;
     }
 
-    private interface OneParameterAction<T> {
+    private interface Action<T> {
 
         /**
          * Performs the action.
@@ -506,29 +579,53 @@ class RebalanceNode implements CurrencyReceiver {
         void doAction(@NotNull T object);
     }
 
-    private interface TwoParameterAction<FirstType, SecondType> {
+    private static abstract class
+    ActionWithContainer<ContainedType, ParameterType> implements
+            Action<ParameterType> {
+
+        // Our member variable
+        private ContainedType contained;
 
         /**
-         * Performs the action.
+         * Gets the member variable.
          *
-         * @param first  The first parameter
-         * @param second The second parameter
+         * @return The member variable
          */
-        void doAction(@NotNull FirstType first,
-                      @NotNull SecondType second);
+        protected @NotNull ContainedType getContained() {
+
+            // Set the member variable if it is null.
+            if (null == contained) {
+                contained = getInitialValue();
+            }
+
+            // Return the member variable.
+            return contained;
+        }
+
+        /**
+         * Gets the initial value of the member variable.
+         *
+         * @return The initial value of the member variable
+         */
+        protected abstract @NotNull ContainedType getInitialValue();
+
+        /**
+         * Sets the member variable.
+         *
+         * @param contained The member variable
+         */
+        protected void setContained(@NotNull ContainedType contained) {
+            this.contained = contained;
+        }
     }
 
-    private static class ConsiderationSetter implements
-            TwoParameterAction<ReceiverDelegate<?>, Integer> {
-
-        // The consideration pattern
-        private int considerationPattern;
+    private static class ConsiderationSetterAction extends
+            ActionWithContainer<Integer, ReceiverDelegate<?>> {
 
         @Override
-        public void doAction(@NotNull ReceiverDelegate<?> delegate,
-                             @NotNull Integer position) {
+        public void doAction(@NotNull ReceiverDelegate<?> delegate) {
             delegate.setConsidered((getConsiderationPattern() &
-                    (1 << position)) < 0);
+                    (1 << getConsiderationPattern())) < 0);
         }
 
         /**
@@ -536,8 +633,13 @@ class RebalanceNode implements CurrencyReceiver {
          *
          * @return The consideration pattern
          */
-        private int getConsiderationPattern() {
-            return considerationPattern;
+        public int getConsiderationPattern() {
+            return getContained();
+        }
+
+        @Override
+        protected @NotNull Integer getInitialValue() {
+            return 0;
         }
 
         /**
@@ -546,36 +648,58 @@ class RebalanceNode implements CurrencyReceiver {
          * @param considerationPattern The consideration pattern
          */
         public void setConsiderationPattern(int considerationPattern) {
-            this.considerationPattern = considerationPattern;
+            setContained(considerationPattern);
         }
     }
 
-    private static class ElementContainer<ElementType> {
+    private static class SetValueUtility {
 
-        // A two-parameter action taking the element as its second argument
-        private TwoParameterAction<ReceiverDelegate<?>, ElementType> action;
+        /*
+         * The accumulated difference between proposed values and the set
+         * values
+         */
+        private final MutableCurrency accumulated = new MutableCurrency();
 
-        // An index into the element list
+        // The user interpreted flag
+        private boolean flag;
+
+        // An index into the currency list
         private int index;
 
-        // An element list
-        private List<ElementType> list;
+        // A currency list
+        private List<MutableCurrency> list;
 
-        /**
-         * Constructs the element container.
-         *
-         * @param action A two-parameter action taking the element as its
-         *               second argument
-         */
-        public ElementContainer(
-                @NotNull TwoParameterAction<ReceiverDelegate<?>,
-                        ElementType> action) {
-            setAction(action);
+        {
+            resetAccumulated();
         }
 
-        public @NotNull TwoParameterAction<ReceiverDelegate<?>, ElementType>
-        getAction() {
-            return action;
+        /**
+         * Adds a difference to the accumulated difference.
+         *
+         * @param difference A difference
+         */
+        public void addDifference(@NotNull Currency difference) {
+            accumulated.add(difference);
+        }
+
+        /**
+         * Gets the accumulated difference between the proposed values and the
+         * set values.
+         *
+         * @return The accumulated difference between the proposed values and
+         * the set values
+         */
+        public @NotNull Currency getAccumulated() {
+            return accumulated.getImmutable();
+        }
+
+        /**
+         * Gets user interpreted flag.
+         *
+         * @return The user interpreted flag
+         */
+        public boolean getFlag() {
+            return flag;
         }
 
         /**
@@ -583,9 +707,17 @@ class RebalanceNode implements CurrencyReceiver {
          *
          * @return The next element, or null if there are no more elements
          */
-        public @Nullable ElementType getNextElement() {
+        public @Nullable MutableCurrency getNextElement() {
             return ((null != list) && (index < list.size())) ?
                     list.get(index++) : null;
+        }
+
+        /**
+         * Resets the accumulated difference between the proposed values and
+         * the set values.
+         */
+        public void resetAccumulated() {
+            accumulated.set(Currency.getZero());
         }
 
         /**
@@ -596,22 +728,31 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Sets the action.
+         * Sets the accumulated difference between the proposed values and the
+         * set values.
          *
-         * @param action A two-parameter action taking the element as its
-         *               second argument
+         * @param difference The accumulated difference between the proposed
+         *                   values and the set values
          */
-        public void setAction(@NotNull TwoParameterAction<ReceiverDelegate<?>,
-                ElementType> action) {
-            this.action = action;
+        public void setAccumulated(@NotNull Currency difference) {
+            accumulated.set(difference);
         }
 
         /**
-         * Sets the element list.
+         * Sets the user interpreted flag.
          *
-         * @param list An element list
+         * @param flag The flag to set
          */
-        public void setList(List<ElementType> list) {
+        public void setFlag(boolean flag) {
+            this.flag = flag;
+        }
+
+        /**
+         * Sets the currency list.
+         *
+         * @param list A currency list
+         */
+        public void setList(List<MutableCurrency> list) {
 
             // Set the list and reset the element index.
             this.list = list;
@@ -619,62 +760,11 @@ class RebalanceNode implements CurrencyReceiver {
         }
     }
 
-    private abstract static class
-    MemberContainer<ParameterType, ContainedType> implements
-            OneParameterAction<ParameterType> {
+    private static class ValueSetterAction extends
+            ActionWithContainer<SetValueUtility, ReceiverDelegate<?>> {
 
-        // Our member variable
-        private ContainedType member;
-
-        /**
-         * Gets the initial value of the member variable.
-         *
-         * @return The initial value of the member variable
-         */
-        protected abstract @NotNull ContainedType getInitialValue();
-
-        /**
-         * Gets the member variable.
-         *
-         * @return The member variable
-         */
-        protected @NotNull ContainedType getMember() {
-
-            // Set the member variable if it is null.
-            if (null == member) {
-                member = getInitialValue();
-            }
-
-            // Return the member variable.
-            return member;
-        }
-
-        /**
-         * Sets the member variable.
-         *
-         * @param member The member variable
-         */
-        protected void setMember(@NotNull ContainedType member) {
-            this.member = member;
-        }
-    }
-
-    private static class ValueSetter extends
-            MemberContainer<ReceiverDelegate<?>, ElementContainer<MutableCurrency>> {
-
-        // The element container
-        private final ElementContainer<MutableCurrency> container;
-
-        /**
-         * Constructs the value setter.
-         *
-         * @param action An action to set a receiver delegate
-         */
-        public ValueSetter(
-                @NotNull TwoParameterAction<ReceiverDelegate<?>,
-                        MutableCurrency> action) {
-            container = new ElementContainer<>(action);
-        }
+        // The value of minus one as currency
+        private static final Currency minusOne = new Currency(-1.);
 
         @Override
         public void doAction(@NotNull ReceiverDelegate<?> delegate) {
@@ -683,35 +773,75 @@ class RebalanceNode implements CurrencyReceiver {
             if (delegate.isConsidered()) {
 
                 /*
-                 * The delegate is considered. Get the next value. Is the next
+                 * The delegate is considered. Get the utility from the
+                 * container, and the next value from the utility. Is the next
                  * value not null?
                  */
-                final MutableCurrency value = getMember().getNextElement();
+                final SetValueUtility utility = getContained();
+                final MutableCurrency value = utility.getNextElement();
                 if (null != value) {
 
                     /*
-                     * The next value is not null. Use the action to set the
-                     * value in the delegate.
+                     * The next value is not null. Interpret a set flag in the
+                     * utility as an indication that the values in the utility
+                     * are meant to be interpreted as negative numbers, and a
+                     * clear flag as an indication that they are meant to be
+                     * interpreted as positive number. Apply a suitable factor
+                     * to the value.
                      */
-                    getMember().getAction().doAction(delegate, value);
+                    value.multiply(utility.getFlag() ? minusOne :
+                            Currency.getOne());
+
+                    /*
+                     * Get any existing value from the delegate. Is the
+                     * existing value not null?
+                     */
+                    final Currency existingValue = delegate.getProposed();
+                    if (null != existingValue) {
+
+                        /*
+                         * The existing value is not null. Add it to the value
+                         * from the utility.
+                         */
+                        value.add(existingValue);
+                    }
+
+                    /*
+                     * Reset the proposed value of the delegate with the new
+                     * value. Receive any returned difference, and add it to
+                     * the utility.
+                     */
+                    utility.addDifference(
+                            delegate.setProposed(value.getImmutable()));
                 }
             }
         }
 
+        /**
+         * Gets the accumulated difference between the proposed values and the
+         * set values.
+         *
+         * @return The accumulated difference between the proposed values and
+         * the set values
+         */
+        public @NotNull Currency getAccumulated() {
+            return getContained().getAccumulated();
+        }
+
         @Override
-        protected @NotNull ElementContainer<MutableCurrency> getInitialValue() {
-            return container;
+        protected @NotNull SetValueUtility getInitialValue() {
+            return new SetValueUtility();
         }
 
         /**
-         * Sets the action in the value setter.
+         * Sets the accumulated difference between the proposed values and the
+         * set values.
          *
-         * @param action An action to set a receiver delegate
+         * @param difference The accumulated difference between the proposed
+         *                   values and the set values
          */
-        public void setAction(
-                @NotNull TwoParameterAction<ReceiverDelegate<?>,
-                        MutableCurrency> action) {
-            container.setAction(action);
+        public void setAccumulated(@NotNull Currency difference) {
+            getContained().setAccumulated(difference);
         }
 
         /**
@@ -720,45 +850,23 @@ class RebalanceNode implements CurrencyReceiver {
          * @param list The currency list
          */
         public void setList(@NotNull List<MutableCurrency> list) {
-            getMember().setList(list);
-        }
-    }
-
-    private static class WeightCounter extends
-            MemberContainer<Double, Double> {
-
-        @Override
-        public void doAction(@NotNull Double weight) {
-            setMember(getWeight() + weight);
-        }
-
-        @Override
-        protected @NotNull Double getInitialValue() {
-            return 0.;
+            getContained().setList(list);
         }
 
         /**
-         * Gets the accumulated weight.
+         * Sets an indication that the values in the utility are meant to be
+         * interpreted as negative numbers.
          *
-         * @return The accumulated weight
+         * @param negation True if the values in the utility are meant to be
+         *                 interpreted as negative numbers; false otherwise
          */
-        public double getWeight() {
-            return getMember();
-        }
-
-        /**
-         * Resets the weight.
-         */
-        public void resetWeight() {
-            setMember(getInitialValue());
+        public void setNegation(boolean negation) {
+            getContained().setFlag(negation);
         }
     }
 
-    private static class WeightList extends
-            MemberContainer<ReceiverDelegate<?>, List<Double>> {
-
-        // The weight list
-        private static final List<Double> weightList = new ArrayList<>();
+    private static class WeightAccumulatorAction extends
+            ActionWithContainer<List<Double>, ReceiverDelegate<?>> {
 
         @Override
         public void doAction(@NotNull ReceiverDelegate<?> delegate) {
@@ -771,7 +879,7 @@ class RebalanceNode implements CurrencyReceiver {
 
         @Override
         protected @NotNull List<Double> getInitialValue() {
-            return weightList;
+            return new ArrayList<>();
         }
 
         /**
@@ -780,7 +888,7 @@ class RebalanceNode implements CurrencyReceiver {
          * @return The weight list
          */
         public @NotNull List<Double> getList() {
-            return getMember();
+            return getContained();
         }
     }
 }
