@@ -94,10 +94,11 @@ public enum WeightType {
 
         /*
          * Get a map entry containing the weight type that has the most
-         * children. Extract the type and set it as a member variable.
+         * children. Extract the type and set the ceiling of its log2.
          */
         final Map.Entry<WeightType, Integer> entry = getMaxEntry();
-        maxChildren = entry.getValue();
+        maxChildren = (int) (Math.ceil(Math.log(entry.getValue()) /
+                Math.log(2.)));
     }
 
     // The parents for the weight type
