@@ -29,16 +29,29 @@ class Reset extends Informer implements Dispatch<CommandLineId> {
         final PreferenceManager manager = PreferenceManager.getInstance();
         manager.setCurrent(null);
 
-        // Reset the backup destination, and the S&P 500 high level.
+        /*
+         * Set the backup destination and the logging level for extraordinary
+         * informational messages.
+         */
         manager.setDestination(null);
+        manager.setExtraordinary(null);
+
+        // Set the S&P 500 high level and the expected annual inflation rate.
         manager.setHigh(null);
+        manager.setInflation(null);
 
         /*
-         * Reset the expected annual inflation rate, the desired logging level,
-         * and the path for the data files.
+         * Set the desired logging level and the limit of allowed receiver
+         * delegates.
          */
-        manager.setInflation(null);
         manager.setLevel(null);
+        manager.setLimit(null);
+
+        /*
+         * Set the logging level for ordinary informational messages and the
+         * path of the data files.
+         */
+        manager.setOrdinary(null);
         manager.setSource(null);
     }
 

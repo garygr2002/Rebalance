@@ -2,6 +2,7 @@ package com.garygregg.rebalance.conductor;
 
 import com.garygregg.rebalance.CommandLineId;
 import com.garygregg.rebalance.PreferenceManager;
+import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.cla.CLAException;
 import com.garygregg.rebalance.cla.Dispatch;
 import com.garygregg.rebalance.cla.Informer;
@@ -28,13 +29,25 @@ class Minimum extends Informer implements Dispatch<CommandLineId> {
     private static void setMinimum() {
 
         /*
-         * Get the preference manager. Set the expected annual inflation rate
-         * to the known average inflation rate over time. Set the logging level
-         * to INFO, and the path for data files to 'data'.
+         * Get the preference manager. Set the logging level for extraordinary
+         * informational messages.
          */
         final PreferenceManager manager = PreferenceManager.getInstance();
+        manager.setExtraordinary(Level.INFO);
+
+        /*
+         * Set the expected annual inflation rate to the known average
+         * inflation rate over time. Set the logging level.
+         */
         manager.setInflation(3.22);
         manager.setLevel(Level.INFO);
+
+        /*
+         * Set the limit of allowed receiver delegates, the logging level for
+         * ordinary informational messages, and the path for the data files.
+         */
+        manager.setLimit(WeightType.getMaxChildren());
+        manager.setOrdinary(Level.FINE);
         manager.setSource(Paths.get("data"));
     }
 

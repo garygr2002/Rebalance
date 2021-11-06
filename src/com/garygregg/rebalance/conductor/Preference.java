@@ -48,6 +48,20 @@ class Preference extends Informer implements Dispatch<CommandLineId> {
         final PreferenceManager manager = PreferenceManager.getInstance();
         displayPreference(CommandLineId.LEVEL, manager.getLevel());
 
+        /*
+         * Display the preference for display of ordinary informational
+         * messages.
+         */
+        displayPreference(CommandLineId.ORDINARY,
+                manager.getOrdinary());
+
+        /*
+         * Display the preference for display of extraordinary informational
+         * messages.
+         */
+        displayPreference(CommandLineId.EXTRAORDINARY,
+                manager.getExtraordinary());
+
         // Display the preference for inflation.
         displayPreference(CommandLineId.INFLATION,
                 Percent.format(manager.getInflation()));
@@ -60,7 +74,11 @@ class Preference extends Informer implements Dispatch<CommandLineId> {
         displayPreference(CommandLineId.CURRENT,
                 formatPreference(manager.getCurrent()));
 
-        // Display preferences for source and destination.
+        /*
+         * Display the preference for the limit of allowed receiver delegates.
+         * Display the preferences for source and destination.
+         */
+        displayPreference(CommandLineId.X, manager.getLimit());
         displayPreference(CommandLineId.SOURCE, manager.getSource());
         displayPreference(CommandLineId.DESTINATION, manager.getDestination());
     }

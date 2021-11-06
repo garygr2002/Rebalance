@@ -527,6 +527,13 @@ public class Conductor implements Dispatch<CommandLineId> {
         dispatchList.add(new PreferenceDispatch<>(CommandLineId.DESTINATION,
                 preferences, outputStream));
 
+        /*
+         * Add a preference dispatch for the level of extraordinary
+         * informational messages.
+         */
+        dispatchList.add(new LimitedPreferenceDispatch<>(
+                CommandLineId.EXTRAORDINARY, preferences, outputStream));
+
         // Add a preference dispatch for the S&P 500 high value.
         dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.HIGH,
                 preferences, outputStream, false));
@@ -538,22 +545,31 @@ public class Conductor implements Dispatch<CommandLineId> {
         // Add a preference dispatch for the desired logging level.
         dispatchList.add(new LevelPreferenceDispatch<>(CommandLineId.LEVEL,
                 preferences, outputStream));
+        /*
+         * Add a preference dispatch for the level of ordinary informational
+         * messages.
+         */
+        dispatchList.add(new LimitedPreferenceDispatch<>(
+                CommandLineId.ORDINARY, preferences, outputStream));
+
 
         // Add a preference dispatch for source data directory.
         dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.SOURCE,
                 preferences, outputStream));
 
+        // Add a preference dispatch for limit of allowed receiver delegates.
+        dispatchList.add(new IntPreferenceDispatch<>(CommandLineId.X,
+                preferences, outputStream, false));
+
         /*
          * Add a preference dispatch for use expected prefix and suffix for
-         * data directory backup.
+         * data directory backup and minimum settings.
          */
         dispatchList.add(new Use(preferences, outputStream));
-
-        // Add dispatches for minimum settings and reset.
         dispatchList.add(new Minimum(outputStream));
-        dispatchList.add(new Reset(outputStream));
 
-        // Add dispatches for backup and preferences.
+        // Add dispatches for reset, backup and preferences.
+        dispatchList.add(new Reset(outputStream));
         dispatchList.add(new Backup(outputStream));
         dispatchList.add(new Preference(outputStream));
 
@@ -573,8 +589,7 @@ public class Conductor implements Dispatch<CommandLineId> {
         /*
          * Catch any command line exception, and print the exception message
          * to the error stream.
-         */
-        catch (@NotNull CLAException exception) {
+         */ catch (@NotNull CLAException exception) {
 
             /*
              * Get the error stream and display the message of the exception.

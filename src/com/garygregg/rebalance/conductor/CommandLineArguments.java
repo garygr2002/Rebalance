@@ -93,6 +93,11 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
                 new PreferenceDispatch<>(CommandLineId.DESTINATION, preferences,
                         System.out);
 
+        // Declare an 'on extraordinary' dispatch action.
+        final Dispatch<CommandLineId> onExtraordinary =
+                new LimitedPreferenceDispatch<>(CommandLineId.EXTRAORDINARY,
+                        preferences, System.out);
+
         // Declare an 'on high' dispatch action.
         final Dispatch<CommandLineId> onHigh =
                 new DoublePreferenceDispatch<>(CommandLineId.HIGH, preferences,
@@ -107,6 +112,11 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         final Dispatch<CommandLineId> onLevel =
                 new LevelPreferenceDispatch<>(CommandLineId.LEVEL, preferences,
                         System.out);
+
+        // Declare an 'on ordinary' dispatch action.
+        final Dispatch<CommandLineId> onOrdinary =
+                new LimitedPreferenceDispatch<>(CommandLineId.ORDINARY,
+                        preferences, System.out);
 
         // Declare an 'on none' dispatch action.
         final Dispatch<CommandLineId> onNone = new Dispatch<>() {
@@ -127,21 +137,36 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
                 new PathPreferenceDispatch<>(CommandLineId.SOURCE, preferences,
                         System.out);
 
+        // Declare an 'on limit' dispatch action.
+        final Dispatch<CommandLineId> onXLimit =
+                new IntPreferenceDispatch<>(CommandLineId.X, preferences,
+                        System.out, false);
+
         /*
          * Declare and initialize a dispatch list for token IDs, then add a
-         * dispatch action for 'on current' and 'on destination' arguments.
+         * dispatch action for the 'on current' argument.
          */
         final List<Dispatch<CommandLineId>> dispatchList = new ArrayList<>();
         dispatchList.add(onCurrent);
-        dispatchList.add(onDestination);
 
-        // Add dispatch actions for 'on high' and 'on inflation' arguments.
+        /*
+         * Add dispatch actions for the 'on destination' and 'on extraordinary'
+         * arguments.
+         */
+        dispatchList.add(onDestination);
+        dispatchList.add(onExtraordinary);
+
+        // Add dispatch actions for the 'on high' and 'on inflation' arguments.
         dispatchList.add(onHigh);
         dispatchList.add(onInflation);
 
-        // Add dispatch actions for 'on level' and 'on source' arguments.
+        // Add dispatch actions for the 'on level' and 'on ordinary' arguments.
         dispatchList.add(onLevel);
+        dispatchList.add(onOrdinary);
+
+        // Add dispatch actions for 'on source' and 'on limit' arguments.
         dispatchList.add(onSource);
+        dispatchList.add(onXLimit);
 
         // Create a command line argument processor using the 'on none' action.
         final CommandLineArguments<CommandLineId> cla =
@@ -457,8 +482,8 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      * @throws CLAException Indicates that there is something wrong with the
      *                      command line arguments
      */
-    private @NotNull List<Token<TokenType>> tokenize(@NotNull String[] arguments)
-            throws CLAException {
+    private @NotNull List<Token<TokenType>> tokenize(
+            @NotNull String @NotNull [] arguments) throws CLAException {
 
         // Declare local variables.
         String[] split;
