@@ -17,6 +17,7 @@ public class LimitedPreferenceDispatch<KeyType extends Enum<KeyType>> extends
     static {
 
         // Load up the acceptable level set.
+        put(Level.ALL);
         put(Level.CONFIG);
         put(Level.FINE);
         put(Level.FINER);
