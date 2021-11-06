@@ -29,12 +29,12 @@ public enum CommandLineId {
 
     // The logging level for ordinary informational messages
     @SuppressWarnings("SpellCheckingInspection")
-    ORDINARY("CONFIG, FINE, FINER, FINEST, INFO, OFF,", "rdnr",
+    ORDINARY("ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF,", "rdnr",
             true),
 
     // The logging level for extraordinary informational messages
     @SuppressWarnings("SpellCheckingInspection")
-    EXTRAORDINARY("CONFIG, FINE, FINER, FINEST, INFO, OFF,", "xtrd",
+    EXTRAORDINARY("ALL, CONFIG, FINE, FINER, FINEST, INFO, OFF,", "xtrd",
             true),
 
     // The annual expected inflation (double, the highest precision)
