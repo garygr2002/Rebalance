@@ -1,6 +1,7 @@
 package com.garygregg.rebalance;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -94,11 +95,11 @@ public enum WeightType {
 
         /*
          * Get a map entry containing the weight type that has the most
-         * children. Extract the type and set the ceiling of its log2.
+         * children. Extract the type and set the ceiling of its log2 if
+         * the entry is not null. Otherwise, set 1.
          */
         final Map.Entry<WeightType, Integer> entry = getMaxEntry();
-        maxChildren = (int) (Math.ceil(Math.log(entry.getValue()) /
-                Math.log(2.)));
+        maxChildren = (null == entry) ? 1 : entry.getValue();
     }
 
     // The parents for the weight type
@@ -137,7 +138,7 @@ public enum WeightType {
      * @return A map entry containing the weight type that has the most
      * children
      */
-    private static @NotNull Map.Entry<WeightType, Integer> getMaxEntry() {
+    private static Map.@Nullable Entry<WeightType, Integer> getMaxEntry() {
 
         /*
          * Declare and initialize a map with weight type keys and integer
@@ -169,9 +170,9 @@ public enum WeightType {
 
         /*
          * Return the map key/value entry for the weight type that has the
-         * highest count.
+         * highest count if the map is not empty. Otherwise, return null.
          */
-        return Collections.max(map.entrySet(),
+        return (map.isEmpty()) ? null : Collections.max(map.entrySet(),
                 Comparator.comparingInt(Map.Entry::getValue));
     }
 
