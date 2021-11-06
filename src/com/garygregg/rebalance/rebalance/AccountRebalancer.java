@@ -43,9 +43,6 @@ abstract class AccountRebalancer extends Rebalancer {
     private static final WeightType[] levelZero = {WeightType.BOND,
             WeightType.CASH, WeightType.REAL_ESTATE, WeightType.STOCK};
 
-    // Our local message logger
-    private static final MessageLogger messageLogger = new MessageLogger();
-
     // The distinguished value for nothing
     private static final double nothing = Percent.getZero().getValue();
 
@@ -139,14 +136,20 @@ abstract class AccountRebalancer extends Rebalancer {
 
     static {
 
-        // Set the logger in the message logger.
-        getLogger().setLogger(Logger.getLogger(
-                AccountRebalancer.class.getCanonicalName()));
-
         // Build the account list, the detailed list, and the portfolio list.
         buildAccountList();
         buildDetailedList();
         buildPortfolioList();
+    }
+
+    // Our message logger
+    private final MessageLogger messageLogger = new MessageLogger();
+
+    {
+
+        // Set the logger in the message logger.
+        messageLogger.setLogger(Logger.getLogger(
+                AccountRebalancer.class.getCanonicalName()));
     }
 
     /**
@@ -398,15 +401,6 @@ abstract class AccountRebalancer extends Rebalancer {
     }
 
     /**
-     * Gets the message logger for the rebalancer.
-     *
-     * @return The message logger for the rebalancer
-     */
-    protected static MessageLogger getLogger() {
-        return messageLogger;
-    }
-
-    /**
      * Creates a weight map for an account.
      *
      * @param account   The account for which to create a weight map
@@ -460,21 +454,6 @@ abstract class AccountRebalancer extends Rebalancer {
     public static @NotNull Map<WeightType, Double> getWeightsForPercentage(
             @NotNull Account account, boolean adjust) {
         return getWeights(account, percentage, adjust);
-    }
-
-    /**
-     * Returns whether there was a problem with a rebalance.
-     *
-     * @return True if there was a problem with a rebalance, false otherwise
-     */
-    public static boolean hadProblem() {
-
-        /*
-         * Get the message logger and return whether problem one or problem
-         * two is set.
-         */
-        final MessageLogger logger = getLogger();
-        return logger.hadProblem1() || logger.hadProblem2();
     }
 
     /**
@@ -555,13 +534,6 @@ abstract class AccountRebalancer extends Rebalancer {
     }
 
     /**
-     * Resets the message logger.
-     */
-    public static void reset() {
-        getLogger().resetProblem();
-    }
-
-    /**
      * Sets the description in a list of value wrappers.
      *
      * @param pairs             A list of weight type to value wrapper pairs
@@ -593,6 +565,30 @@ abstract class AccountRebalancer extends Rebalancer {
     protected abstract boolean doRebalance(@NotNull Account account);
 
     /**
+     * Gets the message logger for the rebalancer.
+     *
+     * @return The message logger for the rebalancer
+     */
+    private MessageLogger getLogger() {
+        return messageLogger;
+    }
+
+    /**
+     * Returns whether there was a problem with a rebalance.
+     *
+     * @return True if there was a problem with a rebalance, false otherwise
+     */
+    public boolean hadProblem() {
+
+        /*
+         * Get the message logger and return whether problem one or problem
+         * two is set.
+         */
+        final MessageLogger logger = getLogger();
+        return logger.hadProblem1() || logger.hadProblem2();
+    }
+
+    /**
      * Rebalances an account.
      *
      * @param account The account to rebalance
@@ -600,10 +596,14 @@ abstract class AccountRebalancer extends Rebalancer {
      * otherwise
      */
     public final boolean rebalance(@NotNull Account account) {
+        return doRebalance(account) && hadProblem();
+    }
 
-        // Reset the problem flags in the logger and rebalance the account.
-        reset();
-        return doRebalance(account);
+    /**
+     * Resets the message logger.
+     */
+    public void reset() {
+        getLogger().resetProblem();
     }
 
     private interface Factory<IdentifierType, ProductType> {
