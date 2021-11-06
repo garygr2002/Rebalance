@@ -94,6 +94,15 @@ public class PreferenceManager {
     }
 
     /**
+     * Gets the logging level for extraordinary informational messages.
+     *
+     * @return The logging level for extraordinary information messages
+     */
+    public Level getExtraordinary() {
+        return getLevel(CommandLineId.EXTRAORDINARY);
+    }
+
+    /**
      * Gets the high value of the S&P 500.
      *
      * @return The high value of the S&P 500
@@ -131,20 +140,48 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the desired logging level.
+     * Gets a logging level using a given command line ID.
      *
-     * @return The desired logging level
+     * @param id The command lind ID
+     * @return The logging level identified by the command ID, or a default if
+     * the logging level identified by the command ID is not set
      */
-    public @NotNull Level getLevel() {
+    private @NotNull Level getLevel(@NotNull CommandLineId id) {
 
         /*
          * Do not let the returned level be null. If the currently set
          * preference is not representable as a level, then return a non-null
          * default.
          */
-        final Level level = LevelPreferenceDispatch.getLevel(
-                getInt(CommandLineId.LEVEL));
+        final Level level = LevelPreferenceDispatch.getLevel(getInt(id));
         return (null == level) ? Level.ALL : level;
+    }
+
+    /**
+     * Gets the desired logging level.
+     *
+     * @return The desired logging level
+     */
+    public @NotNull Level getLevel() {
+        return getLevel(CommandLineId.LEVEL);
+    }
+
+    /**
+     * Gets the limit of allowed receiver delegates
+     *
+     * @return The limit of allowed receiver delegates
+     */
+    public @Nullable Integer getLimit() {
+        return getInt(CommandLineId.X);
+    }
+
+    /**
+     * Gets the logging level for ordinary informational messages.
+     *
+     * @return The logging level for ordinary information messages
+     */
+    public @NotNull Level getOrdinary() {
+        return getLevel(CommandLineId.ORDINARY);
     }
 
     /**
@@ -213,6 +250,15 @@ public class PreferenceManager {
     }
 
     /**
+     * Sets the logging level for extraordinary informational messages.
+     *
+     * @param value The logging level for extraordinary informational messages
+     */
+    public void setExtraordinary(Level value) {
+        setLevel(CommandLineId.EXTRAORDINARY, value);
+    }
+
+    /**
      * Gets the high value of the S&P 500.
      *
      * @param value The high value of the S&P 500
@@ -231,13 +277,51 @@ public class PreferenceManager {
     }
 
     /**
+     * Sets an integer value for a preference ID.
+     *
+     * @param id    The ID for which to set an integer preference
+     * @param value The double value for the given preference ID
+     */
+    private void setInt(@NotNull CommandLineId id, Integer value) {
+        getPreferences().putInt(id.name(), (null == value) ? getDefaultInt() :
+                value);
+    }
+
+    /**
      * Sets the desired logging level.
      *
      * @param value The desired logging level
      */
     public void setLevel(Level value) {
-        getPreferences().putInt(CommandLineId.LEVEL.name(), (null == value) ?
-                getDefaultInt() : value.intValue());
+        setLevel(CommandLineId.LEVEL, value);
+    }
+
+    /**
+     * Sets a logging level using a given command line ID.
+     *
+     * @param id    The command line ID
+     * @param value The logging level to set
+     */
+    private void setLevel(@NotNull CommandLineId id, Level value) {
+        setInt(id, (null == value) ? null : value.intValue());
+    }
+
+    /**
+     * Sets the limit of allowed receiver delegates
+     *
+     * @param limit The limit of allowed receiver delegates
+     */
+    public void setLimit(Integer limit) {
+        setInt(CommandLineId.X, limit);
+    }
+
+    /**
+     * Sets the logging level for ordinary informational messages.
+     *
+     * @param value The logging level for ordinary informational messages
+     */
+    public void setOrdinary(Level value) {
+        setLevel(CommandLineId.ORDINARY, value);
     }
 
     /**
