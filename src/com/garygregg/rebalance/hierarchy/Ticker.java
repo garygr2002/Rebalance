@@ -22,12 +22,9 @@ public class Ticker extends
     // A lazy boy for an artificial ticker
     private static final LazyBoy<Ticker> lazyBoy = new LazyBoy<>(factory);
 
-    // Our message logger
-    private static final MessageLogger logger = new MessageLogger();
-
-    static {
-        logger.setLogger(Logger.getLogger(Ticker.class.getCanonicalName()));
-    }
+    // The preference manager
+    private static final PreferenceManager manager =
+            PreferenceManager.getInstance();
 
     // The map of weight type to activities
     private final Map<WeightType, Activity> associationMap = new HashMap<>();
@@ -57,6 +54,9 @@ public class Ticker extends
     private final FullValueBreakdownManager<Ticker> fullValueManager =
             new FullValueBreakdownManager<>();
 
+    // Our message logger
+    private final MessageLogger messageLogger = new MessageLogger();
+
     // The "not considered" value of the ticker
     private final Purse notConsidered = new Purse();
 
@@ -76,11 +76,14 @@ public class Ticker extends
 
         /*
          * This common initialization block builds the association map of
-         * weight type to activities.
+         * weight type to activities. First set the logger in the message
+         * logger. Declare a weight type.
          */
+        messageLogger.setLogger(Logger.getLogger(
+                Ticker.class.getCanonicalName()));
+        WeightType type;
 
         // Level 0: Bond, cash, real-estate or stock.
-        WeightType type;
         associationMap.put(type = WeightType.ALL, new Activity(type, null,
                 new Association(FundType.BOND, WeightType.BOND),
                 new Association(FundType.CASH, WeightType.CASH),
@@ -575,10 +578,12 @@ public class Ticker extends
     public void setProposedShares(double shares, boolean okayToTakeMore) {
 
         /*
-         * Declare and initialize a logging level for ordinary messages. Format
-         * a prefix for logger messages.
+         * Reset any problems in the message logger. Declare and initialize
+         * a logging level for ordinary messages. Format a prefix for logger
+         * messages.
          */
-        final Level ordinary = Level.FINE;
+        messageLogger.resetProblem();
+        final Level ordinary = manager.getOrdinary();
         final String prefix = String.format("Ticker '%s': ", getKey());
 
         /*
@@ -601,8 +606,8 @@ public class Ticker extends
              * The rounded number of shares are not equal to the given number
              * of shares. Log this finding.
              */
-            logger.logMessage(ordinary, String.format("%s%s shares were " +
-                            "requested, but I needed to round it to %s " +
+            messageLogger.logMessage(ordinary, String.format("%s%s shares " +
+                            "were requested, but I needed to round it to %s " +
                             "shares.", prefix, Shares.format(shares),
                     roundedShares));
         }
@@ -620,7 +625,7 @@ public class Ticker extends
              * number of shares to zero. Log a warning.
              */
             minimumShares = 0.;
-            logger.logMessage(Level.WARNING, String.format("%sCannot " +
+            messageLogger.logMessage(Level.WARNING, String.format("%sCannot " +
                     "calculate whether the minimum value requirement is " +
                     "met with a null price; taking a chance by assuming %s " +
                     "minimum shares.", prefix, minimumShares));
@@ -635,9 +640,9 @@ public class Ticker extends
              * minimum value requirement with zero value price.
              */
             minimumShares = Double.MAX_VALUE;
-            logger.logMessage(Level.WARNING, String.format("%sNo way to " +
-                            "meet minimum value requirements with zero price.",
-                    prefix));
+            messageLogger.logMessage(Level.WARNING, String.format("%sNo way " +
+                    "to meet minimum value requirements with zero " +
+                    "price.", prefix));
         }
 
         // The price is non-null and non-zero.
@@ -693,18 +698,14 @@ public class Ticker extends
              * Log a message about adjusting the requested number of shares
              * because of the minimum.
              */
-            logger.logMessage(ordinary, String.format("%s The rounded " +
-                            "number of shares, %s, is less than the minimum " +
-                            "required, %s; using %s.", prefix,
+            messageLogger.logMessage(ordinary, String.format("%s The " +
+                            "rounded number of shares, %s, is less than the " +
+                            "minimum required, %s; using %s.", prefix,
                     Shares.format(rounded), Shares.format(minimumShares),
                     Shares.format(shares)));
         }
 
-        /*
-         * Reset any problems noted by the logger, and set the (possibly
-         * modified) number of shares.
-         */
-        logger.resetProblem();
+        // Set the (possibly modified) number of shares.
         proposed.setShares(shares);
     }
 
