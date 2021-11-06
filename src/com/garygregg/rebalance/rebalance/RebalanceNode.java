@@ -22,6 +22,13 @@ class RebalanceNode implements CurrencyReceiver {
     // The error stream we will use
     private static final PrintStream errorStream = System.err;
 
+    // The preference manager
+    private static final PreferenceManager manager =
+            PreferenceManager.getInstance();
+
+    // The limit of allowed receiver delegates
+    private static final int limit = calculateLimit();
+
     // Our local message logger
     private static final MessageLogger messageLogger = new MessageLogger();
 
@@ -87,6 +94,34 @@ class RebalanceNode implements CurrencyReceiver {
         // Set the logger inside the message logger.
         getLogger().setLogger(Logger.getLogger(
                 RebalanceNode.class.getCanonicalName()));
+    }
+
+    /**
+     * Calculates the limit of allowed receiver delegates.
+     *
+     * @return The limit of allowed receiver delegates
+     */
+    private static int calculateLimit() {
+
+        /*
+         * Get the limit of allowed receiver delegates from the preference
+         * manager. Is the preference null?
+         */
+        Integer limit = manager.getLimit();
+        if (null == limit) {
+
+            /*
+             * The preference is null. As a default, use the number of
+             * children of the weight type that has the most as a default.
+             */
+            limit = WeightType.getMaxChildren();
+        }
+
+        /*
+         * Return the limit as the smallest of the calculated limit and the
+         * size of an integer.
+         */
+        return Integer.min(limit, Integer.SIZE);
     }
 
     /**
@@ -168,6 +203,15 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
+     * Gets the limit of allowed receiver delegates.
+     *
+     * @return The limit of allowed receiver delegates
+     */
+    private static int getLimit() {
+        return limit;
+    }
+
+    /**
      * Gets the message logger for the node.
      *
      * @return The message logger for the node
@@ -244,8 +288,11 @@ class RebalanceNode implements CurrencyReceiver {
                     String.format("Negative argument %d not allowed", n));
         }
 
-        // The argument cannot be larger than the size of an integer.
-        else if (Integer.SIZE <= n) {
+        /*
+         * The argument cannot be larger than the limit of allowed receiver
+         * delegates.
+         */
+        else if (getLimit() <= n) {
             throw new IllegalArgumentException(
                     String.format("Argument %d is too big", n));
         }
