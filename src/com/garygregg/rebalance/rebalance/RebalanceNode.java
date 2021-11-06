@@ -164,7 +164,7 @@ class RebalanceNode implements CurrencyReceiver {
      * @return The logging level for extraordinary, non-warning activity
      */
     private static @NotNull Level getExtraordinary() {
-        return Level.INFO;
+        return manager.getExtraordinary();
     }
 
     /**
@@ -226,7 +226,7 @@ class RebalanceNode implements CurrencyReceiver {
      * @return The logging level for ordinary, non-warning activity
      */
     private static @NotNull Level getOrdinary() {
-        return Level.FINE;
+        return manager.getOrdinary();
     }
 
     /**
