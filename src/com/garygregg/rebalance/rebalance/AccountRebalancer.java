@@ -596,7 +596,7 @@ abstract class AccountRebalancer extends Rebalancer {
      * otherwise
      */
     public final boolean rebalance(@NotNull Account account) {
-        return doRebalance(account) && hadProblem();
+        return doRebalance(account) && (!hadProblem());
     }
 
     /**
