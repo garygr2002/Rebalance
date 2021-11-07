@@ -2,6 +2,7 @@ package com.garygregg.rebalance.hierarchy;
 
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountDescription;
+import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,8 +10,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Account extends
-        Aggregate<AccountKey, Ticker, AccountDescription> {
+public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
+        implements Balanceable {
 
     // A factory for producing artificial accounts
     private static final Factory<Account> factory = Account::getNewArtificial;
@@ -42,6 +43,9 @@ public class Account extends
 
     // The portfolio description associated with this account
     private PortfolioDescription portfolioDescription;
+
+    // The residual remaining after a rebalance (we hope it is $0!)
+    private MutableCurrency residual;
 
     // Is this ticker synthesized (or programmatically modified)?
     private boolean synthesized;
@@ -127,6 +131,16 @@ public class Account extends
     }
 
     /**
+     * Gets the residual of a rebalance operation.
+     *
+     * @return The residual of a rebalance operation, or null if a rebalance
+     * has not been attempted
+     */
+    MutableCurrency getResidual() {
+        return residual;
+    }
+
+    /**
      * Gets the tax type from the account description.
      *
      * @return The tax type from the account description
@@ -186,6 +200,11 @@ public class Account extends
      */
     void setPortfolioDescription(PortfolioDescription portfolioDescription) {
         this.portfolioDescription = portfolioDescription;
+    }
+
+    @Override
+    public void setResidual(@NotNull MutableCurrency residual) {
+        this.residual = residual;
     }
 
     /**

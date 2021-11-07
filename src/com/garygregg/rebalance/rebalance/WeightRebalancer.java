@@ -1,6 +1,7 @@
 package com.garygregg.rebalance.rebalance;
 
 import com.garygregg.rebalance.WeightType;
+import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Ticker;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
@@ -108,7 +109,8 @@ class WeightRebalancer extends AccountRebalancer
     }
 
     @Override
-    protected boolean doRebalance(@NotNull Account account) {
+    protected boolean doRebalance(@NotNull Account account,
+                                  @NotNull MutableCurrency residual) {
 
         /*
          * Set the account key in the rebalance node class. Clear the root
@@ -134,11 +136,12 @@ class WeightRebalancer extends AccountRebalancer
 
         /*
          * Reinitialize the rebalancer member variables. Set the proposed value
-         * of the root node the same as that of the account. Return whether the
+         * of the root node the same as that of the account, receiving a
+         * residual. Set the residual in the account. Return whether the
          * rebalance node class had a problem.
          */
         initialize();
-        root.setProposed(account.getProposed());
+        residual.set(root.setProposed(account.getProposed()));
         return RebalanceNode.hadProblem();
     }
 

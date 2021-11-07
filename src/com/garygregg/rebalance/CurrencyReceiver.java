@@ -9,7 +9,7 @@ public interface CurrencyReceiver {
      * Sets the proposed value of the receiver.
      *
      * @param currency The proposed value of the receiver
-     * @return The value that could not be set
+     * @return The residual that could not be set
      */
     @NotNull Currency setProposed(@NotNull Currency currency);
 }

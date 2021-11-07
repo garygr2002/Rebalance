@@ -2,6 +2,8 @@ package com.garygregg.rebalance.rebalance;
 
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountDescription;
+import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.countable.Percent;
 import com.garygregg.rebalance.detailed.DetailedDescription;
 import com.garygregg.rebalance.detailed.DetailedLibrary;
@@ -558,11 +560,13 @@ abstract class AccountRebalancer extends Rebalancer {
     /**
      * Rebalances an account.
      *
-     * @param account The account to rebalance
+     * @param account  The account to rebalance
+     * @param residual Receives the residual of the rebalance operation
      * @return True if the account was successfully rebalanced; false
      * otherwise
      */
-    protected abstract boolean doRebalance(@NotNull Account account);
+    protected abstract boolean doRebalance(@NotNull Account account,
+                                           @NotNull MutableCurrency residual);
 
     /**
      * Gets the message logger for the rebalancer.
@@ -596,7 +600,35 @@ abstract class AccountRebalancer extends Rebalancer {
      * otherwise
      */
     public final boolean rebalance(@NotNull Account account) {
-        return doRebalance(account) && (!hadProblem());
+
+        /*
+         * Reset the message logger. Declare and initialize a variable to
+         * receive a residual. Use the known impossible value as an
+         * initializer.
+         */
+        reset();
+        final MutableCurrency residual = new
+                MutableCurrency(Currency.getImpossible());
+
+        /*
+         * Rebalance the account, receiving a result and the residual. Is the
+         * residual now set to something other than the impossible value?
+         */
+        final boolean result = doRebalance(account, residual);
+        if (residual.getImmutable().isNotImpossible()) {
+
+            /*
+             * The residual is set to something other than the impossible
+             * value. Set the residual in the account.
+             */
+            account.setResidual(residual);
+        }
+
+        /*
+         * Return true if this rebalancer had no problem, and the result from
+         * the rebalance operation shows success.
+         */
+        return (!hadProblem()) && result;
     }
 
     /**
