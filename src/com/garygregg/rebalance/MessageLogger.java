@@ -99,6 +99,23 @@ public class MessageLogger {
     }
 
     /**
+     * Streams a message.
+     *
+     * @param level   The level of the message
+     * @param message The message to stream
+     */
+    public static void stream(@NotNull Level level, @NotNull String message) {
+
+        // Identify the proper print stream for the message.
+        final PrintStream printStream = (level.intValue() <
+                Level.SEVERE.intValue()) ? getOutputStream() :
+                getErrorStream();
+
+        // Print the message to the print stream.
+        printStream.println(message);
+    }
+
+    /**
      * Gets the current logger.
      *
      * @return The current logger
@@ -180,18 +197,14 @@ public class MessageLogger {
      * Streams and logs a message.
      *
      * @param level   The level of the message
-     * @param message The message to log
+     * @param message The message to stream and log
      * @return True if the level for this message flags it as a problem
      */
-    public boolean streamAndLog(@NotNull Level level, @NotNull String message) {
-
-        // Identify the proper print stream for the message.
-        final PrintStream printStream = (level.intValue() <
-                Level.SEVERE.intValue()) ? getOutputStream() :
-                getErrorStream();
+    public boolean streamAndLog(@NotNull Level level,
+                                @NotNull String message) {
 
         // Print the message to the print stream, then log the message.
-        printStream.println(message);
+        stream(level, message);
         return log(level, message);
     }
 }
