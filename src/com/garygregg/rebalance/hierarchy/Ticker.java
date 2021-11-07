@@ -41,15 +41,6 @@ public class Ticker extends
     // The considered value of the ticker
     private final Purse considered = new Purse();
 
-    // Our floor function
-    private final SharesFunction floor = new SharesFunction() {
-
-        @Override
-        public double perform(@NotNull Double argument) {
-            return Math.floor(argument);
-        }
-    };
-
     // Our breakdown manager for the weight type
     private final FullValueBreakdownManager<Ticker> fullValueManager =
             new FullValueBreakdownManager<>();
@@ -548,7 +539,7 @@ public class Ticker extends
         if (null != proposedShares) {
 
             // The proposed shares are not null. Set them.
-            setProposedShares(proposedShares, true);
+            setProposedShares(proposedShares);
         }
 
         /*
@@ -570,12 +561,8 @@ public class Ticker extends
      * Sets the proposed number of shares of the ticker holding.
      *
      * @param shares The proposed number of shares of the ticker holding
-     * @param okayToTakeMore True if it is okay for this ticker holding to take
-     *                       more than the proposed number of shares (based on
-     *                       preferred balance rounding and minimum balance);
-     *                       false otherwise
      */
-    public void setProposedShares(double shares, boolean okayToTakeMore) {
+    public void setProposedShares(double shares) {
 
         /*
          * Reset any problems in the message logger. Declare and initialize
@@ -587,18 +574,11 @@ public class Ticker extends
         final String prefix = String.format("Ticker '%s': ", getKey());
 
         /*
-         * Round the given number of shares based on the preference rounding.
-         * Round to the nearest balance rounding (possibly up) if it is okay to
-         * take more. Otherwise, unconditionally round down.
-         */
-        final double rounded = okayToTakeMore ?
-                round.getRoundedShares(shares) :
-                floor.getRoundedShares(shares);
-
-        /*
+         * Round the given number of shares based on the rounding preference.
          * Are the rounded number of shares not equal to the given number of
          * shares?
          */
+        final double rounded = round.getRoundedShares(shares);
         final Shares roundedShares = new Shares(rounded);
         if (roundedShares.areNotEqual(shares)) {
 
@@ -678,17 +658,15 @@ public class Ticker extends
 
             /*
              * The rounded number of shares is less than the minimum. Set zero
-             * shares if it is not okay to take more, or if the number of
-             * shares is less than half the minimum...
+             * shares if the number of shares is less than half the minimum...
              */
-            if ((!okayToTakeMore) || (shares < (minimumShares / 2.))) {
+            if (shares < (minimumShares / 2.)) {
                 shares = Shares.getZero().getValue();
             }
 
             /*
-             * ...or set the minimum number of shares if it is okay to take
-             * more, and the number of shares is greater than or equal to half
-             * the minimum.
+             * ...or set the minimum number of shares if the number of shares
+             * is greater than or equal to half the minimum.
              */
             else {
                 shares = minimumShares;
