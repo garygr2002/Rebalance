@@ -15,6 +15,12 @@ import java.util.logging.Logger;
 
 class RebalanceNode implements CurrencyReceiver {
 
+    // The logging level for extraordinary informational messages
+    final static Level extraordinary = MessageLogger.getOrdinary();
+
+    // The logging level for ordinary informational messages
+    final static Level ordinary = MessageLogger.getOrdinary();
+
     // For use when a rebalance cannot occur
     private static final Action<ReceiverDelegate<?>> cannotSetAction =
             ReceiverDelegate::onCannotSet;
@@ -150,24 +156,6 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * The error stream we will use.
-     *
-     * @return The error stream we will use
-     */
-    private static @NotNull PrintStream getErrorStream() {
-        return errorStream;
-    }
-
-    /**
-     * Gets the logging level for extraordinary, non-warning activity.
-     *
-     * @return The logging level for extraordinary, non-warning activity
-     */
-    private static @NotNull Level getExtraordinary() {
-        return manager.getExtraordinary();
-    }
-
-    /**
      * Gets an initial currency list.
      *
      * @param size              The size of the desired list
@@ -221,24 +209,6 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Gets the logging level for ordinary, non-warning activity.
-     *
-     * @return The logging level for ordinary, non-warning activity
-     */
-    private static @NotNull Level getOrdinary() {
-        return manager.getOrdinary();
-    }
-
-    /**
-     * Gets the output stream we will use.
-     *
-     * @return The output stream we will use
-     */
-    private static @NotNull PrintStream getOutputStream() {
-        return outputStream;
-    }
-
-    /**
      * Returns whether there was a problem with a rebalance.
      *
      * @return True if there was a problem with a rebalance, false otherwise
@@ -251,26 +221,6 @@ class RebalanceNode implements CurrencyReceiver {
          */
         final MessageLogger logger = getLogger();
         return logger.hadProblem1() || logger.hadProblem2();
-    }
-
-    /**
-     * Logs a message.
-     *
-     * @param level   The level of the message
-     * @param message The message to log
-     */
-    @SuppressWarnings("SameParameterValue")
-    private static void logMessage(@NotNull Level level,
-                                   @NotNull String message) {
-
-        // Identify the proper print stream for the message.
-        final PrintStream printStream = (level.intValue() <
-                Level.SEVERE.intValue()) ? getOutputStream() :
-                getErrorStream();
-
-        // Print the message to the print stream, then log the message.
-        printStream.println(message);
-        messageLogger.log(level, message);
     }
 
     /**
@@ -343,8 +293,8 @@ class RebalanceNode implements CurrencyReceiver {
         reset();
 
         // Log an informational message about the incoming account key.
-        logMessage(getExtraordinary(), String.format("Account key %s has " +
-                "been set for rebalance...", getAccountKey()));
+        getLogger().log(ordinary, String.format("Account key %s has been " +
+                "set for rebalance...", getAccountKey()));
     }
 
     /**
@@ -443,9 +393,11 @@ class RebalanceNode implements CurrencyReceiver {
             @NotNull Collection<T> delegates, @NotNull Currency proposed) {
 
         /*
-         * Declare a variable to hold the best accumulated difference.
-         * Initialize it to the proposed value. Try to do the rebalance.
+         * Get the message logger. Declare a variable to hold the best
+         * accumulated difference. Initialize it to the proposed value. Try to
+         * do the rebalance.
          */
+        final MessageLogger logger = getLogger();
         Currency bestDifference = proposed;
         try {
 
@@ -525,8 +477,8 @@ class RebalanceNode implements CurrencyReceiver {
                  * Log a message about this current combination of account key,
                  * weight type and consideration pattern.
                  */
-                logMessage(getOrdinary(), String.format("For account key " +
-                                "%s, weight type %s, and consideration " +
+                logger.log(ordinary, String.format("For account key %s, " +
+                                "weight type %s, and consideration " +
                                 "pattern 0x%08x: Found accumulated " +
                                 "difference of %s.", getAccountKey(),
                         getWeight(), considerationPattern,
@@ -563,7 +515,7 @@ class RebalanceNode implements CurrencyReceiver {
         catch (@NotNull Exception exception) {
 
             // Log a warning saying a rebalance cannot be accomplished.
-            logMessage(Level.WARNING, String.format("A rebalance cannot be " +
+            logger.log(Level.WARNING, String.format("A rebalance cannot be " +
                             "accomplished for account key %s and weight " +
                             "type %s because of an exception containing the " +
                             "following message: '%s'.",
@@ -583,9 +535,9 @@ class RebalanceNode implements CurrencyReceiver {
         finally {
 
             // Log a message identifying the best difference.
-            logMessage(getExtraordinary(), String.format("For account key " +
-                            "%s and weight type %s: I identified a best " +
-                            "difference of %s.", getAccountKey(), getWeight(),
+            logger.log(extraordinary, String.format("For account key %s and " +
+                            "weight type %s: I identified a best difference " +
+                            "of %s.", getAccountKey(), getWeight(),
                     bestDifference));
         }
 

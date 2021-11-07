@@ -26,6 +26,9 @@ import java.util.logging.Logger;
 
 public class Hierarchy {
 
+    // The logging level for ordinary informational messages
+    final static Level ordinary = MessageLogger.getOrdinary();
+
     // A function that returns 'considered' value
     private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> allConsidered =
             new OneParameterFunction<>() {
@@ -343,15 +346,6 @@ public class Hierarchy {
     }
 
     /**
-     * Gets the logging level for extraordinary, non-warning activity.
-     *
-     * @return The logging level for extraordinary, non-warning activity
-     */
-    private static @NotNull Level getExtraordinary() {
-        return Level.INFO;
-    }
-
-    /**
      * Gets a hierarchy instance for a given holding type.
      *
      * @param type The given holding type
@@ -377,7 +371,7 @@ public class Hierarchy {
      * @return The logging level for ordinary, non-warning activity
      */
     private static @NotNull Level getOrdinary() {
-        return Level.FINEST;
+        return ordinary;
     }
 
     /**
