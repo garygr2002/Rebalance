@@ -174,7 +174,7 @@ public class DetailedsBuilder extends ElementReader<DetailedDescription> {
              * Log a message describing where the duplicate detailed description
              * occurs.
              */
-            logMessage(getExtraordinary(), String.format("Replacing details " +
+            logMessage(getInformationLevel(), String.format("Replacing details " +
                             "with account number '%s' at line number %d in " +
                             "detailed file.",
                     AccountKeyLibrary.format(description.getNumber()),

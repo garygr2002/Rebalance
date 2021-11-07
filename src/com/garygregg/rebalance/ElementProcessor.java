@@ -8,6 +8,10 @@ import java.util.logging.Logger;
 
 public abstract class ElementProcessor {
 
+    // The logging level for information
+    private static final Level informationLevel =
+            MessageLogger.getExtraordinary();
+
     // Our date utilities object
     private final DateUtilities dateUtilities =
             new DateUtilities(getPrefix(), getFileType());
@@ -39,20 +43,20 @@ public abstract class ElementProcessor {
     }
 
     /**
-     * Gets the logging level for extraordinary, non-warning activity.
-     *
-     * @return The logging level for extraordinary, non-warning activity
-     */
-    protected @NotNull Level getExtraordinary() {
-        return Level.INFO;
-    }
-
-    /**
      * Gets the file type.
      *
      * @return The file type
      */
     protected abstract String getFileType();
+
+    /**
+     * Gets the logging level for information.
+     *
+     * @return The logging level for information
+     */
+    protected @NotNull Level getInformationLevel() {
+        return informationLevel;
+    }
 
     /**
      * Gets the prefix for configuration files of a subclass.

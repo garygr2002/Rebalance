@@ -277,7 +277,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
                          * that the minimum will be used for re-balancing
                          * purposes.
                          */
-                        logMessage(getExtraordinary(),
+                        logMessage(getInformationLevel(),
                                 String.format("Balance rounding %s at line " +
                                                 "number %d is less than " +
                                                 "minimum of %s; the " +
@@ -931,7 +931,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
                  * Log a message describing where the duplicate account description
                  * occurs.
                  */
-                logMessage(getExtraordinary(), String.format("Replacing " +
+                logMessage(getInformationLevel(), String.format("Replacing " +
                         "ticker with symbol '%s' at line number %d in " +
                         "ticker file.", description.getTicker(), lineNumber));
             }
@@ -1034,7 +1034,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
         }
 
         // Log an informational message, and call the superclass method.
-        logMessage(getExtraordinary(), String.format("Checks of the fund " +
+        logMessage(getInformationLevel(), String.format("Checks of the fund " +
                 "types in the ticker library indicated %s. ", result ?
                 "no inconsistencies" : "one or more inconsistencies"));
         super.stopProcessing();

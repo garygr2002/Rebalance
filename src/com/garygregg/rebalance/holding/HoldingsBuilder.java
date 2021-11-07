@@ -266,8 +266,8 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
              * Log a message describing where the duplicate portfolio
              * description occurs.
              */
-            logMessage(getExtraordinary(), String.format("Replacing holding " +
-                            "with key '%s' at line number %d in the " +
+            logMessage(getInformationLevel(), String.format("Replacing " +
+                            "holding with key '%s' at line number %d in the " +
                             "%s file.", description.getKey(), lineNumber,
                     getPrefix()));
         }

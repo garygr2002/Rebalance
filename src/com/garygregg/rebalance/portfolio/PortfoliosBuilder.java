@@ -393,7 +393,7 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
              * Log a message describing where the duplicate portfolio
              * description occurs.
              */
-            logMessage(getExtraordinary(), String.format("Replacing " +
+            logMessage(getInformationLevel(), String.format("Replacing " +
                     "portfolio with mnemonic '%s' at line number %d in " +
                     "portfolio file.", description.getKey(), lineNumber));
         }

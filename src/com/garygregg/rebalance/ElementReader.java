@@ -496,9 +496,9 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
         }
 
         // Log an exit message.
-        logMessage(getExtraordinary(), String.format("Element reader of " +
-                        "type '%s' is exiting with%s error(s)%s.",
-                prefix, result ? " no" : "", (result || continueOnFalse) ? "" :
+        logMessage(getInformationLevel(), String.format("Element reader of " +
+                        "type '%s' is exiting with%s error(s)%s.", prefix,
+                result ? " no" : "", (result || continueOnFalse) ? "" :
                         "; unread lines after the first error may exist."));
 
         // Return the result.

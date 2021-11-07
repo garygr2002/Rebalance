@@ -170,7 +170,7 @@ public class CodesBuilder extends ElementReader<CodeDescription> {
              * Log a message describing where the duplicate code description
              * occurs.
              */
-            logMessage(getExtraordinary(), String.format("Replacing " +
+            logMessage(getInformationLevel(), String.format("Replacing " +
                             "description with code '%s' at line number %d " +
                             "in the code file.", description.getCode(),
                     lineNumber));

@@ -86,7 +86,7 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
              * Log a message describing where the duplicate tax description
              * occurs.
              */
-            logMessage(getExtraordinary(), String.format("Replacing tax " +
+            logMessage(getInformationLevel(), String.format("Replacing tax " +
                             "bracket with threshold '%s' at line number %d in " +
                             "%s file.", description.getKey(), lineNumber,
                     getPrefix()));

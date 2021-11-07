@@ -245,9 +245,9 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
              * Log a message describing where the duplicate account description
              * occurs.
              */
-            logMessage(getExtraordinary(), String.format("Replacing account " +
-                            "with number '%s' at line number %d in account " +
-                            "file.",
+            logMessage(getInformationLevel(), String.format("Replacing " +
+                            "account with number '%s' at line number %d in " +
+                            "account file.",
                     AccountKeyLibrary.format(description.getNumber()),
                     lineNumber));
         }
