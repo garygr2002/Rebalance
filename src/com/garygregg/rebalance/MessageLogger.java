@@ -67,7 +67,7 @@ public class MessageLogger {
      *
      * @return The error stream we will use
      */
-    private static @NotNull PrintStream getErrorStream() {
+    public static @NotNull PrintStream getErrorStream() {
         return errorStream;
     }
 
@@ -94,7 +94,7 @@ public class MessageLogger {
      *
      * @return The output stream we will use
      */
-    private static @NotNull PrintStream getOutputStream() {
+    public static @NotNull PrintStream getOutputStream() {
         return outputStream;
     }
 
