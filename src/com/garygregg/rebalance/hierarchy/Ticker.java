@@ -606,7 +606,7 @@ public class Ticker extends
              * The rounded number of shares are not equal to the given number
              * of shares. Log this finding.
              */
-            messageLogger.logMessage(ordinary, String.format("%s%s shares " +
+            messageLogger.log(ordinary, String.format("%s%s shares " +
                             "were requested, but I needed to round it to %s " +
                             "shares.", prefix, Shares.format(shares),
                     roundedShares));
@@ -625,7 +625,7 @@ public class Ticker extends
              * number of shares to zero. Log a warning.
              */
             minimumShares = 0.;
-            messageLogger.logMessage(Level.WARNING, String.format("%sCannot " +
+            messageLogger.log(Level.WARNING, String.format("%sCannot " +
                     "calculate whether the minimum value requirement is " +
                     "met with a null price; taking a chance by assuming %s " +
                     "minimum shares.", prefix, minimumShares));
@@ -640,7 +640,7 @@ public class Ticker extends
              * minimum value requirement with zero value price.
              */
             minimumShares = Double.MAX_VALUE;
-            messageLogger.logMessage(Level.WARNING, String.format("%sNo way " +
+            messageLogger.log(Level.WARNING, String.format("%sNo way " +
                     "to meet minimum value requirements with zero " +
                     "price.", prefix));
         }
@@ -698,7 +698,7 @@ public class Ticker extends
              * Log a message about adjusting the requested number of shares
              * because of the minimum.
              */
-            messageLogger.logMessage(ordinary, String.format("%s The " +
+            messageLogger.log(ordinary, String.format("%s The " +
                             "rounded number of shares, %s, is less than the " +
                             "minimum required, %s; using %s.", prefix,
                     Shares.format(rounded), Shares.format(minimumShares),

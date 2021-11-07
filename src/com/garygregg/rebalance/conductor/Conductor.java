@@ -1007,7 +1007,7 @@ public class Conductor implements Dispatch<CommandLineId> {
 
         // Print the message to the print stream, then log the message.
         printStream.println(message);
-        messageLogger.logMessage(level, message);
+        messageLogger.log(level, message);
     }
 
     /**

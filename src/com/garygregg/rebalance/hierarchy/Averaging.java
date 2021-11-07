@@ -166,7 +166,7 @@ class Averaging extends Synthesizer {
                 if (null == estimate) {
 
                     // The estimate is null. Log a warning.
-                    logger.logMessage(Level.WARNING, String.format("Unable " +
+                    logger.log(Level.WARNING, String.format("Unable " +
                             "to retrieve house estimate with key '%s'; its " +
                             "account is missing.", estimateKey));
                 }

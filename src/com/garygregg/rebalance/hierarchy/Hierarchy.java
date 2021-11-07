@@ -1305,7 +1305,7 @@ public class Hierarchy {
      */
     private void logMessage(@NotNull Level level,
                             @NotNull String message) {
-        logger.logMessage(level, message);
+        logger.log(level, message);
     }
 
     /**

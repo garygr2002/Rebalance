@@ -126,7 +126,7 @@ abstract class Annuity extends Synthesizer {
              * The start date is after the end date. Log an informational
              * message; the result of the calculation is zero.
              */
-            getLogger().logMessage(Level.INFO, String.format("Start " +
+            getLogger().log(Level.INFO, String.format("Start " +
                             "date of '%s' occurs after end date of '%s'; " +
                             "the value of the pension is zero.",
                     calculationStart, calculationEnd));
@@ -149,7 +149,7 @@ abstract class Annuity extends Synthesizer {
                  * informational message; the result of the calculation is
                  * zero.
                  */
-                getLogger().logMessage(Level.INFO, String.format("First " +
+                getLogger().log(Level.INFO, String.format("First " +
                                 "payment date of '%s' occurs after end " +
                                 "date of '%s'; value of the pension is zero.",
                         firstPayment, calculationEnd));
@@ -275,7 +275,7 @@ abstract class Annuity extends Synthesizer {
             if (null == description) {
 
                 // The portfolio description is null. Log a warning.
-                getLogger().logMessage(Level.WARNING,
+                getLogger().log(Level.WARNING,
                         String.format("Synthesis of annuity value for " +
                                 "account '%s' requires a non-null " +
                                 "portfolio description.", account.getKey()));

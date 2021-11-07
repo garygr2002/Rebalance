@@ -105,7 +105,7 @@ public class MessageLogger {
      * @return True if the level for this message flags it as a problem
      */
     public boolean extraordinary(@NotNull String message) {
-        return logMessage(getExtraordinary(), message);
+        return log(getExtraordinary(), message);
     }
 
     /**
@@ -144,8 +144,7 @@ public class MessageLogger {
      * @param message The message to log
      * @return True if the level for this message flags it as a problem
      */
-    public boolean logMessage(@NotNull Level level,
-                              @NotNull String message) {
+    public boolean log(@NotNull Level level, @NotNull String message) {
 
         // Log the message, and return the problem flag for this message.
         final ThresholdMonitor first = monitors.getFirst();
@@ -161,7 +160,7 @@ public class MessageLogger {
      * @return True if the level for this message flags it as a problem
      */
     public boolean ordinary(@NotNull String message) {
-        return logMessage(getOrdinary(), message);
+        return log(getOrdinary(), message);
     }
 
     /**
@@ -213,7 +212,7 @@ public class MessageLogger {
 
         // Print the message to the print stream, then log the message.
         printStream.println(message);
-        return logMessage(level, message);
+        return log(level, message);
     }
 
     /**

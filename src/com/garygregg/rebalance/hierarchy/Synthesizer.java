@@ -53,7 +53,7 @@ abstract class Synthesizer {
         if (!result) {
 
             // Value has already been set in the account. Log a warning.
-            getLogger().logMessage(Level.WARNING, String.format("Rejecting " +
+            getLogger().log(Level.WARNING, String.format("Rejecting " +
                     "attempt to synthesize account with key '%s' that " +
                     "already has value set.", givenKey));
         }
@@ -66,7 +66,7 @@ abstract class Synthesizer {
         else if (!(result = !account.hasChildren())) {
 
             // The account has children. Log a warning.
-            getLogger().logMessage(Level.WARNING, String.format("Rejecting " +
+            getLogger().log(Level.WARNING, String.format("Rejecting " +
                     "attempt to synthesize account with key '%s' that " +
                     "has children.", givenKey));
         }
@@ -78,7 +78,7 @@ abstract class Synthesizer {
              * Log some information about beginning synthesis. Set the account
              * as synthesized.
              */
-            getLogger().logMessage(Level.FINEST, String.format("Beginning " +
+            getLogger().log(Level.FINEST, String.format("Beginning " +
                     "synthesis for account with key '%s'.", givenKey));
             account.setSynthesized();
         }

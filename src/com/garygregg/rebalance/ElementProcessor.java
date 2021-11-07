@@ -88,7 +88,7 @@ public abstract class ElementProcessor {
      */
     protected boolean logMessage(@NotNull Level level,
                                  @NotNull String message) {
-        return messageLogger.logMessage(level, message);
+        return messageLogger.log(level, message);
     }
 
     /**
