@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.PrintStream;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,9 +24,6 @@ class RebalanceNode implements CurrencyReceiver {
     private static final Action<ReceiverDelegate<?>> cannotSetAction =
             ReceiverDelegate::onCannotSet;
 
-    // The error stream we will use
-    private static final PrintStream errorStream = System.err;
-
     // The preference manager
     private static final PreferenceManager manager =
             PreferenceManager.getInstance();
@@ -37,9 +33,6 @@ class RebalanceNode implements CurrencyReceiver {
 
     // Our local message logger
     private static final MessageLogger messageLogger = new MessageLogger();
-
-    // The output stream we will use
-    private static final PrintStream outputStream = System.out;
 
     // For use when a snapshot recovery is needed
     private static final Action<ReceiverDelegate<?>> recoverAction =
