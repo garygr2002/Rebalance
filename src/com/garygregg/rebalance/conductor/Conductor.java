@@ -54,9 +54,6 @@ public class Conductor implements Dispatch<CommandLineId> {
     private static final DescribeOptionAction describeOptionAction =
             new DescribeOptionAction();
 
-    // The error stream we will use
-    private static final PrintStream errorStream = System.err;
-
     // A conductor instance
     private static final Conductor instance = new Conductor();
 
@@ -71,9 +68,6 @@ public class Conductor implements Dispatch<CommandLineId> {
     // The command line option list
     private static final List<Pair<String, String>> optionList =
             buildOptionList();
-
-    // The output stream we will use
-    private static final PrintStream outputStream = System.out;
 
     // A preference manager instance
     private static final PreferenceManager preferenceManager =
@@ -367,8 +361,9 @@ public class Conductor implements Dispatch<CommandLineId> {
         catch (@NotNull IOException exception) {
 
             // Print a descriptive error message to system error.
-            getErrorStream().printf("This exception occurred while trying to " +
-                    "add a file handler for logging: '%s'.%n", exception);
+            MessageLogger.stream(Level.SEVERE, String.format("This " +
+                    "exception occurred while trying to add a file handler " +
+                    "for logging: '%s'.", exception));
         }
 
         // Return the result.
@@ -386,9 +381,9 @@ public class Conductor implements Dispatch<CommandLineId> {
         buildOptionAction.resetBuffer(programName);
         iterate(optionList, buildOptionAction);
 
-        // Get the output stream, and output the usage line.
-        final PrintStream stream = getOutputStream();
-        stream.println(buildOptionAction.getBuffer());
+        // Output the usage line.
+        MessageLogger.stream(MessageLogger.getExtraordinary(),
+                buildOptionAction.getBuffer());
 
         // Calculate the length of the longest option.
         maxLengthAction.zeroMaxLength();
@@ -439,15 +434,6 @@ public class Conductor implements Dispatch<CommandLineId> {
     }
 
     /**
-     * The error stream we will use.
-     *
-     * @return The error stream we will use
-     */
-    private static @NotNull PrintStream getErrorStream() {
-        return errorStream;
-    }
-
-    /**
      * Gets a conductor instance.
      *
      * @return A conductor instance
@@ -470,15 +456,6 @@ public class Conductor implements Dispatch<CommandLineId> {
 
         // Return the canonical name.
         return myCanonicalName;
-    }
-
-    /**
-     * Gets the output stream we will use.
-     *
-     * @return The output stream we will use
-     */
-    private static @NotNull PrintStream getOutputStream() {
-        return outputStream;
     }
 
     /**
@@ -517,7 +494,7 @@ public class Conductor implements Dispatch<CommandLineId> {
         // Declare and initialize local variables.
         final List<Dispatch<CommandLineId>> dispatchList = new ArrayList<>();
         final Preferences preferences = preferenceManager.getPreferences();
-        final PrintStream outputStream = getOutputStream();
+        final PrintStream outputStream = MessageLogger.getOutputStream();
 
         // Add a dispatch for the S&P 500 current value.
         dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.CURRENT,
@@ -592,9 +569,9 @@ public class Conductor implements Dispatch<CommandLineId> {
          */ catch (@NotNull CLAException exception) {
 
             /*
-             * Get the error stream and display the message of the exception.
-             * Get the program name system property. Note: To set this property
-             * on the command line, use:
+             * Stream the message of the exception as a severe error. Get the
+             * program name system property. Note: To set this property on the
+             * command line, use:
              *
              * -Dprogram.name = <name>
              *
@@ -603,7 +580,7 @@ public class Conductor implements Dispatch<CommandLineId> {
              * starting the conductor should be able to added to a user login
              * file.
              */
-            getErrorStream().println(exception.getMessage());
+            MessageLogger.stream(Level.SEVERE, exception.getMessage());
             final String programName = System.getProperty(defaultProgramName);
 
             /*
@@ -660,28 +637,30 @@ public class Conductor implements Dispatch<CommandLineId> {
     private static void workWithPortfolios() {
 
         // Configure logging.
-        getOutputStream().println("I am configuring logging (this message " +
-                "will not appear in the log file)...");
+        final Level level = MessageLogger.getExtraordinary();
+        MessageLogger.stream(level, "I am " +
+                "configuring logging (this message will not appear in the " +
+                "log file)...");
         configureLogging();
 
         // Set inflation in the inflation caddy using the preference manager.
         InflationCaddy.getInstance().setPercent(
                 PreferenceManager.getInstance().getInflation());
 
-        /*
-         * Get a conductor instance and build the libraries. Was the build not
-         * successful?
-         */
+        // Get a conductor instance and its logger.
         final Conductor conductor = getInstance();
-        conductor.logMessage(Level.INFO, "I am building libraries...");
+        final MessageLogger logger = conductor.getMessageLogger();
+
+        // Build the libraries. Was the build not successful?
+        logger.streamAndLog(level, "I am building libraries...");
         if (!conductor.buildLibraries()) {
 
             /*
-             * Building libraries was not successful. Log information and
-             * return.
+             * Building libraries was not successful. Stream and log
+             * information and return.
              */
-            conductor.logMessage(Level.INFO, "I am canceling my work " +
-                    "because I could not successfully build the libraries...");
+            logger.streamAndLog(level, "I am canceling my work because I " +
+                    "could not successfully build the libraries...");
             return;
         }
 
@@ -714,16 +693,16 @@ public class Conductor implements Dispatch<CommandLineId> {
         // Oops, an I/O exception occurred while trying to write the reports.
         catch (IOException exception) {
 
-            // Log some information about the exception, and return.
-            conductor.logMessage(Level.INFO, String.format("I received an " +
-                    "I/O exception with message '%s' while attempting to " +
-                    "write my reports, sorry.", exception.getMessage()));
+            // Stream and log some information about the exception, and return.
+            logger.streamAndLog(level, String.format("I received an I/O " +
+                    "exception with message '%s' while attempting to write " +
+                    "my reports, sorry.", exception.getMessage()));
             return;
         }
 
-        // Log a success message if we get this far.
-        conductor.logMessage(Level.INFO, "Congratulations; it seems I " +
-                "have completed my work correctly!");
+        // Stream and log a success message if we get this far.
+        logger.streamAndLog(level, "Congratulations; it seems I have " +
+                "completed my work correctly!");
     }
 
     /**
@@ -760,8 +739,8 @@ public class Conductor implements Dispatch<CommandLineId> {
 
         // It is a horrible problem if a capital gains tax library is missing.
         if (result && (!(result = GainsTaxLibrary.checkContract()))) {
-            logMessage(Level.SEVERE, String.format(missingTaxLibrary,
-                    "Capital gains"));
+            getMessageLogger().streamAndLog(Level.SEVERE,
+                    String.format(missingTaxLibrary, "Capital gains"));
         }
 
         // Return the result.
@@ -787,9 +766,16 @@ public class Conductor implements Dispatch<CommandLineId> {
         final String hierarchyName =
                 hierarchy.getHoldingType().toString().toLowerCase();
 
-        // Log a message about what is going on.
-        logMessage(Level.INFO, String.format("I am building the " +
-                        "%s hierarchy and synthesizing required accounts...",
+        /*
+         * Get the logging level for extraordinary informational messages. Get
+         * the message logger.
+         */
+        final Level level = MessageLogger.getExtraordinary();
+        final MessageLogger logger = getMessageLogger();
+
+        // Stream and log a message about what is going on.
+        logger.streamAndLog(level, String.format("I am building the %s " +
+                "hierarchy and synthesizing required accounts...",
                 hierarchyName));
 
         // Build the hierarchy. Was the build not successful?
@@ -797,12 +783,12 @@ public class Conductor implements Dispatch<CommandLineId> {
         if (hierarchy.hadProblem()) {
 
             /*
-             * Building the hierarchy was not successful. Log information and
-             * reset the return value.
+             * Building the hierarchy was not successful. Stream and log
+             * information and reset the return value.
              */
-            logMessage(Level.INFO, String.format("I am canceling my work " +
-                            "because I could not successfully build the %s hierarchy...",
-                    hierarchyName));
+            logger.streamAndLog(level, String.format("I am canceling my " +
+                    "work because I could not successfully build the %s " +
+                    "hierarchy...", hierarchyName));
             result = false;
         }
 
@@ -838,8 +824,8 @@ public class Conductor implements Dispatch<CommandLineId> {
 
         // It is a horrible problem if an income tax library is missing.
         if (result && (!(result = IncomeTaxLibrary.checkContract()))) {
-            logMessage(Level.SEVERE, String.format(missingTaxLibrary,
-                    "Income"));
+            getMessageLogger().streamAndLog(Level.SEVERE,
+                    String.format(missingTaxLibrary, "Income"));
         }
 
         // Return the result.
@@ -906,12 +892,12 @@ public class Conductor implements Dispatch<CommandLineId> {
         catch (IOException exception) {
 
             /*
-             * Print a descriptive error message to system error. Clear the
+             * Stream a descriptive error message to system error. Clear the
              * return value.
              */
-            getErrorStream().printf("This exception occurred while trying " +
-                            "to build the libraries and hierarchy: '%s'.%n",
-                    exception);
+            MessageLogger.stream(Level.SEVERE, String.format("This " +
+                    "exception occurred while trying to build the libraries " +
+                    "and hierarchy: '%s'.", exception));
             result = false;
         }
 
@@ -939,10 +925,10 @@ public class Conductor implements Dispatch<CommandLineId> {
         final boolean result = (null == floor) ? processor.readLines() :
                 processor.readLines(floor);
 
-        // Log the date of the library.
-        logMessage(Level.INFO, String.format(dateMessageFormat,
-                processor.getPrefix(),
-                DateUtilities.format(factory.produce().getDate())));
+        // Stream and log the date of the library.
+        getMessageLogger().streamAndLog(MessageLogger.getExtraordinary(),
+                String.format(dateMessageFormat, processor.getPrefix(),
+                        DateUtilities.format(factory.produce().getDate())));
 
         // Return the result of reading the data lines.
         return result;
@@ -962,6 +948,15 @@ public class Conductor implements Dispatch<CommandLineId> {
     @Override
     public @NotNull CommandLineId getKey() {
         return CommandLineId.OTHER;
+    }
+
+    /**
+     * Gets our message logger.
+     *
+     * @return Our message logger
+     */
+    public @NotNull MessageLogger getMessageLogger() {
+        return messageLogger;
     }
 
     /**
@@ -989,25 +984,6 @@ public class Conductor implements Dispatch<CommandLineId> {
         tracker.setAccountLibrary(AccountLibrary.getInstance());
         tracker.addAssociations(TickerLibrary.getInstance(),
                 HoldingLineType.TICKER);
-    }
-
-    /**
-     * Logs a message.
-     *
-     * @param level   The level of the message
-     * @param message The message to log
-     */
-    @SuppressWarnings("SameParameterValue")
-    private void logMessage(@NotNull Level level, @NotNull String message) {
-
-        // Identify the proper print stream for the message.
-        final PrintStream printStream = (level.intValue() <
-                Level.SEVERE.intValue()) ? getOutputStream() :
-                getErrorStream();
-
-        // Print the message to the print stream, then log the message.
-        printStream.println(message);
-        messageLogger.log(level, message);
     }
 
     /**
@@ -1102,8 +1078,9 @@ public class Conductor implements Dispatch<CommandLineId> {
 
         @Override
         public void perform(@NotNull Pair<String, String> argument) {
-            getOutputStream().printf((optionFormat) + "%n", prefix,
-                    argument.getFirst(), suffix, argument.getSecond());
+            MessageLogger.stream(MessageLogger.getExtraordinary(),
+                    String.format((optionFormat), prefix, argument.getFirst(),
+                            suffix, argument.getSecond()));
         }
 
         /**
