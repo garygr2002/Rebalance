@@ -2,10 +2,34 @@ package com.garygregg.rebalance;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MessageLogger {
+
+    // The error stream we will use
+    private static final PrintStream errorStream = System.err;
+
+    // The logging level for extraordinary information
+    private static final Level extraordinary;
+
+    // The logging level for ordinary information
+    private static final Level ordinary;
+
+    // The output stream we will use
+    private static final PrintStream outputStream = System.out;
+
+    static {
+
+        /*
+         * Get the preference manager, and use it to set the logging levels for
+         * extraordinary and ordinary information.
+         */
+        final PreferenceManager manager = PreferenceManager.getInstance();
+        extraordinary = manager.getExtraordinary();
+        ordinary = manager.getOrdinary();
+    }
 
     // The default logger in case the current logger is null.
     private final Logger defaultLogger;
@@ -39,6 +63,52 @@ public class MessageLogger {
     }
 
     /**
+     * Gets the error stream we will use.
+     *
+     * @return The error stream we will use
+     */
+    private static @NotNull PrintStream getErrorStream() {
+        return errorStream;
+    }
+
+    /**
+     * Gets the logging level for extraordinary information.
+     *
+     * @return The logging level for extraordinary information
+     */
+    private static @NotNull Level getExtraordinary() {
+        return extraordinary;
+    }
+
+    /**
+     * Gets the logging level for ordinary information.
+     *
+     * @return The logging level for ordinary information
+     */
+    private static @NotNull Level getOrdinary() {
+        return ordinary;
+    }
+
+    /**
+     * Gets the output stream we will use.
+     *
+     * @return The output stream we will use
+     */
+    private static @NotNull PrintStream getOutputStream() {
+        return outputStream;
+    }
+
+    /**
+     * Logs an extraordinary informational message.
+     *
+     * @param message The message to log
+     * @return True if the level for this message flags it as a problem
+     */
+    public boolean extraordinary(@NotNull String message) {
+        return logMessage(getExtraordinary(), message);
+    }
+
+    /**
      * Gets the current logger.
      *
      * @return The current logger
@@ -68,7 +138,7 @@ public class MessageLogger {
     }
 
     /**
-     * Logs a message with the current logger.
+     * Logs a message.
      *
      * @param level   The level for the message
      * @param message The message to log
@@ -82,6 +152,16 @@ public class MessageLogger {
         getLogger().log(first.observe(monitors.getSecond().observe(level)),
                 message);
         return first.isThresholdReached(level);
+    }
+
+    /**
+     * Logs an ordinary informational message.
+     *
+     * @param message The message to log
+     * @return True if the level for this message flags it as a problem
+     */
+    public boolean ordinary(@NotNull String message) {
+        return logMessage(getOrdinary(), message);
     }
 
     /**
@@ -115,5 +195,44 @@ public class MessageLogger {
      */
     public void setLogger(Logger logger) {
         this.logger = (null == logger) ? defaultLogger : logger;
+    }
+
+    /**
+     * Streams and logs a message.
+     *
+     * @param level   The level of the message
+     * @param message The message to log
+     * @return True if the level for this message flags it as a problem
+     */
+    public boolean streamAndLog(@NotNull Level level, @NotNull String message) {
+
+        // Identify the proper print stream for the message.
+        final PrintStream printStream = (level.intValue() <
+                Level.SEVERE.intValue()) ? getOutputStream() :
+                getErrorStream();
+
+        // Print the message to the print stream, then log the message.
+        printStream.println(message);
+        return logMessage(level, message);
+    }
+
+    /**
+     * Streams and logs an extraordinary informational message.
+     *
+     * @param message The message to log
+     * @return True if the level for this message flags it as a problem
+     */
+    public boolean streamExtraordinary(@NotNull String message) {
+        return streamAndLog(getExtraordinary(), message);
+    }
+
+    /**
+     * Streams and logs an ordinary informational message.
+     *
+     * @param message The message to log
+     * @return True if the level for this message flags it as a problem
+     */
+    public boolean streamOrdinary(@NotNull String message) {
+        return streamAndLog(getOrdinary(), message);
     }
 }
