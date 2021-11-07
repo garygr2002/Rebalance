@@ -67,7 +67,7 @@ class WeightRebalancer extends AccountRebalancer
             /*
              * There is no existing child for the incoming weight type. Get the
              * weight map. Create a new child with the weight type and weight
-             * from the weight map if the weight map is not null. Otherwise use
+             * from the weight map if the weight map is not null. Otherwise, use
              * a default weight.
              */
             final Map<WeightType, Double> weightMap = getWeightMap();
