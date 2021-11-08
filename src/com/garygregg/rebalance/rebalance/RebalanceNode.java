@@ -42,6 +42,9 @@ class RebalanceNode implements CurrencyReceiver {
     private static final Action<ReceiverDelegate<?>> takeSnapshotAction =
             ReceiverDelegate::takeSnapshot;
 
+    // The value of zero currency
+    private static final Currency zero = Currency.getZero();
+
     // The key of the account that is being rebalanced
     private static AccountKey accountKey;
 
@@ -71,9 +74,6 @@ class RebalanceNode implements CurrencyReceiver {
     // The weight accumulator action
     private final WeightAccumulatorAction weightAccumulatorAction =
             new WeightAccumulatorAction();
-
-    // The value of zero currency
-    private final Currency zero = Currency.getZero();
 
     // The value assigned to the node
     private Currency value;
@@ -158,25 +158,22 @@ class RebalanceNode implements CurrencyReceiver {
     private static @NotNull List<MutableCurrency>
     getInitialList(int size, @NotNull Currency valueToDistribute) {
 
-        // Create the list. Is the size greater than the first index?
+        // Create the list. Is the size greater than zero?
         final List<MutableCurrency> list = new ArrayList<>();
-        final int firstIndex = 0;
-        if (firstIndex < size) {
-
-            // The size is greater than the first index. Cycle for each index.
-            final MutableCurrency zero = new MutableCurrency();
-            for (int i = firstIndex; i < size; ++i) {
-
-                // Add zero currency.
-                list.add(zero);
-            }
+        if (0 < size) {
 
             /*
-             * Reset the first element to absolute value of the value to
-             * distribute.
+             * The size is greater than zero. Add the first element to the
+             * list using the absolute value of the value to distribute.
              */
-            list.set(firstIndex, new MutableCurrency(
+            int i = 0;
+            list.add(i, new MutableCurrency(
                     Math.abs(valueToDistribute.getValue())));
+
+            // Cycle for any remaining positions, and add zero currency.
+            for (++i; i < size; ++i) {
+                list.add(new MutableCurrency(zero));
+            }
         }
 
         // Return the list.
@@ -338,7 +335,14 @@ class RebalanceNode implements CurrencyReceiver {
      * mapped to the weight type
      */
     public RebalanceNode getChild(@NotNull WeightType type) {
-        return children.get(type).getReceiver();
+
+        /*
+         * Get any existing node delegate present for the given weight type.
+         * Return null if the delegate is null. Otherwise, return the receiver
+         * in the delegate.
+         */
+        final NodeDelegate delegate = children.get(type);
+        return (null == delegate) ? null : delegate.getReceiver();
     }
 
     /**
@@ -346,7 +350,7 @@ class RebalanceNode implements CurrencyReceiver {
      *
      * @return The weight type assigned to the node
      */
-    public WeightType getType() {
+    public @NotNull WeightType getType() {
         return type;
     }
 
@@ -380,18 +384,18 @@ class RebalanceNode implements CurrencyReceiver {
      *                  absolute as well as relative
      * @param <T>       A receiver delegate type
      * @return The difference between proposed value and the value that this
-     * receiver set
+     * receiver set (the "residual")
      */
     private <T extends ReceiverDelegate<?>> @NotNull Currency rebalance(
             @NotNull Collection<T> delegates, @NotNull Currency proposed) {
 
         /*
          * Get the message logger. Declare a variable to hold the best
-         * accumulated difference. Initialize it to the proposed value. Try to
+         * accumulated residual. Initialize it to the proposed value. Try to
          * do the rebalance.
          */
         final MessageLogger logger = getLogger();
-        Currency bestDifference = proposed;
+        Currency bestResidual = proposed;
         try {
 
             /*
@@ -409,95 +413,97 @@ class RebalanceNode implements CurrencyReceiver {
             final List<Double> weightList = weightAccumulatorAction.getList();
 
             /*
-             * Set the proposed value as the accumulated difference in the
-             * value setter action. Declare a variable to hold the accumulated
-             * difference, and initialize it to the accumulated difference in
-             * the value setter action.
+             * Initialize the accumulated residual in the value setter action
+             * to be the proposed value. Declare a variable to hold the
+             * accumulated residual, and initialize it to the accumulated
+             * residual in the value setter action.
              */
             valueSetterAction.setAccumulated(proposed);
-            Currency accumulatedDifference =
-                    valueSetterAction.getAccumulated();
+            Currency accumulatedResidual = valueSetterAction.getAccumulated();
 
             /*
              * Produce a sorted set of receiver consideration patterns. Get an
              * iterator for the patterns. Cycle while the accumulated
-             * difference is not zero, and patterns exist.
+             * residual is not zero, and patterns exist.
              */
             final SortedSet<Integer> patterns = produce(delegates.size());
             final Iterator<Integer> iterator = patterns.iterator();
-            while (accumulatedDifference.isNotZero() && iterator.hasNext()) {
+            while (accumulatedResidual.isNotZero() && iterator.hasNext()) {
 
                 /*
                  * Set the first/next consideration pattern in the
-                 * consideration setter action. Perform the action on each
-                 * receiver delegate.
+                 * consideration setter action.
                  */
                 considerationSetterAction.setConsiderationPattern(
                         considerationPattern = iterator.next());
-                doAction(delegates, considerationSetterAction);
 
                 /*
-                 * Set the negation flag in the value setter action based on
-                 * the sign of the accumulated difference.
+                 * Perform the consideration setter action on each receiver
+                 * delegate. Then perform the weight accumulator action on each
+                 * delegate.
                  */
-                valueSetterAction.setNegation(
-                        accumulatedDifference.compareTo(zero) < 0);
+                doAction(delegates, considerationSetterAction);
+                doAction(delegates, weightAccumulatorAction);
 
                 /*
                  * Create a new reallocator with the weight list. Create a
                  * value list using the size of the weight list and the
-                 * accumulated difference.
+                 * accumulated residual.
                  */
                 reallocator = new Reallocator(weightList);
                 valueList = getInitialList(weightList.size(),
-                        accumulatedDifference);
+                        accumulatedResidual);
 
                 /*
-                 * Reallocate the value list and set the value list in the
-                 * value setter action.
+                 * Reallocate the value list using the reallocator. Set the
+                 * negation flag in the value setter action based on the sign
+                 * of the accumulated residual.
                  */
                 reallocator.reallocate(valueList);
-                valueSetterAction.setList(valueList);
+                valueSetterAction.setNegation(
+                        accumulatedResidual.compareTo(zero) < 0);
 
                 /*
-                 * Perform the value setter action on each receiver delegate.
-                 * Reset the accumulated difference.
+                 * Set the value list in the value setter action. Perform the
+                 * value setter action on each receiver delegate. Reset the
+                 * accumulated residual.
                  */
+                valueSetterAction.setList(valueList);
                 doAction(delegates, valueSetterAction);
-                accumulatedDifference = valueSetterAction.getAccumulated();
+                accumulatedResidual = valueSetterAction.getAccumulated();
 
                 /*
                  * Log a message about this current combination of account key,
-                 * weight type and consideration pattern.
+                 * weight type, consideration pattern and accumulated residual.
                  */
                 logger.log(ordinary, String.format("For account key %s, " +
                                 "weight type %s, and consideration " +
                                 "pattern 0x%08x: Found accumulated " +
-                                "difference of %s.", getAccountKey(),
+                                "residual of %s.", getAccountKey(),
                         getWeight(), considerationPattern,
-                        accumulatedDifference));
+                        accumulatedResidual));
 
                 /*
-                 * Does the absolute value of the accumulated difference
-                 * compare less than that of the best difference?
+                 * Does the absolute value of the accumulated residual compare
+                 * less than that of the best residual?
                  */
                 if (Double.compare(
-                        Math.abs(accumulatedDifference.getValue()),
-                        Math.abs(bestDifference.getValue())) < 0) {
+                        Math.abs(accumulatedResidual.getValue()),
+                        Math.abs(bestResidual.getValue())) < 0) {
 
                     /*
-                     * The absolute value of the accumulated difference
-                     * compares less than that of the best difference. Ask
-                     * each receiver delegate to take a snapshot, and set the
-                     * best difference as the accumulated difference.
+                     * The absolute value of the accumulated residual compares
+                     * less than that of the best residual. Ask each receiver
+                     * delegate to take a snapshot, and set the best residual
+                     * to be current accumulated residual.
                      */
                     doAction(delegates, takeSnapshotAction);
-                    bestDifference = accumulatedDifference;
+                    bestResidual = accumulatedResidual;
                 }
             }
 
             /*
-             * Either we ended because the accumulated difference dropped to
+             * Either we ended because the accumulated residual dropped to
              * zero, or because we ran out of consideration patterns. Recover
              * the best snapshot.
              */
@@ -517,30 +523,29 @@ class RebalanceNode implements CurrencyReceiver {
 
             /*
              * Let each receiver delegate know that explicit values cannot be
-             * set. Reset the accumulated differences and set the best
-             * difference to zero.
+             * set. Reset the best residual to zero.
              */
             doAction(delegates, cannotSetAction);
-            bestDifference = zero;
+            bestResidual = zero;
         }
 
         // Do this unconditionally.
         finally {
 
-            // Log a message identifying the best difference.
+            // Log a message identifying the best residual.
             logger.log(extraordinary, String.format("For account key %s and " +
-                            "weight type %s: I identified a best difference " +
+                            "weight type %s: I identified a best residual " +
                             "of %s.", getAccountKey(), getWeight(),
-                    bestDifference));
+                    bestResidual));
         }
 
         // Calculate the new value of this node.
         final MutableCurrency newValue = new MutableCurrency(proposed);
-        newValue.add(bestDifference);
+        newValue.add(bestResidual);
 
-        // Set the current value of this node, and return the best difference.
+        // Set the current value of this node, and return the best residual.
         setValue(newValue.getImmutable());
-        return bestDifference;
+        return bestResidual;
     }
 
     @Override
@@ -625,10 +630,13 @@ class RebalanceNode implements CurrencyReceiver {
     private static class ConsiderationSetterAction extends
             ActionWithContainer<Integer, ReceiverDelegate<?>> {
 
+        // Count calls to 'doAction(ReceiverDelegate)'
+        private int iteration;
+
         @Override
         public void doAction(@NotNull ReceiverDelegate<?> delegate) {
-            delegate.setConsidered((getConsiderationPattern() &
-                    (1 << getConsiderationPattern())) < 0);
+            delegate.setConsidered(
+                    (getConsiderationPattern() & (1 << (iteration++))) != 0);
         }
 
         /**
@@ -651,13 +659,19 @@ class RebalanceNode implements CurrencyReceiver {
          * @param considerationPattern The consideration pattern
          */
         public void setConsiderationPattern(int considerationPattern) {
+
+            /*
+             * Set the consideration pattern as the contained object, and
+             * reinitialize the iteration counter to zero.
+             */
             setContained(considerationPattern);
+            iteration = 0;
         }
     }
 
     private static class SetValueUtility {
 
-        // The accumulated difference between proposed values and set values
+        // The accumulated residual between proposed values and set values
         private final MutableCurrency accumulated = new MutableCurrency();
 
         // The user interpreted flag
@@ -674,20 +688,18 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Adds a difference to the accumulated difference.
+         * Adds residual to the accumulated residual.
          *
-         * @param difference A difference
+         * @param residual A residual to add
          */
-        public void addDifference(@NotNull Currency difference) {
-            accumulated.add(difference);
+        public void addResidual(@NotNull Currency residual) {
+            accumulated.add(residual);
         }
 
         /**
-         * Gets the accumulated difference between the proposed values and the
-         * set values.
+         * Gets the accumulated residual.
          *
-         * @return The accumulated difference between the proposed values and
-         * the set values
+         * @return The accumulated residual
          */
         public @NotNull Currency getAccumulated() {
             return accumulated.getImmutable();
@@ -713,8 +725,7 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Resets the accumulated difference between the proposed values and
-         * the set values.
+         * Resets the accumulated residual.
          */
         public void resetAccumulated() {
             accumulated.set(Currency.getZero());
@@ -728,14 +739,12 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Sets the accumulated difference between the proposed values and the
-         * set values.
+         * Sets the accumulated residual.
          *
-         * @param difference The accumulated difference between the proposed
-         *                   values and the set values
+         * @param residual The accumulated residual
          */
-        public void setAccumulated(@NotNull Currency difference) {
-            accumulated.set(difference);
+        public void setAccumulated(@NotNull Currency residual) {
+            accumulated.set(residual);
         }
 
         /**
@@ -758,6 +767,15 @@ class RebalanceNode implements CurrencyReceiver {
             this.list = list;
             resetIndex();
         }
+
+        /**
+         * Subracts residual from the accumulated residual.
+         *
+         * @param residual A residual to subtract
+         */
+        public void subtractResidual(@NotNull Currency residual) {
+            accumulated.subtract(residual);
+        }
     }
 
     private static class ValueSetterAction extends
@@ -768,6 +786,9 @@ class RebalanceNode implements CurrencyReceiver {
 
         // The value of one as currency
         private static final Currency one = Currency.getOne();
+
+        // Used for working with values from the utility
+        private final MutableCurrency worker = new MutableCurrency();
 
         @Override
         public void doAction(@NotNull ReceiverDelegate<?> delegate) {
@@ -785,42 +806,48 @@ class RebalanceNode implements CurrencyReceiver {
                 if (null != value) {
 
                     /*
-                     * The next value is not null. Interpret a set flag in the
+                     * The next value is not null. Set the worker with the same
+                     * value as in the value. Interpret a set flag in the
                      * utility as an indication that the values in the utility
                      * are meant to be interpreted as negative numbers, and a
                      * clear flag as an indication that they are meant to be
                      * interpreted as non-negative numbers. Apply a suitable
-                     * factor to the value. Get any existing value from the
-                     * delegate. Is the existing value not null?
+                     * factor to the worker.
                      */
-                    value.multiply(utility.getFlag() ? minusOne : one);
-                    final Currency existingValue = delegate.getProposed();
-                    if (null != existingValue) {
+                    worker.set(value.getImmutable());
+                    worker.multiply(utility.getFlag() ? minusOne : one);
+
+                    /*
+                     * Get any existing value from the delegate. Is the
+                     * existing value not null?
+                     */
+                    Currency currency = delegate.getProposed();
+                    if (null != currency) {
 
                         /*
-                         * The existing value is not null. Add it to the value
-                         * from the utility.
+                         * The existing value is not null. Add it to the
+                         * worker.
                          */
-                        value.add(existingValue);
+                        worker.add(currency);
                     }
 
                     /*
                      * Reset the proposed value of the delegate with the new
-                     * value. Receive any returned difference, and add the
-                     * difference to the difference in the utility.
+                     * value in the worker. Receive any returned residual, and
+                     * add it back to the worker. Subtract the (possibly
+                     * modified) value in the worker to the accumulated
+                     * residual in the utility.
                      */
-                    utility.addDifference(
-                            delegate.setProposed(value.getImmutable()));
+                    worker.add(delegate.setProposed(worker.getImmutable()));
+                    utility.subtractResidual(worker.getImmutable());
                 }
             }
         }
 
         /**
-         * Gets the accumulated difference between the proposed values and the
-         * set values.
+         * Gets the accumulated residual.
          *
-         * @return The accumulated difference between the proposed values and
-         * the set values
+         * @return The accumulated residual
          */
         public @NotNull Currency getAccumulated() {
             return getContained().getAccumulated();
@@ -832,14 +859,12 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Sets the accumulated difference between the proposed values and the
-         * set values.
+         * Sets the accumulated residual.
          *
-         * @param difference The accumulated difference between the proposed
-         *                   values and the set values
+         * @param residual The accumulated residual
          */
-        public void setAccumulated(@NotNull Currency difference) {
-            getContained().setAccumulated(difference);
+        public void setAccumulated(@NotNull Currency residual) {
+            getContained().setAccumulated(residual);
         }
 
         /**
