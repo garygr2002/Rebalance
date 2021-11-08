@@ -2,6 +2,7 @@ package com.garygregg.rebalance.hierarchy;
 
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountDescription;
+import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +46,7 @@ public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
     private PortfolioDescription portfolioDescription;
 
     // The residual remaining after a rebalance (we hope it is $0!)
-    private MutableCurrency residual;
+    private Currency residual;
 
     // Is this ticker synthesized (or programmatically modified)?
     private boolean synthesized;
@@ -136,7 +137,7 @@ public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
      * @return The residual of a rebalance operation, or null if a rebalance
      * has not been attempted
      */
-    MutableCurrency getResidual() {
+    Currency getResidual() {
         return residual;
     }
 
@@ -203,7 +204,7 @@ public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
     }
 
     @Override
-    public void setResidual(@NotNull MutableCurrency residual) {
+    public void setResidual(@NotNull Currency residual) {
         this.residual = residual;
     }
 
