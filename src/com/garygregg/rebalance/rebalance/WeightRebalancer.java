@@ -1,6 +1,7 @@
 package com.garygregg.rebalance.rebalance;
 
 import com.garygregg.rebalance.WeightType;
+import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Ticker;
@@ -87,30 +88,11 @@ class WeightRebalancer extends AccountRebalancer
      * @return True if the root node is the current node
      */
     private boolean checkRoot(@NotNull WeightType type) {
-
-        /*
-         * Are we expecting a root node, and is the weight type not equal to
-         * the weight type of the root?
-         */
-        final boolean isRoot = (root == currentNode);
-        if (isRoot && !type.equals(root.getType())) {
-
-            /*
-             * We are expecting a root node, and the weight type is not equal
-             * to the weight type of the root. This is a design error, so throw
-             * a new runtime exception.
-             */
-            throw new RuntimeException(String.format("First weight " +
-                    "type is not %s!", WeightType.ALL));
-        }
-
-        // Return whether the current node is the root node.
-        return isRoot;
+        return type.equals(root.getType());
     }
 
     @Override
-    protected boolean doRebalance(@NotNull Account account,
-                                  @NotNull MutableCurrency residual) {
+    protected Currency doRebalance(@NotNull Account account) {
 
         /*
          * Set the account key in the rebalance node class. Clear the root
@@ -137,12 +119,12 @@ class WeightRebalancer extends AccountRebalancer
         /*
          * Reinitialize the rebalancer member variables. Set the proposed value
          * of the root node the same as that of the account, receiving a
-         * residual. Set the residual in the account. Return whether the
-         * rebalance node class had a problem.
+         * residual. Return null if the rebalance node class had a problem.
+         * Otherwise, return received residual.
          */
         initialize();
-        residual.set(root.setProposed(account.getProposed()));
-        return RebalanceNode.hadProblem();
+        final Currency residual = root.setProposed(account.getProposed());
+        return RebalanceNode.hadProblem() ? null : residual;
     }
 
     /**
