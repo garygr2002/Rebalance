@@ -11,9 +11,6 @@ public class Currency extends Countable implements Comparable<Currency> {
     private static final Class<MutableCurrency> comparableClass =
             MutableCurrency.class;
 
-    // A known impossible value
-    private static final Currency impossible = new Currency(Double.NaN);
-
     // A known one
     private static final Currency one = new Currency(1.);
 
@@ -88,15 +85,6 @@ public class Currency extends Countable implements Comparable<Currency> {
     }
 
     /**
-     * Gets a known impossible value.
-     *
-     * @return A known impossible value
-     */
-    public static @NotNull Currency getImpossible() {
-        return impossible;
-    }
-
-    /**
      * Gets a known one.
      *
      * @return A known one
@@ -139,17 +127,6 @@ public class Currency extends Countable implements Comparable<Currency> {
     @Override
     public int hashCode() {
         return Objects.hash(getValue());
-    }
-
-    /**
-     * Returns true if the currency is not an impossible value; false
-     * otherwise.
-     *
-     * @return True if the currency is not an impossible value; false
-     * otherwise
-     */
-    public boolean isNotImpossible() {
-        return !equals(getImpossible());
     }
 
     @Override
