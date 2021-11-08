@@ -2,7 +2,6 @@ package com.garygregg.rebalance.rebalance;
 
 import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
-import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Ticker;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;

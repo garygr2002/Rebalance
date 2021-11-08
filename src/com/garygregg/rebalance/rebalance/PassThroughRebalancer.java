@@ -1,7 +1,5 @@
 package com.garygregg.rebalance.rebalance;
 
-import com.garygregg.rebalance.countable.Currency;
-import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Ticker;
 import org.jetbrains.annotations.NotNull;

@@ -3,7 +3,6 @@ package com.garygregg.rebalance.hierarchy;
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.countable.Currency;
-import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
 
