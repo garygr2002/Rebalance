@@ -1,6 +1,6 @@
 package com.garygregg.rebalance;
 
-import com.garygregg.rebalance.countable.MutableCurrency;
+import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
 
 public interface Balanceable {
@@ -10,5 +10,5 @@ public interface Balanceable {
      *
      * @param residual The residual of a rebalance operation
      */
-    void setResidual(@NotNull MutableCurrency residual);
+    void setResidual(@NotNull Currency residual);
 }
