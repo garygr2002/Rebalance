@@ -24,18 +24,6 @@ public class PassThroughRebalancer extends EnumeratingRebalancer {
     };
 
     @Override
-    public boolean doRebalance(@NotNull Account account,
-                               @NotNull MutableCurrency residual) {
-
-        /*
-         * Set zero residual, and call the superclass to perform the ticker
-         * action.
-         */
-        residual.set(Currency.getZero());
-        return super.doRebalance(account, residual);
-    }
-
-    @Override
     protected @NotNull Action<Account, Ticker> getTickerAction() {
         return action;
     }

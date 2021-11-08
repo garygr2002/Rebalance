@@ -560,13 +560,11 @@ abstract class AccountRebalancer extends Rebalancer {
     /**
      * Rebalances an account.
      *
-     * @param account  The account to rebalance
-     * @param residual Receives the residual of the rebalance operation
-     * @return True if the account was successfully rebalanced; false
-     * otherwise
+     * @param account The account to rebalance
+     * @return The residual of the rebalance operation if the rebalance was
+     * successful; null otherwise
      */
-    protected abstract boolean doRebalance(@NotNull Account account,
-                                           @NotNull MutableCurrency residual);
+    protected abstract Currency doRebalance(@NotNull Account account);
 
     /**
      * Gets the message logger for the rebalancer.
@@ -602,31 +600,29 @@ abstract class AccountRebalancer extends Rebalancer {
     public final boolean rebalance(@NotNull Account account) {
 
         /*
-         * Reset the message logger. Declare and initialize a variable to
-         * receive a residual. Use the known impossible value as an
-         * initializer.
+         * Reset the message logger. Rebalance the account, receiving a
+         * residual.
          */
         reset();
-        final MutableCurrency residual = new
-                MutableCurrency(Currency.getImpossible());
+        final Currency residual = doRebalance(account);
 
         /*
-         * Rebalance the account, receiving a result and the residual. Is the
-         * residual now set to something other than the impossible value?
+         * The rebalance operation was successful if the residual is not null.
+         * Was the operation successful?
          */
-        final boolean result = doRebalance(account, residual);
-        if (residual.getImmutable().isNotImpossible()) {
+        final boolean result = (null != residual);
+        if (result) {
 
             /*
-             * The residual is set to something other than the impossible
-             * value. Set the residual in the account.
+             * The operation was successful, therefore the residual is not
+             * null. Set the non-null residual in the account.
              */
             account.setResidual(residual);
         }
 
         /*
          * Return true if this rebalancer had no problem, and the result from
-         * the rebalance operation shows success.
+         * the rebalance operation was successful.
          */
         return (!hadProblem()) && result;
     }
