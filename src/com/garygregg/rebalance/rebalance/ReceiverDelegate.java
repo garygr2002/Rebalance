@@ -81,7 +81,11 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
      * Recovers the last snapshot.
      */
     public void recover() {
-        setProposed(snapshot);
+
+        // Set the snapshot if it is not null.
+        if (null != snapshot) {
+            setProposed(snapshot);
+        }
     }
 
     /**

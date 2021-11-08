@@ -518,8 +518,7 @@ class RebalanceNode implements CurrencyReceiver {
                             "accomplished for account key %s and weight " +
                             "type %s because of an exception containing the " +
                             "following message: '%s'.",
-                    getAccountKey(), getWeight(),
-                    exception.getMessage()));
+                    getAccountKey(), getType(), exception.getMessage()));
 
             /*
              * Let each receiver delegate know that explicit values cannot be
@@ -535,7 +534,7 @@ class RebalanceNode implements CurrencyReceiver {
             // Log a message identifying the best residual.
             logger.log(extraordinary, String.format("For account key %s and " +
                             "weight type %s: I identified a best residual " +
-                            "of %s.", getAccountKey(), getWeight(),
+                            "of %s.", getAccountKey(), getType(),
                     bestResidual));
         }
 
