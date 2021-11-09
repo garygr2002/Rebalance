@@ -20,9 +20,13 @@ class RebalanceNode implements CurrencyReceiver {
     // The logging level for ordinary informational messages
     final static Level ordinary = MessageLogger.getOrdinary();
 
-    // For use when a rebalance cannot occur
+    // An action to notify delegates that a rebalance cannot occur.
     private static final Action<ReceiverDelegate<?>> cannotSetAction =
             ReceiverDelegate::onCannotSet;
+
+    // An action to notify delegates to clear their snapshots
+    private static final Action<ReceiverDelegate<?>> clearSnapshotAction =
+            ReceiverDelegate::clearSnapshot;
 
     // The preference manager
     private static final PreferenceManager manager =
@@ -34,11 +38,11 @@ class RebalanceNode implements CurrencyReceiver {
     // Our local message logger
     private static final MessageLogger messageLogger = new MessageLogger();
 
-    // For use when a snapshot recovery is needed
-    private static final Action<ReceiverDelegate<?>> recoverAction =
-            ReceiverDelegate::recover;
+    // An action to notify delegates to recover their snapshots
+    private static final Action<ReceiverDelegate<?>> recoverSnapshotAction =
+            ReceiverDelegate::recoverSnapshot;
 
-    // For use when a snapshot is needed
+    // An action to notify delegates to take snapshots
     private static final Action<ReceiverDelegate<?>> takeSnapshotAction =
             ReceiverDelegate::takeSnapshot;
 
@@ -51,6 +55,9 @@ class RebalanceNode implements CurrencyReceiver {
     // The children of the node
     private final SortedMap<WeightType, NodeDelegate> children =
             new TreeMap<>();
+
+    // The child values
+    private final Collection<NodeDelegate> childValues = children.values();
 
     // The consideration setter action
     private final ConsiderationSetterAction considerationSetterAction =
@@ -110,10 +117,11 @@ class RebalanceNode implements CurrencyReceiver {
         if (null == limit) {
 
             /*
-             * The preference is null. As a default, use the number of
-             * children of the weight type that has the most as a default.
+             * The preference is null. As a default, use one more than the
+             * number of children of the weight type that has the most
+             * children.
              */
-            limit = WeightType.getMaxChildren();
+            limit = WeightType.getMaxChildren() + 1;
         }
 
         /*
@@ -124,7 +132,7 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Performs a one-parameter action on each object in a collection.
+     * Performs an action on each object in a collection.
      *
      * @param collection The collection
      * @param action     The action to perform on each object in the collection
@@ -211,6 +219,33 @@ class RebalanceNode implements CurrencyReceiver {
          */
         final MessageLogger logger = getLogger();
         return logger.hadProblem1() || logger.hadProblem2();
+    }    // For use when a snapshot is needed
+
+
+    /**
+     * Determines if any receiver delegate in a collection has positive weight.
+     *
+     * @param delegates A collection of delegates
+     * @return True if any receiver delegate in the collection has positive
+     * weight; false otherwise
+     */
+    private static <T extends ReceiverDelegate<?>> boolean hasAnyWeight(
+            @NotNull Collection<T> delegates) {
+
+        /*
+         * Declare and initialize the result. Get an iterator for the receiver
+         * delegates. Cycle while no delegate has weight, and delegates exist.
+         */
+        boolean hasWeight = false;
+        final Iterator<T> iterator = delegates.iterator();
+        while ((!hasWeight) && iterator.hasNext()) {
+
+            // Reinitialize the result.
+            hasWeight = (0. < iterator.next().getWeight());
+        }
+
+        // Return the result.
+        return hasWeight;
     }
 
     /**
@@ -327,6 +362,11 @@ class RebalanceNode implements CurrencyReceiver {
         tickerSet.clear();
     }
 
+    @Override
+    public void clearSnapshot() {
+        doAction(getCollection(), clearSnapshotAction);
+    }
+
     /**
      * Gets a child by weight type.
      *
@@ -343,6 +383,16 @@ class RebalanceNode implements CurrencyReceiver {
          */
         final NodeDelegate delegate = children.get(type);
         return (null == delegate) ? null : delegate.getReceiver();
+    }
+
+    /**
+     * Gets the relevant collection of receiver delegates.
+     *
+     * @return The relevant collection of receiver delegates
+     */
+    private @NotNull Collection<? extends ReceiverDelegate<?>>
+    getCollection() {
+        return childValues.isEmpty() ? tickerSet : childValues;
     }
 
     /**
@@ -390,12 +440,12 @@ class RebalanceNode implements CurrencyReceiver {
             @NotNull Collection<T> delegates, @NotNull Currency proposed) {
 
         /*
-         * Get the message logger. Declare a variable to hold the best
-         * accumulated residual. Initialize it to the proposed value. Try to
-         * do the rebalance.
+         * Declare a variable to hold the best accumulated residual. Initialize
+         * it to the proposed value. Get the message logger, then try to do the
+         * rebalance.
          */
-        final MessageLogger logger = getLogger();
         Currency bestResidual = proposed;
+        final MessageLogger logger = getLogger();
         try {
 
             /*
@@ -406,8 +456,8 @@ class RebalanceNode implements CurrencyReceiver {
             Reallocator reallocator;
 
             /*
-             * Declare a variable hold a value list. Get the weight list from
-             * the weight allocator.
+             * Declare a variable to hold a value list. Get the weight list
+             * from the weight allocator.
              */
             List<MutableCurrency> valueList;
             final List<Double> weightList = weightAccumulatorAction.getList();
@@ -431,74 +481,90 @@ class RebalanceNode implements CurrencyReceiver {
             while (accumulatedResidual.isNotZero() && iterator.hasNext()) {
 
                 /*
-                 * Set the first/next consideration pattern in the
-                 * consideration setter action.
+                 * Reset the consideration setter action, then set the
+                 * first/next consideration pattern in the action.
                  */
+                considerationSetterAction.reset();
                 considerationSetterAction.setConsiderationPattern(
                         considerationPattern = iterator.next());
 
                 /*
                  * Perform the consideration setter action on each receiver
-                 * delegate. Then perform the weight accumulator action on each
-                 * delegate.
+                 * delegate. Reset the weight accumulator action, then perform
+                 * the weight accumulator action on each delegate.
                  */
                 doAction(delegates, considerationSetterAction);
+                weightAccumulatorAction.reset();
                 doAction(delegates, weightAccumulatorAction);
 
                 /*
-                 * Create a new reallocator with the weight list. Create a
-                 * value list using the size of the weight list and the
-                 * accumulated residual.
+                 * Create a new reallocator with the weight list. Is the sum of
+                 * the weights greater than zero?
                  */
                 reallocator = new Reallocator(weightList);
-                valueList = getInitialList(weightList.size(),
-                        accumulatedResidual);
-
-                /*
-                 * Reallocate the value list using the reallocator. Set the
-                 * negation flag in the value setter action based on the sign
-                 * of the accumulated residual.
-                 */
-                reallocator.reallocate(valueList);
-                valueSetterAction.setNegation(
-                        accumulatedResidual.compareTo(zero) < 0);
-
-                /*
-                 * Set the value list in the value setter action. Perform the
-                 * value setter action on each receiver delegate. Reset the
-                 * accumulated residual.
-                 */
-                valueSetterAction.setList(valueList);
-                doAction(delegates, valueSetterAction);
-                accumulatedResidual = valueSetterAction.getAccumulated();
-
-                /*
-                 * Log a message about this current combination of account key,
-                 * weight type, consideration pattern and accumulated residual.
-                 */
-                logger.log(ordinary, String.format("For account key %s, " +
-                                "weight type %s, and consideration " +
-                                "pattern 0x%08x: Found accumulated " +
-                                "residual of %s.", getAccountKey(),
-                        getWeight(), considerationPattern,
-                        accumulatedResidual));
-
-                /*
-                 * Does the absolute value of the accumulated residual compare
-                 * less than that of the best residual?
-                 */
-                if (Double.compare(
-                        Math.abs(accumulatedResidual.getValue()),
-                        Math.abs(bestResidual.getValue())) < 0) {
+                if (0. < reallocator.getWeightSum()) {
 
                     /*
-                     * The absolute value of the accumulated residual compares
-                     * less than that of the best residual. Ask each receiver
-                     * delegate to take a snapshot, and set the best residual
-                     * to be current accumulated residual.
+                     * The sum of the weights is greater than zero. Create a
+                     * value list using the size of the weight list and the
+                     * accumulated residual.
                      */
-                    doAction(delegates, takeSnapshotAction);
-                    bestResidual = accumulatedResidual;
+                    valueList = getInitialList(weightList.size(),
+                            accumulatedResidual);
+
+                    /*
+                     * Reallocate the value list using the reallocator. Reset
+                     * the value setter action.
+                     */
+                    reallocator.reallocate(valueList);
+                    valueSetterAction.reset();
+
+                    /*
+                     * Set the negation flag in the value setter action based
+                     * on the sign of the accumulated residual.
+                     */
+                    valueSetterAction.setNegation(
+                            accumulatedResidual.compareTo(zero) < 0);
+
+                    /*
+                     * Set the value list in the value setter action. Perform
+                     * the value setter action on each receiver delegate. Reset
+                     * the accumulated residual.
+                     */
+                    valueSetterAction.setList(valueList);
+                    doAction(delegates, valueSetterAction);
+                    accumulatedResidual = valueSetterAction.getAccumulated();
+
+                    /*
+                     * Log a message about this current combination of account
+                     * key, weight type, consideration pattern and accumulated
+                     * residual.
+                     */
+                    logger.log(ordinary, String.format("For account key %s, " +
+                                    "weight type %s, and consideration " +
+                                    "pattern 0x%08x: Found accumulated " +
+                                    "residual of %s.", getAccountKey(),
+                            getWeight(), considerationPattern,
+                            accumulatedResidual));
+
+                    /*
+                     * Does the absolute value of the accumulated residual
+                     * compare less than that of the best residual?
+                     */
+                    if (Double.compare(
+                            Math.abs(accumulatedResidual.getValue()),
+                            Math.abs(bestResidual.getValue())) < 0) {
+
+                        /*
+                         * The absolute value of the accumulated residual
+                         * compares less than that of the best residual. Ask
+                         * each receiver delegate to take a snapshot, and set
+                         * the best residual to be the current accumulated
+                         * residual.
+                         */
+                        takeSnapshot();
+                        bestResidual = accumulatedResidual;
+                    }
                 }
             }
 
@@ -507,7 +573,7 @@ class RebalanceNode implements CurrencyReceiver {
              * zero, or because we ran out of consideration patterns. Recover
              * the best snapshot.
              */
-            doAction(delegates, recoverAction);
+            recoverSnapshot();
         }
 
         // Catch any exception that may occur.
@@ -548,23 +614,37 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     @Override
+    public void recoverSnapshot() {
+        doAction(getCollection(), recoverSnapshotAction);
+    }
+
+    @Override
     public @NotNull Currency setProposed(@NotNull Currency currency) {
 
-        // Declare the return value. Are there children?
-        Currency result;
-        if (children.isEmpty()) {
+        /*
+         * Declare and initialize the residual. Does any child have positive
+         * weight?
+         */
+        Currency residual = currency;
+        if (hasAnyWeight(childValues)) {
 
-            // There are no children. Rebalance the tickers.
-            result = rebalance(tickerSet, currency);
+            /*
+             * One or more children have positive weight. Rebalance using
+             * the child values, and reset the residual.
+             */
+            residual = rebalance(childValues, currency);
         }
 
-        // ...otherwise rebalance the children.
-        else {
-            result = rebalance(children.values(), currency);
+        /*
+         * No child has positive weight. Rebalance using the tickers if any has
+         * weight.
+         */
+        else if (hasAnyWeight(tickerSet)) {
+            residual = rebalance(tickerSet, currency);
         }
 
-        // Return the result.
-        return result;
+        // Return the residual.
+        return residual;
     }
 
     /**
@@ -574,6 +654,11 @@ class RebalanceNode implements CurrencyReceiver {
      */
     private void setValue(@NotNull Currency value) {
         this.value = value;
+    }
+
+    @Override
+    public void takeSnapshot() {
+        doAction(getCollection(), takeSnapshotAction);
     }
 
     private interface Action<T> {
@@ -624,6 +709,11 @@ class RebalanceNode implements CurrencyReceiver {
         protected void setContained(@NotNull ContainedType contained) {
             this.contained = contained;
         }
+
+        /**
+         * Resets the container.
+         */
+        public abstract void reset();
     }
 
     private static class ConsiderationSetterAction extends
@@ -652,6 +742,11 @@ class RebalanceNode implements CurrencyReceiver {
             return 0;
         }
 
+        @Override
+        public void reset() {
+            iteration = 0;
+        }
+
         /**
          * Sets the consideration pattern.
          *
@@ -661,10 +756,10 @@ class RebalanceNode implements CurrencyReceiver {
 
             /*
              * Set the consideration pattern as the contained object, and
-             * reinitialize the iteration counter to zero.
+             * reset the action.
              */
             setContained(considerationPattern);
-            iteration = 0;
+            reset();
         }
     }
 
@@ -684,15 +779,6 @@ class RebalanceNode implements CurrencyReceiver {
 
         {
             resetAccumulated();
-        }
-
-        /**
-         * Adds residual to the accumulated residual.
-         *
-         * @param residual A residual to add
-         */
-        public void addResidual(@NotNull Currency residual) {
-            accumulated.add(residual);
         }
 
         /**
@@ -768,7 +854,7 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Subracts residual from the accumulated residual.
+         * Subtracts residual from the accumulated residual.
          *
          * @param residual A residual to subtract
          */
@@ -857,6 +943,11 @@ class RebalanceNode implements CurrencyReceiver {
             return new SetValueUtility();
         }
 
+        @Override
+        public void reset() {
+            getContained().resetIndex();
+        }
+
         /**
          * Sets the accumulated residual.
          *
@@ -902,6 +993,11 @@ class RebalanceNode implements CurrencyReceiver {
         @Override
         protected @NotNull List<Double> getInitialValue() {
             return new ArrayList<>();
+        }
+
+        @Override
+        public void reset() {
+            getList().clear();
         }
 
         /**
