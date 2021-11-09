@@ -4,8 +4,8 @@ import com.garygregg.rebalance.CurrencyReceiver;
 import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
 
-abstract class ReceiverDelegate<T extends CurrencyReceiver>
-        implements CurrencyReceiver {
+abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
+        CurrencyReceiver {
 
     // The receiver from whom we are delegated
     private final T receiver;
@@ -15,9 +15,6 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
 
     // Consider this delegate to receive additional value
     private boolean considerMe;
-
-    // A snapshot of the current value
-    private Currency snapshot;
 
     /**
      * Constructs the receiver delegate.
@@ -30,6 +27,11 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
         // Set the member variables.
         this.receiver = receiver;
         this.weight = weight;
+    }
+
+    @Override
+    public void clearSnapshot() {
+        getReceiver().clearSnapshot();
     }
 
     /**
@@ -77,15 +79,9 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
         // The default is to do nothing.
     }
 
-    /**
-     * Recovers the last snapshot.
-     */
-    public void recover() {
-
-        // Set the snapshot if it is not null.
-        if (null != snapshot) {
-            setProposed(snapshot);
-        }
+    @Override
+    public void recoverSnapshot() {
+        getReceiver().recoverSnapshot();
     }
 
     /**
@@ -104,10 +100,8 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver>
         return getReceiver().setProposed(currency);
     }
 
-    /**
-     * Takes a snapshot of the current value.
-     */
+    @Override
     public void takeSnapshot() {
-        this.snapshot = getProposed();
+        getReceiver().takeSnapshot();
     }
 }

@@ -13,8 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Ticker extends
-        Common<String, Common<?, ?, ?>, TickerDescription>
-        implements CurrencyReceiver {
+        Common<String, Common<?, ?, ?>, TickerDescription> implements
+        CurrencyReceiver {
 
     // A factory for producing artificial tickers
     private static final Factory<Ticker> factory = Ticker::getNewArtificial;
@@ -25,6 +25,9 @@ public class Ticker extends
     // The preference manager
     private static final PreferenceManager manager =
             PreferenceManager.getInstance();
+
+    // Zero shares
+    private static final double zero = Shares.getZero().getValue();
 
     // The map of weight type to activities
     private final Map<WeightType, Activity> associationMap = new HashMap<>();
@@ -62,6 +65,9 @@ public class Ticker extends
             return Math.round(argument);
         }
     };
+
+    // A snapshot of the number of proposed shares
+    private Double snapshot;
 
     {
 
@@ -201,6 +207,9 @@ public class Ticker extends
                 new Activity(type, null));
         associationMap.put(type = WeightType.STOCK_VALUE,
                 new Activity(type, null));
+
+        // Initialize the last snapshot of proposed shares.
+        clearSnapshot();
     }
 
     /**
@@ -250,6 +259,11 @@ public class Ticker extends
     @Override
     void clear() {
         getFullValueManager().clear();
+    }
+
+    @Override
+    public void clearSnapshot() {
+        snapshot = null;
     }
 
     /**
@@ -477,6 +491,11 @@ public class Ticker extends
     }
 
     @Override
+    public void recoverSnapshot() {
+        proposed.setShares((null == snapshot) ? zero : snapshot);
+    }
+
+    @Override
     void setConsidered(double value) {
         considered.setValueAdjustShares(value);
     }
@@ -685,6 +704,26 @@ public class Ticker extends
 
         // Set the (possibly modified) number of shares.
         proposed.setShares(shares);
+    }
+
+    @Override
+    public void takeSnapshot() {
+
+        /*
+         * Get the number of proposed shares. Is the number of proposed shares
+         * null?
+         */
+        final Shares shares = proposed.getShares();
+        if (null == shares) {
+
+            // The number of proposed shares is null. Clear the snapshot.
+            clearSnapshot();
+        }
+
+        // The number of proposed shares is not null. Take the snapshot.
+        else {
+            snapshot = shares.getValue();
+        }
     }
 
     @Override
