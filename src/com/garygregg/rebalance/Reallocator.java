@@ -20,6 +20,9 @@ public class Reallocator {
     private final ValueExtractor<Double> forDoubles =
             object -> object;
 
+    // The sum of the weights
+    private final double weightSum;
+
     // A list of weights
     private final List<Double> weights;
 
@@ -31,7 +34,10 @@ public class Reallocator {
      *                subsequent reallocation
      */
     public Reallocator(@NotNull List<Double> weights) {
+
+        // Set the member variables.
         this.weights = weights;
+        this.weightSum = sum(weights, forDoubles);
     }
 
     /***
@@ -232,6 +238,15 @@ public class Reallocator {
     }
 
     /**
+     * Gets the sum of the weights.
+     *
+     * @return The sum of the weights
+     */
+    public double getWeightSum() {
+        return weightSum;
+    }
+
+    /**
      * Reallocates amounts in a list of countables based on the weights
      * contained in the reallocator.
      *
@@ -248,7 +263,7 @@ public class Reallocator {
          * weights zero?
          */
         checkNoNegatives(weights);
-        final double weightsSum = sum(weights, forDoubles);
+        final double weightsSum = getWeightSum();
         if (0. == weightsSum) {
 
             /*
