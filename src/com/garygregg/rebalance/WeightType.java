@@ -49,10 +49,7 @@ public enum WeightType {
      */
     BOND_UNCATEGORIZED("Bond unspecific", BOND),
 
-    /*
-     * Tickers must contain fund type SHORT. Suggest letting 'short' prevail
-     * for bonds that are both 'government' AND 'short'.
-     */
+    // Tickers must contain fund type SHORT.
     BOND_SHORT("Bond short-term", BOND),
 
     // Tickers must contain fund type REAL_ESTATE.
