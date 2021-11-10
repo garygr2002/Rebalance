@@ -88,28 +88,24 @@ public class Ticker extends
                 new Association(FundType.STOCK, WeightType.STOCK)));
 
         /*
-         * Level 1 (Bond): Uncategorized, corporate, foreign, short, treasury,
-         * high-yield, inflation or mortgage.
-         *
-         * (Let 'short' go before 'government'; see WeightType.)
+         * Level 1 (Bond): High-yield (make sure high-yield goes before
+         * corporate), corporate, foreign, inflation, mortgage, short,
+         * treasury, and uncategorized.
          */
         associationMap.put(type = WeightType.BOND, new Activity(type,
                 WeightType.BOND_UNCATEGORIZED,
+                new Association(FundType.HIGH, WeightType.BOND_HIGH),
                 new Association(FundType.CORPORATE, WeightType.BOND_CORPORATE),
                 new Association(FundType.FOREIGN, WeightType.BOND_FOREIGN),
-                new Association(FundType.SHORT, WeightType.BOND_SHORT),
-                new Association(FundType.TREASURY, WeightType.BOND_GOVERNMENT),
-//              new Association(FundType.HIGH, WeightType.BOND_HIGH),
                 new Association(FundType.INFLATION, WeightType.BOND_INFLATION),
-                new Association(FundType.MORTGAGE, WeightType.BOND_MORTGAGE)));
+                new Association(FundType.MORTGAGE, WeightType.BOND_MORTGAGE),
+                new Association(FundType.SHORT, WeightType.BOND_SHORT),
+                new Association(FundType.TREASURY, WeightType.BOND_GOVERNMENT)));
 
         // Level 2 (Bond subtypes).
         associationMap.put(type = WeightType.BOND_CORPORATE,
-                new Activity(type, null,
-                        new Association(FundType.HIGH, WeightType.BOND_HIGH)));
-        associationMap.put(type = WeightType.BOND_FOREIGN,
                 new Activity(type, null));
-        associationMap.put(type = WeightType.BOND_SHORT,
+        associationMap.put(type = WeightType.BOND_FOREIGN,
                 new Activity(type, null));
         associationMap.put(type = WeightType.BOND_GOVERNMENT,
                 new Activity(type, null));
@@ -119,13 +115,16 @@ public class Ticker extends
                 new Activity(type, null));
         associationMap.put(type = WeightType.BOND_MORTGAGE,
                 new Activity(type, null));
+        associationMap.put(type = WeightType.BOND_SHORT,
+                new Activity(type, null));
         associationMap.put(type = WeightType.BOND_UNCATEGORIZED,
                 new Activity(type, null));
 
-        // Level 1 (Cash): Uncategorized or treasury.
+        // Level 1 (Cash): Treasury or uncategorized.
         associationMap.put(type = WeightType.CASH,
                 new Activity(type, WeightType.CASH_UNCATEGORIZED,
-                        new Association(FundType.TREASURY, WeightType.CASH_GOVERNMENT)));
+                        new Association(FundType.TREASURY,
+                                WeightType.CASH_GOVERNMENT)));
 
         // Level 2 (Cash subtypes).
         associationMap.put(type = WeightType.CASH_GOVERNMENT,
