@@ -550,10 +550,31 @@ public class Ticker extends
     }
 
     @Override
-    public @NotNull Currency setProposed(@NotNull Currency currency) {
+    public @NotNull Currency setProposed(@NotNull Currency currency,
+                                         boolean isRelative) {
 
-        // Calculate the proposed shares. Are the proposed shares not null?
-        final Double proposedShares = calculateShares(currency);
+        /*
+         * Declare a mutable currency value, and initialize it to the incoming
+         * value. Get the existing value. Is the existing value set, and is
+         * the incoming value relative?
+         */
+        final MutableCurrency mutableCurrency = new MutableCurrency(currency);
+        Currency valueSet = getProposed();
+        if ((null != valueSet) && isRelative) {
+
+            /*
+             * The existing value is set, and the incoming value is relative.
+             * Add the existing value to the incoming value.
+             */
+            mutableCurrency.add(valueSet);
+        }
+
+        /*
+         * Calculate the proposed shares for the new proposed value. Are the
+         * proposed shares not null?
+         */
+        final Double proposedShares =
+                calculateShares(mutableCurrency.getImmutable());
         if (null != proposedShares) {
 
             // The proposed shares are not null. Set them.
@@ -561,17 +582,24 @@ public class Ticker extends
         }
 
         /*
-         * Get the proposed value that was set. Create a new mutable currency
-         * with the desired value.
+         * Get the new, proposed value. Is the proposed value not null? Because
+         * it better not be null; we just set it!
          */
-        final Currency valueSet = getProposed();
-        final MutableCurrency mutableCurrency = new MutableCurrency(currency);
+        valueSet = getProposed();
+        if (null != valueSet) {
+
+            /*
+             * The proposed value is not null. Set the value in our mutable
+             * currency value.
+             */
+            mutableCurrency.set(valueSet);
+        }
 
         /*
          * Subtract the value that was set from the desired value, and return
-         * it.
+         * the result as the residual.
          */
-        mutableCurrency.subtract((null == valueSet) ? currency : valueSet);
+        mutableCurrency.subtract(mutableCurrency.getImmutable());
         return mutableCurrency.getImmutable();
     }
 

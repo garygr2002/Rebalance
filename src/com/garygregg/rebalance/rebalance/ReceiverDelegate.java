@@ -96,8 +96,9 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
     }
 
     @Override
-    public @NotNull Currency setProposed(@NotNull Currency currency) {
-        return getReceiver().setProposed(currency);
+    public @NotNull Currency setProposed(@NotNull Currency currency,
+                                         boolean isRelative) {
+        return getReceiver().setProposed(currency, isRelative);
     }
 
     @Override

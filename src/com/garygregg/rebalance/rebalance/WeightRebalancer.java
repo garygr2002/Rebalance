@@ -116,13 +116,14 @@ class WeightRebalancer extends AccountRebalancer
         }
 
         /*
-         * Reinitialize the rebalancer member variables. Set the proposed value
-         * of the root node the same as that of the account, receiving a
-         * residual. Return null if the rebalance node class had a problem.
-         * Otherwise, return received residual.
+         * Reinitialize the rebalancer member variables. Set the absolute
+         * (not-relative) proposed value of the root node the same as that of
+         * the account, receiving a residual. Return null if the rebalance node
+         * class had a problem. Otherwise, return the received residual.
          */
         initialize();
-        final Currency residual = root.setProposed(account.getProposed());
+        final Currency residual = root.setProposed(account.getProposed(),
+                false);
         return RebalanceNode.hadProblem() ? null : residual;
     }
 
