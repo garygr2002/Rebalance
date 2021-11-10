@@ -219,7 +219,7 @@ class RebalanceNode implements CurrencyReceiver {
          */
         final MessageLogger logger = getLogger();
         return logger.hadProblem1() || logger.hadProblem2();
-    }    // For use when a snapshot is needed
+    }
 
 
     /**
@@ -280,7 +280,7 @@ class RebalanceNode implements CurrencyReceiver {
                     Integer.bitCount(first);
 
             /*
-             * Return the difference in the integers of their bit counts are
+             * Return the difference of the integers if their bit counts are
              * the same. Otherwise, return the difference in their bit counts.
              */
             return (0 == bitCountDifference) ? second - first :
@@ -425,60 +425,67 @@ class RebalanceNode implements CurrencyReceiver {
     /**
      * Rebalances a collection of receiver delegates.
      *
-     * @param delegates A collection of receiver delegates
-     * @param proposed  The proposed value of this receiver - this value should
-     *                  be interpreted as a relative amount from what the
-     *                  receiver already has set. On first call, the proposed
-     *                  value set in the receiver is null and interpreted as
-     *                  zero. Thus, <em>this</em> proposed value is then
-     *                  absolute as well as relative
-     * @param <T>       A receiver delegate type
+     * @param delegates  A collection of receiver delegates
+     * @param proposed   A value with which to adjust the proposed value of the
+     *                   receiver
+     * @param isRelative True if the incoming value is relative to the value
+     *                   already set in the receiver; false if it is absolute
+     * @param <T>        A receiver delegate type
      * @return The difference between proposed value and the value that this
      * receiver set (the "residual")
      */
     private <T extends ReceiverDelegate<?>> @NotNull Currency rebalance(
-            @NotNull Collection<T> delegates, @NotNull Currency proposed) {
+            @NotNull Collection<T> delegates, @NotNull Currency proposed,
+            boolean isRelative) {
 
         /*
-         * Declare a variable to hold the best accumulated residual. Initialize
-         * it to the proposed value. Get the message logger, then try to do the
-         * rebalance.
+         * Declare and initialize a description of the 'relative' flag. Declare
+         * a variable to hold the best accumulated residual. Initialize the
+         * best residual to the proposed value.
          */
+        final String description = isRelative ? "relative" : "absolute";
         Currency bestResidual = proposed;
+
+        // Get the message logger. Try to rebalance...
         final MessageLogger logger = getLogger();
         try {
 
             /*
-             * Declare a variable to hold a consideration pattern and a
-             * variable to hold a reallocator.
+             * Declare a variable to hold an accumulated residual and a
+             * variable to hold a consideration pattern.
              */
+            Currency accumulatedResidual;
             int considerationPattern;
-            Reallocator reallocator;
 
             /*
-             * Declare a variable to hold a value list. Get the weight list
-             * from the weight allocator.
+             * Declare a variable to hold a reallocator and a variable to hold
+             * a value list.
              */
+            Reallocator reallocator;
             List<MutableCurrency> valueList;
+
+            /*
+             * Declare and initialize a constant for a sorted set of
+             * consideration patterns and a constant representing the weight
+             * list from the weight accumulator action.
+             */
+            final SortedSet<Integer> patterns = produce(delegates.size());
             final List<Double> weightList = weightAccumulatorAction.getList();
 
             /*
-             * Initialize the accumulated residual in the value setter action
-             * to be the proposed value. Declare a variable to hold the
-             * accumulated residual, and initialize it to the accumulated
-             * residual in the value setter action.
+             * Set the relative flag in the value setter action. Ask each
+             * receiver to take an initial snapshot.
              */
-            valueSetterAction.setAccumulated(proposed);
-            Currency accumulatedResidual = valueSetterAction.getAccumulated();
+            valueSetterAction.setRelative(isRelative);
+            takeSnapshot();
 
             /*
-             * Produce a sorted set of receiver consideration patterns. Get an
-             * iterator for the patterns. Cycle while the accumulated
-             * residual is not zero, and patterns exist.
+             * Get an iterator for the receiver consideration patterns. Cycle
+             * while the best residual is not zero and receiver consideration
+             * patterns exist.
              */
-            final SortedSet<Integer> patterns = produce(delegates.size());
             final Iterator<Integer> iterator = patterns.iterator();
-            while (accumulatedResidual.isNotZero() && iterator.hasNext()) {
+            while (bestResidual.isNotZero() && iterator.hasNext()) {
 
                 /*
                  * Reset the consideration setter action, then set the
@@ -507,45 +514,44 @@ class RebalanceNode implements CurrencyReceiver {
                     /*
                      * The sum of the weights is greater than zero. Create a
                      * value list using the size of the weight list and the
-                     * accumulated residual.
+                     * best residual. Note: 'getInitialList(int, Currency)' is
+                     * expected to use the absolute value of the best residual
+                     * when creating the initial list. Reallocate the value
+                     * list using the reallocator.
                      */
                     valueList = getInitialList(weightList.size(),
-                            accumulatedResidual);
-
-                    /*
-                     * Reallocate the value list using the reallocator. Reset
-                     * the value setter action.
-                     */
+                            bestResidual);
                     reallocator.reallocate(valueList);
-                    valueSetterAction.reset();
 
                     /*
-                     * Set the negation flag in the value setter action based
-                     * on the sign of the accumulated residual.
+                     * Set/reset the best residual and value list in the value
+                     * setter action.
                      */
-                    valueSetterAction.setNegation(
-                            accumulatedResidual.compareTo(zero) < 0);
-
-                    /*
-                     * Set the value list in the value setter action. Perform
-                     * the value setter action on each receiver delegate. Reset
-                     * the accumulated residual.
-                     */
+                    valueSetterAction.setAccumulated(bestResidual);
                     valueSetterAction.setList(valueList);
+
+                    /*
+                     * Perform the value setter action on each receiver
+                     * delegate. Receive the accumulated residual. Set the
+                     * 'relative' flag in the value setter action (for
+                     * subsequent calls).
+                     */
                     doAction(delegates, valueSetterAction);
                     accumulatedResidual = valueSetterAction.getAccumulated();
+                    valueSetterAction.setRelative(true);
 
                     /*
                      * Log a message about this current combination of account
-                     * key, weight type, consideration pattern and accumulated
-                     * residual.
+                     * key, weight type, consideration pattern, accumulated
+                     * residual, and the proposed value.
                      */
                     logger.log(ordinary, String.format("For account key %s, " +
                                     "weight type %s, and consideration " +
                                     "pattern 0x%08x: Found accumulated " +
-                                    "residual of %s.", getAccountKey(),
+                                    "residual of %s when trying to set %s " +
+                                    "proposed value %s.", getAccountKey(),
                             getWeight(), considerationPattern,
-                            accumulatedResidual));
+                            accumulatedResidual, description, proposed));
 
                     /*
                      * Does the absolute value of the accumulated residual
@@ -565,15 +571,17 @@ class RebalanceNode implements CurrencyReceiver {
                         takeSnapshot();
                         bestResidual = accumulatedResidual;
                     }
+
+                    /*
+                     * The absolute value of the accumulated residual does not
+                     * compare less than that of the best residual. Ask each
+                     * receiver delegate to recover their best snapshot.
+                     */
+                    else {
+                        recoverSnapshot();
+                    }
                 }
             }
-
-            /*
-             * Either we ended because the accumulated residual dropped to
-             * zero, or because we ran out of consideration patterns. Recover
-             * the best snapshot.
-             */
-            recoverSnapshot();
         }
 
         // Catch any exception that may occur.
@@ -599,16 +607,17 @@ class RebalanceNode implements CurrencyReceiver {
 
             // Log a message identifying the best residual.
             logger.log(extraordinary, String.format("For account key %s and " +
-                            "weight type %s: I identified a best residual " +
-                            "of %s.", getAccountKey(), getType(),
-                    bestResidual));
+                            "weight type %s: I have identified the best " +
+                            "residual of %s when trying to set %s proposed " +
+                            "value %s.", getAccountKey(), getType(),
+                    bestResidual, description, proposed));
         }
 
         // Calculate the new value of this node.
         final MutableCurrency newValue = new MutableCurrency(proposed);
         newValue.add(bestResidual);
 
-        // Set the current value of this node, and return the best residual.
+        // Set the current value of this node and return the best residual.
         setValue(newValue.getImmutable());
         return bestResidual;
     }
@@ -619,7 +628,8 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     @Override
-    public @NotNull Currency setProposed(@NotNull Currency currency) {
+    public @NotNull Currency setProposed(@NotNull Currency currency,
+                                         boolean isRelative) {
 
         /*
          * Declare and initialize the residual. Does any child have positive
@@ -632,7 +642,7 @@ class RebalanceNode implements CurrencyReceiver {
              * One or more children have positive weight. Rebalance using
              * the child values, and reset the residual.
              */
-            residual = rebalance(childValues, currency);
+            residual = rebalance(childValues, currency, isRelative);
         }
 
         /*
@@ -640,7 +650,7 @@ class RebalanceNode implements CurrencyReceiver {
          * weight.
          */
         else if (hasAnyWeight(tickerSet)) {
-            residual = rebalance(tickerSet, currency);
+            residual = rebalance(tickerSet, currency, isRelative);
         }
 
         // Return the residual.
@@ -702,6 +712,11 @@ class RebalanceNode implements CurrencyReceiver {
         protected abstract @NotNull ContainedType getInitialValue();
 
         /**
+         * Resets the container.
+         */
+        public abstract void reset();
+
+        /**
          * Sets the member variable.
          *
          * @param contained The member variable
@@ -709,11 +724,6 @@ class RebalanceNode implements CurrencyReceiver {
         protected void setContained(@NotNull ContainedType contained) {
             this.contained = contained;
         }
-
-        /**
-         * Resets the container.
-         */
-        public abstract void reset();
     }
 
     private static class ConsiderationSetterAction extends
@@ -733,7 +743,7 @@ class RebalanceNode implements CurrencyReceiver {
          *
          * @return The consideration pattern
          */
-        public int getConsiderationPattern() {
+        protected int getConsiderationPattern() {
             return getContained();
         }
 
@@ -768,14 +778,25 @@ class RebalanceNode implements CurrencyReceiver {
         // The accumulated residual between proposed values and set values
         private final MutableCurrency accumulated = new MutableCurrency();
 
-        // The user interpreted flag
-        private boolean flag;
-
         // An index into the currency list
         private int index;
 
         // A currency list
         private List<MutableCurrency> list;
+
+        /*
+         * True if the values in the currency list are to be interpreted as
+         * negative values; false if they are to be interpreted as
+         * non-negative values
+         */
+        private boolean negative;
+
+        /*
+         * True if the value in the currency list are to be interpreted as
+         * relative values; false if they are to be interpreted as absolute
+         * values
+         */
+        private boolean relative;
 
         {
             resetAccumulated();
@@ -791,15 +812,6 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Gets the user interpreted flag.
-         *
-         * @return The user interpreted flag
-         */
-        public boolean getFlag() {
-            return flag;
-        }
-
-        /**
          * Gets the next element.
          *
          * @return The next element, or null if there are no more elements
@@ -807,6 +819,28 @@ class RebalanceNode implements CurrencyReceiver {
         public @Nullable MutableCurrency getNextElement() {
             return ((null != list) && (index < list.size())) ?
                     list.get(index++) : null;
+        }
+
+        /**
+         * Gets the 'negative' flag.
+         *
+         * @return True if the value in the currency list are to be interpreted
+         * as negative values; false if they are to be interpreted as non-negative
+         * values
+         */
+        public boolean isNegative() {
+            return negative;
+        }
+
+        /**
+         * Gets the 'relative' flag.
+         *
+         * @return True if the value in the currency list are to be interpreted
+         * as relative values; false if they are to be interpreted as absolute
+         * values
+         */
+        public boolean isRelative() {
+            return relative;
         }
 
         /**
@@ -833,15 +867,6 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Sets the user interpreted flag.
-         *
-         * @param flag The flag to set
-         */
-        public void setFlag(boolean flag) {
-            this.flag = flag;
-        }
-
-        /**
          * Sets the currency list.
          *
          * @param list A currency list
@@ -851,6 +876,28 @@ class RebalanceNode implements CurrencyReceiver {
             // Set the list and reset the element index.
             this.list = list;
             resetIndex();
+        }
+
+        /**
+         * Sets the 'negative' flag.
+         *
+         * @param negative True if the value in the currency list are to be
+         *                 interpreted as negative values; false if they are
+         *                 to be interpreted as non-negative values
+         */
+        public void setNegative(boolean negative) {
+            this.negative = negative;
+        }
+
+        /**
+         * Sets the 'relative' flag.
+         *
+         * @param relative True if the value in the currency list are to be
+         *                 interpreted as relative values; false if they are
+         *                 to be interpreted as absolute values
+         */
+        public void setRelative(boolean relative) {
+            this.relative = relative;
         }
 
         /**
@@ -869,12 +916,6 @@ class RebalanceNode implements CurrencyReceiver {
         // The value of minus one as currency
         private static final Currency minusOne = new Currency(-1.);
 
-        // The value of one as currency
-        private static final Currency one = Currency.getOne();
-
-        // Used for working with values from the utility
-        private final MutableCurrency worker = new MutableCurrency();
-
         @Override
         public void doAction(@NotNull ReceiverDelegate<?> delegate) {
 
@@ -883,48 +924,53 @@ class RebalanceNode implements CurrencyReceiver {
 
                 /*
                  * The delegate is considered. Get the utility from the
-                 * container, and the next value from the utility. Is the next
-                 * value not null?
+                 * container, and the incoming value from the utility. Is the
+                 * incoming value not null?
                  */
                 final SetValueUtility utility = getContained();
-                final MutableCurrency value = utility.getNextElement();
-                if (null != value) {
+                final MutableCurrency currency = utility.getNextElement();
+                if (null != currency) {
 
                     /*
-                     * The next value is not null. Set the worker with the same
-                     * value as in the value. Interpret a set flag in the
-                     * utility as an indication that the values in the utility
-                     * are meant to be interpreted as negative numbers, and a
-                     * clear flag as an indication that they are meant to be
-                     * interpreted as non-negative numbers. Apply a suitable
-                     * factor to the worker.
+                     * The incoming value is not null. Multiply it by minus one
+                     * if the negation flag in the utility so indicates.
                      */
-                    worker.set(value.getImmutable());
-                    worker.multiply(utility.getFlag() ? minusOne : one);
-
-                    /*
-                     * Get any existing value from the delegate. Is the
-                     * existing value not null?
-                     */
-                    Currency currency = delegate.getProposed();
-                    if (null != currency) {
-
-                        /*
-                         * The existing value is not null. Add it to the
-                         * worker.
-                         */
-                        worker.add(currency);
+                    if (utility.isNegative()) {
+                        currency.multiply(minusOne);
                     }
 
                     /*
-                     * Reset the proposed value of the delegate with the new
-                     * value in the worker. Receive any returned residual, and
-                     * add it back to the worker. Subtract the (possibly
-                     * modified) value in the worker to the accumulated
-                     * residual in the utility.
+                     * Does the utility indicate that the incoming value is
+                     * not relative?
                      */
-                    worker.add(delegate.setProposed(worker.getImmutable()));
-                    utility.subtractResidual(worker.getImmutable());
+                    if (!utility.isRelative()) {
+
+                        /*
+                         * The utility indicates that the incoming value is
+                         * not relative. Set the proposed value in the
+                         * delegate, and subtract the residual from the
+                         * incoming value.
+                         */
+                        currency.subtract(delegate.setProposed(
+                                currency.getImmutable(), false));
+                    }
+
+                    /*
+                     * The utility indicates that the incoming value is relative.
+                     * Set the proposed value in the delegate, and add the
+                     * residual from the incoming value if the incoming value
+                     * is not zero.
+                     */
+                    else if (currency.isNotZero()) {
+                        currency.add(delegate.setProposed(
+                                currency.getImmutable(), true));
+                    }
+
+                    /*
+                     * Subtract the modified incoming value from the accumulated
+                     * residual.
+                     */
+                    utility.subtractResidual(currency.getImmutable());
                 }
             }
         }
@@ -954,7 +1000,17 @@ class RebalanceNode implements CurrencyReceiver {
          * @param residual The accumulated residual
          */
         public void setAccumulated(@NotNull Currency residual) {
-            getContained().setAccumulated(residual);
+
+            /*
+             * Get the set value utility from the container. Set the negative
+             * flag in the utility if the residual is less than zero.
+             */
+            final SetValueUtility utility = getContained();
+            utility.setNegative(residual.compareTo(zero) < 0);
+
+            // Set the accumulated residual in the container. Reset the action.
+            utility.setAccumulated(residual);
+            reset();
         }
 
         /**
@@ -967,14 +1023,14 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Sets an indication that the values in the utility are meant to be
-         * interpreted as negative numbers.
+         * Sets the 'relative' flag.
          *
-         * @param negation True if the values in the utility are meant to be
-         *                 interpreted as negative numbers; false otherwise
+         * @param relative True if the value in the currency list are to be
+         *                 interpreted as relative values; false if they are
+         *                 to be interpreted as absolute values
          */
-        public void setNegation(boolean negation) {
-            getContained().setFlag(negation);
+        public void setRelative(boolean relative) {
+            getContained().setRelative(relative);
         }
     }
 
@@ -995,11 +1051,6 @@ class RebalanceNode implements CurrencyReceiver {
             return new ArrayList<>();
         }
 
-        @Override
-        public void reset() {
-            getList().clear();
-        }
-
         /**
          * Gets the weight list.
          *
@@ -1007,6 +1058,11 @@ class RebalanceNode implements CurrencyReceiver {
          */
         public @NotNull List<Double> getList() {
             return getContained();
+        }
+
+        @Override
+        public void reset() {
+            getList().clear();
         }
     }
 }
