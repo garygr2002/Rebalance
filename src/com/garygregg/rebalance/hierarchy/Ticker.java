@@ -589,17 +589,13 @@ public class Ticker extends
         if (null != valueSet) {
 
             /*
-             * The proposed value is not null. Set the value in our mutable
-             * currency value.
+             * The proposed value is not null. Subtract it from the value we
+             * tried to set.
              */
-            mutableCurrency.set(valueSet);
+            mutableCurrency.subtract(valueSet);
         }
 
-        /*
-         * Subtract the value that was set from the desired value, and return
-         * the result as the residual.
-         */
-        mutableCurrency.subtract(mutableCurrency.getImmutable());
+        // Return the residual.
         return mutableCurrency.getImmutable();
     }
 
