@@ -19,7 +19,9 @@ public interface CurrencyReceiver {
      * Sets the proposed value of the receiver.
      *
      * @param currency The proposed value of the receiver
-     * @return The residual that could not be set
+     * @return The difference between what was desired and what was actually
+     * set (the 'residual'); this will be positive if a receiver took too
+     * little, negative if it took too much
      */
     @NotNull Currency setProposed(@NotNull Currency currency);
 
