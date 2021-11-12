@@ -822,26 +822,25 @@ class RebalanceNode implements CurrencyReceiver {
 
             /*
              * Calculate the difference between zero and the incoming value. Is
-             * zero less than the incoming value?
+             * the incoming value less than zero?
              */
             final int difference = zero.compareTo(currency);
             if (0 < difference) {
 
                 /*
-                 * Zero is less than the incoming value. Or, more succinctly,
-                 * the incoming value is positive. Add the incoming value to the
-                 * absolute residual.
+                 * The incoming value is less than zero. Subtract the incoming
+                 * value from the absolute residual.
                  */
-                absolute.add(currency);
+                absolute.subtract(currency);
             }
 
             /*
-             * Subtract the incoming value from the absolute residual if zero
-             * is greater than the incoming value (the incoming value is
-             * negative).
+             * Add the incoming value to the absolute residual if the incoming
+             * value is greater than zero. If the incoming value *is* zero, we
+             * do nothing.
              */
             else if (0 > difference) {
-                absolute.subtract(currency);
+                absolute.add(currency);
             }
         }
 
