@@ -532,7 +532,7 @@ class RebalanceNode implements CurrencyReceiver {
                      * Set/reset the best residual and value list in the value
                      * setter action.
                      */
-                    valueSetterAction.setAccumulated(bestResidual);
+                    valueSetterAction.setResidual(bestResidual);
                     valueSetterAction.setList(valueList);
 
                     /*
@@ -542,7 +542,7 @@ class RebalanceNode implements CurrencyReceiver {
                      * subsequent calls).
                      */
                     doAction(delegates, valueSetterAction);
-                    accumulatedResidual = valueSetterAction.getAccumulated();
+                    accumulatedResidual = valueSetterAction.getResidual();
                     valueSetterAction.setRelative(true);
 
                     /*
@@ -780,8 +780,14 @@ class RebalanceNode implements CurrencyReceiver {
 
     private static class SetValueUtility {
 
-        // The accumulated residual between proposed values and set values
-        private final MutableCurrency accumulated = new MutableCurrency();
+        // The value of zero currency
+        private static final Currency zero = Currency.getZero();
+
+        // The absolute residual between proposed values and set values
+        private final MutableCurrency absolute = new MutableCurrency();
+
+        // The residual between proposed values and set values
+        private final MutableCurrency residual = new MutableCurrency();
 
         // An index into the currency list
         private int index;
@@ -804,16 +810,50 @@ class RebalanceNode implements CurrencyReceiver {
         private boolean relative;
 
         {
-            resetAccumulated();
+            resetResidual();
         }
 
         /**
-         * Gets the accumulated residual.
+         * Adds the absolute value of currency to the absolute residual.
          *
-         * @return The accumulated residual
+         * @param currency Currency to add
          */
-        public @NotNull Currency getAccumulated() {
-            return accumulated.getImmutable();
+        public void addAbsolute(@NotNull Currency currency) {
+
+            /*
+             * Calculate the difference between zero and the incoming value. Is
+             * zero less than the incoming value?
+             */
+            final int difference = zero.compareTo(currency);
+            if (0 < difference) {
+
+                /*
+                 * Zero is less than the incoming value. Or, more succinctly,
+                 * the incoming value is positive. Add the incoming value to the
+                 * absolute residual.
+                 */
+                absolute.add(currency);
+            }
+
+            /*
+             * Subtract the incoming value from the absolute residual if zero
+             * is greater than the incoming value (the incoming value is
+             * negative).
+             */
+            else if (0 > difference) {
+                absolute.subtract(currency);
+            }
+        }
+
+        /**
+         * Gets the absolute residual between proposed values and set values.
+         *
+         * @return The absolute residual between proposed values and set
+         * values
+         */
+        public double getAverageAbsolute() {
+            return (0 < index) ? absolute.getValue() / index :
+                    Double.MAX_VALUE;
         }
 
         /**
@@ -824,6 +864,15 @@ class RebalanceNode implements CurrencyReceiver {
         public @Nullable MutableCurrency getNextElement() {
             return ((null != list) && (index < list.size())) ?
                     list.get(index++) : null;
+        }
+
+        /**
+         * Gets the residual.
+         *
+         * @return The residual
+         */
+        public @NotNull Currency getResidual() {
+            return residual.getImmutable();
         }
 
         /**
@@ -849,13 +898,6 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Resets the accumulated residual.
-         */
-        public void resetAccumulated() {
-            accumulated.set(Currency.getZero());
-        }
-
-        /**
          * Resets the element index.
          */
         public void resetIndex() {
@@ -863,12 +905,10 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Sets the accumulated residual.
-         *
-         * @param residual The accumulated residual
+         * Resets the residual.
          */
-        public void setAccumulated(@NotNull Currency residual) {
-            accumulated.set(residual);
+        public void resetResidual() {
+            setResidual(zero);
         }
 
         /**
@@ -886,7 +926,7 @@ class RebalanceNode implements CurrencyReceiver {
         /**
          * Sets the 'negative' flag.
          *
-         * @param negative True if the value in the currency list are to be
+         * @param negative True if the values in the currency list are to be
          *                 interpreted as negative values; false if they are
          *                 to be interpreted as non-negative values
          */
@@ -897,7 +937,7 @@ class RebalanceNode implements CurrencyReceiver {
         /**
          * Sets the 'relative' flag.
          *
-         * @param relative True if the value in the currency list are to be
+         * @param relative True if the values in the currency list are to be
          *                 interpreted as relative values; false if they are
          *                 to be interpreted as absolute values
          */
@@ -906,12 +946,27 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Subtracts residual from the accumulated residual.
+         * Sets the residual.
          *
-         * @param residual A residual to subtract
+         * @param residual The residual
          */
-        public void subtractResidual(@NotNull Currency residual) {
-            accumulated.subtract(residual);
+        public void setResidual(@NotNull Currency residual) {
+
+            /*
+             * Set the indicated residual, but always set the absolute
+             * residual to zero.
+             */
+            this.absolute.set(zero);
+            this.residual.set(residual);
+        }
+
+        /**
+         * Subtracts currency from the residual.
+         *
+         * @param currency Currency to subtract
+         */
+        public void subtractResidual(@NotNull Currency currency) {
+            residual.subtract(currency);
         }
     }
 
@@ -945,48 +1000,42 @@ class RebalanceNode implements CurrencyReceiver {
                     }
 
                     /*
-                     * Does the utility indicate that the incoming value is
-                     * not relative?
+                     * Get the 'relative' flag from the utility. Set the
+                     * proposed value in the delegate, receiving any residual.
                      */
-                    if (!utility.isRelative()) {
+                    final boolean isRelative = utility.isRelative();
+                    final Currency residual = delegate.setProposed(
+                            currency.getImmutable(), isRelative);
+
+                    /*
+                     * Add the absolute value of the residual to the utility.
+                     * Does the utility indicate that the incoming value is not
+                     * relative?
+                     */
+                    utility.addAbsolute(residual);
+                    if (!isRelative) {
 
                         /*
                          * The utility indicates that the incoming value is
-                         * not relative. Set the proposed value in the
-                         * delegate, and subtract the residual from the
+                         * not relative. Subtract the residual from the
                          * incoming value.
                          */
-                        currency.subtract(delegate.setProposed(
-                                currency.getImmutable(), false));
+                        currency.subtract(residual);
                     }
 
                     /*
                      * The utility indicates that the incoming value is relative.
-                     * Set the proposed value in the delegate, and add the
-                     * residual from the incoming value if the incoming value
-                     * is not zero.
+                     * Add the residual to the incoming value if the incoming
+                     * value is not zero.
                      */
                     else if (currency.isNotZero()) {
-                        currency.add(delegate.setProposed(
-                                currency.getImmutable(), true));
+                        currency.add(residual);
                     }
 
-                    /*
-                     * Subtract the modified incoming value from the accumulated
-                     * residual.
-                     */
+                    // Subtract the modified incoming value from the residual.
                     utility.subtractResidual(currency.getImmutable());
                 }
             }
-        }
-
-        /**
-         * Gets the accumulated residual.
-         *
-         * @return The accumulated residual
-         */
-        public @NotNull Currency getAccumulated() {
-            return getContained().getAccumulated();
         }
 
         @Override
@@ -994,28 +1043,28 @@ class RebalanceNode implements CurrencyReceiver {
             return new SetValueUtility();
         }
 
-        @Override
-        public void reset() {
-            getContained().resetIndex();
+        /**
+         * Gets the residual.
+         *
+         * @return The residual
+         */
+        public @NotNull Currency getResidual() {
+            return getContained().getResidual();
         }
 
         /**
-         * Sets the accumulated residual.
+         * Gets the reallocation score.
          *
-         * @param residual The accumulated residual
+         * @return The reallocation score
          */
-        public void setAccumulated(@NotNull Currency residual) {
+        public @NotNull ReallocationScore getScore() {
+            return new ReallocationScore(getResidual(),
+                    getContained().getAverageAbsolute());
+        }
 
-            /*
-             * Get the set value utility from the container. Set the negative
-             * flag in the utility if the residual is less than zero.
-             */
-            final SetValueUtility utility = getContained();
-            utility.setNegative(residual.compareTo(zero) < 0);
-
-            // Set the accumulated residual in the container. Reset the action.
-            utility.setAccumulated(residual);
-            reset();
+        @Override
+        public void reset() {
+            getContained().resetIndex();
         }
 
         /**
@@ -1036,6 +1085,25 @@ class RebalanceNode implements CurrencyReceiver {
          */
         public void setRelative(boolean relative) {
             getContained().setRelative(relative);
+        }
+
+        /**
+         * Sets the residual.
+         *
+         * @param residual The residual
+         */
+        public void setResidual(@NotNull Currency residual) {
+
+            /*
+             * Get the set value utility from the container. Set the negative
+             * flag in the utility if the residual is less than zero.
+             */
+            final SetValueUtility utility = getContained();
+            utility.setNegative(residual.compareTo(zero) < 0);
+
+            // Set the residual in the container. Reset the action.
+            utility.setResidual(residual);
+            reset();
         }
     }
 
