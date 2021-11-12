@@ -7,6 +7,7 @@ import com.garygregg.rebalance.hierarchy.Ticker;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -249,13 +250,13 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Produces a set of integers sorted by descending count of set bits.
+     * Produces a list of integers sorted by descending count of set bits.
      *
-     * @param n Integers in the resulting set will be less than 2 ^ (n - 1)
-     * @return A set of integers sorted by descending count of set bits
+     * @param n Integers in the resulting list will be less than 2 ^ (n - 1)
+     * @return A list of integers sorted by descending count of set bits
      */
     @Contract(pure = true)
-    private static @NotNull SortedSet<Integer> produce(int n) {
+    private static @NotNull @UnmodifiableView List<Integer> produce(int n) {
 
         // The argument cannot be negative.
         if (0 > n) {
@@ -272,8 +273,20 @@ class RebalanceNode implements CurrencyReceiver {
                     String.format("Argument %d is too big", n));
         }
 
-        // Create the sorted set.
-        final SortedSet<Integer> set = new TreeSet<>((first, second) -> {
+        /*
+         * Create the list. Calculate the count of integers, and cycle for
+         * each.
+         */
+        final List<Integer> list = new ArrayList<>();
+        final long count = 1L << n;
+        for (long i = 1; i < count; ++i) {
+
+            // Add the first/next integer to the list.
+            list.add((int) i);
+        }
+
+        // Sort the list.
+        list.sort((first, second) -> {
 
             // Calculate the bit count difference.
             final int bitCountDifference = Integer.bitCount(second) -
@@ -287,16 +300,8 @@ class RebalanceNode implements CurrencyReceiver {
                     bitCountDifference;
         });
 
-        // Calculate the count of integers, and cycle for each.
-        final long count = 1L << n;
-        for (long i = 1; i < count; ++i) {
-
-            // Add the first/next integer.
-            set.add((int) i);
-        }
-
-        // Return the sorted set.
-        return set;
+        // Return an unmodifiable copy of the sorted list.
+        return Collections.unmodifiableList(list);
     }
 
     /**
@@ -465,11 +470,11 @@ class RebalanceNode implements CurrencyReceiver {
             List<MutableCurrency> valueList;
 
             /*
-             * Declare and initialize a constant for a sorted set of
-             * consideration patterns and a constant representing the weight
+             * Declare and initialize a constant for a sorted list of
+             * consideration patterns, and a constant representing the weight
              * list from the weight accumulator action.
              */
-            final SortedSet<Integer> patterns = produce(delegates.size());
+            final List<Integer> patterns = produce(delegates.size());
             final List<Double> weightList = weightAccumulatorAction.getList();
 
             /*
