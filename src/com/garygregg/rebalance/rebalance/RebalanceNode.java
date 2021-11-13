@@ -627,7 +627,7 @@ class RebalanceNode implements CurrencyReceiver {
              * Log a message identifying the best reallocation score
              * characteristics.
              */
-            logger.streamAndLog(extraordinary, String.format("For account " +
+            logger.log(extraordinary, String.format("For account " +
                             "key %s and weight type %s: I have identified " +
                             "the best residual of %s (average deviation %f) " +
                             "when trying to set %s proposed value %s.",
