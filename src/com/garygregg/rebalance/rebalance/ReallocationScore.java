@@ -5,9 +5,13 @@ import org.jetbrains.annotations.NotNull;
 
 class ReallocationScore implements Comparable<ReallocationScore> {
 
+    // The ideal deviation
+    private static final double idealDeviation = 0.;
+
     // The ideal reallocation score
     private static final ReallocationScore idealScore =
-            new ReallocationScore(Currency.getZero(), 0.);
+            new ReallocationScore(Currency.getZero(),
+                    getIdealDeviation());
 
     // The deviation component
     private final double deviation;
@@ -16,8 +20,9 @@ class ReallocationScore implements Comparable<ReallocationScore> {
     private final Currency residual;
 
     /**
-     * Constructs the reallocation score; how the residual and deviation are
-     * interpreted are application dependent.
+     * Constructs the reallocation score. How the residual and deviation are
+     * interpreted are application dependent, except with the certain
+     * knowledge that ideal definition is known.
      *
      * @param residual  The residual component
      * @param deviation The deviation component
@@ -28,6 +33,15 @@ class ReallocationScore implements Comparable<ReallocationScore> {
         // Set the member variables.
         this.deviation = deviation;
         this.residual = residual;
+    }
+
+    /**
+     * Gets the ideal deviation.
+     *
+     * @return The ideal deviation
+     */
+    public static double getIdealDeviation() {
+        return idealDeviation;
     }
 
     /**
