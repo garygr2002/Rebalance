@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 abstract class AccountRebalancer extends Rebalancer {
@@ -598,17 +599,23 @@ abstract class AccountRebalancer extends Rebalancer {
      */
     public final boolean rebalance(@NotNull Account account) {
 
-        /*
-         * Reset the message logger. Rebalance the account, receiving a
-         * residual.
-         */
+        // Declare and initialize local variables.
+        final AccountKey key = account.getKey();
+        final MessageLogger logger = getLogger();
+        final Level level = MessageLogger.getExtraordinary();
+
+        // Reset the message logger. Stream and log a rebalance start message.
         reset();
-        final Currency residual = doRebalance(account);
+        logger.streamAndLog(MessageLogger.getExtraordinary(),
+                String.format("Rebalancing has commented for account: %s.",
+                        key));
 
         /*
-         * The rebalance operation was successful if the residual is not null.
-         * Was the operation successful?
+         * Rebalance the account, receiving a residual. The rebalance was
+         * successful if the residual is not null. Was the operation
+         * successful?
          */
+        final Currency residual = doRebalance(account);
         final boolean result = (null != residual);
         if (result) {
 
@@ -618,6 +625,11 @@ abstract class AccountRebalancer extends Rebalancer {
              */
             account.setResidual(residual);
         }
+
+        // Stream and log a rebalance complete message.
+        logger.streamAndLog(MessageLogger.getExtraordinary(),
+                String.format("Rebalancing has completed for account: %s " +
+                        "with%s error.", key, result ? " no" : ""));
 
         /*
          * Return true if this rebalancer had no problem, and the result from
