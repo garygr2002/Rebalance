@@ -428,6 +428,104 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
+     * Rebalances a collection of receiver delegate(s).
+     *
+     * @param delegates            A collection of receiver delegates
+     * @param proposed             A value with which to adjust the proposed
+     *                             value of the delegate(s)
+     * @param considerationPattern A bit flag which describes which delegates
+     *                             are participating - 1 means yes, 0 means no;
+     *                             the lowest order bit represents the first
+     *                             delegate in the collection
+     * @param <T>                  A receiver delegate type
+     * @return The score resulting from the reallocation/rebalance
+     */
+    private <T extends ReceiverDelegate<?>>
+    @NotNull ReallocationScore rebalance(
+            @NotNull Collection<T> delegates, @NotNull Currency proposed,
+            int considerationPattern) {
+
+        /*
+         * Reset the consideration setter action, then set the consideration
+         * pattern in the action.
+         */
+        considerationSetterAction.reset();
+        considerationSetterAction.setConsiderationPattern(
+                considerationPattern);
+
+        /*
+         * Perform the consideration setter action on each receiver
+         * delegate. Reset the weight accumulator action.
+         */
+        doAction(delegates, considerationSetterAction);
+        weightAccumulatorAction.reset();
+
+        /*
+         * Perform the weight accumulator action on each receiver delegate.
+         * Get the resulting weight list from the weight accumulator action.
+         */
+        doAction(delegates, weightAccumulatorAction);
+        final List<Double> weightList = weightAccumulatorAction.getList();
+
+        /*
+         * Declare an uninitialized reallocation score. Create a new allocator
+         * with the weight list. Is the sum of the weights greater than zero?
+         */
+        ReallocationScore score;
+        final Reallocator reallocator = new Reallocator(weightList);
+        if (0. < reallocator.getWeightSum()) {
+
+            /*
+             * The sum of the weights is greater than zero. Create a value list
+             * using the size of the weight list and the best residual. Note:
+             * 'getInitialList(int, Currency)' is expected to use the absolute
+             * value of the proposed value when creating the list. Reallocate
+             * the value list using the reallocator.
+             */
+            final List<MutableCurrency> valueList =
+                    getInitialList(weightList.size(), proposed);
+            reallocator.reallocate(valueList);
+
+            // Set the residual and the value list in the value setter action.
+            valueSetterAction.setResidual(proposed);
+            valueSetterAction.setList(valueList);
+
+            /*
+             * Perform the value setter action on each receiver delegate. Get
+             * the reallocation score from the value setter action, and
+             * reinitialize the 'relative' flag in the value setter action for
+             * subsequent calls.
+             */
+            doAction(delegates, valueSetterAction);
+            score = valueSetterAction.getScore();
+            valueSetterAction.setRelative(true);
+
+            /*
+             * Log a message about this current combination of account key,
+             * weight type, consideration pattern, residual, and proposed
+             * value.
+             */
+            getLogger().log(ordinary, String.format("For account key %s, " +
+                            "weight type %s, and consideration pattern " +
+                            "0x%08x: Found accumulated residual of %s when " +
+                            "trying to set proposed value %s.",
+                    getAccountKey(), getWeight(), considerationPattern,
+                    score.getResidual(), proposed));
+        }
+
+        /*
+         * The sum of the weights is not zero. Initialize the reallocation
+         * score appropriately.
+         */
+        else {
+            score = new ReallocationScore(proposed, Double.MAX_VALUE);
+        }
+
+        // Return the reallocation score.
+        return score;
+    }
+
+    /**
      * Rebalances a collection of receiver delegates.
      *
      * @param delegates  A collection of receiver delegates
