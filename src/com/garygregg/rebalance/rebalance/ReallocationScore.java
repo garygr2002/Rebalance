@@ -9,28 +9,25 @@ class ReallocationScore implements Comparable<ReallocationScore> {
     private static final ReallocationScore idealScore =
             new ReallocationScore(Currency.getZero(), 0.);
 
-    // The average absolute residual;
-    private final double averageAbsolute;
+    // The deviation component
+    private final double deviation;
 
-    // The residual
-    private final double residual;
-
-    // The residual as currency
-    private final Currency residualCurrency;
+    // The residual component
+    private final Currency residual;
 
     /**
-     * Constructs the reallocation score.
+     * Constructs the reallocation score; how the residual and deviation are
+     * interpreted are application dependent.
      *
-     * @param residual        The residual
-     * @param averageAbsolute The average absolute residual
+     * @param residual  The residual component
+     * @param deviation The deviation component
      */
     public ReallocationScore(@NotNull Currency residual,
-                             double averageAbsolute) {
+                             double deviation) {
 
         // Set the member variables.
-        this.averageAbsolute = Math.abs(averageAbsolute);
-        this.residual = Math.abs(residual.getValue());
-        this.residualCurrency = new Currency(getResidual());
+        this.deviation = deviation;
+        this.residual = residual;
     }
 
     /**
@@ -45,43 +42,34 @@ class ReallocationScore implements Comparable<ReallocationScore> {
     @Override
     public int compareTo(@NotNull ReallocationScore score) {
 
-        // Compare first by residual.
-        final int byResidual = Double.compare(getResidual(),
-                score.getResidual());
+        // Compare first by the residual component.
+        final int byResidual = Double.compare(getResidual().getValue(),
+                score.getResidual().getValue());
 
         /*
-         * If residuals compare the same, compare by average absolutes and
-         * return the result. Otherwise, return the comparison of the
-         * residuals.
+         * If residuals compare the same, compare by the deviation component,
+         * and return the result. Otherwise, return the comparison of the
+         * residual components.
          */
-        return (0 == byResidual) ? Double.compare(getAverageAbsolute(),
-                score.getAverageAbsolute()) : byResidual;
+        return (0 == byResidual) ? Double.compare(getDeviation(),
+                score.getDeviation()) : byResidual;
     }
 
     /**
-     * Gets the average absolute residual.
+     * Gets the deviation component.
      *
-     * @return The average absolute residual.
+     * @return The deviation component
      */
-    public double getAverageAbsolute() {
-        return averageAbsolute;
+    public double getDeviation() {
+        return deviation;
     }
 
     /**
-     * Gets the residual.
+     * Gets the residual component.
      *
-     * @return The residual
+     * @return The residual component
      */
-    private double getResidual() {
+    public @NotNull Currency getResidual() {
         return residual;
-    }
-
-    /**
-     * Gets the residual currency.
-     *
-     * @return The residual currency
-     */
-    public Currency getResidualCurrency() {
-        return residualCurrency;
     }
 }

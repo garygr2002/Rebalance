@@ -782,13 +782,10 @@ class RebalanceNode implements CurrencyReceiver {
 
         // The value of zero currency
         private static final Currency zero = Currency.getZero();
-
-        // The absolute residual between proposed values and set values
-        private final MutableCurrency absolute = new MutableCurrency();
-
-        // The residual between proposed values and set values
+        // The residual component
         private final MutableCurrency residual = new MutableCurrency();
-
+        // The deviation component
+        private double deviation;
         // An index into the currency list
         private int index;
 
@@ -814,45 +811,21 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Adds the absolute value of currency to the absolute residual.
+         * Adds deviation.
          *
-         * @param currency Currency to add
+         * @param deviation The deviation to add
          */
-        public void addAbsolute(@NotNull Currency currency) {
-
-            /*
-             * Calculate the difference between zero and the incoming value. Is
-             * the incoming value less than zero?
-             */
-            final int difference = zero.compareTo(currency);
-            if (0 < difference) {
-
-                /*
-                 * The incoming value is less than zero. Subtract the incoming
-                 * value from the absolute residual.
-                 */
-                absolute.subtract(currency);
-            }
-
-            /*
-             * Add the incoming value to the absolute residual if the incoming
-             * value is greater than zero. If the incoming value *is* zero, we
-             * do nothing.
-             */
-            else if (0 > difference) {
-                absolute.add(currency);
-            }
+        public void addDeviation(double deviation) {
+            this.deviation += Math.abs(deviation);
         }
 
         /**
-         * Gets the absolute residual between proposed values and set values.
+         * Gets the deviation.
          *
-         * @return The absolute residual between proposed values and set
-         * values
+         * @return The deviation
          */
-        public double getAverageAbsolute() {
-            return (0 < index) ? absolute.getValue() / index :
-                    Double.MAX_VALUE;
+        public double getDeviation() {
+            return (0 < index) ? deviation / index : Double.MAX_VALUE;
         }
 
         /**
@@ -888,9 +861,9 @@ class RebalanceNode implements CurrencyReceiver {
         /**
          * Gets the 'relative' flag.
          *
-         * @return True if the value in the currency list are to be interpreted
-         * as relative values; false if they are to be interpreted as absolute
-         * values
+         * @return True if the values in the currency list are to be
+         * interpreted as relative values; false if they are to be interpreted
+         * as absolute values
          */
         public boolean isRelative() {
             return relative;
@@ -915,7 +888,7 @@ class RebalanceNode implements CurrencyReceiver {
          *
          * @param list A currency list
          */
-        public void setList(List<MutableCurrency> list) {
+        public void setList(@NotNull List<MutableCurrency> list) {
 
             // Set the list and reset the element index.
             this.list = list;
@@ -951,11 +924,8 @@ class RebalanceNode implements CurrencyReceiver {
          */
         public void setResidual(@NotNull Currency residual) {
 
-            /*
-             * Set the indicated residual, but always set the absolute
-             * residual to zero.
-             */
-            this.absolute.set(zero);
+            // Always set the deviation to zero here.
+            this.deviation = 0.;
             this.residual.set(residual);
         }
 
@@ -1007,11 +977,13 @@ class RebalanceNode implements CurrencyReceiver {
                             currency.getImmutable(), isRelative);
 
                     /*
-                     * Add the absolute value of the residual to the utility.
-                     * Does the utility indicate that the incoming value is not
-                     * relative?
+                     * Add deviation to the utility. By deviation, in this case
+                     * we mean a ratio of residual from the value that was
+                     * actually set. Does the utility indicate that the
+                     * income value is not relative?
                      */
-                    utility.addAbsolute(residual);
+                    utility.addDeviation(residual.getValue() /
+                            delegate.getProposed().getValue());
                     if (!isRelative) {
 
                         /*
@@ -1058,7 +1030,7 @@ class RebalanceNode implements CurrencyReceiver {
          */
         public @NotNull ReallocationScore getScore() {
             return new ReallocationScore(getResidual(),
-                    getContained().getAverageAbsolute());
+                    getContained().getDeviation());
         }
 
         @Override
@@ -1078,7 +1050,7 @@ class RebalanceNode implements CurrencyReceiver {
         /**
          * Sets the 'relative' flag.
          *
-         * @param relative True if the value in the currency list are to be
+         * @param relative True if the values in the currency list are to be
          *                 interpreted as relative values; false if they are
          *                 to be interpreted as absolute values
          */
