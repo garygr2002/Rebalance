@@ -20,8 +20,8 @@ class RebalanceNode implements CurrencyReceiver {
             ReceiverDelegate::onCannotSet;
 
     // An action to notify delegates to clear their snapshots
-    private static final Action<ReceiverDelegate<?>> clearSnapshotAction =
-            ReceiverDelegate::clearSnapshot;
+    private static final Action<ReceiverDelegate<?>> clearSnapshotsAction =
+            ReceiverDelegate::clearSnapshots;
 
     // The logging level for extraordinary informational messages
     private final static Level extraordinary = MessageLogger.getOrdinary();
@@ -40,12 +40,24 @@ class RebalanceNode implements CurrencyReceiver {
     private final static Level ordinary = MessageLogger.getOrdinary();
 
     // An action to notify delegates to recover their snapshots
-    private static final Action<ReceiverDelegate<?>> recoverSnapshotAction =
-            ReceiverDelegate::recoverSnapshot;
+    private static final SnapshotAction recoverSnapshotAction =
+            new SnapshotAction() {
+
+                @Override
+                public void doAction(@NotNull ReceiverDelegate<?> delegate) {
+                    delegate.recoverSnapshot(getContained());
+                }
+            };
 
     // An action to notify delegates to take snapshots
-    private static final Action<ReceiverDelegate<?>> takeSnapshotAction =
-            ReceiverDelegate::takeSnapshot;
+    private static final SnapshotAction takeSnapshotAction =
+
+            new SnapshotAction() {
+                @Override
+                public void doAction(@NotNull ReceiverDelegate<?> delegate) {
+                    delegate.takeSnapshot(getContained());
+                }
+            };
 
     // The value of zero currency
     private static final Currency zero = Currency.getZero();
@@ -367,8 +379,13 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     @Override
-    public void clearSnapshot() {
-        doAction(getCollection(), clearSnapshotAction);
+    public void clearSnapshot(@NotNull SnapshotType type) {
+        doAction(getCollection(), clearSnapshotsAction);
+    }
+
+    @Override
+    public void clearSnapshots() {
+
     }
 
     /**
@@ -564,7 +581,7 @@ class RebalanceNode implements CurrencyReceiver {
              */
             ReallocationScore currentScore;
             valueSetterAction.setRelative(isRelative);
-            takeSnapshot();
+            takeSnapshot(SnapshotType.FIRST);
 
             /*
              * Get an iterator for the consideration patterns. Cycle while
@@ -589,7 +606,7 @@ class RebalanceNode implements CurrencyReceiver {
                      * Take a snapshot, and set the best score to the current
                      * score.
                      */
-                    takeSnapshot();
+                    takeSnapshot(SnapshotType.FIRST);
                     bestScore = currentScore;
                 }
 
@@ -598,7 +615,7 @@ class RebalanceNode implements CurrencyReceiver {
                  * Recover the best snapshot.
                  */
                 else {
-                    recoverSnapshot();
+                    recoverSnapshot(SnapshotType.FIRST);
                 }
             }
         }
@@ -627,7 +644,7 @@ class RebalanceNode implements CurrencyReceiver {
              * Log a message identifying the best reallocation score
              * characteristics.
              */
-            logger.log(extraordinary, String.format("For account " +
+            logger.streamAndLog(extraordinary, String.format("For account " +
                             "key %s and weight type %s: I have identified " +
                             "the best residual of %s (average deviation %f) " +
                             "when trying to set %s proposed value %s.",
@@ -650,7 +667,10 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     @Override
-    public void recoverSnapshot() {
+    public void recoverSnapshot(@NotNull SnapshotType type) {
+
+        // Set the given snapshot type before performing the action.
+        recoverSnapshotAction.setType(type);
         doAction(getCollection(), recoverSnapshotAction);
     }
 
@@ -694,7 +714,10 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     @Override
-    public void takeSnapshot() {
+    public void takeSnapshot(@NotNull SnapshotType type) {
+
+        // Set the given snapshot type before performing the action.
+        takeSnapshotAction.setType(type);
         doAction(getCollection(), takeSnapshotAction);
     }
 
@@ -961,6 +984,32 @@ class RebalanceNode implements CurrencyReceiver {
          */
         public void subtractResidual(@NotNull Currency currency) {
             residual.subtract(currency);
+        }
+    }
+
+    private abstract static class SnapshotAction extends
+            ActionWithContainer<SnapshotType, ReceiverDelegate<?>> {
+
+        // The initial snapshot type
+        private static final SnapshotType initialType = SnapshotType.FIRST;
+
+        @Override
+        protected @NotNull SnapshotType getInitialValue() {
+            return SnapshotType.FIRST;
+        }
+
+        @Override
+        public void reset() {
+            setContained(initialType);
+        }
+
+        /**
+         * Sets the snapshot type for the action.
+         *
+         * @param type The snapshot type for the action
+         */
+        public void setType(@NotNull SnapshotType type) {
+            setContained(type);
         }
     }
 

@@ -30,8 +30,13 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
     }
 
     @Override
-    public void clearSnapshot() {
-        getReceiver().clearSnapshot();
+    public void clearSnapshot(@NotNull SnapshotType type) {
+        getReceiver().clearSnapshot(type);
+    }
+
+    @Override
+    public void clearSnapshots() {
+        getReceiver().clearSnapshots();
     }
 
     /**
@@ -80,8 +85,8 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
     }
 
     @Override
-    public void recoverSnapshot() {
-        getReceiver().recoverSnapshot();
+    public void recoverSnapshot(@NotNull SnapshotType type) {
+        getReceiver().recoverSnapshot(type);
     }
 
     /**
@@ -102,7 +107,7 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
     }
 
     @Override
-    public void takeSnapshot() {
-        getReceiver().takeSnapshot();
+    public void takeSnapshot(@NotNull SnapshotType type) {
+        getReceiver().takeSnapshot(type);
     }
 }

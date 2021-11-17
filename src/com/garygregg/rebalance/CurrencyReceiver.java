@@ -7,13 +7,22 @@ public interface CurrencyReceiver {
 
     /**
      * Clears the last snapshot.
+     *
+     * @param type The snapshot type to clear
      */
-    void clearSnapshot();
+    void clearSnapshot(@NotNull SnapshotType type);
 
     /**
-     * Recovers the last snapshot.
+     * Clears snapshots of all types.
      */
-    void recoverSnapshot();
+    void clearSnapshots();
+
+    /**
+     * Recovers a snapshot.
+     *
+     * @param type The snapshot type to recover
+     */
+    void recoverSnapshot(@NotNull SnapshotType type);
 
     /**
      * Sets the proposed value of the receiver.
@@ -30,6 +39,17 @@ public interface CurrencyReceiver {
 
     /**
      * Takes a snapshot.
+     *
+     * @param type The snapshot type to take
      */
-    void takeSnapshot();
+    void takeSnapshot(@NotNull SnapshotType type);
+
+    public enum SnapshotType {
+
+        // The optimal rebalance snapshot
+        BEST,
+
+        // The first rebalance snapshot
+        FIRST
+    }
 }
