@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,6 +23,10 @@ class RebalanceNode implements CurrencyReceiver {
     // An action to notify delegates to clear their snapshots
     private static final Action<ReceiverDelegate<?>> clearSnapshotsAction =
             ReceiverDelegate::clearSnapshots;
+
+    // The way deviation values are reported
+    private static final DecimalFormat deviationFormat =
+            new DecimalFormat("0.00");
 
     // The logging level for extraordinary informational messages
     private final static Level extraordinary = MessageLogger.getOrdinary();
@@ -646,11 +651,11 @@ class RebalanceNode implements CurrencyReceiver {
              */
             logger.streamAndLog(extraordinary, String.format("For account " +
                             "key %s and weight type %s: I have identified " +
-                            "the best residual of %s (average deviation %f) " +
+                            "the best residual of %s (average deviation %s) " +
                             "when trying to set %s proposed value %s.",
                     getAccountKey(), getType(), bestScore.getResidual(),
-                    bestScore.getDeviation(), isRelative ? "relative" :
-                            "absolute", proposed));
+                    deviationFormat.format(bestScore.getDeviation()),
+                    isRelative ? "relative" : "absolute", proposed));
         }
 
         /*
@@ -1059,20 +1064,6 @@ class RebalanceNode implements CurrencyReceiver {
                     if (residual.isNotZero()) {
 
                         /*
-                         * The residual is not zero. Add deviation to the
-                         * utility using the ratio of the residual and the
-                         * value that was actually set in the delegate. Note:
-                         * this will produce a not-a-number (NaN) if the
-                         * proposed value had been set to zero. However, in
-                         * that event we would also expect that the residual
-                         * would then also be zero. We would then not be inside
-                         * this block. A NaN appearing in the deviation,
-                         * therefore, indicates a design flaw.
-                         */
-                        utility.addDeviation(residual.getValue() /
-                                delegate.getProposed().getValue());
-
-                        /*
                          * Add the residual to the proposed value if the
                          * 'relative' flag is set.
                          */
@@ -1092,6 +1083,13 @@ class RebalanceNode implements CurrencyReceiver {
                     // Subtract the modified incoming value from the residual.
                     utility.subtractResidual(incoming.getImmutable());
                 }
+
+                /*
+                 * Add the last residual of the delegate to the deviation in
+                 * the utility even if the delegate is not currently
+                 * considered.
+                 */
+                utility.addDeviation(delegate.getLastResidual().getValue());
             }
         }
 
