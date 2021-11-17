@@ -16,6 +16,9 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
     // Consider this delegate to receive additional value
     private boolean considerMe;
 
+    // The last difference between what was desired and what was actually set
+    private Currency lastResidual = Currency.getZero();
+
     /**
      * Constructs the receiver delegate.
      *
@@ -37,6 +40,15 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
     @Override
     public void clearSnapshots() {
         getReceiver().clearSnapshots();
+    }
+
+    /**
+     * Gets the last residual.
+     *
+     * @return The last residual
+     */
+    public @NotNull Currency getLastResidual() {
+        return lastResidual;
     }
 
     /**
@@ -100,10 +112,29 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
         this.considerMe = considerMe;
     }
 
+    /**
+     * Sets the last residual.
+     *
+     * @param lastResidual The last residual
+     * @return The last residual that was set
+     */
+    private @NotNull Currency setLastResidual(@NotNull Currency lastResidual) {
+
+        // Set the last residual, then return the residual that was set.
+        this.lastResidual = lastResidual;
+        return getLastResidual();
+    }
+
     @Override
     public @NotNull Currency setProposed(@NotNull Currency currency,
                                          boolean isRelative) {
-        return getReceiver().setProposed(currency, isRelative);
+
+        /*
+         * Set the last residual received from setting the proposed value in
+         * the receiver.
+         */
+        return setLastResidual(getReceiver().setProposed(
+                currency, isRelative));
     }
 
     @Override
