@@ -18,6 +18,13 @@ public interface CurrencyReceiver {
     void clearSnapshots();
 
     /**
+     * Gets the current value of the receiver.
+     *
+     * @return The current value of the receiver
+     */
+    @NotNull Currency getCurrent();
+
+    /**
      * Recovers a snapshot.
      *
      * @param type The snapshot type to recover

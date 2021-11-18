@@ -26,8 +26,11 @@ public class Ticker extends
     private static final PreferenceManager manager =
             PreferenceManager.getInstance();
 
+    // Zero currency
+    private static final Currency zeroCurrency = Currency.getZero();
+
     // Zero shares
-    private static final double zero = Shares.getZero().getValue();
+    private static final double zeroShares = Shares.getZero().getValue();
 
     // The map of weight type to activities
     private final Map<WeightType, Activity> associationMap = new HashMap<>();
@@ -341,6 +344,17 @@ public class Ticker extends
         return considered.getShares();
     }
 
+    @Override
+    public @NotNull Currency getCurrent() {
+
+        /*
+         * Get the considered value of the ticker. Return zero if the
+         * considered value is null. Otherwise, return the considered value.
+         */
+        final Currency considered = getConsidered();
+        return (null == considered) ? zeroCurrency : considered;
+    }
+
     /**
      * Gets the breakdown manager.
      *
@@ -507,7 +521,7 @@ public class Ticker extends
          * number of shares.
          */
         final Double snapshot = snapshotMap.get(type);
-        proposed.setShares((null == snapshot) ? zero : snapshot);
+        proposed.setShares((null == snapshot) ? zeroShares : snapshot);
     }
 
     @Override

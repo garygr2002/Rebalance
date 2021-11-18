@@ -42,6 +42,11 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
         getReceiver().clearSnapshots();
     }
 
+    @Override
+    public @NotNull Currency getCurrent() {
+        return getReceiver().getCurrent();
+    }
+
     /**
      * Gets the last residual.
      *

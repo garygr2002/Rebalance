@@ -90,6 +90,9 @@ class RebalanceNode implements CurrencyReceiver {
     private final ConsiderationSetterAction considerationSetterAction =
             new ConsiderationSetterAction();
 
+    // The sum current action
+    private final SumCurrentAction sumCurrentAction = new SumCurrentAction();
+
     // The tickers in the node
     private final SortedSet<TickerDelegate> tickerSet =
             new TreeSet<>(Comparator.comparing(tickerDelegate ->
@@ -459,6 +462,18 @@ class RebalanceNode implements CurrencyReceiver {
     private @NotNull Collection<? extends ReceiverDelegate<?>>
     getCollection() {
         return childValues.isEmpty() ? tickerSet : childValues;
+    }
+
+    @Override
+    public @NotNull Currency getCurrent() {
+
+        /*
+         * Reset the sum current action. Perform the action on the collection
+         * of receiver delegates, then return the sum contained in the action.
+         */
+        sumCurrentAction.reset();
+        doAction(getCollection(), sumCurrentAction);
+        return sumCurrentAction.getSum();
     }
 
     /**
@@ -1092,6 +1107,35 @@ class RebalanceNode implements CurrencyReceiver {
          */
         public void setType(@NotNull SnapshotType type) {
             setContained(type);
+        }
+    }
+
+    private static class SumCurrentAction extends
+            ActionWithContainer<MutableCurrency, ReceiverDelegate<?>> {
+
+        // The initial value for the container in the action
+        private static final double initialValue = 0.;
+
+        // The sum of the current values of the delegates
+        private final MutableCurrency sum = getContained();
+
+        @Override
+        public void doAction(@NotNull ReceiverDelegate<?> delegate) {
+            sum.add(delegate.getCurrent());
+        }
+
+        @Override
+        protected @NotNull MutableCurrency getInitialValue() {
+            return new MutableCurrency(initialValue);
+        }
+
+        public @NotNull Currency getSum() {
+            return sum.getImmutable();
+        }
+
+        @Override
+        public void reset() {
+            sum.set(initialValue);
         }
     }
 
