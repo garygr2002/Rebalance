@@ -17,14 +17,24 @@ import java.util.logging.Logger;
 class RebalanceNode implements CurrencyReceiver {
 
     // An action to notify delegates that a rebalance cannot occur.
-    private static final Action<ReceiverDelegate<?>> cannotSetAction =
+    private static final Action<ReceiverDelegate<?>> cannotRebalanceAction =
             ReceiverDelegate::onCannotSet;
+
+    // An action to notify delegates to clear snapshots
+    private static final SnapshotAction clearSnapshotAction =
+
+            new SnapshotAction() {
+                @Override
+                public void doAction(@NotNull ReceiverDelegate<?> delegate) {
+                    delegate.clearSnapshot(getContained());
+                }
+            };
 
     // An action to notify delegates to clear their snapshots
     private static final Action<ReceiverDelegate<?>> clearSnapshotsAction =
             ReceiverDelegate::clearSnapshots;
 
-    // The way deviation values are reported
+    // The format for reporting deviation values
     private static final DecimalFormat deviationFormat =
             new DecimalFormat("0.00");
 
@@ -56,7 +66,6 @@ class RebalanceNode implements CurrencyReceiver {
 
     // An action to notify delegates to take snapshots
     private static final SnapshotAction takeSnapshotAction =
-
             new SnapshotAction() {
                 @Override
                 public void doAction(@NotNull ReceiverDelegate<?> delegate) {
@@ -385,12 +394,22 @@ class RebalanceNode implements CurrencyReceiver {
 
     @Override
     public void clearSnapshot(@NotNull SnapshotType type) {
-        doAction(getCollection(), clearSnapshotsAction);
+
+        // Set the given snapshot type before performing the action.
+        clearSnapshotAction.setType(type);
+        doAction(getCollection(), clearSnapshotAction);
     }
 
     @Override
     public void clearSnapshots() {
+        doAction(getCollection(), clearSnapshotsAction);
+    }
 
+    /**
+     * Notifies all receiver delegates that a rebalance cannot occur.
+     */
+    private void declareCannotRebalance() {
+        doAction(getCollection(), cannotRebalanceAction);
     }
 
     /**
@@ -563,66 +582,106 @@ class RebalanceNode implements CurrencyReceiver {
             @NotNull Collection<T> delegates, @NotNull Currency proposed,
             boolean isRelative) {
 
-        // Get the message logger. Initialize the best score.
+        /*
+         * Get the message logger. Initialize the best score.
+         *
+         * TODO:
+         *
+         * Initializing the residual of the best score to zero is fine, but the
+         * initial deviation should be the largest possible. Calculate it.
+         */
         final MessageLogger logger = getLogger();
-        ReallocationScore bestScore = new ReallocationScore(proposed,
+        ReallocationScore bestScore = new ReallocationScore(zero,
                 ReallocationScore.getIdealDeviation());
 
-        // Try to rebalance this node.
+        // Clear all snapshots. Try to rebalance this node.
+        clearSnapshots();
         try {
 
             /*
-             * Get a list of consideration patterns. Initialize a constant with
-             * the ideal reallocation score.
+             * Get a list of consideration patterns. Initialize the value of
+             * the 'relative' flag in the value setter action.
              */
             final List<Integer> patterns = produce(delegates.size());
-            final ReallocationScore idealScore =
-                    ReallocationScore.getIdealScore();
-
-            /*
-             * Declare a variable to receive the current reallocation score.
-             * Initialize the value of the 'relative' flag in the value setter
-             * action. Take an initial snapshot.
-             */
-            ReallocationScore currentScore;
             valueSetterAction.setRelative(isRelative);
-            takeSnapshot(SnapshotType.FIRST);
 
             /*
-             * Get an iterator for the consideration patterns. Cycle while
-             * consideration patterns exist, and while the best score is not as
-             * good as the ideal score.
+             * Get an iterator for the consideration patterns. Try an initial
+             * rebalance using the first pattern, which uses all delegates.
+             * A precondition for calling this method is that the delegate
+             * collection passed to it has non-zero weight. Non-zero weight
+             * implies at least one delegate, so it will be okay to call 'next'
+             * on the pattern iterator at least once without checking for a
+             * true 'hasNext'. Get the residual from the first score.
              */
             final Iterator<Integer> iterator = patterns.iterator();
+            bestScore = rebalance(delegates, proposed, iterator.next());
+            final Currency residual = bestScore.getResidual();
+
+            /*
+             * Initially, the best snapshot is the first snapshot. Initialize
+             * both first and best snapshots to the current rebalance.
+             */
+            takeSnapshot(SnapshotType.FIRST);
+            takeSnapshot(SnapshotType.BEST);
+
+            /*
+             * Initialize a constant for the 'ideal' score, and a variable to
+             * receive the current score.
+             */
+            final ReallocationScore idealScore =
+                    ReallocationScore.getIdealScore();
+            ReallocationScore currentScore;
+
+            /*
+             * Cycle while there continue to be consideration patterns, and
+             * while the ideal score is less than the best score. If *all*
+             * delegates had no residual on first rebalance, then the best
+             * score will be ideal without any iterations of the following
+             * loop. Our rebalancing problem will have been equivalent to a
+             * fractional knapsack problem. If we do enter the loop, however,
+             * I postulate that the following loop will never exit due to the
+             * best score becoming ideal. Why? Even if the residual component
+             * of the best score reaches zero, there will always be a non-zero
+             * deviation from an ideal rebalance. It cannot be helped.
+             */
             while (iterator.hasNext() &&
                     (idealScore.compareTo(bestScore) < 0)) {
 
                 /*
-                 * Rebalance using the first/next consideration pattern,
-                 * receiving a reallocation score. Is the current reallocation
-                 * score the best seen so far?
+                 * Okay, we are inside the loop. This means two things: 1)
+                 * there are two or more delegates, and; 2) and at least one of
+                 * the delegates had a residual. Our rebalancing problem is now
+                 * a 0/1 knapsack problem. Rebalance again, using the next
+                 * consideration pattern and the residual from the first
+                 * rebalance attempt. Receive the current score. Is the current
+                 * score better than the best score?
+                 *
+                 * (Note: We are not currently performing the most efficient
+                 * algorithm to find an exact solution to 0/1 knapsack problem,
+                 * which involves dynamic programming. Fix it later.)
                  */
-                currentScore = rebalance(delegates, bestScore.getResidual(),
-                        iterator.next());
+                currentScore = rebalance(delegates, residual, iterator.next());
                 if (currentScore.compareTo(bestScore) < 0) {
 
                     /*
                      * The current reallocation score is the best seen so far.
-                     * Take a snapshot, and set the best score to the current
-                     * score.
+                     * Reset the best snapshot, and set the best score to the
+                     * current score.
                      */
-                    takeSnapshot(SnapshotType.FIRST);
+                    takeSnapshot(SnapshotType.BEST);
                     bestScore = currentScore;
                 }
 
                 /*
-                 * The current reallocation score is not the best seen so far.
-                 * Recover the best snapshot.
+                 * Recover the first snapshot in case we require any further
+                 * rebalance attempts.
                  */
-                else {
-                    recoverSnapshot(SnapshotType.FIRST);
-                }
+                recoverSnapshot(SnapshotType.FIRST);
             }
+
+            // Done. Recover the best snapshot.
+            recoverSnapshot(SnapshotType.BEST);
         }
 
         // Catch any exception that may occur.
@@ -635,11 +694,8 @@ class RebalanceNode implements CurrencyReceiver {
                             "following message: '%s'.",
                     getAccountKey(), getType(), exception.getMessage()));
 
-            /*
-             * Let each receiver delegate know that explicit values cannot be
-             * set.
-             */
-            doAction(delegates, cannotSetAction);
+            // Declare that we cannot perform a rebalance.
+            declareCannotRebalance();
         }
 
         // Do this unconditionally.
@@ -649,7 +705,7 @@ class RebalanceNode implements CurrencyReceiver {
              * Log a message identifying the best reallocation score
              * characteristics.
              */
-            logger.streamAndLog(extraordinary, String.format("For account " +
+            logger.log(extraordinary, String.format("For account " +
                             "key %s and weight type %s: I have identified " +
                             "the best residual of %s (average deviation %s) " +
                             "when trying to set %s proposed value %s.",
@@ -985,7 +1041,7 @@ class RebalanceNode implements CurrencyReceiver {
         /**
          * Subtracts currency from the residual.
          *
-         * @param currency Currency to subtract
+         * @param currency The currency to subtract
          */
         public void subtractResidual(@NotNull Currency currency) {
             residual.subtract(currency);
@@ -1027,15 +1083,14 @@ class RebalanceNode implements CurrencyReceiver {
         @Override
         public void doAction(@NotNull ReceiverDelegate<?> delegate) {
 
-            // Is the delegate considered?
+            // Get the utility from the container. Is the delegate considered?
+            final SetValueUtility utility = getContained();
             if (delegate.isConsidered()) {
 
                 /*
-                 * The delegate is considered. Get the utility from the
-                 * container, and the incoming value from the utility. Is the
-                 * incoming value not null?
+                 * The delegate is considered. Get the incoming value from the
+                 * utility. Is the incoming value not null?
                  */
-                final SetValueUtility utility = getContained();
                 final MutableCurrency incoming = utility.getNextElement();
                 if (null != incoming) {
 
@@ -1064,33 +1119,35 @@ class RebalanceNode implements CurrencyReceiver {
                     if (residual.isNotZero()) {
 
                         /*
-                         * Add the residual to the proposed value if the
-                         * 'relative' flag is set.
+                         * The residual is not zero. Add the residual to the
+                         * proposed value if the 'relative' flag is set.
                          */
                         if (isRelative) {
                             incoming.add(residual);
                         }
 
                         /*
-                         * ...otherwise subtract the residual if the flag is
-                         * not set.
+                         * ...otherwise subtract the residual if the 'relative'
+                         * flag is not set.
                          */
                         else {
                             incoming.subtract(residual);
                         }
                     }
 
-                    // Subtract the modified incoming value from the residual.
+                    /*
+                     * Subtract the modified incoming value from the residual
+                     * in the utility.
+                     */
                     utility.subtractResidual(incoming.getImmutable());
                 }
-
-                /*
-                 * Add the last residual of the delegate to the deviation in
-                 * the utility even if the delegate is not currently
-                 * considered.
-                 */
-                utility.addDeviation(delegate.getLastResidual().getValue());
             }
+
+            /*
+             * Add the last residual of the delegate to the deviation in the
+             * utility even if the delegate is not currently considered.
+             */
+            utility.addDeviation(delegate.getLastResidual().getValue());
         }
 
         @Override
