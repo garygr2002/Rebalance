@@ -130,6 +130,27 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
+     * Does the function this class will use when accepting a deviation from a
+     * desired rebalanced quantity.
+     *
+     * @param deviation A deviation from a desired rebalanced quantity
+     * @return The result of the function
+     */
+    public static double calculateDeviation(double deviation) {
+        return Math.pow(deviation, 2.);
+    }
+
+    /**
+     * Does the function this class will use when calculating a deviation score.
+     *
+     * @param deviationAggregate An aggregate of deviations
+     * @return The result of the function
+     */
+    public static double calculateDeviationScore(double deviationAggregate) {
+        return Math.sqrt(deviationAggregate);
+    }
+
+    /**
      * Calculates the limit of allowed receiver delegates.
      *
      * @return The limit of allowed receiver delegates
@@ -925,7 +946,7 @@ class RebalanceNode implements CurrencyReceiver {
          * @param deviation The deviation to add
          */
         public void addDeviation(double deviation) {
-            this.deviation += Math.pow(deviation, 2.);
+            this.deviation += calculateDeviation(deviation);
         }
 
         /**
@@ -1080,11 +1101,13 @@ class RebalanceNode implements CurrencyReceiver {
         // The value of minus one as currency
         private static final Currency minusOne = new Currency(-1.);
 
+        // The contained set-value utility
+        private final SetValueUtility utility = getContained();
+
         @Override
         public void doAction(@NotNull ReceiverDelegate<?> delegate) {
 
-            // Get the utility from the container. Is the delegate considered?
-            final SetValueUtility utility = getContained();
+            // Is the delegate considered?
             if (delegate.isConsidered()) {
 
                 /*
@@ -1161,7 +1184,7 @@ class RebalanceNode implements CurrencyReceiver {
          * @return The residual
          */
         public @NotNull Currency getResidual() {
-            return getContained().getResidual();
+            return utility.getResidual();
         }
 
         /**
@@ -1172,12 +1195,12 @@ class RebalanceNode implements CurrencyReceiver {
         public @NotNull ReallocationScore getScore() {
             return new ReallocationScore(
                     new Currency(Math.abs(getResidual().getValue())),
-                    getContained().getDeviation());
+                    calculateDeviationScore(utility.getDeviation()));
         }
 
         @Override
         public void reset() {
-            getContained().resetIndex();
+            utility.resetIndex();
         }
 
         /**
@@ -1186,7 +1209,7 @@ class RebalanceNode implements CurrencyReceiver {
          * @param list The currency list
          */
         public void setList(@NotNull List<MutableCurrency> list) {
-            getContained().setList(list);
+            utility.setList(list);
         }
 
         /**
@@ -1197,7 +1220,7 @@ class RebalanceNode implements CurrencyReceiver {
          *                 to be interpreted as absolute values
          */
         public void setRelative(boolean relative) {
-            getContained().setRelative(relative);
+            utility.setRelative(relative);
         }
 
         /**
@@ -1208,13 +1231,11 @@ class RebalanceNode implements CurrencyReceiver {
         public void setResidual(@NotNull Currency residual) {
 
             /*
-             * Get the set value utility from the container. Set the negative
-             * flag in the utility if the residual is less than zero.
+             * Set the negative flag in the utility if the residual is less
+             * than zero. Set the residual in the container, and reset the
+             * action.
              */
-            final SetValueUtility utility = getContained();
             utility.setNegative(residual.compareTo(zero) < 0);
-
-            // Set the residual in the container. Reset the action.
             utility.setResidual(residual);
             reset();
         }
