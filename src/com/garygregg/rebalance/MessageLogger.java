@@ -9,7 +9,10 @@ import java.util.logging.Logger;
 public class MessageLogger {
 
     // The error stream we will use
-    private static final PrintStream errorStream = System.err;
+    private static final PrintStream defaultErrorStream = System.err;
+
+    // The output stream we will use
+    private static final PrintStream defaultOutputStream = System.out;
 
     // The logging level for extraordinary information
     private static final Level extraordinary;
@@ -17,8 +20,13 @@ public class MessageLogger {
     // The logging level for ordinary information
     private static final Level ordinary;
 
+    // The error stream we will use
+    private static PrintStream errorStream = getStream(null,
+            defaultErrorStream);
+
     // The output stream we will use
-    private static final PrintStream outputStream = System.out;
+    private static PrintStream outputStream = getStream(null,
+            defaultOutputStream);
 
     static {
 
@@ -96,6 +104,36 @@ public class MessageLogger {
      */
     public static @NotNull PrintStream getOutputStream() {
         return outputStream;
+    }
+
+    /**
+     * Gets a non-null print stream.
+     *
+     * @param candidate     The candidate print stream, possibly null
+     * @param defaultStream A default non-null print stream
+     * @return A non-null print stream, either the candidate or the default
+     */
+    private static @NotNull PrintStream getStream(PrintStream candidate,
+                                                  @NotNull PrintStream defaultStream) {
+        return (null == candidate) ? defaultStream : candidate;
+    }
+
+    /**
+     * Sets an error stream.
+     *
+     * @param stream An error stream to set; null to set a default
+     */
+    public static void setErrorStream(@NotNull PrintStream stream) {
+        errorStream = getStream(stream, defaultErrorStream);
+    }
+
+    /**
+     * Sets an output stream.
+     *
+     * @param stream An output stream to set; null to set a default
+     */
+    public static void setOutputStream(@NotNull PrintStream stream) {
+        outputStream = getStream(stream, defaultOutputStream);
     }
 
     /**
