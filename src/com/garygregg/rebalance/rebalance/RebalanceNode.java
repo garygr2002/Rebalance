@@ -41,6 +41,10 @@ class RebalanceNode implements CurrencyReceiver {
     // The logging level for extraordinary informational messages
     private final static Level extraordinary = MessageLogger.getOrdinary();
 
+    // An action to calculate initial residual and deviation
+    private static final InitialScoreAction initialScoreAction =
+            new InitialScoreAction();
+
     // The preference manager
     private static final PreferenceManager manager =
             PreferenceManager.getInstance();
@@ -407,6 +411,53 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
+     * Calculates the initial reallocation score.
+     *
+     * @return The initial reallocation score
+     */
+    private @NotNull ReallocationScore calculateInitialScore() {
+
+        // Create a weight list using all possible receiver delegates.
+        final List<Double> weightList = createWeightList(getCollection(),
+                Integer.MAX_VALUE);
+
+        /*
+         * Create an allocator with the weight list. Is the sum of the weights
+         * greater than zero?
+         */
+        final Reallocator reallocator = new Reallocator(weightList);
+        if (0. < reallocator.getWeightSum()) {
+
+            /*
+             * The sum of the weights is greater than zero. Get the current
+             * value of this node. Create a value list using the size of the
+             * weight list and the current value of this node.
+             */
+            final Currency current = getCurrent();
+            final List<MutableCurrency> valueList = getInitialList(
+                    weightList.size(), current);
+
+            /*
+             * Reallocate the value list using the reallocator. Initialize the
+             * residual of the initial score action to the current value of
+             * this node.
+             */
+            reallocator.reallocate(valueList);
+            initialScoreAction.setResidual(current);
+
+            /*
+             * Set the reallocated value list in the initial score action, and
+             * perform the action.
+             */
+            initialScoreAction.setList(valueList);
+            doAction(getCollection(), initialScoreAction);
+        }
+
+        // Return the score obtained from the initial score action.
+        return initialScoreAction.getScore();
+    }
+
+    /**
      * Clears the node.
      */
     public void clear() {
@@ -427,6 +478,45 @@ class RebalanceNode implements CurrencyReceiver {
     @Override
     public void clearSnapshots() {
         doAction(getCollection(), clearSnapshotsAction);
+    }
+
+    /**
+     * Creates a weight list.
+     *
+     * @param delegates            A collection of receiver delegates from
+     *                             which to gather weights
+     * @param considerationPattern A bit pattern determining from which receiver
+     *                             delegates weights are gathered: the least
+     *                             significant bit refers to the first delegate
+     *                             enumerated in the given collection
+     * @param <T>                  An arbitrary receiver delegate type
+     * @return A weight list gathered from the receiver delegates
+     */
+    private <T extends ReceiverDelegate<?>> @NotNull List<Double>
+    createWeightList(@NotNull Collection<T> delegates,
+                     int considerationPattern) {
+
+        /*
+         * Reset the consideration setter action, then set the consideration
+         * pattern in the action.
+         */
+        considerationSetterAction.reset();
+        considerationSetterAction.setConsiderationPattern(
+                considerationPattern);
+
+        /*
+         * Perform the consideration setter action on each receiver
+         * delegate. Reset the weight accumulator action.
+         */
+        doAction(delegates, considerationSetterAction);
+        weightAccumulatorAction.reset();
+
+        /*
+         * Perform the weight accumulator action on each receiver delegate.
+         * Get the resulting weight list from the weight accumulator action.
+         */
+        doAction(delegates, weightAccumulatorAction);
+        return weightAccumulatorAction.getList();
     }
 
     /**
@@ -521,33 +611,15 @@ class RebalanceNode implements CurrencyReceiver {
             @NotNull Collection<T> delegates, @NotNull Currency proposed,
             int considerationPattern) {
 
-        /*
-         * Reset the consideration setter action, then set the consideration
-         * pattern in the action.
-         */
-        considerationSetterAction.reset();
-        considerationSetterAction.setConsiderationPattern(
+        // Create the weight list. Declare an uninitialized reallocation score.
+        final List<Double> weightList = createWeightList(delegates,
                 considerationPattern);
-
-        /*
-         * Perform the consideration setter action on each receiver
-         * delegate. Reset the weight accumulator action.
-         */
-        doAction(delegates, considerationSetterAction);
-        weightAccumulatorAction.reset();
-
-        /*
-         * Perform the weight accumulator action on each receiver delegate.
-         * Get the resulting weight list from the weight accumulator action.
-         */
-        doAction(delegates, weightAccumulatorAction);
-        final List<Double> weightList = weightAccumulatorAction.getList();
-
-        /*
-         * Declare an uninitialized reallocation score. Create a new allocator
-         * with the weight list. Is the sum of the weights greater than zero?
-         */
         ReallocationScore score;
+
+        /*
+         * Create a new allocator with the weight list. Is the sum of the
+         * weights greater than zero?
+         */
         final Reallocator reallocator = new Reallocator(weightList);
         if (0. < reallocator.getWeightSum()) {
 
@@ -619,16 +691,11 @@ class RebalanceNode implements CurrencyReceiver {
             boolean isRelative) {
 
         /*
-         * Get the message logger. Initialize the best score.
-         *
-         * TODO:
-         *
-         * Initializing the residual of the best score to zero is fine, but the
-         * initial deviation should be the largest possible. Calculate it.
+         * Get the message logger. Initialize the best score to the initial
+         * score.
          */
         final MessageLogger logger = getLogger();
-        ReallocationScore bestScore = new ReallocationScore(zero,
-                ReallocationScore.getIdealDeviation());
+        ReallocationScore bestScore = calculateInitialScore();
 
         // Clear all snapshots. Try to rebalance this node.
         clearSnapshots();
@@ -741,10 +808,10 @@ class RebalanceNode implements CurrencyReceiver {
              * Log a message identifying the best reallocation score
              * characteristics.
              */
-            logger.log(extraordinary, String.format("For account " +
-                            "key %s and weight type %s: I have identified " +
-                            "the best residual of %s (average deviation %s) " +
-                            "when trying to set %s proposed value %s.",
+            logger.log(extraordinary, String.format("For account key %s and " +
+                            "weight type %s: I have identified the best " +
+                            "residual of %s (average deviation %s) when " +
+                            "trying to set %s proposed value %s.",
                     getAccountKey(), getType(), bestScore.getResidual(),
                     deviationFormat.format(bestScore.getDeviation()),
                     isRelative ? "relative" : "absolute", proposed));
@@ -916,6 +983,245 @@ class RebalanceNode implements CurrencyReceiver {
              * reset the action.
              */
             setContained(considerationPattern);
+            reset();
+        }
+    }
+
+    private static class InitialScoreAction extends
+            ResidualProducerAction {
+
+        // The residual of the action
+        private Currency residual;
+
+        /**
+         * Constructs the initial score action.
+         */
+        public InitialScoreAction() {
+            setRelative(false);
+        }
+
+        @Override
+        protected @NotNull Currency getResidual(
+                ReceiverDelegate<?> delegate) {
+            return residual;
+        }
+
+        @Override
+        protected boolean isConsidered(@NotNull ReceiverDelegate<?> delegate) {
+            return true;
+        }
+
+        @Override
+        protected @NotNull Currency produceResidual(
+                @NotNull ReceiverDelegate<?> delegate,
+                @NotNull Currency currency, boolean isRelative) {
+
+            /*
+             * Declare and initialize mutable currency to hold the incoming
+             * value. Is the incoming value not relative?
+             */
+            final MutableCurrency incoming = new MutableCurrency(currency);
+            if (!isRelative) {
+
+                /*
+                 * The incoming value is not relative (a.k.a., it is absolute).
+                 * Subtract the current value of the delegate from the incoming
+                 * value.
+                 */
+                incoming.subtract(delegate.getCurrent());
+            }
+
+            // Set last residual, and return it.
+            residual = incoming.getImmutable();
+            return residual;
+        }
+    }
+
+    private static abstract class ResidualProducerAction extends
+            ActionWithContainer<SetValueUtility, ReceiverDelegate<?>> {
+
+        // The value of minus one as currency
+        private static final Currency minusOne = new Currency(-1.);
+
+        // The contained set-value utility
+        private final SetValueUtility utility = getContained();
+
+        /**
+         * Gets the value of minus one as currency.
+         *
+         * @return The value of minus one as currency
+         */
+        protected static @NotNull Currency getMinusOne() {
+            return minusOne;
+        }
+
+        @Override
+        public void doAction(@NotNull ReceiverDelegate<?> delegate) {
+
+            // Is the delegate considered?
+            if (isConsidered(delegate)) {
+
+                /*
+                 * The delegate is considered. Get the incoming value from the
+                 * utility. Is the incoming value not null?
+                 */
+                final MutableCurrency incoming = utility.getNextElement();
+                if (null != incoming) {
+
+                    /*
+                     * The incoming value is not null. Get the 'relative' flag
+                     * from the utility. Does the utility indicate that the
+                     * incoming value is a negative number?
+                     */
+                    final boolean isRelative = utility.isRelative();
+                    if (utility.isNegative()) {
+
+                        /*
+                         * The utility indicates that the incoming value is a
+                         * negative number. Multiply the incoming value by
+                         * minus one.
+                         */
+                        incoming.multiply(getMinusOne());
+                    }
+
+                    /*
+                     * Ask the delegate to produce residual using the incoming
+                     * value. Is the residual not zero?
+                     */
+                    final Currency residual =
+                            produceResidual(delegate, incoming.getImmutable(),
+                                    isRelative);
+                    if (residual.isNotZero()) {
+
+                        /*
+                         * The residual is not zero. Add the residual to the
+                         * proposed value if the 'relative' flag is set.
+                         */
+                        if (isRelative) {
+                            incoming.add(residual);
+                        }
+
+                        /*
+                         * ...otherwise subtract the residual if the 'relative'
+                         * flag is not set.
+                         */
+                        else {
+                            incoming.subtract(residual);
+                        }
+                    }
+
+                    /*
+                     * Subtract the modified incoming value from the residual
+                     * in the utility.
+                     */
+                    utility.subtractResidual(incoming.getImmutable());
+                }
+            }
+
+            /*
+             * Add the residual from the delegate to the deviation in the
+             * utility even if the delegate is not currently considered.
+             */
+            utility.addDeviation(getResidual(delegate).getValue());
+        }
+
+        @Override
+        protected @NotNull SetValueUtility getInitialValue() {
+            return new SetValueUtility();
+        }
+
+        /**
+         * Gets the residual from a receiver delegate.
+         *
+         * @param delegate A receiver delegate
+         * @return The residual from the receiver delegate
+         */
+        protected abstract @NotNull Currency getResidual(
+                ReceiverDelegate<?> delegate);
+
+        /**
+         * Gets the residual.
+         *
+         * @return The residual
+         */
+        public @NotNull Currency getResidual() {
+            return utility.getResidual();
+        }
+
+        /**
+         * Gets the reallocation score.
+         *
+         * @return The reallocation score
+         */
+        public @NotNull ReallocationScore getScore() {
+            return new ReallocationScore(
+                    new Currency(Math.abs(getResidual().getValue())),
+                    calculateDeviationScore(utility.getDeviation()));
+        }
+
+        /**
+         * Is the delegate to be considered for an action?
+         *
+         * @param delegate The delegate to consider
+         * @return True if the delegate is to be considered for an action;
+         * false otherwise
+         */
+        protected abstract boolean isConsidered(
+                @NotNull ReceiverDelegate<?> delegate);
+
+        /**
+         * Asks a receiver delegate to produce residual.
+         *
+         * @param delegate   The receiver delegate
+         * @param currency   Incoming currency
+         * @param isRelative True if the incoming currency is relative to any
+         *                   existing value in the delegate; false otherwise
+         * @return Residual from the operation
+         */
+        protected abstract @NotNull Currency produceResidual(
+                @NotNull ReceiverDelegate<?> delegate,
+                @NotNull Currency currency,
+                boolean isRelative);
+
+        @Override
+        public void reset() {
+            utility.resetIndex();
+        }
+
+        /**
+         * Sets the currency list.
+         *
+         * @param list The currency list
+         */
+        public void setList(@NotNull List<MutableCurrency> list) {
+            utility.setList(list);
+        }
+
+        /**
+         * Sets the 'relative' flag.
+         *
+         * @param relative True if the values in the currency list are to be
+         *                 interpreted as relative values; false if they are
+         *                 to be interpreted as absolute values
+         */
+        protected void setRelative(boolean relative) {
+            utility.setRelative(relative);
+        }
+
+        /**
+         * Sets the residual.
+         *
+         * @param residual The residual
+         */
+        public void setResidual(@NotNull Currency residual) {
+
+            /*
+             * Set the negative flag in the utility if the residual is less
+             * than zero. Set the residual in the container, and reset the
+             * action.
+             */
+            utility.setNegative(residual.compareTo(zero) < 0);
+            utility.setResidual(residual);
             reset();
         }
     }
@@ -1139,149 +1445,29 @@ class RebalanceNode implements CurrencyReceiver {
         }
     }
 
-    private static class ValueSetterAction extends
-            ActionWithContainer<SetValueUtility, ReceiverDelegate<?>> {
-
-        // The value of minus one as currency
-        private static final Currency minusOne = new Currency(-1.);
-
-        // The contained set-value utility
-        private final SetValueUtility utility = getContained();
+    private static class ValueSetterAction extends ResidualProducerAction {
 
         @Override
-        public void doAction(@NotNull ReceiverDelegate<?> delegate) {
-
-            // Is the delegate considered?
-            if (delegate.isConsidered()) {
-
-                /*
-                 * The delegate is considered. Get the incoming value from the
-                 * utility. Is the incoming value not null?
-                 */
-                final MutableCurrency incoming = utility.getNextElement();
-                if (null != incoming) {
-
-                    /*
-                     * The incoming value is not null. Get the 'relative' flag
-                     * from the utility. Does the utility indicate that the
-                     * incoming value is a negative number?
-                     */
-                    final boolean isRelative = utility.isRelative();
-                    if (utility.isNegative()) {
-
-                        /*
-                         * The utility indicates that the incoming value is a
-                         * negative number. Multiply the incoming value by
-                         * minus one.
-                         */
-                        incoming.multiply(minusOne);
-                    }
-
-                    /*
-                     * Set the proposed value in the delegate, receiving any
-                     * residual. Is the residual not zero?
-                     */
-                    final Currency residual = delegate.setProposed(
-                            incoming.getImmutable(), isRelative);
-                    if (residual.isNotZero()) {
-
-                        /*
-                         * The residual is not zero. Add the residual to the
-                         * proposed value if the 'relative' flag is set.
-                         */
-                        if (isRelative) {
-                            incoming.add(residual);
-                        }
-
-                        /*
-                         * ...otherwise subtract the residual if the 'relative'
-                         * flag is not set.
-                         */
-                        else {
-                            incoming.subtract(residual);
-                        }
-                    }
-
-                    /*
-                     * Subtract the modified incoming value from the residual
-                     * in the utility.
-                     */
-                    utility.subtractResidual(incoming.getImmutable());
-                }
-            }
-
-            /*
-             * Add the last residual of the delegate to the deviation in the
-             * utility even if the delegate is not currently considered.
-             */
-            utility.addDeviation(delegate.getLastResidual().getValue());
+        protected @NotNull Currency getResidual(
+                @NotNull ReceiverDelegate<?> delegate) {
+            return delegate.getLastResidual();
         }
 
         @Override
-        protected @NotNull SetValueUtility getInitialValue() {
-            return new SetValueUtility();
-        }
-
-        /**
-         * Gets the residual.
-         *
-         * @return The residual
-         */
-        public @NotNull Currency getResidual() {
-            return utility.getResidual();
-        }
-
-        /**
-         * Gets the reallocation score.
-         *
-         * @return The reallocation score
-         */
-        public @NotNull ReallocationScore getScore() {
-            return new ReallocationScore(
-                    new Currency(Math.abs(getResidual().getValue())),
-                    calculateDeviationScore(utility.getDeviation()));
+        protected boolean isConsidered(@NotNull ReceiverDelegate<?> delegate) {
+            return delegate.isConsidered();
         }
 
         @Override
-        public void reset() {
-            utility.resetIndex();
+        protected @NotNull Currency produceResidual(
+                @NotNull ReceiverDelegate<?> delegate,
+                @NotNull Currency currency, boolean isRelative) {
+            return delegate.setProposed(currency, isRelative);
         }
 
-        /**
-         * Sets the currency list.
-         *
-         * @param list The currency list
-         */
-        public void setList(@NotNull List<MutableCurrency> list) {
-            utility.setList(list);
-        }
-
-        /**
-         * Sets the 'relative' flag.
-         *
-         * @param relative True if the values in the currency list are to be
-         *                 interpreted as relative values; false if they are
-         *                 to be interpreted as absolute values
-         */
+        @Override
         public void setRelative(boolean relative) {
-            utility.setRelative(relative);
-        }
-
-        /**
-         * Sets the residual.
-         *
-         * @param residual The residual
-         */
-        public void setResidual(@NotNull Currency residual) {
-
-            /*
-             * Set the negative flag in the utility if the residual is less
-             * than zero. Set the residual in the container, and reset the
-             * action.
-             */
-            utility.setNegative(residual.compareTo(zero) < 0);
-            utility.setResidual(residual);
-            reset();
+            super.setRelative(relative);
         }
     }
 
