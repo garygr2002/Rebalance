@@ -17,7 +17,7 @@ public class PortfolioRebalancer extends Rebalancer {
 
     // The default rebalancer
     private static final AccountRebalancer defaultRebalancer =
-            new PassThroughRebalancer();
+            new WeightRebalancer();
 
     // A rebalancer instance
     private static final PortfolioRebalancer instance =
@@ -215,7 +215,7 @@ public class PortfolioRebalancer extends Rebalancer {
      * otherwise
      */
     private boolean rebalance(@NotNull Account account, boolean isLast) {
-
+        
         /*
          * Try to get an explicit rebalancer from the rebalancer map.
          *
@@ -232,7 +232,6 @@ public class PortfolioRebalancer extends Rebalancer {
         if (null == rebalancer) {
             rebalancer = isLast ? lastRebalancer : notLastRebalancer;
         }
-
 
         // Rebalance the account with the designated account rebalancer.
         return rebalancer.rebalance(account);
