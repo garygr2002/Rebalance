@@ -41,6 +41,10 @@ abstract class AccountRebalancer extends Rebalancer {
     private static final double everything =
             Percent.getOneHundred().getValue();
 
+    // The extraordinary logging level
+    private static final Level extraordinary =
+            MessageLogger.getExtraordinary();
+
     // The level zero weight types
     private static final WeightType[] levelZero = {WeightType.BOND,
             WeightType.CASH, WeightType.REAL_ESTATE, WeightType.STOCK};
@@ -602,13 +606,11 @@ abstract class AccountRebalancer extends Rebalancer {
         // Declare and initialize local variables.
         final AccountKey key = account.getKey();
         final MessageLogger logger = getLogger();
-        final Level level = MessageLogger.getExtraordinary();
 
         // Reset the message logger. Stream and log a rebalance start message.
         reset();
-        logger.streamAndLog(MessageLogger.getExtraordinary(),
-                String.format("Rebalancing has commented for account: %s.",
-                        key));
+        logger.streamAndLog(extraordinary, String.format("Rebalancing has " +
+                "commenced for account: %s.", key));
 
         /*
          * Rebalance the account, receiving a residual. The rebalance was
@@ -621,15 +623,25 @@ abstract class AccountRebalancer extends Rebalancer {
 
             /*
              * The operation was successful, therefore the residual is not
-             * null. Set the non-null residual in the account.
+             * null. Is it zero? It would be best if it were not zero.
              */
+            if (residual.isNotZero()) {
+
+                // Drat, the residual is not zero. Stream and log a message.
+                logger.log(extraordinary, String.format("BAD NEWS...You will " +
+                                "not like this: Rebalancing has discovered " +
+                                "a non-zero residual %s for account %s; " +
+                                "deal with it.", residual, account));
+            }
+
+            // Set the non-null residual in the account, zero or not.
             account.setResidual(residual);
         }
 
         // Stream and log a rebalance complete message.
-        logger.streamAndLog(MessageLogger.getExtraordinary(),
-                String.format("Rebalancing has completed for account: %s " +
-                        "with%s error.", key, result ? " no" : ""));
+        logger.streamAndLog(extraordinary, String.format("Rebalancing has " +
+                        "completed for account: %s with%s error.", key,
+                result ? " no" : ""));
 
         /*
          * Return true if this rebalancer had no problem, and the result from
