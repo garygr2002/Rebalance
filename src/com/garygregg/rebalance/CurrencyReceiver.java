@@ -51,7 +51,7 @@ public interface CurrencyReceiver {
      */
     void takeSnapshot(@NotNull SnapshotType type);
 
-    public enum SnapshotType {
+    enum SnapshotType {
 
         // The optimal rebalance snapshot
         BEST,
