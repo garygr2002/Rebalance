@@ -333,6 +333,116 @@ public class Conductor implements Dispatch<CommandLineId> {
     }
 
     /**
+     * Conducts the rebalancer.
+     *
+     * @param arguments An array of arguments
+     */
+    public static void conduct(@NotNull String[] arguments) {
+
+        // Declare and initialize local variables.
+        final List<Dispatch<CommandLineId>> dispatchList = new ArrayList<>();
+        final Preferences preferences = preferenceManager.getPreferences();
+        final PrintStream outputStream = MessageLogger.getOutputStream();
+
+        // Add a dispatch for the S&P 500 current value.
+        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.CURRENT,
+                preferences, outputStream, false));
+
+        // Add a preference dispatch for the data directory backup.
+        dispatchList.add(new PreferenceDispatch<>(CommandLineId.DESTINATION,
+                preferences, outputStream));
+
+        /*
+         * Add a preference dispatch for the level of extraordinary
+         * informational messages.
+         */
+        dispatchList.add(new LimitedPreferenceDispatch<>(
+                CommandLineId.EXTRAORDINARY, preferences, outputStream));
+
+        // Add a preference dispatch for the S&P 500 high value.
+        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.HIGH,
+                preferences, outputStream, false));
+
+        // Add a preference dispatch for the expected annual inflation.
+        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.INFLATION,
+                preferences, outputStream, true));
+
+        // Add a preference dispatch for the desired logging level.
+        dispatchList.add(new LevelPreferenceDispatch<>(CommandLineId.LEVEL,
+                preferences, outputStream));
+        /*
+         * Add a preference dispatch for the level of ordinary informational
+         * messages.
+         */
+        dispatchList.add(new LimitedPreferenceDispatch<>(
+                CommandLineId.ORDINARY, preferences, outputStream));
+
+
+        // Add a preference dispatch for source data directory.
+        dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.SOURCE,
+                preferences, outputStream));
+
+        // Add a preference dispatch for limit of allowed receiver delegates.
+        dispatchList.add(new IntPreferenceDispatch<>(CommandLineId.X,
+                preferences, outputStream, false));
+
+        /*
+         * Add a preference dispatch for use expected prefix and suffix for
+         * data directory backup and minimum settings.
+         */
+        dispatchList.add(new Use(preferences, outputStream));
+        dispatchList.add(new Minimum(outputStream));
+
+        // Add dispatches for reset, backup and preferences.
+        dispatchList.add(new Reset(outputStream));
+        dispatchList.add(new Backup(outputStream));
+        dispatchList.add(new Preference(outputStream));
+
+        /*
+         * Create a command line arguments object with an instance of the
+         * conductor.
+         */
+        final CommandLineArguments<CommandLineId> cla =
+                new CommandLineArguments<>(dispatchList, getInstance());
+        //noinspection SpellCheckingInspection
+        try {
+
+            // Try to process the command line arguments, if any.
+            cla.process(arguments);
+        }
+
+        /*
+         * Catch any command line exception, and print the exception message
+         * to the error stream.
+         */
+        catch (@NotNull CLAException exception) {
+
+            /*
+             * Stream the message of the exception as a severe error. Get the
+             * program name system property. Note: To set this property on the
+             * command line, use:
+             *
+             * -Dprogram.name = <name>
+             *
+             * In IntelliJ, select 'Add VM options' under 'Modify options'. Use
+             * the same syntax as above. A properly configured alias for
+             * starting the conductor should be able to added to a user login
+             * file.
+             */
+            MessageLogger.stream(Level.SEVERE, exception.getMessage());
+            final String programName = System.getProperty(defaultProgramName);
+
+            /*
+             * Use the program name system property to display a usage message
+             * if the program name property is not null. Otherwise, use a
+             * default program name.
+             */
+            displayUsage((null == programName) ? getDefaultProgramName() :
+                    programName);
+        }
+    }
+
+    /**
      * Configures logging for conductors.
      *
      * @return True if logging was successfully configures, false otherwise
@@ -485,112 +595,19 @@ public class Conductor implements Dispatch<CommandLineId> {
     }
 
     /**
-     * Conducts the rebalancer.
+     * Conducts the rebalancer from a command line.
      *
      * @param arguments Command line arguments.
      */
     public static void main(@NotNull String[] arguments) {
 
-        // Declare and initialize local variables.
-        final List<Dispatch<CommandLineId>> dispatchList = new ArrayList<>();
-        final Preferences preferences = preferenceManager.getPreferences();
-        final PrintStream outputStream = MessageLogger.getOutputStream();
-
-        // Add a dispatch for the S&P 500 current value.
-        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.CURRENT,
-                preferences, outputStream, false));
-
-        // Add a preference dispatch for the data directory backup.
-        dispatchList.add(new PreferenceDispatch<>(CommandLineId.DESTINATION,
-                preferences, outputStream));
-
         /*
-         * Add a preference dispatch for the level of extraordinary
-         * informational messages.
+         * Explicitly set the error and output streams in the message logger
+         * and start conducting!
          */
-        dispatchList.add(new LimitedPreferenceDispatch<>(
-                CommandLineId.EXTRAORDINARY, preferences, outputStream));
-
-        // Add a preference dispatch for the S&P 500 high value.
-        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.HIGH,
-                preferences, outputStream, false));
-
-        // Add a preference dispatch for the expected annual inflation.
-        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.INFLATION,
-                preferences, outputStream, true));
-
-        // Add a preference dispatch for the desired logging level.
-        dispatchList.add(new LevelPreferenceDispatch<>(CommandLineId.LEVEL,
-                preferences, outputStream));
-        /*
-         * Add a preference dispatch for the level of ordinary informational
-         * messages.
-         */
-        dispatchList.add(new LimitedPreferenceDispatch<>(
-                CommandLineId.ORDINARY, preferences, outputStream));
-
-
-        // Add a preference dispatch for source data directory.
-        dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.SOURCE,
-                preferences, outputStream));
-
-        // Add a preference dispatch for limit of allowed receiver delegates.
-        dispatchList.add(new IntPreferenceDispatch<>(CommandLineId.X,
-                preferences, outputStream, false));
-
-        /*
-         * Add a preference dispatch for use expected prefix and suffix for
-         * data directory backup and minimum settings.
-         */
-        dispatchList.add(new Use(preferences, outputStream));
-        dispatchList.add(new Minimum(outputStream));
-
-        // Add dispatches for reset, backup and preferences.
-        dispatchList.add(new Reset(outputStream));
-        dispatchList.add(new Backup(outputStream));
-        dispatchList.add(new Preference(outputStream));
-
-        /*
-         * Create a command line arguments object with an instance of the
-         * conductor.
-         */
-        final CommandLineArguments<CommandLineId> cla =
-                new CommandLineArguments<>(dispatchList, getInstance());
-        //noinspection SpellCheckingInspection
-        try {
-
-            // Try to process the command line arguments, if any.
-            cla.process(arguments);
-        }
-
-        /*
-         * Catch any command line exception, and print the exception message
-         * to the error stream.
-         */ catch (@NotNull CLAException exception) {
-
-            /*
-             * Stream the message of the exception as a severe error. Get the
-             * program name system property. Note: To set this property on the
-             * command line, use:
-             *
-             * -Dprogram.name = <name>
-             *
-             * In IntelliJ, select 'Add VM options' under 'Modify options'. Use
-             * the same syntax as above. A properly configured alias for
-             * starting the conductor should be able to added to a user login
-             * file.
-             */
-            MessageLogger.stream(Level.SEVERE, exception.getMessage());
-            final String programName = System.getProperty(defaultProgramName);
-
-            /*
-             * Use the program name system property to display a usage message
-             * if the program name property is not null. Otherwise, use a
-             * default program name.
-             */
-            displayUsage((null == programName) ? getDefaultProgramName() :
-                    programName);
-        }
+        MessageLogger.setErrorStream(System.err);
+        MessageLogger.setOutputStream(System.out);
+        conduct(arguments);
     }
 
     /**
@@ -775,7 +792,7 @@ public class Conductor implements Dispatch<CommandLineId> {
 
         // Stream and log a message about what is going on.
         logger.streamAndLog(level, String.format("I am building the %s " +
-                "hierarchy and synthesizing required accounts...",
+                        "hierarchy and synthesizing required accounts...",
                 hierarchyName));
 
         // Build the hierarchy. Was the build not successful?
