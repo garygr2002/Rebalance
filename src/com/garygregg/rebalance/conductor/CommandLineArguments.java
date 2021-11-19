@@ -1,15 +1,20 @@
 package com.garygregg.rebalance.conductor;
 
 import com.garygregg.rebalance.CommandLineId;
+import com.garygregg.rebalance.MessageLogger;
 import com.garygregg.rebalance.Pair;
 import com.garygregg.rebalance.cla.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.*;
 import java.util.prefs.Preferences;
 
 public class CommandLineArguments<TokenType extends Enum<TokenType>> {
+
+    // The output stream
+    private static final PrintStream stream = MessageLogger.getOutputStream();
 
     // A map of token types to a list of matching dispatch actions
     private final Map<TokenType, List<Dispatch<TokenType>>> dispatchMap =
@@ -85,38 +90,38 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
 
         // Declare an 'on current' dispatch action.
         final Dispatch<CommandLineId> onCurrent =
-                new DoublePreferenceDispatch<>(CommandLineId.CURRENT, preferences,
-                        System.out, false);
+                new DoublePreferenceDispatch<>(CommandLineId.CURRENT,
+                        preferences, stream, false);
 
         // Declare an 'on destination' dispatch action.
         final Dispatch<CommandLineId> onDestination =
-                new PreferenceDispatch<>(CommandLineId.DESTINATION, preferences,
-                        System.out);
+                new PreferenceDispatch<>(CommandLineId.DESTINATION,
+                        preferences, stream);
 
         // Declare an 'on extraordinary' dispatch action.
         final Dispatch<CommandLineId> onExtraordinary =
                 new LimitedPreferenceDispatch<>(CommandLineId.EXTRAORDINARY,
-                        preferences, System.out);
+                        preferences, stream);
 
         // Declare an 'on high' dispatch action.
         final Dispatch<CommandLineId> onHigh =
                 new DoublePreferenceDispatch<>(CommandLineId.HIGH, preferences,
-                        System.out, false);
+                        stream, false);
 
         // Declare an 'on inflation' dispatch action.
         final Dispatch<CommandLineId> onInflation =
                 new DoublePreferenceDispatch<>(CommandLineId.INFLATION, preferences,
-                        System.out, true);
+                        stream, true);
 
         // Declare an 'on level' dispatch action.
         final Dispatch<CommandLineId> onLevel =
                 new LevelPreferenceDispatch<>(CommandLineId.LEVEL, preferences,
-                        System.out);
+                        stream);
 
         // Declare an 'on ordinary' dispatch action.
         final Dispatch<CommandLineId> onOrdinary =
                 new LimitedPreferenceDispatch<>(CommandLineId.ORDINARY,
-                        preferences, System.out);
+                        preferences, stream);
 
         // Declare an 'on none' dispatch action.
         final Dispatch<CommandLineId> onNone = new Dispatch<>() {
@@ -135,12 +140,12 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         // Declare an 'on source' dispatch action.
         final Dispatch<CommandLineId> onSource =
                 new PathPreferenceDispatch<>(CommandLineId.SOURCE, preferences,
-                        System.out);
+                        stream);
 
         // Declare an 'on limit' dispatch action.
         final Dispatch<CommandLineId> onXLimit =
                 new IntPreferenceDispatch<>(CommandLineId.X, preferences,
-                        System.out, false);
+                        stream, false);
 
         /*
          * Declare and initialize a dispatch list for token IDs, then add a
@@ -210,13 +215,13 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         for (String[] test : tests) {
 
             // Describe the test, perform it, then print a newline.
-            System.out.printf("Performing test %d...%n", i++);
+            stream.printf("Performing test %d...%n", i++);
             doTest(test);
-            System.out.println();
+            stream.println();
         }
 
         // Perform the last test with the command line arguments.
-        System.out.printf("Performing last test, %d, with command line " +
+        stream.printf("Performing last test, %d, with command line " +
                 "arguments...%n", i);
         doTest(arguments);
     }
@@ -263,7 +268,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
     private static <T, U> void receive(T key, @NotNull U argument) {
 
         // TODO: Delete this method.
-        System.out.printf("Processing %s with argument of '%s'.%n",
+        stream.printf("Processing %s with argument of '%s'.%n",
                 (null == key) ? null : key.toString().toLowerCase(),
                 argument);
     }

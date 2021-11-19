@@ -3,10 +3,15 @@ package com.garygregg.rebalance;
 import com.garygregg.rebalance.countable.Percent;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.PrintStream;
+
 public class InflationCaddy {
 
     // The singleton inflation caddy instance
     private static final InflationCaddy instance = new InflationCaddy();
+
+    // The output stream
+    private static final PrintStream stream = MessageLogger.getOutputStream();
 
     // Annual inflation
     private double annual;
@@ -54,17 +59,17 @@ public class InflationCaddy {
         // Get the inflation caddy instance and print the default values.
         final InflationCaddy caddy = getInstance();
         print(caddy);
-        System.out.println();
+        stream.println();
 
         // Set two percent inflation, and print values.
         caddy.setPercent(2.);
         print(caddy);
-        System.out.println();
+        stream.println();
 
         // Set average annual inflation, and print values.
         caddy.setPercent(3.22);
         print(caddy);
-        System.out.println();
+        stream.println();
     }
 
     /**
@@ -87,8 +92,8 @@ public class InflationCaddy {
      * @param inflation The inflation value
      */
     private static void print(@NotNull String type, double inflation) {
-        System.out.printf("%-22s: %f.%n", String.format("%s inflation rate",
-                type), inflation);
+        stream.printf("%-22s: %f.%n", String.format("%s inflation rate", type),
+                inflation);
     }
 
     /**
