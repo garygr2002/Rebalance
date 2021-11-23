@@ -56,17 +56,23 @@ class ReallocationScore implements Comparable<ReallocationScore> {
     @Override
     public int compareTo(@NotNull ReallocationScore score) {
 
-        // Compare first by the residual component.
-        final int byResidual = Double.compare(getResidual().getValue(),
-                score.getResidual().getValue());
+        // Compare first by the absolute values of the residual component.
+        final int byResidual = Double.compare(
+                Math.abs(getResidual().getValue()),
+                Math.abs(score.getResidual().getValue()));
 
         /*
-         * If residuals compare the same, compare by the deviation component,
-         * and return the result. Otherwise, return the comparison of the
-         * residual components.
+         * If absolute values of the residuals compare the same, compare by
+         * absolute values of the deviation component, and return the result.
+         * Otherwise, return the comparison of the absolute values of the
+         * residual component. Note: It is not strictly necessary to take the
+         * absolute values of the deviations if they are calculated in the
+         * expected way, as the sum of squares divided by the number of
+         * samples. The deviation squares are already always positive.
          */
-        return (0 == byResidual) ? Double.compare(getDeviation(),
-                score.getDeviation()) : byResidual;
+        return (0 == byResidual) ? Double.compare(
+                Math.abs(getDeviation()),
+                Math.abs(score.getDeviation())) : byResidual;
     }
 
     /**
