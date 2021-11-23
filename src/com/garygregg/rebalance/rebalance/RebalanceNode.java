@@ -662,8 +662,8 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /*
-         * The sum of the weights is not zero. Initialize the reallocation
-         * score appropriately.
+         * The sum of the weights is zero. Initialize the reallocation score
+         * appropriately.
          */
         else {
             score = new ReallocationScore(proposed,
