@@ -1175,7 +1175,7 @@ class RebalanceNode implements CurrencyReceiver {
          */
         public @NotNull ReallocationScore getScore() {
             return new ReallocationScore(
-                    new Currency(Math.abs(getResidual().getValue())),
+                    new Currency(getResidual().getValue()),
                     calculateDeviationScore(utility.getDeviation() /
                             getCount()));
         }
