@@ -810,8 +810,8 @@ class RebalanceNode implements CurrencyReceiver {
              */
             logger.log(extraordinary, String.format("For account key %s and " +
                             "weight type %s: I have identified the best " +
-                            "residual of %s (average deviation %s) when " +
-                            "trying to set %s proposed value %s.",
+                            "residual of %s (deviation of %s) when trying " +
+                            "to set %s proposed value %s.",
                     getAccountKey(), getType(), bestScore.getResidual(),
                     deviationFormat.format(bestScore.getDeviation()),
                     isRelative ? "relative" : "absolute", proposed));
@@ -1046,6 +1046,16 @@ class RebalanceNode implements CurrencyReceiver {
         // The contained set-value utility
         private final SetValueUtility utility = getContained();
 
+        // The count of calls to 'doAction' since last reset
+        private int actionCallCount;
+
+        /**
+         * Constructs the residual producer action.
+         */
+        public ResidualProducerAction() {
+            reset();
+        }
+
         /**
          * Gets the value of minus one as currency.
          *
@@ -1058,7 +1068,8 @@ class RebalanceNode implements CurrencyReceiver {
         @Override
         public void doAction(@NotNull ReceiverDelegate<?> delegate) {
 
-            // Is the delegate considered?
+            // Increment the action call count. Is the delegate considered?
+            incrementCount();
             if (isConsidered(delegate)) {
 
                 /*
@@ -1125,6 +1136,15 @@ class RebalanceNode implements CurrencyReceiver {
             utility.addDeviation(getResidual(delegate).getValue());
         }
 
+        /**
+         * Gets the action call count.
+         *
+         * @return The action call count
+         */
+        private int getCount() {
+            return actionCallCount;
+        }
+
         @Override
         protected @NotNull SetValueUtility getInitialValue() {
             return new SetValueUtility();
@@ -1156,7 +1176,15 @@ class RebalanceNode implements CurrencyReceiver {
         public @NotNull ReallocationScore getScore() {
             return new ReallocationScore(
                     new Currency(Math.abs(getResidual().getValue())),
-                    calculateDeviationScore(utility.getDeviation()));
+                    calculateDeviationScore(utility.getDeviation() /
+                            getCount()));
+        }
+
+        /**
+         * Increments the action call count.
+         */
+        private void incrementCount() {
+            ++actionCallCount;
         }
 
         /**
@@ -1185,7 +1213,20 @@ class RebalanceNode implements CurrencyReceiver {
 
         @Override
         public void reset() {
+
+            /*
+             * Reset the index in the set-value utility. Reset the action call
+             * count.
+             */
             utility.resetIndex();
+            resetCount();
+        }
+
+        /**
+         * Resets the action call count.
+         */
+        private void resetCount() {
+            actionCallCount = 0;
         }
 
         /**
@@ -1249,7 +1290,6 @@ class RebalanceNode implements CurrencyReceiver {
          * non-negative values
          */
         private boolean negative;
-
         /*
          * True if the value in the currency list are to be interpreted as
          * relative values; false if they are to be interpreted as absolute
