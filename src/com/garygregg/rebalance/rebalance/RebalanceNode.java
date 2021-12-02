@@ -95,7 +95,10 @@ class RebalanceNode implements CurrencyReceiver {
             new ConsiderationSetterAction();
 
     // The sum current action
-    private final SumCurrentAction sumCurrentAction = new SumCurrentAction();
+    private final SumAction sumCurrentAction = new SumCurrentAction();
+
+    // The sum proposed action
+    private final SumAction sumProposedAction = new SumProposedAction();
 
     // The tickers in the node
     private final SortedSet<TickerDelegate> tickerSet =
@@ -151,12 +154,12 @@ class RebalanceNode implements CurrencyReceiver {
      * Does the function this class will use when calculating a deviation score.
      *
      * @param deviationAggregate An aggregate of deviations
-     * @param sampleCount The count of samples
+     * @param sampleCount        The count of samples
      * @return The result of the function
      */
     public static double calculateDeviationScore(double deviationAggregate,
                                                  int sampleCount) {
-        return Math.sqrt(deviationAggregate/ sampleCount);
+        return Math.sqrt(deviationAggregate / sampleCount);
     }
 
     /**
@@ -569,6 +572,33 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
+     * Gets the proposed value of the node, with an optional extra added in.
+     *
+     * @return The proposed value of the node, with the extra added in if it
+     * is not null
+     */
+    private @NotNull Currency getProposed(Currency extra) {
+
+        // Get the value of the extra (if given), as mutable currency.
+        final MutableCurrency currency = new MutableCurrency((null == extra) ?
+                zero : extra);
+
+        /*
+         * Reset the sum proposed action. Perform the action on the collection
+         * of receiver delegates.
+         */
+        sumProposedAction.reset();
+        doAction(getCollection(), sumProposedAction);
+
+        /*
+         * Add the sum contained in the action to the existing value. Return
+         * the result as immutable currency.
+         */
+        currency.add(sumProposedAction.getSum());
+        return currency.getImmutable();
+    }
+
+    /**
      * Gets the weight type assigned to the node.
      *
      * @return The weight type assigned to the node
@@ -828,7 +858,6 @@ class RebalanceNode implements CurrencyReceiver {
         myNewValue.add(residual);
 
         // Set the current value of this node and return the residual.
-        setValue(myNewValue.getImmutable());
         return residual;
     }
 
@@ -1458,32 +1487,67 @@ class RebalanceNode implements CurrencyReceiver {
         }
     }
 
-    private static class SumCurrentAction extends
+    private abstract static class SumAction extends
             ActionWithContainer<MutableCurrency, ReceiverDelegate<?>> {
 
         // The initial value for the container in the action
         private static final double initialValue = 0.;
 
-        // The sum of the current values of the delegates
+        // The sum of the values of the delegates
         private final MutableCurrency sum = getContained();
-
-        @Override
-        public void doAction(@NotNull ReceiverDelegate<?> delegate) {
-            sum.add(delegate.getCurrent());
-        }
 
         @Override
         protected @NotNull MutableCurrency getInitialValue() {
             return new MutableCurrency(initialValue);
         }
 
+        /**
+         * Gets the mutable sum.
+         *
+         * @return The mutable sum
+         */
+        protected @NotNull MutableCurrency getMutableSum() {
+            return sum;
+        }
+
+        /**
+         * Gets the sum.
+         *
+         * @return The sum
+         */
         public @NotNull Currency getSum() {
-            return sum.getImmutable();
+            return getMutableSum().getImmutable();
         }
 
         @Override
         public void reset() {
             sum.set(initialValue);
+        }
+    }
+
+    private static class SumCurrentAction extends SumAction {
+
+        @Override
+        public void doAction(@NotNull ReceiverDelegate<?> delegate) {
+            getMutableSum().add(delegate.getCurrent());
+        }
+    }
+
+    private static class SumProposedAction extends SumAction {
+
+        @Override
+        public void doAction(@NotNull ReceiverDelegate<?> delegate) {
+
+            /*
+             * Get the proposed value of the receiver. Is the proposed value
+             * not null?
+             */
+            final Currency currency = delegate.getProposed();
+            if (null != currency) {
+
+                // The proposed value is not null. Add it to the mutable sum.
+                getMutableSum().add(currency);
+            }
         }
     }
 
