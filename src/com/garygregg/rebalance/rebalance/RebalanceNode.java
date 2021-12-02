@@ -151,10 +151,12 @@ class RebalanceNode implements CurrencyReceiver {
      * Does the function this class will use when calculating a deviation score.
      *
      * @param deviationAggregate An aggregate of deviations
+     * @param sampleCount The count of samples
      * @return The result of the function
      */
-    public static double calculateDeviationScore(double deviationAggregate) {
-        return Math.sqrt(deviationAggregate);
+    public static double calculateDeviationScore(double deviationAggregate,
+                                                 int sampleCount) {
+        return Math.sqrt(deviationAggregate/ sampleCount);
     }
 
     /**
@@ -1176,7 +1178,7 @@ class RebalanceNode implements CurrencyReceiver {
         public @NotNull ReallocationScore getScore() {
             return new ReallocationScore(
                     new Currency(getResidual().getValue()),
-                    calculateDeviationScore(utility.getDeviation() /
+                    calculateDeviationScore(utility.getDeviation(),
                             getCount()));
         }
 
