@@ -140,29 +140,6 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Does the function this class will use when accepting a deviation from a
-     * desired rebalanced quantity.
-     *
-     * @param deviation A deviation from a desired rebalanced quantity
-     * @return The result of the function
-     */
-    public static double calculateDeviation(double deviation) {
-        return Math.pow(deviation, 2.);
-    }
-
-    /**
-     * Does the function this class will use when calculating a deviation score.
-     *
-     * @param deviationAggregate An aggregate of deviations
-     * @param sampleCount        The count of samples
-     * @return The result of the function
-     */
-    public static double calculateDeviationScore(double deviationAggregate,
-                                                 int sampleCount) {
-        return Math.sqrt(deviationAggregate / sampleCount);
-    }
-
-    /**
      * Calculates the limit of allowed receiver delegates.
      *
      * @return The limit of allowed receiver delegates
@@ -443,11 +420,12 @@ class RebalanceNode implements CurrencyReceiver {
                     weightList.size(), current);
 
             /*
-             * Reallocate the value list using the reallocator. Initialize the
-             * residual of the initial score action to the current value of
-             * this node.
+             * Reallocate the value list using the reallocator. Clear the maps
+             * in the initial score action. Initialize the residual of the
+             * initial score action to the current value of this node.
              */
             reallocator.reallocate(valueList);
+            initialScoreAction.clearMaps();
             initialScoreAction.setResidual(current);
 
             /*
@@ -892,10 +870,11 @@ class RebalanceNode implements CurrencyReceiver {
                                          boolean isRelative) {
 
         /*
-         * Declare and initialize the residual. Does any child have positive
-         * weight?
+         * Declare and initialize the residual. Clear the maps in the value
+         * setter action. Does any child have positive weight?
          */
         Currency residual = currency;
+        valueSetterAction.clearMaps();
         if (hasAnyWeight(childValues)) {
 
             /*
@@ -1039,20 +1018,11 @@ class RebalanceNode implements CurrencyReceiver {
     private static class InitialScoreAction extends
             ResidualProducerAction {
 
-        // The residual of the action
-        private Currency residual;
-
         /**
          * Constructs the initial score action.
          */
         public InitialScoreAction() {
             setRelative(false);
-        }
-
-        @Override
-        protected @NotNull Currency getResidual(
-                ReceiverDelegate<?> delegate) {
-            return residual;
         }
 
         @Override
@@ -1080,9 +1050,8 @@ class RebalanceNode implements CurrencyReceiver {
                 incoming.subtract(delegate.getCurrent());
             }
 
-            // Set last residual, and return it.
-            residual = incoming.getImmutable();
-            return residual;
+            // Return the incoming value as immutable currency.
+            return incoming.getImmutable();
         }
     }
 
@@ -1091,6 +1060,16 @@ class RebalanceNode implements CurrencyReceiver {
 
         // The value of minus one as currency
         private static final Currency minusOne = new Currency(-1.);
+
+        // The value of zero
+        private static final Currency zero = Currency.getZero();
+
+        // A map of call-count indices to actual values
+        private final Map<Integer, MutableCurrency> actualValues =
+                new TreeMap<>();
+
+        // A map of call-count indices to means
+        private final Map<Integer, Currency> means = new TreeMap<>();
 
         // The contained set-value utility
         private final SetValueUtility utility = getContained();
@@ -1112,6 +1091,77 @@ class RebalanceNode implements CurrencyReceiver {
          */
         protected static @NotNull Currency getMinusOne() {
             return minusOne;
+        }
+
+        /**
+         * Adds an addend to the actual value associated with an index.
+         *
+         * @param index  An index
+         * @param addend The value to add to the actual value associated with
+         *               the index
+         */
+        private void addToActual(int index, @NotNull Currency addend) {
+
+            /*
+             * Get the actual value associated with the index, and add the
+             * addend.
+             */
+            final MutableCurrency currency = getActual(index);
+            currency.add(addend);
+        }
+
+        /**
+         * Calculates the deviation between actual values and means.
+         *
+         * @return The deviation between actual values and means
+         */
+        private double calculateDeviation() {
+
+            /*
+             * Declare and initialize a variable to perform currency
+             * calculations. Declare and initialize the accumulation. Cycle
+             * for each key in the actual values set.
+             */
+            final MutableCurrency currency = new MutableCurrency(zero);
+            double accumulation = 0.;
+            for (Integer key : actualValues.keySet()) {
+
+                /*
+                 * Get the first/next actual value. Subtract the mean
+                 * associated with the key. Square the difference, and
+                 * accumulate differences.
+                 */
+                currency.set(getActual(key));
+                currency.subtract(getMean(key));
+                accumulation += Math.pow(currency.getValue(), 2.);
+            }
+
+            // Return the square root of the accumulated differences.
+            return Math.sqrt(accumulation / actualValues.size());
+        }
+
+        /**
+         * Clears the actual values map.
+         */
+        private void clearActualValues() {
+            actualValues.clear();
+        }
+
+        /**
+         * Clears both the actual values map and the means map.
+         */
+        public void clearMaps() {
+
+            // Clear both the actual values map and the means map.
+            clearActualValues();
+            clearMeans();
+        }
+
+        /**
+         * Clears the means map.
+         */
+        private void clearMeans() {
+            means.clear();
         }
 
         @Override
@@ -1138,28 +1188,81 @@ class RebalanceNode implements CurrencyReceiver {
                     }
 
                     /*
+                     * Get the current count to use as an index. Use the
+                     * utility to determine if the incoming value is relative.
+                     * Is the incoming value not relative?
+                     */
+                    final int index = getCount();
+                    final boolean isRelative = utility.isRelative();
+                    if (!isRelative) {
+
+                        /*
+                         * The incoming value is not relative. Use the incoming
+                         * value to set a mean for the index.
+                         */
+                        setMean(index, incoming.getImmutable());
+                    }
+
+                    /*
                      * Ask the delegate to produce residual using the incoming
                      * value.
                      */
                     final Currency residual =
                             produceResidual(delegate, incoming.getImmutable(),
-                                    utility.isRelative());
+                                    isRelative);
 
                     /*
-                     * Subtract the residual from the proposed value, then
-                     * subtract the (possibly) modified incoming value from the
-                     * residual in the utility.
+                     * Subtract the residual from the incoming value, and get
+                     * its (possibly modified) value. Is the incoming value
+                     * relative?
                      */
                     incoming.subtract(residual);
-                    utility.subtractResidual(incoming.getImmutable());
+                    final Currency modifiedIncoming = incoming.getImmutable();
+                    if (isRelative) {
+
+                        /*
+                         * The incoming value is relative. Add the modified
+                         * incoming value to the actual value associated with
+                         * the index.
+                         */
+                        addToActual(index, modifiedIncoming);
+                    }
+
+                    /*
+                     * The incoming value is absolute. Set the modified
+                     * incoming value to the actual value associated with the
+                     * index.
+                     */
+                    else {
+                        setActual(index, modifiedIncoming);
+                    }
+
+                    /*
+                     * Subtract the modified incoming value from the residual
+                     * in the utility.
+                     */
+                    utility.subtractResidual(modifiedIncoming);
                 }
             }
+        }
+
+        /**
+         * Gets the actual value associated with an index.
+         *
+         * @param index An index
+         * @return The actual value associated with the index, or a default if
+         * no actual value had been set since the last time the actual value
+         * map was cleared
+         */
+        private @NotNull MutableCurrency getActual(int index) {
 
             /*
-             * Add the residual from the delegate to the deviation in the
-             * utility even if the delegate is not currently considered.
+             * Put a default in the actual values map if an entry is absent
+             * for the index. Return the non-null entry associated with the
+             * index.
              */
-            utility.addDeviation(getResidual(delegate).getValue());
+            actualValues.putIfAbsent(index, new MutableCurrency(zero));
+            return actualValues.get(index);
         }
 
         /**
@@ -1177,21 +1280,20 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
-         * Gets the residual from a receiver delegate.
+         * Gets the mean associated with an index.
          *
-         * @param delegate A receiver delegate
-         * @return The residual from the receiver delegate
+         * @param index An index
+         * @return The mean associated with the index, or a default if no mean
+         * had been set since the last time the means map was cleared
          */
-        protected abstract @NotNull Currency getResidual(
-                ReceiverDelegate<?> delegate);
+        private @NotNull Currency getMean(int index) {
 
-        /**
-         * Gets the residual.
-         *
-         * @return The residual
-         */
-        public @NotNull Currency getResidual() {
-            return utility.getResidual();
+            /*
+             * Put a default in the means map if an entry is absent for the
+             * index. Return the non-null entry associated with the index.
+             */
+            means.putIfAbsent(index, zero);
+            return means.get(index);
         }
 
         /**
@@ -1201,9 +1303,8 @@ class RebalanceNode implements CurrencyReceiver {
          */
         public @NotNull ReallocationScore getScore() {
             return new ReallocationScore(
-                    new Currency(getResidual().getValue()),
-                    calculateDeviationScore(utility.getDeviation(),
-                            getCount()));
+                    new Currency(utility.getResidual().getValue()),
+                    calculateDeviation());
         }
 
         /**
@@ -1256,12 +1357,37 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /**
+         * Sets the actual value associated with an index.
+         *
+         * @param index  An index
+         * @param actual The new actual value to associate with the index
+         */
+        private void setActual(int index, @NotNull Currency actual) {
+
+            // Get the actual value associated with the index, and set it.
+            final MutableCurrency currency = getActual(index);
+            currency.set(actual);
+        }
+
+        /**
          * Sets the currency list.
          *
          * @param list The currency list
          */
         public void setList(@NotNull List<MutableCurrency> list) {
             utility.setList(list);
+        }
+
+        /**
+         * Associates a mean to an index.
+         *
+         * @param index An index
+         * @param mean  A mean to associate to the index
+         * @return Any mean previously associated with the index
+         */
+        @SuppressWarnings("UnusedReturnValue")
+        private Currency setMean(int index, @NotNull Currency mean) {
+            return means.put(index, mean);
         }
 
         /**
@@ -1301,9 +1427,6 @@ class RebalanceNode implements CurrencyReceiver {
         // The residual component
         private final MutableCurrency residual = new MutableCurrency();
 
-        // The deviation component
-        private double deviation;
-
         // An index into the currency list
         private int index;
 
@@ -1316,6 +1439,7 @@ class RebalanceNode implements CurrencyReceiver {
          * non-negative values
          */
         private boolean negative;
+
         /*
          * True if the value in the currency list are to be interpreted as
          * relative values; false if they are to be interpreted as absolute
@@ -1325,24 +1449,6 @@ class RebalanceNode implements CurrencyReceiver {
 
         {
             resetResidual();
-        }
-
-        /**
-         * Adds deviation.
-         *
-         * @param deviation The deviation to add
-         */
-        public void addDeviation(double deviation) {
-            this.deviation += calculateDeviation(deviation);
-        }
-
-        /**
-         * Gets the deviation.
-         *
-         * @return The deviation
-         */
-        public double getDeviation() {
-            return deviation;
         }
 
         /**
@@ -1440,9 +1546,6 @@ class RebalanceNode implements CurrencyReceiver {
          * @param residual The residual
          */
         public void setResidual(@NotNull Currency residual) {
-
-            // Reinitialize the deviation to the ideal, and set the residual.
-            this.deviation = ReallocationScore.getIdealDeviation();
             this.residual.set(residual);
         }
 
@@ -1547,12 +1650,6 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     private static class ValueSetterAction extends ResidualProducerAction {
-
-        @Override
-        protected @NotNull Currency getResidual(
-                @NotNull ReceiverDelegate<?> delegate) {
-            return delegate.getLastResidual();
-        }
 
         @Override
         protected boolean isConsidered(@NotNull ReceiverDelegate<?> delegate) {
