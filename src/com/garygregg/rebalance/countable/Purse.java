@@ -80,6 +80,7 @@ public class Purse {
         // Return the countable.
         return countable;
     }    // The reset for shares
+
     private final Reset forShares = new Reset() {
 
         @Override
@@ -109,8 +110,15 @@ public class Purse {
      * considering the current price
      */
     public Double calculateShares(@NotNull Currency value) {
+
+        /*
+         * Get the price. Return the value divided by the price if it is okay
+         * to reset the shares. Otherwise, return null.
+         */
+        final Price price = getPrice();
         return forShares.okayToReset() ?
-                (value.getValue() / price.getValue()) : null;
+                (value.getValue() /
+                        ((null == price) ? 0. : price.getValue())) : null;
     }
 
     /**
