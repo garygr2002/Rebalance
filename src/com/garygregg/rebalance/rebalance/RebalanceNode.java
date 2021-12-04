@@ -723,13 +723,17 @@ class RebalanceNode implements CurrencyReceiver {
             boolean isRelative) {
 
         /*
-         * Get the message logger. Initialize the best score to the initial
-         * score.
+         * Get the message logger. Determine the proposed holdings prior to
+         * any rebalance.
          */
         final MessageLogger logger = getLogger();
-        ReallocationScore bestScore = calculateInitialScore();
+        final Currency beforeRebalance = getProposed(proposed);
 
-        // Clear all snapshots. Try to rebalance this node.
+        /*
+         * Initialize the best score to the initial score. Clear all snapshots.
+         * Try to rebalance this node.
+         */
+        ReallocationScore bestScore = calculateInitialScore();
         clearSnapshots();
         try {
 
@@ -850,14 +854,28 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /*
-         * Get the residual from the best reallocation score. Calculate the new
-         * value of this node by adding the residual to proposed value.
+         * Get the residual from the best reallocation score. Get the proposed
+         * value of this node with the residual added in. As a post-condition,
+         * the resulting sum should be equal to that taken prior to any
+         * rebalance. Does the precondition not hold?
          */
         final Currency residual = bestScore.getResidual();
-        final MutableCurrency myNewValue = new MutableCurrency(proposed);
-        myNewValue.add(residual);
+        final Currency afterRebalance = getProposed(residual);
+        if (!afterRebalance.equals(beforeRebalance)) {
+
+            /*
+             * The resulting sum after rebalance is not equal to the sum before
+             * rebalance. Log a message.
+             */
+            logger.streamAndLog(extraordinary, String.format("For account " +
+                            "key %s and weight type %s: The after-rebalance " +
+                            "sum of %s does not equal the before-rebalance " +
+                            "sum of %s.", getAccountKey(), getType(),
+                    afterRebalance, beforeRebalance));
+        }
 
         // Set the current value of this node and return the residual.
+        setValue(sumProposedAction.getSum());
         return residual;
     }
 
@@ -1111,51 +1129,28 @@ class RebalanceNode implements CurrencyReceiver {
                 if (null != incoming) {
 
                     /*
-                     * The incoming value is not null. Get the 'relative' flag
-                     * from the utility. Does the utility indicate that the
-                     * incoming value is a negative number?
+                     * The incoming value is not null. Multiply the incoming
+                     * value by minus one if the utility indicates that the
+                     * incoming value is a negative number.
                      */
-                    final boolean isRelative = utility.isRelative();
                     if (utility.isNegative()) {
-
-                        /*
-                         * The utility indicates that the incoming value is a
-                         * negative number. Multiply the incoming value by
-                         * minus one.
-                         */
                         incoming.multiply(getMinusOne());
                     }
 
                     /*
                      * Ask the delegate to produce residual using the incoming
-                     * value. Is the residual not zero?
+                     * value.
                      */
                     final Currency residual =
                             produceResidual(delegate, incoming.getImmutable(),
-                                    isRelative);
-                    if (residual.isNotZero()) {
-
-                        /*
-                         * The residual is not zero. Add the residual to the
-                         * proposed value if the 'relative' flag is set.
-                         */
-                        if (isRelative) {
-                            incoming.add(residual);
-                        }
-
-                        /*
-                         * ...otherwise subtract the residual if the 'relative'
-                         * flag is not set.
-                         */
-                        else {
-                            incoming.subtract(residual);
-                        }
-                    }
+                                    utility.isRelative());
 
                     /*
-                     * Subtract the modified incoming value from the residual
-                     * in the utility.
+                     * Subtract the residual from the proposed value, then
+                     * subtract the (possibly) modified incoming value from the
+                     * residual in the utility.
                      */
+                    incoming.subtract(residual);
                     utility.subtractResidual(incoming.getImmutable());
                 }
             }
