@@ -801,8 +801,8 @@ class RebalanceNode implements CurrencyReceiver {
             recoverSnapshot(SnapshotType.BEST);
         }
 
-        // Catch any exception that may occur.
-        catch (@NotNull Exception exception) {
+        // Catch illegal argument exceptions.
+        catch (@NotNull IllegalArgumentException exception) {
 
             // Log a warning saying a rebalance cannot be accomplished.
             logger.log(Level.WARNING, String.format("A rebalance cannot be " +
@@ -845,7 +845,7 @@ class RebalanceNode implements CurrencyReceiver {
              * The resulting sum after rebalance is not equal to the sum before
              * rebalance. Log a message.
              */
-            logger.streamAndLog(extraordinary, String.format("For account " +
+            logger.streamAndLog(Level.WARNING, String.format("For account " +
                             "key %s and weight type %s: The after-rebalance " +
                             "sum of %s does not equal the before-rebalance " +
                             "sum of %s.", getAccountKey(), getType(),
