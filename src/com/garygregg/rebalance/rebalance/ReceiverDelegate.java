@@ -7,6 +7,9 @@ import org.jetbrains.annotations.NotNull;
 abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
         CurrencyReceiver {
 
+    // The value of zero
+    private static final Currency zero = Currency.getZero();
+
     // The receiver from whom we are delegated
     private final T receiver;
 
@@ -17,7 +20,7 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
     private boolean considerMe;
 
     // The last difference between what was desired and what was actually set
-    private Currency lastResidual = Currency.getZero();
+    private Currency lastResidual = zero;
 
     /**
      * Constructs the receiver delegate.
@@ -27,9 +30,17 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
      */
     protected ReceiverDelegate(@NotNull T receiver, double weight) {
 
-        // Set the member variables.
+        // Set the member variables, and clear the last residual.
         this.receiver = receiver;
         this.weight = weight;
+        clearLastResidual();
+    }
+
+    /**
+     * Clears the last residual.
+     */
+    public void clearLastResidual() {
+        setLastResidual(zero);
     }
 
     @Override

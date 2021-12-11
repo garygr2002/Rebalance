@@ -185,6 +185,11 @@ abstract class ResidualProducerAction
                 utility.subtractResidual(modifiedIncoming);
             }
         }
+
+        // The delegate is not considered. Clear its last residual.
+        else {
+            delegate.clearLastResidual();
+        }
     }
 
     /**
