@@ -110,8 +110,12 @@ abstract class ResidualProducerAction
     @Override
     public void doAction(@NotNull ReceiverDelegate<?> delegate) {
 
-        // Increment the action call count. Is the delegate considered?
+        /*
+         * Increment the action call count, then get the count. Is the delegate
+         * considered?
+         */
         incrementCount();
+        final int index = getCount();
         if (isConsidered(delegate)) {
 
             /*
@@ -135,7 +139,7 @@ abstract class ResidualProducerAction
                  * determine if the incoming value is relative. Is the incoming
                  * value not relative?
                  */
-                final int index = getCount();
+
                 final boolean isRelative = utility.isRelative();
                 if (!isRelative) {
 
@@ -186,8 +190,14 @@ abstract class ResidualProducerAction
             }
         }
 
-        // The delegate is not considered. Clear its last residual.
+        // The delegate is not considered.
         else {
+
+            /*
+             * Set the adjustment for the current index to zero, and clear the
+             * last residual of the delegate.
+             */
+            setAdjustment(index, zero);
             delegate.clearLastResidual();
         }
     }
