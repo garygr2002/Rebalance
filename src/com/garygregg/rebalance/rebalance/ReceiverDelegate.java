@@ -1,6 +1,7 @@
 package com.garygregg.rebalance.rebalance;
 
 import com.garygregg.rebalance.CurrencyReceiver;
+import com.garygregg.rebalance.SnapshotKey;
 import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,13 +45,8 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
     }
 
     @Override
-    public void clearSnapshot(@NotNull SnapshotType type) {
-        getReceiver().clearSnapshot(type);
-    }
-
-    @Override
-    public void clearSnapshots() {
-        getReceiver().clearSnapshots();
+    public void clearSnapshot(@NotNull SnapshotKey key) {
+        getReceiver().clearSnapshot(key);
     }
 
     @Override
@@ -92,6 +88,11 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
         return weight;
     }
 
+    @Override
+    public boolean hasNoSnapshots() {
+        return receiver.hasNoSnapshots();
+    }
+
     /**
      * Determines if this delegate is to be considered to receive additional
      * value.
@@ -113,8 +114,8 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
     }
 
     @Override
-    public void recoverSnapshot(@NotNull SnapshotType type) {
-        getReceiver().recoverSnapshot(type);
+    public void recoverSnapshot(@NotNull SnapshotKey key) {
+        getReceiver().recoverSnapshot(key);
     }
 
     /**
@@ -154,7 +155,7 @@ abstract class ReceiverDelegate<T extends CurrencyReceiver> implements
     }
 
     @Override
-    public void takeSnapshot(@NotNull SnapshotType type) {
-        getReceiver().takeSnapshot(type);
+    public void takeSnapshot(@NotNull SnapshotKey key) {
+        getReceiver().takeSnapshot(key);
     }
 }

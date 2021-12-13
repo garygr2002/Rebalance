@@ -6,16 +6,11 @@ import org.jetbrains.annotations.NotNull;
 public interface CurrencyReceiver {
 
     /**
-     * Clears the last snapshot.
+     * Clears a snapshot.
      *
-     * @param type The snapshot type to clear
+     * @param key The key of the snapshot to clear
      */
-    void clearSnapshot(@NotNull SnapshotType type);
-
-    /**
-     * Clears snapshots of all types.
-     */
-    void clearSnapshots();
+    void clearSnapshot(@NotNull SnapshotKey key);
 
     /**
      * Gets the current value of the receiver.
@@ -25,11 +20,19 @@ public interface CurrencyReceiver {
     @NotNull Currency getCurrent();
 
     /**
+     * Determines if the receiver has no snapshots.
+     *
+     * @return True if the receiver has no snapshots; false if it has one or
+     * more
+     */
+    boolean hasNoSnapshots();
+
+    /**
      * Recovers a snapshot.
      *
-     * @param type The snapshot type to recover
+     * @param key The key of the snapshot to recover
      */
-    void recoverSnapshot(@NotNull SnapshotType type);
+    void recoverSnapshot(@NotNull SnapshotKey key);
 
     /**
      * Sets the proposed value of the receiver.
@@ -47,16 +50,7 @@ public interface CurrencyReceiver {
     /**
      * Takes a snapshot.
      *
-     * @param type The snapshot type to take
+     * @param key The key to be associated with the snapshot
      */
-    void takeSnapshot(@NotNull SnapshotType type);
-
-    enum SnapshotType {
-
-        // The optimal rebalance snapshot
-        BEST,
-
-        // The first rebalance snapshot
-        FIRST
-    }
+    void takeSnapshot(@NotNull SnapshotKey key);
 }

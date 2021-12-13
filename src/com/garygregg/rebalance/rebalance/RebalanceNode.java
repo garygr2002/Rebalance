@@ -19,20 +19,6 @@ class RebalanceNode implements CurrencyReceiver {
     private static final NodeAction<ReceiverDelegate<?>>
             cannotRebalanceAction = ReceiverDelegate::onCannotSet;
 
-    // An action to notify delegates to clear snapshots
-    private static final SnapshotAction clearSnapshotAction =
-
-            new SnapshotAction() {
-                @Override
-                public void doAction(@NotNull ReceiverDelegate<?> delegate) {
-                    delegate.clearSnapshot(getContained());
-                }
-            };
-
-    // An action to notify delegates to clear their snapshots
-    private static final NodeAction<ReceiverDelegate<?>> clearSnapshotsAction =
-            ReceiverDelegate::clearSnapshots;
-
     // The format for reporting deviation values
     private static final DecimalFormat deviationFormat =
             new DecimalFormat("0.00");
@@ -43,6 +29,20 @@ class RebalanceNode implements CurrencyReceiver {
     // An action to calculate initial residual and deviation
     private static final InitialScoreAction initialScoreAction =
             new InitialScoreAction();
+
+    // Our snapshot key factory
+    private static final SnapshotKeyFactory keyFactory =
+            new SnapshotKeyFactory(new Random());
+
+    // An action to notify delegates to clear snapshots
+    private static final SnapshotAction clearSnapshotAction =
+
+            new SnapshotAction(keyFactory.produce()) {
+                @Override
+                public void doAction(@NotNull ReceiverDelegate<?> delegate) {
+                    delegate.clearSnapshot(getContained());
+                }
+            };
 
     // The preference manager
     private static final PreferenceManager manager =
@@ -59,7 +59,7 @@ class RebalanceNode implements CurrencyReceiver {
 
     // An action to notify delegates to recover their snapshots
     private static final SnapshotAction recoverSnapshotAction =
-            new SnapshotAction() {
+            new SnapshotAction(keyFactory.produce()) {
 
                 @Override
                 public void doAction(@NotNull ReceiverDelegate<?> delegate) {
@@ -69,7 +69,7 @@ class RebalanceNode implements CurrencyReceiver {
 
     // An action to notify delegates to take snapshots
     private static final SnapshotAction takeSnapshotAction =
-            new SnapshotAction() {
+            new SnapshotAction(keyFactory.produce()) {
                 @Override
                 public void doAction(@NotNull ReceiverDelegate<?> delegate) {
                     delegate.takeSnapshot(getContained());
@@ -92,6 +92,9 @@ class RebalanceNode implements CurrencyReceiver {
     // The consideration setter action
     private final ConsiderationSetterAction considerationSetterAction =
             new ConsiderationSetterAction();
+
+    // A map of snapshot keys to the value of the snapshot
+    private final Map<SnapshotKey, Currency> snapshotMap = new HashMap<>();
 
     // The sum current action
     private final SumAction sumCurrentAction = new SumCurrentAction();
@@ -284,6 +287,31 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
+     * Determines if no receiver delegate in a collection has a snapshot.
+     *
+     * @return True if no receiver delegate has a snapshots; false if any have
+     * one or more snapshots.
+     */
+    private static <T extends ReceiverDelegate<?>>
+    boolean hasNoSnapshots(@NotNull Collection<T> delegates) {
+
+        /*
+         * Initialize the result. Get a receiver delegate iterator. Cycle while
+         * receiver delegates exist, and while no receiver has a snapshot.
+         */
+        boolean result = true;
+        final Iterator<T> iterator = delegates.iterator();
+        while (iterator.hasNext() && result) {
+
+            // Reinitialize the result.
+            result = iterator.next().hasNoSnapshots();
+        }
+
+        // Return the result.
+        return result;
+    }
+
+    /**
      * Produces a list of integers sorted by descending count of set bits.
      *
      * @param n Integers in the resulting list will be less than 2 ^ (n - 1)
@@ -450,16 +478,15 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     @Override
-    public void clearSnapshot(@NotNull SnapshotType type) {
+    public void clearSnapshot(@NotNull SnapshotKey key) {
 
-        // Set the given snapshot type before performing the action.
-        clearSnapshotAction.setType(type);
+        /*
+         * Set the given snapshot key before performing the action. Remove the
+         * key from the snapshot map.
+         */
+        clearSnapshotAction.setKey(key);
         doAction(getCollection(), clearSnapshotAction);
-    }
-
-    @Override
-    public void clearSnapshots() {
-        doAction(getCollection(), clearSnapshotsAction);
+        snapshotMap.remove(key);
     }
 
     /**
@@ -576,6 +603,24 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
+     * Gets a value given a snapshot key.
+     *
+     * @param key A snapshot key
+     * @return A value associated with the snapshot key, or zero if there is no
+     * current association for the key
+     */
+    private @NotNull Currency getSnapshot(@NotNull SnapshotKey key) {
+
+        /*
+         * Get any value associated with the key in the snapshot map. Return
+         * zero if there is no current association. Otherwise, return the
+         * associated value.
+         */
+        final Currency currency = snapshotMap.get(key);
+        return (null == currency) ? zero : currency;
+    }
+
+    /**
      * Gets the weight type assigned to the node.
      *
      * @return The weight type assigned to the node
@@ -600,6 +645,37 @@ class RebalanceNode implements CurrencyReceiver {
      */
     public double getWeight() {
         return weight;
+    }
+
+    @Override
+    public boolean hasNoSnapshots() {
+
+        /*
+         * Declare and initialize the result according to whether the snapshot
+         * map is empty. Is the snapshot map empty?
+         */
+        boolean result = snapshotMap.isEmpty();
+        if (result) {
+
+            /*
+             * The snapshot map is empty. Check the child values for snapshots
+             * if one or more children have positive weight.
+             */
+            if (hasAnyWeight(childValues)) {
+                result = hasNoSnapshots(childValues);
+            }
+
+            /*
+             * No child has positive weight. Check the tickers for snapshots if
+             * any has weight.
+             */
+            else if (hasAnyWeight(tickerSet)) {
+                result = hasNoSnapshots(tickerSet);
+            }
+        }
+
+        // Return the result.
+        return result;
     }
 
     /**
@@ -706,12 +782,15 @@ class RebalanceNode implements CurrencyReceiver {
         final MessageLogger logger = getLogger();
         final Currency beforeRebalance = getProposed(proposed);
 
+        // Create snapshot keys for the best snapshot and the first snapshot.
+        final SnapshotKey bestKey = keyFactory.produce();
+        final SnapshotKey firstKey = keyFactory.produce();
+
         /*
-         * Initialize the best score to the initial score. Clear all snapshots.
-         * Try to rebalance this node.
+         * Initialize the best score to the initial score. Try to rebalance
+         * this node.
          */
         ReallocationScore bestScore = calculateInitialScore();
-        clearSnapshots();
         try {
 
             /*
@@ -736,10 +815,10 @@ class RebalanceNode implements CurrencyReceiver {
 
             /*
              * Initially, the best snapshot is the first snapshot. Initialize
-             * both first and best snapshots to the current rebalance.
+             * both best and first snapshots to the current rebalance.
              */
-            takeSnapshot(SnapshotType.FIRST);
-            takeSnapshot(SnapshotType.BEST);
+            takeSnapshot(bestKey);
+            takeSnapshot(firstKey);
 
             /*
              * Initialize a constant for the 'ideal' score, and a variable to
@@ -785,7 +864,7 @@ class RebalanceNode implements CurrencyReceiver {
                      * Reset the best snapshot, and set the best score to the
                      * current score.
                      */
-                    takeSnapshot(SnapshotType.BEST);
+                    takeSnapshot(bestKey);
                     bestScore = currentScore;
                 }
 
@@ -793,11 +872,11 @@ class RebalanceNode implements CurrencyReceiver {
                  * Recover the first snapshot in case we require any further
                  * rebalance attempts.
                  */
-                recoverSnapshot(SnapshotType.FIRST);
+                recoverSnapshot(firstKey);
             }
 
             // Done. Recover the best snapshot.
-            recoverSnapshot(SnapshotType.BEST);
+            recoverSnapshot(bestKey);
         }
 
         // Catch illegal argument exceptions.
@@ -817,6 +896,10 @@ class RebalanceNode implements CurrencyReceiver {
         // Do this unconditionally.
         finally {
 
+            // Clear snapshots, if any.
+            clearSnapshot(firstKey);
+            clearSnapshot(bestKey);
+
             /*
              * Log a message identifying the best reallocation score
              * characteristics.
@@ -834,7 +917,7 @@ class RebalanceNode implements CurrencyReceiver {
          * Get the residual from the best reallocation score. Get the proposed
          * value of this node with the residual added in. As a post-condition,
          * the resulting sum should be equal to that taken prior to any
-         * rebalance. Does the precondition not hold?
+         * rebalance. Does the post-condition not hold?
          */
         final Currency residual = bestScore.getResidual();
         final Currency afterRebalance = getProposed(residual);
@@ -857,11 +940,15 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     @Override
-    public void recoverSnapshot(@NotNull SnapshotType type) {
+    public void recoverSnapshot(@NotNull SnapshotKey key) {
 
-        // Set the given snapshot type before performing the action.
-        recoverSnapshotAction.setType(type);
+        /*
+         * Set the given snapshot key before performing the action. Restore
+         * the value from the snapshot map.
+         */
+        recoverSnapshotAction.setKey(key);
         doAction(getCollection(), recoverSnapshotAction);
+        setValue(getSnapshot(key));
     }
 
     @Override
@@ -905,10 +992,14 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     @Override
-    public void takeSnapshot(@NotNull SnapshotType type) {
+    public void takeSnapshot(@NotNull SnapshotKey key) {
 
-        // Set the given snapshot type before performing the action.
-        takeSnapshotAction.setType(type);
+        /*
+         * Set the given snapshot key before performing the action. Put the
+         * current value in the snapshot map.
+         */
+        takeSnapshotAction.setKey(key);
         doAction(getCollection(), takeSnapshotAction);
+        snapshotMap.put(key, getValue());
     }
 }

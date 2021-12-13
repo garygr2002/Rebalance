@@ -69,8 +69,8 @@ public class Ticker extends
         }
     };
 
-    // A map of snapshot type to the of the number of proposed shares in the snapshot
-    private final Map<SnapshotType, Double> snapshotMap = new HashMap<>();
+    // A map of snapshot keys to the of the number of proposed shares in the snapshot
+    private final Map<SnapshotKey, Double> snapshotMap = new HashMap<>();
 
     {
 
@@ -209,9 +209,6 @@ public class Ticker extends
                 new Activity(type, null));
         associationMap.put(type = WeightType.STOCK_VALUE,
                 new Activity(type, null));
-
-        // Clear all snapshots.
-        clearSnapshots();
     }
 
     /**
@@ -264,17 +261,8 @@ public class Ticker extends
     }
 
     @Override
-    public void clearSnapshot(@NotNull SnapshotType type) {
-        snapshotMap.remove(type);
-    }
-
-    @Override
-    public void clearSnapshots() {
-
-        // Clear the snapshot for each snapshot type.
-        for (SnapshotType type : SnapshotType.values()) {
-            clearSnapshot(type);
-        }
+    public void clearSnapshot(@NotNull SnapshotKey key) {
+        snapshotMap.remove(key);
     }
 
     /**
@@ -353,6 +341,11 @@ public class Ticker extends
          */
         final Currency considered = getConsidered();
         return (null == considered) ? zeroCurrency : considered;
+    }
+
+    @Override
+    public boolean hasNoSnapshots() {
+        return snapshotMap.isEmpty();
     }
 
     /**
@@ -513,14 +506,14 @@ public class Ticker extends
     }
 
     @Override
-    public void recoverSnapshot(@NotNull SnapshotType type) {
+    public void recoverSnapshot(@NotNull SnapshotKey key) {
 
         /*
          * Get the snapshot from the snapshot map. Set zero proposed shares if
          * the snapshot is null. Otherwise, set the snapshot as the proposed
          * number of shares.
          */
-        final Double snapshot = snapshotMap.get(type);
+        final Double snapshot = snapshotMap.get(key);
         proposed.setShares((null == snapshot) ? zeroShares : snapshot);
     }
 
@@ -760,7 +753,7 @@ public class Ticker extends
     }
 
     @Override
-    public void takeSnapshot(@NotNull SnapshotType type) {
+    public void takeSnapshot(@NotNull SnapshotKey key) {
 
         /*
          * Get the number of proposed shares. Is the number of proposed shares
@@ -770,12 +763,12 @@ public class Ticker extends
         if (null == shares) {
 
             // The number of proposed shares is null. Clear the snapshot.
-            clearSnapshot(type);
+            clearSnapshot(key);
         }
 
         // The number of proposed shares is not null. Take the snapshot.
         else {
-            snapshotMap.put(type, shares.getValue());
+            snapshotMap.put(key, shares.getValue());
         }
     }
 
