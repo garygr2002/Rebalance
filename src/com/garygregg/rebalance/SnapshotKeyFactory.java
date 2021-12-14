@@ -55,11 +55,14 @@ public class SnapshotKeyFactory {
      */
     public @NotNull SnapshotKey produce() {
 
+        // Calculate the new internal key as an unsigned long.
+        final long newKey = Integer.toUnsignedLong(key) * bigPrime1 +
+                bigPrime2;
+
         /*
-         * Calculate the new internal key and return a new snapshot key with
-         * it.
+         * Mask the high-end bits of the new internal key, wrap it in a
+         * snapshot key, and return the snapshot key.
          */
-        final long newKey = key * bigPrime1 + bigPrime2;
         key = (int) (newKey & mask);
         return new SnapshotKey(key);
     }
