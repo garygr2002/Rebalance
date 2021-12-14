@@ -136,7 +136,7 @@ public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
      * @return The residual of a rebalance operation, or null if a rebalance
      * has not been attempted
      */
-    Currency getResidual() {
+    public Currency getResidual() {
         return residual;
     }
 
