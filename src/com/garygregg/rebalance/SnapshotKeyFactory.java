@@ -2,25 +2,17 @@ package com.garygregg.rebalance;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Random;
 
 public class SnapshotKeyFactory {
 
-    // A list of big primes
-    private static final List<Long> bigPrimes =
-            List.of(4294967291L, 4294967279L);
+    // The largest prime less than 2^(Integer.SIZE - 1)
+    private static final long bigPrime = 2147483647L;
 
-    // Big prime one
-    private static final long bigPrime1 = bigPrimes.get(0);
+    // A modulus for clearing bits beyond Integer.SIZE - 1
+    private static final long mod = (1L << Integer.SIZE);
 
-    // Big prime two
-    private static final long bigPrime2 = bigPrimes.get(1);
-
-    // A mask to clear the high-end bits in a long integer
-    private static final long mask = (1L << Integer.SIZE) - 1;
-
-    // The internal key
+    // The current internal key
     private int key;
 
     /**
@@ -54,16 +46,7 @@ public class SnapshotKeyFactory {
      * @return A new snapshot key
      */
     public @NotNull SnapshotKey produce() {
-
-        // Calculate the new internal key as an unsigned long.
-        final long newKey = Integer.toUnsignedLong(key) * bigPrime1 +
-                bigPrime2;
-
-        /*
-         * Mask the high-end bits of the new internal key, wrap it in a
-         * snapshot key, and return the snapshot key.
-         */
-        key = (int) (newKey & mask);
-        return new SnapshotKey(key);
+        return new SnapshotKey(key = ((int) ((Integer.toUnsignedLong(key) +
+                bigPrime) % mod)));
     }
 }
