@@ -300,6 +300,24 @@ abstract class ReportWriter extends ElementProcessor {
     }
 
     /**
+     * Writes portfolio information between the balanceable and unbalanceable
+     * sections of the report.
+     *
+     * @param writer    The recipient for writer output
+     * @param portfolio A portfolio
+     * @return True if the information was successfully written; false
+     * otherwise
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    protected boolean writeBetween(@NotNull FileWriter writer,
+                                   @NotNull Portfolio portfolio)
+            throws IOException {
+
+        // The default is to do nothing.
+        return true;
+    }
+
+    /**
      * Writes dates for each known element reader.
      *
      * @param writer The file writer to receive the dates
@@ -547,24 +565,30 @@ abstract class ReportWriter extends ElementProcessor {
 
         /*
          * Write a summary of the portfolio using the balance-able writer,
-         * receiving a result. Create an unbalance-able writer with the file
-         * writer. For this writer, the valuator is well known and does need to
-         * be supplied.
+         * receiving a result. Write any information that should appear between
+         * the balance-able and un-balanceable portions of the report. Receive
+         * a result, and-ing it with the previous result.
          */
         boolean result = balanceableWriter.writeSummary(portfolio);
-        final UnbalanceableWriter unbalanceableWriter =
-                new UnbalanceableWriter(fileWriter);
+        result = writeBetween(fileWriter, portfolio) && result;
 
         /*
-         * Write a newline, followed by a summary of the portfolio using the
-         * un-balanceable writer. Receive a result, and-ing it with the
-         * previous result.
+         * Create an unbalance-able writer with the file writer. For this
+         * writer, the valuator is well known and does not need to be supplied.
+         * Write a newline.
          */
+        final UnbalanceableWriter unbalanceableWriter =
+                new UnbalanceableWriter(fileWriter);
         fileWriter.write("\n");
+
+        /*
+         * Write a summary of the portfolio using the un-balanceable writer.
+         * Receive a result, and-ing it with the previous result.
+         */
         result = unbalanceableWriter.writeSummary(portfolio) && result;
+        writeTrailer(fileWriter, portfolio);
 
         // Close the file writer and return the result to our caller.
-        writeTrailer(fileWriter, portfolio);
         fileWriter.close();
         return result;
     }
