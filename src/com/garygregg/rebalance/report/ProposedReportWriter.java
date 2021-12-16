@@ -105,23 +105,43 @@ public class ProposedReportWriter extends ReportWriter {
 
             /*
              * Get the key of the account and its rebalance residual. Is the
-             * rebalance residual for the first/next account non-zero?
+             * rebalance residual for the first/next account null?
              */
             key = account.getKey();
             residual = account.getResidual();
-            if (residual.isNotZero()) {
+            if (null == residual) {
 
                 /*
                  * The rebalance residual for the first/next account is
-                 * non-zero. Increment the count of accounts with this problem,
-                 * and write a line to the report describing the account and
-                 * the amount of its non-zero residual.
+                 * null. Increment the count of accounts with non-zero
+                 * residuals, and write a line to the report describing the
+                 * account and its null residual.
+                 */
+                ++accountsWithNonZeroResiduals;
+                writer.write(String.format("WARNING! Account %s of " +
+                                "institution %s has a null rebalance " +
+                                "residual!\n",
+                        AccountKey.format(key.getSecond()), key.getFirst()));
+            }
+
+            /*
+             * The rebalance residual for the first/next account is not null,
+             * but is it non-zero?
+             */
+            else if (residual.isNotZero()) {
+
+                /*
+                 * The rebalance residual for the first/next account is not
+                 * null, but is non-zero. Increment the count of accounts with
+                 * non-zero residuals, and write a line to the report
+                 * describing the account and the amount of its non-zero
+                 * residual.
                  */
                 ++accountsWithNonZeroResiduals;
                 writer.write(String.format("WARNING! Account %s of " +
                                 "institution %s has a rebalance residual of " +
                                 "%s!\n", AccountKey.format(key.getSecond()),
-                        key.getFirst(), account.getResidual()));
+                        key.getFirst(), residual));
             }
         }
 
