@@ -12,7 +12,7 @@ class TickerDelegate extends ReceiverDelegate<Ticker> {
      * @param ticker The ticker from whom we are delegated
      */
     public TickerDelegate(@NotNull Ticker ticker) {
-        super(ticker, 1.);
+        super(ticker, ticker.getWeight());
     }
 
     @Override

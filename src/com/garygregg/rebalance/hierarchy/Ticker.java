@@ -72,6 +72,9 @@ public class Ticker extends
     // A map of snapshot keys to the of the number of proposed shares in the snapshot
     private final Map<SnapshotKey, Double> snapshotMap = new HashMap<>();
 
+    // The rebalancing weight of the ticker
+    private final double weight;
+
     {
 
         /*
@@ -212,12 +215,29 @@ public class Ticker extends
     }
 
     /**
-     * Creates the ticker hierarchy object.
+     * Creates the ticker hierarchy object with an explicit rebalancing weight.
+     *
+     * @param ticker The key of the ticker hierarchy object
+     * @param weight The rebalancing weight of the ticker
+     */
+    Ticker(@NotNull String ticker, Double weight) {
+
+        /*
+         * Call the super class method with the ticker key. Set a default
+         * rebalancing weight if the given weight is null. Otherwise, use the
+         * given rebalancing weight.
+         */
+        super(ticker);
+        this.weight = (null == weight) ? 1. : weight;
+    }
+
+    /**
+     * Creates the ticker hierarchy object with a default rebalancing weight.
      *
      * @param ticker The key of the ticker hierarchy object
      */
     Ticker(@NotNull String ticker) {
-        super(ticker);
+        this(ticker, null);
     }
 
     /**
@@ -343,11 +363,6 @@ public class Ticker extends
         return (null == considered) ? zeroCurrency : considered;
     }
 
-    @Override
-    public boolean hasNoSnapshots() {
-        return snapshotMap.isEmpty();
-    }
-
     /**
      * Gets the breakdown manager.
      *
@@ -412,6 +427,15 @@ public class Ticker extends
         return proposed.getShares();
     }
 
+    /**
+     * Gets the rebalancing weight of the ticker.
+     *
+     * @return The rebalancing weight of the ticker
+     */
+    public double getWeight() {
+        return weight;
+    }
+
     @Override
     public boolean hasCategoryType(@NotNull CategoryType type) {
         return type.equals(CategoryType.NOT_AN_ACCOUNT);
@@ -426,6 +450,11 @@ public class Ticker extends
          */
         final TickerDescription description = getDescription();
         return (null != description) && description.hasType(type);
+    }
+
+    @Override
+    public boolean hasNoSnapshots() {
+        return snapshotMap.isEmpty();
     }
 
     @Override

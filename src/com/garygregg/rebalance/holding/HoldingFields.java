@@ -18,7 +18,10 @@ enum HoldingFields {
     SHARES(3),
 
     // The value of the holding: shares times price
-    VALUE(5);
+    VALUE(5),
+
+    // The rebalancing weight of the holding
+    WEIGHT(6);
 
     // The position of the field in the data file
     private final int position;

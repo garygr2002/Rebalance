@@ -935,10 +935,12 @@ public class Hierarchy {
         }
 
         /*
-         * Create a new ticker object with the ticker symbol. Try to add and
-         * push the ticker. Could this not be accomplished?
+         * Create a new ticker object with the ticker symbol and rebalancing
+         * weight. Try to add and push the ticker. Could this not be
+         * accomplished?
          */
-        final Ticker ticker = new Ticker(tickerSymbol);
+        final Ticker ticker = new Ticker(tickerSymbol,
+                holdingDescription.getWeight());
         if (!addAndPush(ticker)) {
 
             // The ticker could not be added and pushed. Do not continue.

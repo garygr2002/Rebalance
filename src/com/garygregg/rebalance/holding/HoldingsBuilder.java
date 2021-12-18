@@ -111,8 +111,8 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
                     final Currency current = getTarget().getValue();
 
                     /*
-                     * Use the current value of the description of the
-                     * description if it is not null; otherwise use zero.
+                     * Use the current value of the description if it is not
+                     * null; otherwise use zero.
                      */
                     final double defaultValue = (null == current) ?
                             Currency.getZero().getValue() : current.getValue();
@@ -123,6 +123,32 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
                 }
             };
 
+    // Our rebalancing weight interpreter
+    private final DoubleInterpreter weightInterpreter =
+            new DoubleInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Double defaultValue) {
+                    logMessage(Level.WARNING, String.format("Rebalancing " +
+                                    "weight '%s' at line number %d in the " +
+                                    "holding file cannot be parsed; using %s.",
+                            string, getRow(), defaultValue));
+                }
+            };
+
+    // The rebalancing weight processor
+    private final FieldProcessor<HoldingDescription> weightProcessor =
+            new FieldProcessor<>() {
+
+                @Override
+                public void processField(@NotNull String field) {
+                    getTarget().setWeight(weightInterpreter.interpret(field,
+                            0.));
+                }
+            };
+
     {
 
         // Initialize a field index. Add the name and shares processors.
@@ -130,9 +156,13 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
         addFieldProcessor(++fieldIndex, nameProcessor);
         addFieldProcessor(++fieldIndex, sharesProcessor);
 
-        // Add the price and value processors.
+        /*
+         * Add the price processor, the value processor and the weight
+         * processor.
+         */
         addFieldProcessor(++fieldIndex, priceProcessor);
         addFieldProcessor(++fieldIndex, valueProcessor);
+        addFieldProcessor(++fieldIndex, weightProcessor);
     }
 
     /**
@@ -236,7 +266,7 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
 
             // The line type is not known. Log a warning and return.
             logMessage(Level.WARNING, String.format("Line code '%s' is not " +
-                    "recognized at line number %d in the %s file.", lineCode,
+                            "recognized at line number %d in the %s file.", lineCode,
                     lineNumber, getPrefix()));
             return;
         }
@@ -299,12 +329,13 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
         }
 
         /*
-         * Or log a different warning if the fields-to-process is less than one
-         * less than the number of portfolio fields. We allow the final field
-         * (holding value) to be missing, assuming it is the product of shares
-         * times price.
+         * Or log a different warning if the fields-to-process is less than two
+         * less than the number of portfolio fields. We allow the final two
+         * fields (holding value and rebalancing weight) to be missing. We
+         * assume that the holding value is the product of shares times price,
+         * and that the rebalancing weight is null.
          */
-        else if (fieldsToProcess < numberOfPortfolioFields - 1) {
+        else if (fieldsToProcess < numberOfPortfolioFields - 2) {
             logMessage(Level.WARNING, String.format("There are %d holding " +
                             "fields but only %d holding line elements at " +
                             "line number %d; you might want to check that.",
@@ -334,11 +365,12 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
         priceInterpreter.setRow(lineNumber);
 
         /*
-         * Set the line number as the row in the shares interpreter and the
-         * value interpreter.
+         * Set the line number as the row in the shares interpreter, the value
+         * interpreter, and the weight interpreter.
          */
         sharesInterpreter.setRow(lineNumber);
         valueInterpreter.setRow(lineNumber);
+        weightInterpreter.setRow(lineNumber);
     }
 
     @Override
@@ -349,6 +381,7 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
         sharesProcessor.setTarget(description);
         priceProcessor.setTarget(description);
         valueProcessor.setTarget(description);
+        weightProcessor.setTarget(description);
     }
 
     @Override

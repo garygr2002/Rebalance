@@ -33,6 +33,9 @@ public class HoldingDescription implements Description<Integer> {
     // The name associated with the holding
     private String name;
 
+    // The rebalancing weight of the holding
+    private Double weight;
+
     /**
      * Constructs the holding description.
      *
@@ -103,6 +106,15 @@ public class HoldingDescription implements Description<Integer> {
     }
 
     /**
+     * Gets the rebalancing weight of the holding.
+     *
+     * @return The rebalancing weight of the holding
+     */
+    public Double getWeight() {
+        return weight;
+    }
+
+    /**
      * Sets the holding line type.
      *
      * @param lineType The holding line type
@@ -145,5 +157,14 @@ public class HoldingDescription implements Description<Integer> {
      */
     void setValue(double value) {
         purse.setValueAdjustShares(value);
+    }
+
+    /**
+     * Sets the rebalancing weight of the holding.
+     *
+     * @param weight The rebalancing weight of the holding
+     */
+    void setWeight(Double weight) {
+        this.weight = weight;
     }
 }
