@@ -51,7 +51,7 @@ public enum CommandLineId {
 
     // The limit of allowed receiver delegates
     @SuppressWarnings("SpellCheckingInspection")
-    X("Rebalance limit of funds per account", "ncnt", true),
+    X("rebalance limit of funds per account", "ncnt", true),
 
     // Source data directory (string path)
     @SuppressWarnings("SpellCheckingInspection")
