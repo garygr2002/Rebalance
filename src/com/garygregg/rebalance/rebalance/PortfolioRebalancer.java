@@ -15,38 +15,17 @@ import java.util.*;
 @SuppressWarnings("EmptyClassInitializer")
 public class PortfolioRebalancer extends Rebalancer {
 
-    // The default rebalancer
-    private static final AccountRebalancer defaultRebalancer =
-            new WeightRebalancer();
-
     // A rebalancer instance
     private static final PortfolioRebalancer instance =
             new PortfolioRebalancer();
 
     // The rebalancer for an account that is last
-    private static final AccountRebalancer lastRebalancer = defaultRebalancer;
+    private static final AccountRebalancer lastRebalancer =
+            new ClosureRebalancer();
 
     // The rebalancer for an account that is not last
     private static final AccountRebalancer notLastRebalancer =
-            defaultRebalancer;
-
-    /*
-     * A map of distinguished accounts to account rebalancers
-     *
-     * TODO: Delete this.
-     */
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private static final Map<DistinguishedAccount, AccountRebalancer> rebalancerMap =
-            new HashMap<>();
-
-    static {
-
-        /*
-         * TODO: Put test rebalancers in this static block...
-         *
-         * ...but delete the block later, as well as all the other test code.
-         */
-    }
+            new WeightRebalancer();
 
     // A rebalance action for accounts
     private final Action<Hierarchy, Account> accountAction =
@@ -215,25 +194,10 @@ public class PortfolioRebalancer extends Rebalancer {
      * otherwise
      */
     private boolean rebalance(@NotNull Account account, boolean isLast) {
-        
-        /*
-         * Try to get an explicit rebalancer from the rebalancer map.
-         *
-         * TODO: Remove this logic when testing is complete.
-         */
-        AccountRebalancer rebalancer = rebalancerMap.get(
-                DistinguishedAccountLibrary.getInstance().getKey(
-                        account.getKey()));
 
-        /*
-         * Use either the default 'last' rebalancer or the default 'not last'
-         * rebalancer if there is no explicit rebalancer.
-         */
-        if (null == rebalancer) {
-            rebalancer = isLast ? lastRebalancer : notLastRebalancer;
-        }
-
-        // Rebalance the account with the designated account rebalancer.
+        // Determine which rebalancer to use, and rebalance the account.
+        final AccountRebalancer rebalancer = isLast ? lastRebalancer :
+                notLastRebalancer;
         return rebalancer.rebalance(account);
     }
 
