@@ -171,7 +171,14 @@ public class PortfolioRebalancer extends Rebalancer {
      * otherwise
      */
     private boolean rebalance(@NotNull Portfolio portfolio) {
-        return perform(portfolio, portfolioAction);
+
+        /*
+         * Perform the portfolio rebalance action, receiving a result. Break
+         * down the portfolio, and return the result.
+         */
+        final boolean result = perform(portfolio, portfolioAction);
+        breakdownPortfolio(portfolio);
+        return result;
     }
 
     /**
