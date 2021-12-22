@@ -104,7 +104,7 @@ class WeightRebalancer extends AccountRebalancer
          * Set the weight map based on the given account, and cycle for each
          * ticker in the account.
          */
-        setWeightMap(getWeightsForPercentage(account, shouldAdjust(account)));
+        setWeightMap(getWeights(account, shouldAdjust(account)));
         for (Ticker ticker : account.getChildren()) {
 
             /*
@@ -134,6 +134,24 @@ class WeightRebalancer extends AccountRebalancer
      */
     private Map<WeightType, Double> getWeightMap() {
         return weightMap;
+    }
+
+    /**
+     * Creates a weight map for a rebalance.
+     *
+     * @param account The account for which to create a weight map
+     * @param adjust  True if the map should be adjusted for relative market
+     *                valuation; false otherwise
+     * @return A weight map for the account
+     */
+    protected @NotNull Map<WeightType, Double> getWeights(
+            @NotNull Account account, boolean adjust) {
+
+        /*
+         * The default is to get weights for percentage. Override this method
+         * in a subclass to do something else.
+         */
+        return getWeightsForPercentage(account, shouldAdjust(account));
     }
 
     /**
