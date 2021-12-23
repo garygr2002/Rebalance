@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class AccountDescription implements Description<AccountKey> {
+public class AccountDescription implements Comparable<AccountDescription>,
+        Description<AccountKey> {
 
     // The number of the account
     private final Long accountNumber;
@@ -80,6 +81,18 @@ public class AccountDescription implements Description<AccountKey> {
      */
     void adjustAllocation(@NotNull FundType type, Double value) {
         allocation.put(type, value);
+    }
+
+    @Override
+    public int compareTo(@NotNull AccountDescription accountDescription) {
+
+        // Get his rebalance order and my rebalance order.
+        final Long his = accountDescription.getRebalanceOrder();
+        final Long mine = getRebalanceOrder();
+
+        // Calculate the return value.
+        return (null == mine) ? ((null == his) ? 0 : -1) :
+                ((null == his) ? 1 : mine.compareTo(his));
     }
 
     /**
