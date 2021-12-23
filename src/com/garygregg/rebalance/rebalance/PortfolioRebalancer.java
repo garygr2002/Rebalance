@@ -37,7 +37,7 @@ public class PortfolioRebalancer extends Rebalancer {
                 @Override
                 public boolean perform(@NotNull Account child,
                                        boolean isLast) {
-                    return rebalance(child, isLast);
+                    return rebalance(child, isLastAccount(child));
                 }
             };
 
@@ -54,9 +54,12 @@ public class PortfolioRebalancer extends Rebalancer {
                 @Override
                 public boolean perform(@NotNull Account child,
                                        boolean isLast) {
-                    return rebalance(child, isLast);
+                    return rebalance(child, isLastAccount(child));
                 }
             };
+
+    // A set of last accounts
+    private final Set<Account> lastAccounts = new HashSet<>();
 
     // A rebalance action for a portfolio
     private final Action<Portfolio, Institution> portfolioAction =
@@ -161,6 +164,70 @@ public class PortfolioRebalancer extends Rebalancer {
     }
 
     /**
+     * Adds an account to the last accounts set.
+     *
+     * @param portfolio A portfolio containing the last account
+     * @return True if the last account of the portfolio was successfully
+     * added to the last account set; false otherwise
+     */
+    private boolean addLastAccount(@NotNull Portfolio portfolio) {
+
+        /*
+         * Get the last account from the portfolio, and add it to the last
+         * accounts set.
+         */
+        final Account last = portfolio.getLast();
+        return (null != last) && lastAccounts.add(last);
+    }
+
+    /**
+     * Adds last accounts to the last accounts set.
+     *
+     * @param hierarchy A hierarchy
+     * @return True if last accounts were added to the last accounts set for
+     * each portfolio in the hierarchy
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    private boolean addLastAccounts(@NotNull Hierarchy hierarchy) {
+
+        /*
+         * Declare and initialize the return value. Clear all last accounts in
+         * the last accounts set. Cycle for each portfolio in the hierarchy.
+         */
+        boolean result = true;
+        clearLastAccounts();
+        for (Portfolio portfolio : hierarchy.getPortfolios()) {
+
+            /*
+             * Add the last account of the portfolio, and maintain the return
+             * value.
+             */
+            result = addLastAccount(portfolio) && result;
+        }
+
+        // Return the result.
+        return result;
+    }
+
+    /**
+     * Clears the last accounts set.
+     */
+    private void clearLastAccounts() {
+        lastAccounts.clear();
+    }
+
+    /**
+     * Determines if an account is the last account in its portfolio.
+     *
+     * @param account An account
+     * @return True if the account is the last account in its portfolio; false
+     * otherwise
+     */
+    private boolean isLastAccount(@NotNull Account account) {
+        return lastAccounts.contains(account);
+    }
+
+    /**
      * Rebalances each institution in a portfolio
      *
      * @param portfolio The portfolio to rebalance
@@ -218,14 +285,14 @@ public class PortfolioRebalancer extends Rebalancer {
     public boolean rebalanceByAccount(@NotNull Hierarchy hierarchy) {
 
         /*
-         * Perform the account rebalancing action for each account in the
-         * hierarchy and save the result. Cycle for each portfolio in the
-         * hierarchy.
+         * Add last accounts for each portfolio in the hierarchy. Perform the
+         * account rebalance action, receiving a result.
          */
+        addLastAccounts(hierarchy);
         final boolean result = perform(hierarchy, accountAction);
-        for (Portfolio portfolio : hierarchy.getPortfolios()) {
 
-            // Break down the first/next portfolio.
+        // Break down each portfolio in the hierarchy.
+        for (Portfolio portfolio : hierarchy.getPortfolios()) {
             breakdownPortfolio(portfolio);
         }
 
@@ -252,6 +319,12 @@ public class PortfolioRebalancer extends Rebalancer {
      * otherwise
      */
     public boolean rebalanceByInstitution(@NotNull Hierarchy hierarchy) {
+
+        /*
+         * Add last accounts for each portfolio in the hierarchy. Perform the
+         * hierarchy rebalance action.
+         */
+        addLastAccounts(hierarchy);
         return perform(hierarchy, hierarchyAction);
     }
 
