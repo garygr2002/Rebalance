@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
-        implements Balanceable {
+        implements Balanceable, Comparable<Account> {
 
     // A factory for producing artificial accounts
     private static final Factory<Account> factory = Account::getNewArtificial;
@@ -85,6 +85,18 @@ public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
          */
         return new Account(new AccountKey(Library.getDefaultStringKey(),
                 AccountKeyLibrary.getDefaultAccountNumber()), new Date());
+    }
+
+    @Override
+    public int compareTo(@NotNull Account account) {
+
+        // Get his account description and my account description.
+        final AccountDescription his = account.getDescription();
+        final AccountDescription mine = getDescription();
+
+        // Calculate the return value.
+        return (null == mine) ? ((null == his) ? 0 : -1) :
+                ((null == his) ? 1 : mine.compareTo(his));
     }
 
     @Override
