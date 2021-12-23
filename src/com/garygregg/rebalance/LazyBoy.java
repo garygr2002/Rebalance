@@ -16,7 +16,17 @@ public class LazyBoy<T> {
      * @param factory A factory for producing objects of our type
      */
     public LazyBoy(@NotNull Factory<T> factory) {
+
+        // Set the factory, and clear this lazy boy.
         this.factory = factory;
+        clear();
+    }
+
+    /**
+     * Clears the lazy boy.
+     */
+    public void clear() {
+        object = null;
     }
 
     /**
