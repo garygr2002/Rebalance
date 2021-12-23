@@ -700,11 +700,11 @@ public class Conductor implements Dispatch<CommandLineId> {
             new CurrentReportWriter().writeLines(hierarchy, null);
 
             /*
-             * Now rebalance the hierarchy by institution. Try to write a
-             * report for proposed holdings for each portfolio in the default
+             * Now rebalance the hierarchy by account. Try to write a report
+             * for proposed holdings for each portfolio in the default
              * hierarchy.
              */
-            PortfolioRebalancer.getInstance().rebalanceByInstitution(hierarchy);
+            PortfolioRebalancer.getInstance().rebalanceByAccount(hierarchy);
             new ProposedReportWriter().writeLines(hierarchy, null);
         }
 
