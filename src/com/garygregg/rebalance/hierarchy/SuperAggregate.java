@@ -141,6 +141,13 @@ abstract class SuperAggregate<KeyType,
     }
 
     /**
+     * Gets the last account.
+     *
+     * @return The last account
+     */
+    public abstract Account getLast();
+
+    /**
      * Gets the value of the hierarchy object that cannot be considered for
      * rebalance specific to the given category type.
      *

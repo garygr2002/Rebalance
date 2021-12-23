@@ -15,6 +15,9 @@ public class Institution extends SuperAggregate<
     // A lazy boy for an artificial institution
     private static final LazyBoy<Institution> lazyBoy = new LazyBoy<>(factory);
 
+    // The last account in the institution
+    private Account last = null;
+
     /**
      * Constructs the institution hierarchy object.
      *
@@ -43,8 +46,37 @@ public class Institution extends SuperAggregate<
     }
 
     @Override
+    Account addChild(@NotNull Common<?, ?, ?> hierarchyObject)
+            throws ClassCastException {
+
+        /*
+         * Cast the incoming hierarchy object to an account. Is the last
+         * account null, or does the last account compare less than the
+         * incoming account?
+         */
+        final Account account = (Account) hierarchyObject;
+        if ((null == last) || (0 < account.compareTo(last))) {
+
+            /*
+             * The last account is null, or the last account compares less than
+             * the incoming account. Save the incoming account as the last
+             * account.
+             */
+            last = account;
+        }
+
+        // Call the superclass method to add the incoming account.
+        return super.addChild(hierarchyObject);
+    }
+
+    @Override
     protected @NotNull Account getArtificialChild() {
         return Account.getArtificial();
+    }
+
+    @Override
+    public Account getLast() {
+        return last;
     }
 
     @Override

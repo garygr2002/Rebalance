@@ -1,13 +1,48 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.BreakdownType;
-import com.garygregg.rebalance.FundType;
-import com.garygregg.rebalance.HoldingLineType;
+import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
 
 public class Portfolio
         extends SuperAggregate<String, Institution, PortfolioDescription> {
+
+    // A factory for producing the last account
+    private final Factory<Account> factory = () -> {
+
+        /*
+         * Declare a variable to receive a candidate account, and a
+         * variable to receive the last account. Cycle for each
+         * institution.
+         */
+        Account candidate, last = null;
+        for (Institution institution : getChildren()) {
+
+            /*
+             * Get the last account of the first/next institution as a
+             * candidate. Compare the candidate to the last account. Does
+             * the current last account compare less than the candidate?
+             */
+            candidate = institution.getLast();
+            if ((null == last) || (0 < candidate.compareTo(last))) {
+
+                /*
+                 * The current last account compares less than the
+                 * candidate. Set the candidate as the new last.
+                 */
+                last = candidate;
+            }
+        }
+
+        /*
+         * Return the last account, or an artificial account if the last
+         * account is null.
+         */
+        return (null == last) ? Account.getArtificial() : last;
+    };
+
+    // A lazy boy for producing the last account
+    private final LazyBoy<Account> lazyBoy = new LazyBoy<>(factory);
 
     /**
      * Constructs the portfolio hierarchy object.
@@ -16,6 +51,15 @@ public class Portfolio
      */
     Portfolio(@NotNull String mnemonic) {
         super(mnemonic);
+    }
+
+    @Override
+    Institution addChild(@NotNull Common<?, ?, ?> hierarchyObject)
+            throws ClassCastException {
+
+        // Clear the lazy boy, and add the hierarchy object.
+        lazyBoy.clear();
+        return super.addChild(hierarchyObject);
     }
 
     /**
@@ -62,6 +106,11 @@ public class Portfolio
     @Override
     protected @NotNull Institution getArtificialChild() {
         return Institution.getArtificial();
+    }
+
+    @Override
+    public Account getLast() {
+        return lazyBoy.getLazily();
     }
 
     @Override
