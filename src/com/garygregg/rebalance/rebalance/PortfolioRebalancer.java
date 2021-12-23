@@ -2,8 +2,6 @@ package com.garygregg.rebalance.rebalance;
 
 import com.garygregg.rebalance.BreakdownType;
 import com.garygregg.rebalance.account.AccountDescription;
-import com.garygregg.rebalance.distinguished.DistinguishedAccount;
-import com.garygregg.rebalance.distinguished.DistinguishedAccountLibrary;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Hierarchy;
 import com.garygregg.rebalance.hierarchy.Institution;
@@ -12,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-@SuppressWarnings("EmptyClassInitializer")
 public class PortfolioRebalancer extends Rebalancer {
 
     // A rebalancer instance
@@ -171,7 +168,17 @@ public class PortfolioRebalancer extends Rebalancer {
      * otherwise
      */
     private boolean rebalance(@NotNull Portfolio portfolio) {
-        return perform(portfolio, portfolioAction);
+
+        /*
+         * Set the current portfolio. Perform the portfolio rebalance action,
+         * and receive a result.
+         */
+        setCurrent(portfolio);
+        final boolean result = perform(portfolio, portfolioAction);
+
+        // Clear the current portfolio and return the result.
+        setCurrent(null);
+        return result;
     }
 
     /**
