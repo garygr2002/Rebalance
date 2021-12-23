@@ -579,9 +579,9 @@ abstract class AccountRebalancer extends Rebalancer {
     protected abstract Currency doRebalance(@NotNull Account account);
 
     /**
-     * Gets the message logger for the rebalancer.
+     * Gets the message logger for the account rebalancer.
      *
-     * @return The message logger for the rebalancer
+     * @return The message logger for the account rebalancer
      */
     private MessageLogger getLogger() {
         return messageLogger;
