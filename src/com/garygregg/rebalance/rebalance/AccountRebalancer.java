@@ -46,8 +46,8 @@ abstract class AccountRebalancer extends Rebalancer {
             MessageLogger.getExtraordinary();
 
     // The level zero weight types
-    private static final WeightType[] levelZero = {WeightType.BOND,
-            WeightType.CASH, WeightType.REAL_ESTATE, WeightType.STOCK};
+    private static final List<WeightType> levelZero = List.of(WeightType.BOND,
+            WeightType.CASH, WeightType.REAL_ESTATE, WeightType.STOCK);
 
     // The distinguished value for nothing
     private static final double nothing = Percent.getZero().getValue();
@@ -93,7 +93,6 @@ abstract class AccountRebalancer extends Rebalancer {
                     }
                 }
             };
-
     // A list of weight types to portfolio valuation pairs
     private final static List<Pair<WeightType, ValueFromPortfolio>>
             portfolioList = new ArrayList<>();
@@ -209,7 +208,7 @@ abstract class AccountRebalancer extends Rebalancer {
          * Cycle for each level zero weight type.
          */
         double all = 0.;
-        for (WeightType type : levelZero) {
+        for (WeightType type : getLevelZero()) {
 
             // Add the first/next weight type to the sum.
             all += weightMap.get(type);
@@ -370,7 +369,7 @@ abstract class AccountRebalancer extends Rebalancer {
          * Cycle for each level zero weight type, and add a new pair to the
          * portfolio list.
          */
-        for (WeightType type : levelZero) {
+        for (WeightType type : getLevelZero()) {
             portfolioList.add(new Pair<>(type,
                     valueFromPortfolioMap.get(type)));
         }
@@ -404,6 +403,15 @@ abstract class AccountRebalancer extends Rebalancer {
 
         // Return the map.
         return map;
+    }
+
+    /**
+     * Gets the level zero weight types.
+     *
+     * @return The level zero weight types
+     */
+    protected static @NotNull List<WeightType> getLevelZero() {
+        return levelZero;
     }
 
     /**
@@ -629,9 +637,9 @@ abstract class AccountRebalancer extends Rebalancer {
 
                 // Drat, the residual is not zero. Stream and log a message.
                 logger.log(extraordinary, String.format("BAD NEWS...You will " +
-                                "not like this: Rebalancing has discovered " +
-                                "a non-zero residual %s for account %s; " +
-                                "deal with it.", residual, account));
+                        "not like this: Rebalancing has discovered " +
+                        "a non-zero residual %s for account %s; " +
+                        "deal with it.", residual, account));
             }
 
             // Set the non-null residual in the account, zero or not.
