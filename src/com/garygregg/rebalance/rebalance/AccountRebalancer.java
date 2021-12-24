@@ -46,8 +46,8 @@ abstract class AccountRebalancer extends Rebalancer {
             MessageLogger.getExtraordinary();
 
     // The level zero weight types
-    private static final List<WeightType> levelZero = List.of(WeightType.BOND,
-            WeightType.CASH, WeightType.REAL_ESTATE, WeightType.STOCK);
+    private static final List<WeightType> levelZero =
+            WeightType.getLevelZero();
 
     // The distinguished value for nothing
     private static final double nothing = Percent.getZero().getValue();

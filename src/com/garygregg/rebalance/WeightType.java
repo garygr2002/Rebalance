@@ -2,11 +2,9 @@ package com.garygregg.rebalance;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public enum WeightType {
 
@@ -85,16 +83,21 @@ public enum WeightType {
     STOCK_VALUE("Stock value", STOCK_LARGE, STOCK_NOT_LARGE, STOCK_MEDIUM,
             STOCK_SMALL);
 
+    // A list of level zero weight types
+    private static final List<WeightType> levelZero;
+
     // The number of children of the weight type that has the most
     private static final int maxChildren;
 
     static {
 
         /*
-         * Get a map entry containing the weight type that has the most
-         * children. Extract the type and set the ceiling of its log2 if
-         * the entry is not null. Otherwise, set 1.
+         * Build the list of level zero weight types. Get a map entry
+         * containing the weight type that has the most children. Extract the
+         * type and set the ceiling of its log2 if the entry is not null.
+         * Otherwise, set 1.
          */
+        levelZero = buildLevelZeroList();
         final Map.Entry<WeightType, Integer> entry = getMaxEntry();
         maxChildren = (null == entry) ? 1 : entry.getValue();
     }
@@ -116,6 +119,43 @@ public enum WeightType {
         // Assign the member variables.
         this.parents = parents;
         this.softName = softName;
+    }
+
+    /**
+     * Builds a list of level zero weight types.
+     *
+     * @return A list of level zero weight types
+     */
+    private static @NotNull @UnmodifiableView List<WeightType>
+    buildLevelZeroList() {
+
+        /*
+         * Create an empty, modifiable list to hold the level zero weight
+         * types. Cycle for each weight type.
+         */
+        final List<WeightType> levelZero = new ArrayList<>();
+        for (WeightType type : WeightType.values()) {
+
+            /*
+             * Add the first/next weight type to the level zero list if it
+             * passes the level zero test.
+             */
+            if (isLevelZero(type)) {
+                levelZero.add(type);
+            }
+        }
+
+        // Return the level zero weight list as an unmodifiable list.
+        return Collections.unmodifiableList(levelZero);
+    }
+
+    /**
+     * Returns a list of level zero weight types.
+     *
+     * @return A list of level zero weight types
+     */
+    public static @NotNull List<WeightType> getLevelZero() {
+        return levelZero;
     }
 
     /**
@@ -174,11 +214,41 @@ public enum WeightType {
     }
 
     /**
+     * Determines if a weight type is a level zero weight type.
+     *
+     * @param type A weight type to test
+     * @return True if the weight type is a level zero weight type; false
+     * otherwise
+     */
+    public static boolean isLevelZero(@NotNull WeightType type) {
+
+        /*
+         * Get the parents of the given type. Declare and initialize to a test
+         * of there being just one parent. Is there just one parent?
+         */
+        final WeightType[] parents = type.getParents();
+        boolean result = (1 == parents.length);
+        if (result) {
+
+            /*
+             * There is just one parent. Get the parent, and test to be certain
+             * that it is equal to WeightType.ALL. Reinitialize the result
+             * accordingly.
+             */
+            final WeightType parent = parents[0];
+            result = (null != parent) && parent.equals(WeightType.ALL);
+        }
+
+        // Return the result.
+        return result;
+    }
+
+    /**
      * Gets the parents for the weight type.
      *
      * @return The parents for the weight type
      */
-    public WeightType[] getParents() {
+    public @NotNull WeightType[] getParents() {
         return parents;
     }
 
@@ -187,7 +257,16 @@ public enum WeightType {
      *
      * @return The 'soft' name of the type
      */
-    public String getSoftName() {
+    public @NotNull String getSoftName() {
         return softName;
+    }
+
+    /**
+     * Determines if the weight type is a level zero weight type.
+     *
+     * @return True if the weight type is a level zero weight type
+     */
+    public boolean isLevelZero() {
+        return isLevelZero(this);
     }
 }
