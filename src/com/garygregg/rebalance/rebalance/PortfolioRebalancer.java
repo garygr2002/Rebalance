@@ -1,5 +1,6 @@
 package com.garygregg.rebalance.rebalance;
 
+import com.garygregg.rebalance.AccountKey;
 import com.garygregg.rebalance.BreakdownType;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.hierarchy.Account;
@@ -17,12 +18,18 @@ public class PortfolioRebalancer extends Rebalancer {
             new PortfolioRebalancer();
 
     // The rebalancer for an account that is last
-    private static final AccountRebalancer lastRebalancer =
+    private static final ClosureRebalancer lastRebalancer =
             new ClosureRebalancer();
 
     // The rebalancer for an account that is not last
-    private static final AccountRebalancer notLastRebalancer =
+    private static final WeightRebalancer notLastRebalancer =
             new WeightRebalancer();
+
+    /*
+     * The keys of the last accounts to be rebalanced mapped to the portfolios
+     * that contain them
+     */
+    private final Map<AccountKey, Portfolio> portfolioMap = new HashMap<>();
 
     // A rebalance action for accounts
     private final Action<Hierarchy, Account> accountAction =
@@ -37,7 +44,7 @@ public class PortfolioRebalancer extends Rebalancer {
                 @Override
                 public boolean perform(@NotNull Account child,
                                        boolean isLast) {
-                    return rebalance(child, isLastAccount(child));
+                    return rebalance(child);
                 }
             };
 
@@ -54,12 +61,9 @@ public class PortfolioRebalancer extends Rebalancer {
                 @Override
                 public boolean perform(@NotNull Account child,
                                        boolean isLast) {
-                    return rebalance(child, isLastAccount(child));
+                    return rebalance(child);
                 }
             };
-
-    // A set of last accounts
-    private final Set<Account> lastAccounts = new HashSet<>();
 
     // A rebalance action for a portfolio
     private final Action<Portfolio, Institution> portfolioAction =
@@ -164,51 +168,34 @@ public class PortfolioRebalancer extends Rebalancer {
     }
 
     /**
-     * Adds last accounts to the last accounts set.
+     * Adds maps of the keys of the last account to be rebalanced in a
+     * portfolio to the portfolios that contain the corresponding accounts.
      *
-     * @param hierarchy A hierarchy
-     * @return True if last accounts were added to the last accounts set for
-     * each portfolio in the hierarchy
+     * @param hierarchy A hierarchy that contains portfolios
      */
-    @SuppressWarnings("UnusedReturnValue")
-    private boolean addLastAccounts(@NotNull Hierarchy hierarchy) {
+    private void addLastAccounts(@NotNull Hierarchy hierarchy) {
 
         /*
-         * Declare and initialize the return value. Clear all last accounts in
-         * the last accounts set. Cycle for each portfolio in the hierarchy.
+         * Clear all key/value pairs in the portfolio map. Cycle for each
+         * portfolio in the hierarchy.
          */
-        boolean result = true;
         clearLastAccounts();
         for (Portfolio portfolio : hierarchy.getPortfolios()) {
 
             /*
-             * Add the last account of the portfolio, and maintain the return
-             * value.
+             * Map the key of the last portfolio to be rebalanced in the
+             * portfolio to the portfolio itself.
              */
-            result = lastAccounts.add(portfolio.getLastToBeRebalanced()) &&
-                    result;
+            portfolioMap.put(portfolio.getLastToBeRebalanced().getKey(),
+                    portfolio);
         }
-
-        // Return the result.
-        return result;
     }
 
     /**
      * Clears the last accounts set.
      */
     private void clearLastAccounts() {
-        lastAccounts.clear();
-    }
-
-    /**
-     * Determines if an account is the last account in its portfolio.
-     *
-     * @param account An account
-     * @return True if the account is the last account in its portfolio; false
-     * otherwise
-     */
-    private boolean isLastAccount(@NotNull Account account) {
-        return lastAccounts.contains(account);
+        portfolioMap.clear();
     }
 
     /**
@@ -219,17 +206,7 @@ public class PortfolioRebalancer extends Rebalancer {
      * otherwise
      */
     private boolean rebalance(@NotNull Portfolio portfolio) {
-
-        /*
-         * Set the current portfolio. Perform the portfolio rebalance action,
-         * and receive a result.
-         */
-        setCurrent(portfolio);
-        final boolean result = perform(portfolio, portfolioAction);
-
-        // Clear the current portfolio and return the result.
-        setCurrent(null);
-        return result;
+        return perform(portfolio, portfolioAction);
     }
 
     /**
@@ -247,16 +224,36 @@ public class PortfolioRebalancer extends Rebalancer {
      * Rebalances an account.
      *
      * @param account The account to rebalance
-     * @param isLast  True if this is the last child; false otherwise
      * @return True if the account was successfully rebalanced; false
      * otherwise
      */
-    private boolean rebalance(@NotNull Account account, boolean isLast) {
+    private boolean rebalance(@NotNull Account account) {
 
-        // Determine which rebalancer to use, and rebalance the account.
-        final AccountRebalancer rebalancer = isLast ? lastRebalancer :
-                notLastRebalancer;
-        return rebalancer.rebalance(account);
+        /*
+         * Get a portfolio, if any, from the portfolio map. If the portfolio is
+         * null, then the given account is *not* the last to be rebalanced in
+         * its portfolio. One way or another, it will not hurt to set the null
+         * or non-null portfolio as the portfolio in the last rebalancer.
+         */
+        final Portfolio portfolio = portfolioMap.get(account.getKey());
+        lastRebalancer.setPortfolio(portfolio);
+
+        /*
+         * Choose a rebalancer: The not-last rebalancer or the last rebalancer.
+         * A null or not-null portfolio obtained in the step above decides
+         * this.
+         */
+        final AccountRebalancer rebalancer = (null == portfolio) ?
+                notLastRebalancer : lastRebalancer;
+
+        /*
+         * Use the chosen rebalancer to rebalance the account, receiving a
+         * result. Reset the portfolio in the last rebalancer to null.
+         * Return the result.
+         */
+        final boolean result = rebalancer.rebalance(account);
+        lastRebalancer.setPortfolio(null);
+        return result;
     }
 
     /**
