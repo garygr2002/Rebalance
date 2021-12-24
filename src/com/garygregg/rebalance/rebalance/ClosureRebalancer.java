@@ -19,6 +19,9 @@ class ClosureRebalancer extends WeightRebalancer {
     // Our message logger
     private final MessageLogger messageLogger = new MessageLogger();
 
+    // The portfolio associated with the account to be rebalanced
+    private Portfolio portfolio;
+
     {
 
         // Set the logger in the message logger.
@@ -94,6 +97,15 @@ class ClosureRebalancer extends WeightRebalancer {
         return messageLogger;
     }
 
+    /**
+     * Gets the portfolio associated with the account to be rebalanced.
+     *
+     * @return The portfolio associated with the account be rebalanced
+     */
+    public Portfolio getPortfolio() {
+        return portfolio;
+    }
+
     @Override
     protected @NotNull Map<WeightType, Double> getWeights(@NotNull Account account,
                                                           boolean adjust) {
@@ -102,8 +114,8 @@ class ClosureRebalancer extends WeightRebalancer {
         final Map<WeightType, Double> weightMap = getWeightsForClosure(account,
                 adjust);
 
-        // Get the current portfolio and its value.
-        final Portfolio portfolio = getCurrent();
+        // Get the portfolio and its value.
+        final Portfolio portfolio = getPortfolio();
         final Currency portfolioValue = (null == portfolio) ? zero :
                 portfolio.getConsidered();
 
@@ -125,6 +137,16 @@ class ClosureRebalancer extends WeightRebalancer {
 
         // Return the modified weight map.
         return weightMap;
+    }
+
+    /**
+     * Sets the portfolio associated with the account to be rebalanced.
+     *
+     * @param portfolio The portfolio associated with the account to be
+     *                  rebalanced
+     */
+    public void setPortfolio(Portfolio portfolio) {
+        this.portfolio = portfolio;
     }
 
     /**
@@ -170,9 +192,10 @@ class ClosureRebalancer extends WeightRebalancer {
                 if (desired < existing) {
                     getLogger().streamAndLog(MessageLogger.getExtraordinary(),
                             String.format("At rebalance closure, portfolio " +
-                                            "'%s' already %s for weight type %s; " +
-                                            "desired value is %s.", portfolio.getKey(),
-                                    type, Currency.format(existing),
+                                            "'%s' already has %s for weight " +
+                                            "type %s; desired value is %s.",
+                                    portfolio.getKey(),
+                                    Currency.format(existing), type,
                                     Currency.format(desired)));
                 }
 

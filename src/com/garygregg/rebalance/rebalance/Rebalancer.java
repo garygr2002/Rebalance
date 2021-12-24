@@ -1,23 +1,10 @@
 package com.garygregg.rebalance.rebalance;
 
-import com.garygregg.rebalance.hierarchy.Portfolio;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
 class Rebalancer {
-
-    // The current portfolio
-    private static Portfolio current;
-
-    /**
-     * Gets the current portfolio.
-     *
-     * @return The current portfolio
-     */
-    static Portfolio getCurrent() {
-        return current;
-    }
 
     /**
      * Performs an action on the children of a parent.
@@ -66,14 +53,5 @@ class Rebalancer {
         // Signal that the action is complete, and return the result.
         action.onComplete();
         return result;
-    }
-
-    /**
-     * Sets the current portfolio.
-     *
-     * @param current The current portfolio
-     */
-    static void setCurrent(Portfolio current) {
-        Rebalancer.current = current;
     }
 }
