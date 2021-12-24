@@ -141,11 +141,11 @@ abstract class SuperAggregate<KeyType,
     }
 
     /**
-     * Gets the last account.
+     * Gets the last account to be rebalanced.
      *
-     * @return The last account
+     * @return The last account to be rebalanced
      */
-    public abstract Account getLast();
+    public abstract @NotNull Account getLastToBeRebalanced();
 
     /**
      * Gets the value of the hierarchy object that cannot be considered for

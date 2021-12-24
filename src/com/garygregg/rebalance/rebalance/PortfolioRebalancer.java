@@ -164,23 +164,6 @@ public class PortfolioRebalancer extends Rebalancer {
     }
 
     /**
-     * Adds an account to the last accounts set.
-     *
-     * @param portfolio A portfolio containing the last account
-     * @return True if the last account of the portfolio was successfully
-     * added to the last account set; false otherwise
-     */
-    private boolean addLastAccount(@NotNull Portfolio portfolio) {
-
-        /*
-         * Get the last account from the portfolio, and add it to the last
-         * accounts set.
-         */
-        final Account last = portfolio.getLast();
-        return (null != last) && lastAccounts.add(last);
-    }
-
-    /**
      * Adds last accounts to the last accounts set.
      *
      * @param hierarchy A hierarchy
@@ -202,7 +185,8 @@ public class PortfolioRebalancer extends Rebalancer {
              * Add the last account of the portfolio, and maintain the return
              * value.
              */
-            result = addLastAccount(portfolio) && result;
+            result = lastAccounts.add(portfolio.getLastToBeRebalanced()) &&
+                    result;
         }
 
         // Return the result.

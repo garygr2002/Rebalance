@@ -23,7 +23,7 @@ public class Portfolio
              * candidate. Compare the candidate to the last account. Does
              * the current last account compare less than the candidate?
              */
-            candidate = institution.getLast();
+            candidate = institution.getLastToBeRebalanced();
             if ((null == last) || (0 < candidate.compareTo(last))) {
 
                 /*
@@ -109,7 +109,7 @@ public class Portfolio
     }
 
     @Override
-    public Account getLast() {
+    public @NotNull Account getLastToBeRebalanced() {
         return lazyBoy.getLazily();
     }
 

@@ -93,7 +93,7 @@ public class Institution extends SuperAggregate<
     }
 
     @Override
-    public Account getLast() {
+    public @NotNull Account getLastToBeRebalanced() {
         return lazyBoyForAccounts.getLazily();
     }
 
