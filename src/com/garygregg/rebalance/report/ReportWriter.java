@@ -262,9 +262,9 @@ abstract class ReportWriter extends ElementProcessor {
      * @return A file writer conforming to the parameters
      * @throws IOException If the file cannot be opened for any reason
      */
-    private @NotNull FileWriter getWriter(@NotNull File directory,
-                                          @NotNull String key,
-                                          Date date) throws IOException {
+    protected @NotNull FileWriter getWriter(@NotNull File directory,
+                                            @NotNull String key,
+                                            Date date) throws IOException {
 
         // Create a file representative of the given parameters.
         final File file = new File(Paths.get(directory.getPath(), key,
