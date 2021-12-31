@@ -791,11 +791,12 @@ public class Hierarchy {
 
         /*
          * Get the mnemonic of the institution. Create a new institution
-         * object with the given mnemonic. Try to add and push the institution.
-         * Could this not be accomplished?
+         * object with the given mnemonic and the name of the institution. Try
+         * to add and push the institution. Could this not be accomplished?
          */
         final String institutionMnemonic = key.getSecond();
-        final Institution institution = new Institution(institutionMnemonic);
+        final Institution institution = new Institution(institutionMnemonic,
+                holdingDescription.getName());
         if (!addAndPush(institution)) {
 
             // The institution could not be added and pushed. Do not continue.

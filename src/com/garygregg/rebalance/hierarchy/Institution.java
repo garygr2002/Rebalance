@@ -3,10 +3,7 @@ package com.garygregg.rebalance.hierarchy;
 import com.garygregg.rebalance.*;
 import org.jetbrains.annotations.NotNull;
 
-public class Institution extends SuperAggregate<
-        String,
-        Account,
-        Description<String>> {
+public class Institution extends SuperAggregate<String, Account, Description<String>> {
 
     // A factory for producing artificial institutions
     private static final Factory<Institution> factoryForInstitutions =
@@ -51,13 +48,23 @@ public class Institution extends SuperAggregate<
     private final LazyBoy<Account> lazyBoyForAccounts =
             new LazyBoy<>(factoryForAccounts);
 
+    // The name of the institution
+    private final String name;
+
     /**
      * Constructs the institution hierarchy object.
      *
      * @param mnemonic The key of the institution hierarchy object
+     * @param name     The name of the institution
      */
-    Institution(@NotNull String mnemonic) {
+    Institution(@NotNull String mnemonic, String name) {
+
+        /*
+         * Call the superclass constructor with the institution key, and set
+         * the name of the institution.
+         */
         super(mnemonic);
+        this.name = name;
     }
 
     /**
@@ -75,7 +82,7 @@ public class Institution extends SuperAggregate<
      * @return A new artificial institution
      */
     private static @NotNull Institution getNewArtificial() {
-        return new Institution(Library.getDefaultStringKey());
+        return new Institution(Library.getDefaultStringKey(), null);
     }
 
     @Override
@@ -100,6 +107,15 @@ public class Institution extends SuperAggregate<
     @Override
     public @NotNull HoldingLineType getLineType() {
         return HoldingLineType.INSTITUTION;
+    }
+
+    /**
+     * Gets the name of the institution.
+     *
+     * @return The name of the institution
+     */
+    public String getName() {
+        return name;
     }
 
     @Override
