@@ -66,8 +66,7 @@ public enum WeightType {
     STOCK_LARGE("Stock large-cap", STOCK_DOMESTIC, STOCK_FOREIGN),
 
     // Tickers must contain fund type NOT_LARGE.
-    STOCK_NOT_LARGE("Stock not large", STOCK_DOMESTIC,
-            STOCK_FOREIGN),
+    STOCK_NOT_LARGE("Stock not large", STOCK_DOMESTIC, STOCK_FOREIGN),
 
     // Tickers must contain fund type MEDIUM.
     STOCK_MEDIUM("Stock mid-cap", STOCK_NOT_LARGE),
@@ -83,8 +82,11 @@ public enum WeightType {
     STOCK_VALUE("Stock value", STOCK_LARGE, STOCK_NOT_LARGE, STOCK_MEDIUM,
             STOCK_SMALL);
 
+    // A list of level one weight types
+    private static final List<WeightType> levelOne;
+
     // A list of level zero weight types
-    private static final List<WeightType> levelZero;
+    private static final List<WeightType> levelZero = List.of(WeightType.ALL);
 
     // The number of children of the weight type that has the most
     private static final int maxChildren;
@@ -92,12 +94,11 @@ public enum WeightType {
     static {
 
         /*
-         * Build the list of level zero weight types. Get a map entry
-         * containing the weight type that has the most children. Extract the
-         * type and set the ceiling of its log2 if the entry is not null.
-         * Otherwise, set 1.
+         * Build the list of level one weight types. Get a map entry containing
+         * the weight type that has the most children. Extract the type and set
+         * the ceiling of its log2 if the entry is not null. Otherwise, set 1.
          */
-        levelZero = buildLevelZeroList();
+        levelOne = buildLevelOneList();
         final Map.Entry<WeightType, Integer> entry = getMaxEntry();
         maxChildren = (null == entry) ? 1 : entry.getValue();
     }
@@ -113,8 +114,7 @@ public enum WeightType {
      *
      * @param parents The parents for the weight type
      */
-    WeightType(@NotNull String softName,
-               WeightType... parents) {
+    WeightType(@NotNull String softName, WeightType... parents) {
 
         // Assign the member variables.
         this.parents = parents;
@@ -127,26 +127,35 @@ public enum WeightType {
      * @return A list of level zero weight types
      */
     private static @NotNull @UnmodifiableView List<WeightType>
-    buildLevelZeroList() {
+    buildLevelOneList() {
 
         /*
-         * Create an empty, modifiable list to hold the level zero weight
-         * types. Cycle for each weight type.
+         * Create an empty, modifiable list to hold the level one weight types.
+         * Cycle for each weight type.
          */
-        final List<WeightType> levelZero = new ArrayList<>();
+        final List<WeightType> levelOne = new ArrayList<>();
         for (WeightType type : WeightType.values()) {
 
             /*
-             * Add the first/next weight type to the level zero list if it
-             * passes the level zero test.
+             * Add the first/next weight type to the level one list if it
+             * passes the level one test.
              */
-            if (isLevelZero(type)) {
-                levelZero.add(type);
+            if (testLevelOne(type)) {
+                levelOne.add(type);
             }
         }
 
-        // Return the level zero weight list as an unmodifiable list.
-        return Collections.unmodifiableList(levelZero);
+        // Return the level one weight list as an unmodifiable list.
+        return Collections.unmodifiableList(levelOne);
+    }
+
+    /**
+     * Returns a list of level one weight types.
+     *
+     * @return A list of level one weight types
+     */
+    public static @NotNull List<WeightType> getLevelOne() {
+        return levelOne;
     }
 
     /**
@@ -214,6 +223,28 @@ public enum WeightType {
     }
 
     /**
+     * Determine if a weight type is greater than level one.
+     *
+     * @param type A weight type to test
+     * @return True if the weight type is greater than level one; false
+     * otherwise
+     */
+    public static boolean isHighLevel(@NotNull WeightType type) {
+        return !(isLevelZero(type) || isLevelOne(type));
+    }
+
+    /**
+     * Determines if a weight type is a level one weight type.
+     *
+     * @param type A weight type to test
+     * @return True if the weight type is a level one weight type; false
+     * otherwise
+     */
+    public static boolean isLevelOne(@NotNull WeightType type) {
+        return levelOne.contains(type);
+    }
+
+    /**
      * Determines if a weight type is a level zero weight type.
      *
      * @param type A weight type to test
@@ -221,10 +252,21 @@ public enum WeightType {
      * otherwise
      */
     public static boolean isLevelZero(@NotNull WeightType type) {
+        return levelZero.contains(type);
+    }
+
+    /**
+     * Tests a weight type to determine if it is a level one weight type.
+     *
+     * @param type A weight type to test
+     * @return True if the weight type is a level one weight type; false
+     * otherwise
+     */
+    private static boolean testLevelOne(@NotNull WeightType type) {
 
         /*
-         * Get the parents of the given type. Declare and initialize to a test
-         * of there being just one parent. Is there just one parent?
+         * Get the parents of the given type. Declare and initialize a variable
+         * to a test if there is just one parent. Is there just one parent?
          */
         final WeightType[] parents = type.getParents();
         boolean result = (1 == parents.length);
@@ -232,11 +274,10 @@ public enum WeightType {
 
             /*
              * There is just one parent. Get the parent, and test to be certain
-             * that it is equal to WeightType.ALL. Reinitialize the result
-             * accordingly.
+             * that it is a level zero type.
              */
             final WeightType parent = parents[0];
-            result = (null != parent) && parent.equals(WeightType.ALL);
+            result = (null != parent) && isLevelZero(parent);
         }
 
         // Return the result.
@@ -259,6 +300,24 @@ public enum WeightType {
      */
     public @NotNull String getSoftName() {
         return softName;
+    }
+
+    /**
+     * Determines if a weight type is a high level weight type.
+     *
+     * @return True if the weight type is a high level weight type
+     */
+    public boolean isHighLevel() {
+        return isHighLevel(this);
+    }
+
+    /**
+     * Determines if the weight type is a level one weight type.
+     *
+     * @return True if the weight type is a level one weight type
+     */
+    public boolean isLevelOne() {
+        return isLevelOne(this);
     }
 
     /**
