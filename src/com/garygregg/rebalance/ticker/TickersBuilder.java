@@ -147,7 +147,8 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
         }
 
         // Return a new ETF description with a default minimum.
-        return new ETFDescription(ticker, number, name, minimum, balanceRounding);
+        return new ETFDescription(ticker, number, name, minimum,
+                balanceRounding);
     };
 
     // A map of character codes to ticker factories
@@ -322,7 +323,8 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
         }
 
         // Return a new stock description with a default minimum.
-        return new StockDescription(ticker, number, name, minimum, balanceRounding);
+        return new StockDescription(ticker, number, name, minimum,
+                balanceRounding);
     };
 
     // Our ticker interpreter
@@ -866,7 +868,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
     }
 
     @Override
-    public void processElements(String[] elements, int lineNumber) {
+    public void processElements(String @NotNull [] elements, int lineNumber) {
 
         // Set the line number, and get the line code.
         setLineNumber(lineNumber);
