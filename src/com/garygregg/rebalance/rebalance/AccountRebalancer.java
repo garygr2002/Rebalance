@@ -45,9 +45,9 @@ abstract class AccountRebalancer extends Rebalancer {
     private static final Level extraordinary =
             MessageLogger.getExtraordinary();
 
-    // The level zero weight types
-    private static final List<WeightType> levelZero =
-            WeightType.getLevelZero();
+    // The level one weight types
+    private static final List<WeightType> levelOne =
+            WeightType.getLevelOne();
 
     // The distinguished value for nothing
     private static final double nothing = Percent.getZero().getValue();
@@ -205,10 +205,10 @@ abstract class AccountRebalancer extends Rebalancer {
 
         /*
          * Declare and initialize a sum for all the level zero weight types.
-         * Cycle for each level zero weight type.
+         * Cycle for each level one weight type.
          */
         double all = 0.;
-        for (WeightType type : getLevelZero()) {
+        for (WeightType type : getLevelOne()) {
 
             // Add the first/next weight type to the sum.
             all += weightMap.get(type);
@@ -366,10 +366,10 @@ abstract class AccountRebalancer extends Rebalancer {
     private static void buildPortfolioList() {
 
         /*
-         * Cycle for each level zero weight type, and add a new pair to the
+         * Cycle for each level one weight type, and add a new pair to the
          * portfolio list.
          */
-        for (WeightType type : getLevelZero()) {
+        for (WeightType type : getLevelOne()) {
             portfolioList.add(new Pair<>(type,
                     valueFromPortfolioMap.get(type)));
         }
@@ -406,12 +406,12 @@ abstract class AccountRebalancer extends Rebalancer {
     }
 
     /**
-     * Gets the level zero weight types.
+     * Gets the level one weight types.
      *
-     * @return The level zero weight types
+     * @return The level one weight types
      */
-    protected static @NotNull List<WeightType> getLevelZero() {
-        return levelZero;
+    protected static @NotNull List<WeightType> getLevelOne() {
+        return levelOne;
     }
 
     /**

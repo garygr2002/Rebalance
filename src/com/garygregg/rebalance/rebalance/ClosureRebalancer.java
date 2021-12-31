@@ -30,7 +30,7 @@ class ClosureRebalancer extends WeightRebalancer {
     }
 
     /**
-     * Adjusts level-zero weights in a weight map to take into account the
+     * Adjusts level one weights in a weight map to take into account the
      * considered value of a portfolio.
      *
      * @param weightMap  A weight map
@@ -40,15 +40,15 @@ class ClosureRebalancer extends WeightRebalancer {
                                double considered) {
 
         /*
-         * Sum the existing level-zero weights in the weight map. Declare a
+         * Sum the existing level one weights in the weight map. Declare a
          * variable to receive a weight from the map.
          */
         final double sum = sum(weightMap);
         Double weight;
-        for (WeightType type : getLevelZero()) {
+        for (WeightType type : getLevelOne()) {
 
             /*
-             * Get the existing weight for the first/next level-zero type.
+             * Get the existing weight for the first/next level one type.
              * Replace (or add, if necessary) the mapping for the type by
              * multiplying the existing weight by the considered value of the
              * portfolio, and dividing by the calculated weight sum.
@@ -60,20 +60,20 @@ class ClosureRebalancer extends WeightRebalancer {
     }
 
     /**
-     * Sums the level-zero weights in a weight map.
+     * Sums the level one weights in a weight map.
      *
      * @param weightMap The weight map
-     * @return The sum of the level-zero weights in the map
+     * @return The sum of the level one weights in the map
      */
     private static double sum(@NotNull Map<WeightType, Double> weightMap) {
 
         /*
          * Declare and initialize the sum. Declare a variable to receive a
-         * weight. Cycle for each level-zero weight type.
+         * weight. Cycle for each level one weight type.
          */
         double sum = 0.;
         Double weight;
-        for (WeightType type : getLevelZero()) {
+        for (WeightType type : getLevelOne()) {
 
             // Get the weight for the first/next type. Is the weight not null?
             weight = weightMap.get(type);
@@ -150,8 +150,8 @@ class ClosureRebalancer extends WeightRebalancer {
     }
 
     /**
-     * Subtracts existing values in a portfolio from desired values for level-
-     * zero weight types.
+     * Subtracts existing values in a portfolio from desired values for level
+     * one weight types.
      *
      * @param weightMap The weight map to modify
      * @param portfolio A portfolio
@@ -160,11 +160,11 @@ class ClosureRebalancer extends WeightRebalancer {
                           @NotNull Portfolio portfolio) {
 
         /*
-         * Declare desired and existing weights. Cycle for each level zero
+         * Declare desired and existing weights. Cycle for each level one
          * weight type.
          */
         double desired, existing;
-        for (WeightType type : getLevelZero()) {
+        for (WeightType type : getLevelOne()) {
 
             /*
              * Get the desired and existing weights. Is the existing value less

@@ -80,13 +80,13 @@ public class Ticker extends
         /*
          * This common initialization block builds the association map of
          * weight type to activities. First set the logger in the message
-         * logger. Declare a weight type.
+         * logger. Declare a weight type. Level 0: WeightType.ALL.
          */
         messageLogger.setLogger(Logger.getLogger(
                 Ticker.class.getCanonicalName()));
         WeightType type;
 
-        // Level 0: Bond, cash, real-estate or stock.
+        // Level 1: Bond, cash, real-estate or stock.
         associationMap.put(type = WeightType.ALL, new Activity(type, null,
                 new Association(FundType.BOND, WeightType.BOND),
                 new Association(FundType.CASH, WeightType.CASH),
@@ -94,7 +94,7 @@ public class Ticker extends
                 new Association(FundType.STOCK, WeightType.STOCK)));
 
         /*
-         * Level 1 (Bond): High-yield (make sure high-yield goes before
+         * Level 2 (Bond): High-yield (make sure high-yield goes before
          * corporate), corporate, foreign, inflation, mortgage, short,
          * treasury, and uncategorized.
          */
@@ -108,7 +108,7 @@ public class Ticker extends
                 new Association(FundType.SHORT, WeightType.BOND_SHORT),
                 new Association(FundType.TREASURY, WeightType.BOND_GOVERNMENT)));
 
-        // Level 2 (Bond subtypes).
+        // Level 3 (Bond subtypes).
         associationMap.put(type = WeightType.BOND_CORPORATE,
                 new Activity(type, null));
         associationMap.put(type = WeightType.BOND_FOREIGN,
@@ -126,29 +126,29 @@ public class Ticker extends
         associationMap.put(type = WeightType.BOND_UNCATEGORIZED,
                 new Activity(type, null));
 
-        // Level 1 (Cash): Treasury or uncategorized.
+        // Level 2 (Cash): Treasury or uncategorized.
         associationMap.put(type = WeightType.CASH,
                 new Activity(type, WeightType.CASH_UNCATEGORIZED,
                         new Association(FundType.TREASURY,
                                 WeightType.CASH_GOVERNMENT)));
 
-        // Level 2 (Cash subtypes).
+        // Level 3 (Cash subtypes).
         associationMap.put(type = WeightType.CASH_GOVERNMENT,
                 new Activity(type, null));
         associationMap.put(type = WeightType.CASH_UNCATEGORIZED,
                 new Activity(type, null));
 
-        // Level 1 (Real-estate).
+        // Level 2 (Real-estate).
         associationMap.put(type = WeightType.REAL_ESTATE,
                 new Activity(type, null));
 
-        // Level 1 (Stock): Domestic or foreign.
+        // Level 2 (Stock): Domestic or foreign.
         associationMap.put(type = WeightType.STOCK, new Activity(type, null,
                 new Association(FundType.DOMESTIC, WeightType.STOCK_DOMESTIC),
                 new Association(FundType.FOREIGN, WeightType.STOCK_FOREIGN)));
 
         /*
-         * Level 2 (Stock subtype - Domestic stock): Large, not-large, medium
+         * Level 3 (Stock subtype - Domestic stock): Large, not-large, medium
          * or small.
          */
         associationMap.put(type = WeightType.STOCK_DOMESTIC,
@@ -160,7 +160,7 @@ public class Ticker extends
                         new Association(FundType.SMALL, WeightType.STOCK_NOT_LARGE)));
 
         /*
-         * Level 2 (Stock subtype - Foreign stock): Large, not-large, medium
+         * Level 3 (Stock subtype - Foreign stock): Large, not-large, medium
          * or small.
          */
         associationMap.put(type = WeightType.STOCK_FOREIGN,
@@ -172,7 +172,7 @@ public class Ticker extends
                         new Association(FundType.SMALL, WeightType.STOCK_NOT_LARGE)));
 
         /*
-         * Level 3 (Domestic or foreign stock subtype - Large stocks): Growth
+         * Level 4 (Domestic or foreign stock subtype - Large stocks): Growth
          * or value.
          */
         associationMap.put(type = WeightType.STOCK_LARGE,
@@ -181,7 +181,7 @@ public class Ticker extends
                         new Association(FundType.VALUE, WeightType.STOCK_VALUE)));
 
         /*
-         * Level 3 (Domestic or foreign stock subtype - Not-large stocks):
+         * Level 4 (Domestic or foreign stock subtype - Not-large stocks):
          * Growth or value.
          */
         associationMap.put(type = WeightType.STOCK_NOT_LARGE,
@@ -190,7 +190,7 @@ public class Ticker extends
                         new Association(FundType.VALUE, WeightType.STOCK_VALUE)));
 
         /*
-         * Level 3 (Domestic or foreign stock subtype - Medium stocks): Growth
+         * Level 4 (Domestic or foreign stock subtype - Medium stocks): Growth
          * or value.
          */
         associationMap.put(type = WeightType.STOCK_MEDIUM,
@@ -199,7 +199,7 @@ public class Ticker extends
                         new Association(FundType.VALUE, WeightType.STOCK_VALUE)));
 
         /*
-         * Level 3 (Domestic or foreign stock subtype - Small stocks): Growth
+         * Level 4 (Domestic or foreign stock subtype - Small stocks): Growth
          * or value.
          */
         associationMap.put(type = WeightType.STOCK_SMALL,
@@ -207,7 +207,7 @@ public class Ticker extends
                         new Association(FundType.GROWTH, WeightType.STOCK_GROWTH),
                         new Association(FundType.VALUE, WeightType.STOCK_VALUE)));
 
-        // Level 4 (Large, not-large, medium or small stock subtypes)
+        // Level 5 (Large, not-large, medium or small stock subtypes)
         associationMap.put(type = WeightType.STOCK_GROWTH,
                 new Activity(type, null));
         associationMap.put(type = WeightType.STOCK_VALUE,
