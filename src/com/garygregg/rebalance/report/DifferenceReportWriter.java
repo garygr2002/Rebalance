@@ -3,6 +3,7 @@ package com.garygregg.rebalance.report;
 import com.garygregg.rebalance.AccountKey;
 import com.garygregg.rebalance.Description;
 import com.garygregg.rebalance.Library;
+import com.garygregg.rebalance.account.AccountLibrary;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.hierarchy.*;
@@ -59,7 +60,7 @@ public class DifferenceReportWriter extends ReportWriter {
         classMap.put(StockDescription.class, TickerLibrary.getStockCode());
 
         // Get the first line codes for accounts and institutions.
-        firstAccountLineCode = getFirstLineCode(TickerLibrary.getInstance());
+        firstAccountLineCode = getFirstLineCode(AccountLibrary.getInstance());
         firstInstitutionLineCode = 'I';
 
         // Get the first line code for portfolios.
