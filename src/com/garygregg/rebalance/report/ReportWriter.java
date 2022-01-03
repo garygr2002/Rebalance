@@ -7,10 +7,7 @@ import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.countable.Percent;
 import com.garygregg.rebalance.detailed.DetailedLibrary;
-import com.garygregg.rebalance.hierarchy.Hierarchy;
-import com.garygregg.rebalance.hierarchy.Portfolio;
-import com.garygregg.rebalance.hierarchy.Valuator;
-import com.garygregg.rebalance.hierarchy.ValueByNotConsidered;
+import com.garygregg.rebalance.hierarchy.*;
 import com.garygregg.rebalance.holding.HoldingLibrary;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
@@ -43,12 +40,21 @@ abstract class ReportWriter extends ElementProcessor {
     }
 
     /**
-     * Constructs the report writer.
+     * Constructs the report writer with an explicit valuator for balanceable
+     * assets.
      *
      * @param balanceable The valuator to for balanceable assets
      */
     ReportWriter(@NotNull Valuator balanceable) {
         setBalanceable(balanceable);
+    }
+
+    /**
+     * Constructs the report writer with a default valuator for balanceable
+     * assets.
+     */
+    ReportWriter() {
+        this(ValueByConsidered.getInstance());
     }
 
     /**

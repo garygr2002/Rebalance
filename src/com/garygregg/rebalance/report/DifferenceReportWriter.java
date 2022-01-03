@@ -6,7 +6,10 @@ import com.garygregg.rebalance.Library;
 import com.garygregg.rebalance.account.AccountLibrary;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
-import com.garygregg.rebalance.hierarchy.*;
+import com.garygregg.rebalance.hierarchy.Account;
+import com.garygregg.rebalance.hierarchy.Institution;
+import com.garygregg.rebalance.hierarchy.Portfolio;
+import com.garygregg.rebalance.hierarchy.Ticker;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
 import com.garygregg.rebalance.ticker.*;
 import org.jetbrains.annotations.NotNull;
@@ -73,13 +76,6 @@ public class DifferenceReportWriter extends ReportWriter {
      * considered values
      */
     private final MutableCurrency difference = new MutableCurrency();
-
-    /**
-     * Constructs the difference report writer.
-     */
-    public DifferenceReportWriter() {
-        super(ValueByConsidered.getInstance());
-    }
 
     /**
      * Formats a name.
