@@ -74,6 +74,14 @@ public enum WeightType {
     // Tickers must contain fund type SMALL.
     STOCK_SMALL("Stock small-cap", STOCK_NOT_LARGE),
 
+    // Tickers must contain fund type GROWTH_AND_VALUE.
+    STOCK_GROWTH_AND_VALUE ("Stock growth and value", STOCK_LARGE,
+            STOCK_NOT_LARGE, STOCK_MEDIUM, STOCK_SMALL),
+
+    // Tickers must contain fund type GROWTH or fund type VALUE.
+    STOCK_GROWTH_OR_VALUE("Stock growth or value", STOCK_LARGE,
+            STOCK_NOT_LARGE, STOCK_MEDIUM, STOCK_SMALL),
+
     // Tickers must contain fund type GROWTH.
     STOCK_GROWTH("Stock growth", STOCK_LARGE, STOCK_NOT_LARGE, STOCK_MEDIUM,
             STOCK_SMALL),

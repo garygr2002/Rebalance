@@ -93,6 +93,7 @@ abstract class AccountRebalancer extends Rebalancer {
                     }
                 }
             };
+
     // A list of weight types to portfolio valuation pairs
     private final static List<Pair<WeightType, ValueFromPortfolio>>
             portfolioList = new ArrayList<>();
@@ -344,18 +345,26 @@ abstract class AccountRebalancer extends Rebalancer {
         detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
 
         // 19
-        type = WeightType.STOCK_MEDIUM;
+        type = WeightType.STOCK_GROWTH_AND_VALUE;
         detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
 
         // 20
-        type = WeightType.STOCK_NOT_LARGE;
+        type = WeightType.STOCK_GROWTH_OR_VALUE;
         detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
 
         // 21
-        type = WeightType.STOCK_SMALL;
+        type = WeightType.STOCK_MEDIUM;
         detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
 
         // 22
+        type = WeightType.STOCK_NOT_LARGE;
+        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+
+        // 23
+        type = WeightType.STOCK_SMALL;
+        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+
+        // 24
         type = WeightType.STOCK_VALUE;
         detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
     }
@@ -497,6 +506,8 @@ abstract class AccountRebalancer extends Rebalancer {
         weightMap.put(WeightType.STOCK_DOMESTIC, 60.);
         weightMap.put(WeightType.STOCK_FOREIGN, 40.);
         weightMap.put(WeightType.STOCK_GROWTH, 40.);
+        weightMap.put(WeightType.STOCK_GROWTH_AND_VALUE, 50.);
+        weightMap.put(WeightType.STOCK_GROWTH_OR_VALUE, 50.);
         weightMap.put(WeightType.STOCK_LARGE, 60.);
         weightMap.put(WeightType.STOCK_MEDIUM, 20.);
         weightMap.put(WeightType.STOCK_NOT_LARGE, 40.);

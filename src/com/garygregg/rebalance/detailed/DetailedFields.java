@@ -37,50 +37,58 @@ enum DetailedFields {
     // Desired percentage of small stocks
     PERCENTAGE_STOCK_SMALL(9, WeightType.STOCK_SMALL),
 
+    // Desired percentage of growth and value stocks
+    PERCENTAGE_STOCK_GROWTH_AND_VALUE(10,
+            WeightType.STOCK_GROWTH_AND_VALUE),
+
+    // Desired percentage of growth or value stocks
+    PERCENTAGE_STOCK_GROWTH_OR_VALUE(11,
+            WeightType.STOCK_GROWTH_OR_VALUE),
+
     // Desired percentage of growth stocks
-    PERCENTAGE_STOCK_GROWTH(10, WeightType.STOCK_GROWTH),
+    PERCENTAGE_STOCK_GROWTH(12, WeightType.STOCK_GROWTH),
 
     // Desired percentage of value stocks
-    PERCENTAGE_STOCK_VALUE(11, WeightType.STOCK_VALUE),
+    PERCENTAGE_STOCK_VALUE(13, WeightType.STOCK_VALUE),
 
     // Desired percentage of bonds
-    PERCENTAGE_BOND(12, WeightType.BOND),
+    PERCENTAGE_BOND(14, WeightType.BOND),
 
     // Desired percentage of corporate bonds
-    PERCENTAGE_BOND_CORPORATE(13, WeightType.BOND_CORPORATE),
+    PERCENTAGE_BOND_CORPORATE(15, WeightType.BOND_CORPORATE),
 
     // Desired percentage of foreign bonds
-    PERCENTAGE_BOND_FOREIGN(14, WeightType.BOND_FOREIGN),
+    PERCENTAGE_BOND_FOREIGN(16, WeightType.BOND_FOREIGN),
 
     // Desired percentage of government bonds
-    PERCENTAGE_BOND_GOVERNMENT(15, WeightType.BOND_GOVERNMENT),
+    PERCENTAGE_BOND_GOVERNMENT(17, WeightType.BOND_GOVERNMENT),
 
     // Desired percentage of high-yield bonds
-    PERCENTAGE_BOND_HIGH(16, WeightType.BOND_HIGH),
+    PERCENTAGE_BOND_HIGH(18, WeightType.BOND_HIGH),
 
     // Desired percentage of inflation-protected bonds
-    PERCENTAGE_BOND_INFLATION(17, WeightType.BOND_INFLATION),
+    PERCENTAGE_BOND_INFLATION(19, WeightType.BOND_INFLATION),
 
     // Desired percentage of mortgage-backed bonds
-    PERCENTAGE_BOND_MORTGAGE(18, WeightType.BOND_MORTGAGE),
+    PERCENTAGE_BOND_MORTGAGE(20, WeightType.BOND_MORTGAGE),
 
     // Desired percentage of short-term bonds
-    PERCENTAGE_BOND_SHORT(19, WeightType.BOND_SHORT),
+    PERCENTAGE_BOND_SHORT(21, WeightType.BOND_SHORT),
 
     // Desired percentage of uncategorized bonds
-    PERCENTAGE_BOND_UNCATEGORIZED(20, WeightType.BOND_UNCATEGORIZED),
+    PERCENTAGE_BOND_UNCATEGORIZED(22, WeightType.BOND_UNCATEGORIZED),
 
     // Desired percentage of cash
-    PERCENTAGE_CASH(21, WeightType.CASH),
+    PERCENTAGE_CASH(23, WeightType.CASH),
 
     // Desired percentage of cash in government securities
-    PERCENTAGE_CASH_GOVERNMENT(22, WeightType.CASH_GOVERNMENT),
+    PERCENTAGE_CASH_GOVERNMENT(24, WeightType.CASH_GOVERNMENT),
 
     // Desired percentage of cash in uncategorized securities
-    PERCENTAGE_CASH_UNCATEGORIZED(23, WeightType.CASH_UNCATEGORIZED),
+    PERCENTAGE_CASH_UNCATEGORIZED(25, WeightType.CASH_UNCATEGORIZED),
 
     // Desired percentage of real estate
-    PERCENTAGE_REAL_ESTATE(24, WeightType.REAL_ESTATE);
+    PERCENTAGE_REAL_ESTATE(26, WeightType.REAL_ESTATE);
 
     // The position of the field in the data file
     final int position;

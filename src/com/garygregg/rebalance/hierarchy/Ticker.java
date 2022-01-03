@@ -173,41 +173,67 @@ public class Ticker extends
 
         /*
          * Level 4 (Domestic or foreign stock subtype - Large stocks): Growth
-         * or value.
+         * and value, or growth or value.
          */
         associationMap.put(type = WeightType.STOCK_LARGE,
                 new Activity(type, null,
-                        new Association(FundType.GROWTH, WeightType.STOCK_GROWTH),
-                        new Association(FundType.VALUE, WeightType.STOCK_VALUE)));
+                        new Association(FundType.GROWTH_AND_VALUE,
+                                WeightType.STOCK_GROWTH_AND_VALUE),
+                        new Association(FundType.GROWTH,
+                                WeightType.STOCK_GROWTH_OR_VALUE),
+                        new Association(FundType.VALUE,
+                                WeightType.STOCK_GROWTH_OR_VALUE)));
 
         /*
          * Level 4 (Domestic or foreign stock subtype - Not-large stocks):
-         * Growth or value.
+         * Growth and value, or growth or value.
          */
         associationMap.put(type = WeightType.STOCK_NOT_LARGE,
                 new Activity(type, null,
-                        new Association(FundType.GROWTH, WeightType.STOCK_GROWTH),
-                        new Association(FundType.VALUE, WeightType.STOCK_VALUE)));
+                        new Association(FundType.GROWTH_AND_VALUE,
+                                WeightType.STOCK_GROWTH_AND_VALUE),
+                        new Association(FundType.GROWTH,
+                                WeightType.STOCK_GROWTH_OR_VALUE),
+                        new Association(FundType.VALUE,
+                                WeightType.STOCK_GROWTH_OR_VALUE)));
 
         /*
          * Level 4 (Domestic or foreign stock subtype - Medium stocks): Growth
-         * or value.
+         * and value, or growth or value.
          */
         associationMap.put(type = WeightType.STOCK_MEDIUM,
                 new Activity(type, null,
-                        new Association(FundType.GROWTH, WeightType.STOCK_GROWTH),
-                        new Association(FundType.VALUE, WeightType.STOCK_VALUE)));
+                        new Association(FundType.GROWTH_AND_VALUE,
+                                WeightType.STOCK_GROWTH_AND_VALUE),
+                        new Association(FundType.GROWTH,
+                                WeightType.STOCK_GROWTH_OR_VALUE),
+                        new Association(FundType.VALUE,
+                                WeightType.STOCK_GROWTH_OR_VALUE)));
 
         /*
          * Level 4 (Domestic or foreign stock subtype - Small stocks): Growth
-         * or value.
+         * and value, or growth or value.
          */
         associationMap.put(type = WeightType.STOCK_SMALL,
                 new Activity(type, null,
-                        new Association(FundType.GROWTH, WeightType.STOCK_GROWTH),
-                        new Association(FundType.VALUE, WeightType.STOCK_VALUE)));
+                        new Association(FundType.GROWTH_AND_VALUE,
+                                WeightType.STOCK_GROWTH_AND_VALUE),
+                        new Association(FundType.GROWTH,
+                                WeightType.STOCK_GROWTH_OR_VALUE),
+                        new Association(FundType.VALUE,
+                                WeightType.STOCK_GROWTH_OR_VALUE)));
 
         // Level 5 (Large, not-large, medium or small stock subtypes)
+        associationMap.put(type = WeightType.STOCK_GROWTH_AND_VALUE,
+                new Activity(type, null));
+        associationMap.put(type = WeightType.STOCK_GROWTH_OR_VALUE,
+                new Activity(type, null,
+                        new Association(FundType.GROWTH,
+                                WeightType.STOCK_GROWTH),
+                        new Association(FundType.VALUE,
+                                WeightType.STOCK_VALUE)));
+
+        // Level 6 (Large, not-large, medium or small stock subtypes)
         associationMap.put(type = WeightType.STOCK_GROWTH,
                 new Activity(type, null));
         associationMap.put(type = WeightType.STOCK_VALUE,
