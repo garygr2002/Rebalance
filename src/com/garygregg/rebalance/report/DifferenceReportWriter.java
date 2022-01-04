@@ -16,11 +16,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DifferenceReportWriter extends ReportWriter {
+public class DifferenceReportWriter extends HierarchyWriter {
 
     // A map of ticker description classes to their corresponding line codes
     private static final Map<Class<? extends TickerDescription>,
@@ -182,6 +181,47 @@ public class DifferenceReportWriter extends ReportWriter {
     }
 
     @Override
+    protected void doPreCycle(@NotNull FileWriter writer,
+                              @NotNull Portfolio portfolio)
+            throws IOException {
+
+        // Write about the given portfolio.
+        writeLine(writer, firstPortfolioLineCode,
+                formatNonTickerKey(portfolio.getKey()),
+                formatName(getName(portfolio.getDescription())),
+                portfolio.getProposed(), portfolio.getConsidered());
+    }
+
+    @Override
+    protected void doPreCycle(@NotNull FileWriter writer,
+                              @NotNull Institution institution)
+            throws IOException {
+
+        // Write about the given institution.
+        writeLine(writer, firstInstitutionLineCode,
+                formatNonTickerKey(institution.getKey()),
+                formatName(institution.getName()), institution.getProposed(),
+                institution.getConsidered());
+    }
+
+    @Override
+    protected void doPreCycle(@NotNull FileWriter writer,
+                              @NotNull Account account)
+            throws IOException {
+
+        /*
+         * Get the account number from the account key. Write about the given
+         * account.
+         */
+        final Long accountNumber = account.getKey().getSecond();
+        writeLine(writer, firstAccountLineCode,
+                formatNonTickerKey((null == accountNumber) ? "" :
+                        AccountKey.format(accountNumber)),
+                formatName(getName(account.getDescription())),
+                account.getProposed(), account.getConsidered());
+    }
+
+    @Override
     protected @NotNull String getPrefix() {
         return "difference";
     }
@@ -226,91 +266,15 @@ public class DifferenceReportWriter extends ReportWriter {
         }
     }
 
-    /**
-     * Writes lines for an account.
-     *
-     * @param writer  The file writer to receive the lines
-     * @param account The account for which to write lines
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private void writeLines(@NotNull FileWriter writer,
-                            @NotNull Account account)
-            throws IOException {
-
-        /*
-         * Get the account number from the account key. Write about the given
-         * account.
-         */
-        final Long accountNumber = account.getKey().getSecond();
-        writeLine(writer, firstAccountLineCode,
-                formatNonTickerKey((null == accountNumber) ? "" :
-                        AccountKey.format(accountNumber)),
-                formatName(getName(account.getDescription())),
-                account.getProposed(), account.getConsidered());
-
-        // Cycle for each ticker.
-        for (Ticker ticker : account.getChildren()) {
-
-            // Write lines for the first/next ticker.
-            writeLine(writer, getFirstLineCode(ticker),
-                    formatTickerKey(ticker.getKey()),
-                    formatName(getName(ticker.getDescription())),
-                    ticker.getProposed(), ticker.getConsidered());
-        }
-    }
-
-    /**
-     * Writes lines for an institution.
-     *
-     * @param writer      The file writer to receive the lines
-     * @param institution The institution for which to write lines
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private void writeLines(@NotNull FileWriter writer,
-                            @NotNull Institution institution)
-            throws IOException {
-
-        // Write about the given institution.
-        writeLine(writer, firstInstitutionLineCode,
-                formatNonTickerKey(institution.getKey()),
-                formatName(institution.getName()), institution.getProposed(),
-                institution.getConsidered());
-
-        // Cycle for each account.
-        for (Account account : institution.getChildren()) {
-
-            // Write lines for the first/next account.
-            writeLines(writer, account);
-        }
-    }
-
     @Override
-    public boolean writeLines(@NotNull Portfolio portfolio, Date date)
+    protected void writeLines(@NotNull FileWriter writer,
+                              @NotNull Ticker ticker)
             throws IOException {
 
-        /*
-         * Create a file writer tailored to the portfolio key and the given
-         * date.
-         */
-        final String key = portfolio.getKey();
-        final FileWriter fileWriter = getWriter(
-                getDateUtilities().getTypeDirectory(), key, date);
-
-        // Write about the given portfolio.
-        writeLine(fileWriter, firstPortfolioLineCode,
-                formatNonTickerKey(key),
-                formatName(getName(portfolio.getDescription())),
-                portfolio.getProposed(), portfolio.getConsidered());
-
-        // Cycle for each institution.
-        for (Institution institution : portfolio.getChildren()) {
-
-            // Write lines for the first/next institution.
-            writeLines(fileWriter, institution);
-        }
-
-        // Close the file writer and return success to our caller.
-        fileWriter.close();
-        return true;
+        // Write lines for the first/next ticker.
+        writeLine(writer, getFirstLineCode(ticker),
+                formatTickerKey(ticker.getKey()),
+                formatName(getName(ticker.getDescription())),
+                ticker.getProposed(), ticker.getConsidered());
     }
 }
