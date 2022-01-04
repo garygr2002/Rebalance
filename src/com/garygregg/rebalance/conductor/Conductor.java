@@ -17,6 +17,7 @@ import com.garygregg.rebalance.holding.ValuationsBuilder;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
 import com.garygregg.rebalance.portfolio.PortfoliosBuilder;
 import com.garygregg.rebalance.rebalance.PortfolioRebalancer;
+import com.garygregg.rebalance.report.ActionReportWriter;
 import com.garygregg.rebalance.report.CurrentReportWriter;
 import com.garygregg.rebalance.report.DifferenceReportWriter;
 import com.garygregg.rebalance.report.ProposedReportWriter;
@@ -703,13 +704,19 @@ public class Conductor implements Dispatch<CommandLineId> {
             /*
              * Now rebalance the hierarchy by account. Try to write a report
              * for proposed holdings for each portfolio in the default
-             * hierarchy, then try to write a report for the difference between
-             * proposed and considered values for each line in the holding
-             * file.
+             * hierarchy.
              */
             PortfolioRebalancer.getInstance().rebalanceByAccount(hierarchy);
             new ProposedReportWriter().writeLines(hierarchy, null);
+
+            /*
+             * Try to write a report for the difference between proposed and
+             * considered values for each line in the holding file. Then try to
+             * write a report for actions to be taken to rebalance the
+             * portfolio.
+             */
             new DifferenceReportWriter().writeLines(hierarchy, null);
+            new ActionReportWriter().writeLines(hierarchy, null);
         }
 
         // Oops, an I/O exception occurred while trying to write the reports.
