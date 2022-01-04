@@ -154,7 +154,7 @@ abstract class HierarchyWriter extends ReportWriter {
         return true;
     }
 
-    private interface Action<T> {
+    protected interface Action<T> {
 
         /**
          * Performs an action.
