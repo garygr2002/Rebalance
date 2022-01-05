@@ -702,15 +702,15 @@ class RebalanceNode implements CurrencyReceiver {
         ReallocationScore score;
 
         /*
-         * Create a new allocator with the weight list. Is the sum of the
-         * weights greater than zero?
+         * Create a new allocator with the weight list. Can a reallocation be
+         * performed?
          */
         final Reallocator reallocator = new Reallocator(weightList);
-        if (0. < reallocator.getWeightSum()) {
+        if (reallocator.canReallocate()) {
 
             /*
-             * The sum of the weights is greater than zero. Create a value list
-             * using the size of the weight list and the best residual. Note:
+             * A reallocation can be performed. Create a value list using the
+             * size of the weight list and the best residual. Note:
              * 'getInitialList(int, Currency)' is expected to use the absolute
              * value of the proposed value when creating the list. Reallocate
              * the value list using the reallocator.
@@ -747,8 +747,8 @@ class RebalanceNode implements CurrencyReceiver {
         }
 
         /*
-         * The sum of the weights is zero. Initialize the reallocation score
-         * appropriately.
+         * A reallocation cannot be performed. Initialize the reallocation
+         * score appropriately.
          */
         else {
             score = new ReallocationScore(proposed,

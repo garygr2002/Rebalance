@@ -238,6 +238,15 @@ public class Reallocator {
     }
 
     /**
+     * Determines whether a reallocation can be performed.
+     *
+     * @return True if a reallocation can be performed; false otherwise
+     */
+    public boolean canReallocate() {
+        return (0. < getWeightSum());
+    }
+
+    /**
      * Gets the sum of the weights.
      *
      * @return The sum of the weights
