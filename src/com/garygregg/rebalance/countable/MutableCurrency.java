@@ -198,6 +198,7 @@ public class MutableCurrency extends MutableCountable
      * @param currency A currency
      * @return The value that was set
      */
+    @SuppressWarnings("UnusedReturnValue")
     public double multiply(@NotNull Currency currency) {
 
         // Multiply the value, and return the result.
