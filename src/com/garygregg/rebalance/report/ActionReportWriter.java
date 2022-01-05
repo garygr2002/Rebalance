@@ -51,7 +51,7 @@ public class ActionReportWriter extends HierarchyWriter {
 
     // A temporary report string
     private static final String temporaryReport = "There is/are %d tickers " +
-            "potentially needing rebalance %s.\n";
+            "that need rebalance %s.\n";
 
     // The value of zero currency
     private static final Currency zeroCurrency = Currency.getZero();
@@ -314,15 +314,41 @@ public class ActionReportWriter extends HierarchyWriter {
 
         // Do one thing if the rebalance procedure is redistribution...
         if (RebalanceProcedure.REDISTRIBUTE.equals(getProcedure())) {
-            writer.write(String.format(temporaryReport, byCurrency.size(),
-                    "by currency exchange using redistribution"));
+            reportByRedistribution(writer);
         }
 
         // ...otherwise, do another thing.
         else {
-            writer.write(String.format(temporaryReport, byCurrency.size(),
-                    "by currency exchange using percentages"));
+            reportByPercentage(writer);
         }
+    }
+
+    /**
+     * Reports currency transfer rebalance by percentages.
+     *
+     * @param writer The file writer to receive the report lines
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private void reportByPercentage(@NotNull FileWriter writer)
+            throws IOException {
+
+        // TODO: Fill this in.
+        writer.write(String.format(temporaryReport, byCurrency.size(),
+                "by percentages"));
+    }
+
+    /**
+     * Reports currency transfer rebalance by redistribution.
+     *
+     * @param writer The file writer to receive the report lines
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private void reportByRedistribution(@NotNull FileWriter writer)
+            throws IOException {
+
+        // TODO: Fill this in.
+        writer.write(String.format(temporaryReport, byCurrency.size(),
+                "by reallocation"));
     }
 
     /**
