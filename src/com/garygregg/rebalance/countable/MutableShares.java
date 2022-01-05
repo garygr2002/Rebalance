@@ -156,6 +156,20 @@ public class MutableShares extends MutableCountable
         return equals(Shares.getOne());
     }
 
+    /**
+     * Multiplies mutable shares with shares.
+     *
+     * @param shares A shares
+     * @return The value that was set
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public double multiply(@NotNull Shares shares) {
+
+        // Multiply the value, and return the result.
+        set(getValue() * shares.getValue());
+        return getValue();
+    }
+
     @Override
     public @NotNull Shares produce() {
         return new Shares(this);
@@ -168,6 +182,19 @@ public class MutableShares extends MutableCountable
      * @return The value that was set
      */
     public double set(@NotNull MutableShares shares) {
+
+        // Set the value, and return the result.
+        set(shares.getValue());
+        return getValue();
+    }
+
+    /**
+     * Sets mutable shares with shares.
+     *
+     * @param shares A shares
+     * @return The value that was set
+     */
+    public double set(@NotNull Shares shares) {
 
         // Set the value, and return the result.
         set(shares.getValue());
