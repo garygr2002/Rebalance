@@ -2,6 +2,7 @@ package com.garygregg.rebalance.report;
 
 import com.garygregg.rebalance.AccountKey;
 import com.garygregg.rebalance.Pair;
+import com.garygregg.rebalance.RebalanceProcedure;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
@@ -24,6 +25,10 @@ public class ActionReportWriter extends HierarchyWriter {
     // A string to separate accounts in a report
     private static final String accountSeparator =
             String.format("%s\n", "-".repeat(65));
+
+    // The default rebalance procedure
+    private static final RebalanceProcedure defaultProcedure =
+            RebalanceProcedure.PERCENT;
 
     // A string to separate institutions in a report
     private static final String institutionSeparator =
@@ -79,6 +84,9 @@ public class ActionReportWriter extends HierarchyWriter {
 
     // A list of tickers that have descriptions of unknown types
     private final List<Ticker> unknownDescription = new ArrayList<>();
+
+    // The rebalance procedure for the current account
+    private RebalanceProcedure procedure = defaultProcedure;
 
     {
 
@@ -237,10 +245,28 @@ public class ActionReportWriter extends HierarchyWriter {
         writer.write(String.format(requiredRebalance, "account",
                 AccountKey.format(account.getKey().getSecond())));
 
-        // Write the name of the account.
+        // Get the account description. Is the description null?
         final AccountDescription description = account.getDescription();
-        writeName(writer, (null == description) ? null :
-                description.getName());
+        if (null == description) {
+
+            /*
+             * The account description is null. Set null as the rebalance
+             * procedure, and use null to write the name of the account.
+             */
+            setProcedure(null);
+            writeName(writer, null);
+        }
+
+        // The account description is not null.
+        else {
+
+            /*
+             * Set the rebalance procedure using the value from the account
+             * description. Write the name given in the account description.
+             */
+            setProcedure(description.getRebalanceProcedure());
+            writeName(writer, description.getName());
+        }
     }
 
     /**
@@ -269,6 +295,15 @@ public class ActionReportWriter extends HierarchyWriter {
     }
 
     /**
+     * Gets the rebalance procedure for the current account.
+     *
+     * @return The rebalance procedure for the current account
+     */
+    private @NotNull RebalanceProcedure getProcedure() {
+        return procedure;
+    }
+
+    /**
      * Reports rebalance actions by currency transfer.
      *
      * @param writer The file writer to receive the report lines
@@ -277,9 +312,17 @@ public class ActionReportWriter extends HierarchyWriter {
     private void reportByCurrency(@NotNull FileWriter writer)
             throws IOException {
 
-        // TODO: Fill this out.
-        writer.write(String.format(temporaryReport, byCurrency.size(),
-                "by currency exchange"));
+        // Do one thing if the rebalance procedure is redistribution...
+        if (RebalanceProcedure.REDISTRIBUTE.equals(getProcedure())) {
+            writer.write(String.format(temporaryReport, byCurrency.size(),
+                    "by currency exchange using redistribution"));
+        }
+
+        // ...otherwise, do another thing.
+        else {
+            writer.write(String.format(temporaryReport, byCurrency.size(),
+                    "by currency exchange using percentages"));
+        }
     }
 
     /**
@@ -380,6 +423,15 @@ public class ActionReportWriter extends HierarchyWriter {
         // TODO: Fill this out.
         writer.write(String.format(temporaryReport, unknownDescription.size(),
                 "with unknown ticker descriptions"));
+    }
+
+    /**
+     * Sets the rebalance procedure for the current account.
+     *
+     * @param procedure The rebalance procedure for the current account
+     */
+    private void setProcedure(RebalanceProcedure procedure) {
+        this.procedure = (null == procedure) ? defaultProcedure : procedure;
     }
 
     @Override
