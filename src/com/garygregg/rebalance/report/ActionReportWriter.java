@@ -1,18 +1,13 @@
 package com.garygregg.rebalance.report;
 
-import com.garygregg.rebalance.AccountKey;
-import com.garygregg.rebalance.Pair;
-import com.garygregg.rebalance.RebalanceProcedure;
+import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountDescription;
+import com.garygregg.rebalance.countable.*;
 import com.garygregg.rebalance.countable.Currency;
-import com.garygregg.rebalance.countable.MutableCurrency;
-import com.garygregg.rebalance.countable.MutableShares;
-import com.garygregg.rebalance.countable.Shares;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Institution;
 import com.garygregg.rebalance.hierarchy.Portfolio;
 import com.garygregg.rebalance.hierarchy.Ticker;
-import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import com.garygregg.rebalance.ticker.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,9 +32,24 @@ public class ActionReportWriter extends HierarchyWriter {
     // The value of minus one share
     private static final Shares minusOne = new Shares(-1.);
 
+    // The message used for reporting the name of a description
+    private static final String nameMessage = "Name: '%s'\n\n";
+
     // The message written when there are no tickers matching given criteria
     private static final String noTickers = "There are no tickers that " +
             "require rebalance by %s.\n";
+
+    // The message used for tickers not considered for rebalance
+    private static final String notConsideredMessage = "Problem in ticker " +
+            "%-5s ('%s'; Number %s)!\n";
+
+    // The message used for unknown ticker description
+    private static final String nullMessage = "Ticker %-5s does not have a " +
+            "description.\n";
+
+    // The message used for percentage reallocation
+    private static final String percentageMessage = "Allocate %7s%% to %-5s " +
+            "('%s'; Number: %s).\n";
 
     // The common portfolio/institution/account declaration string
     private static final String requiredRebalance = "Required rebalance " +
@@ -47,14 +57,21 @@ public class ActionReportWriter extends HierarchyWriter {
 
     // The message used for buying and selling shares
     private static final String sharesMessage = "%-4s %14s shares of %-5s " +
-            "(%s; Number: %s).\n";
+            "('%s'; Number: %s).\n";
 
     // A temporary report string
     private static final String temporaryReport = "There is/are %d tickers " +
             "that need rebalance %s.\n";
 
+    // The message used for unknown ticker description
+    private static final String unknownMessage = "Ticker %-5s ('%s'; Number " +
+            "%s) has a description of an unknown type.\n";
+
     // The value of zero currency
     private static final Currency zeroCurrency = Currency.getZero();
+
+    // The value of zero percent
+    private static final Percent zeroPercent = Percent.getZero();
 
     // The value of zero shares
     private static final Shares zeroShares = Shares.getZero();
@@ -149,16 +166,86 @@ public class ActionReportWriter extends HierarchyWriter {
     }
 
     /**
+     * Gets an initial percentage list.
+     *
+     * @param size The size of the desired list
+     * @return An initial percentage list
+     */
+    private static @NotNull List<MutablePercent> getInitialList(int size) {
+
+        // Create the list. Is the size greater than zero?
+        final List<MutablePercent> list = new ArrayList<>();
+        if (0 < size) {
+
+            /*
+             * The size is greater than zero. Add the first element to the
+             * list using one hundred percent.
+             */
+            int i = 0;
+            list.add(i, new MutablePercent(Math.abs(100.)));
+
+            // Cycle for any remaining positions, and add zero percent.
+            for (++i; i < size; ++i) {
+                list.add(new MutablePercent(zeroPercent));
+            }
+        }
+
+        // Return the list.
+        return list;
+    }
+
+    /**
+     * Gets the name from a description.
+     *
+     * @param description The description from which to get a name
+     * @return The name of the description, or a default if the name is null
+     */
+    private static @NotNull String getName(Description<?> description) {
+
+        /*
+         * Get the name from the description. Return the name, or default if
+         * the name is null.
+         */
+        final String name = (null == description) ? null :
+                description.getName();
+        return (null == name) ? "<name unavailable" : name;
+    }
+
+    /**
+     * Gets the number from a ticker description.
+     *
+     * @param description The description from which to get a number
+     * @return The number of the ticker description, or a default if the
+     * number is null
+     */
+    private static Integer getNumber(TickerDescription description) {
+        return (null == description) ? null : description.getNumber();
+    }
+
+    /**
      * Writes a name string.
      *
      * @param writer The file writer to receive the report lines
      * @param name   The name to write
      * @throws IOException Indicates an I/O exception occurred
      */
-    private static void writeName(@NotNull FileWriter writer, String name)
+    private static void writeName(@NotNull FileWriter writer,
+                                  @NotNull String name)
             throws IOException {
-        writer.write(String.format("Name: '%s'\n\n", (null == name) ?
-                "<name unavailable>" : name));
+        writer.write(String.format(nameMessage, name));
+    }
+
+    /**
+     * Writes a name string.
+     *
+     * @param writer      The file writer to receive the report lines
+     * @param description A description containing the name to write
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private static void writeName(@NotNull FileWriter writer,
+                                  Description<?> description)
+            throws IOException {
+        writeName(writer, getName(description));
     }
 
     /**
@@ -168,31 +255,17 @@ public class ActionReportWriter extends HierarchyWriter {
      */
     private void addDifferencePair(@NotNull Ticker ticker) {
 
-        // Get the considered and proposed values of the ticker.
-        final Currency considered = ticker.getConsidered();
-        final Currency proposed = ticker.getProposed();
-
         /*
-         * Create a new mutable currency with the proposed value of the ticker
-         * if the proposed value is not null. If it is null, use zero. Is the
-         * considered value of the ticker not null?
+         * Get the difference between the proposed and considered values of the
+         * ticker. Is the difference not zero?
          */
-        final MutableCurrency currency =
-                new MutableCurrency((null == proposed) ? zeroCurrency : proposed);
-        if (null != considered) {
+        final MutableCurrency currency = getDifference(ticker);
+        if (currency.isNotZero()) {
 
             /*
-             * The considered value of the ticker is not null. Subtract it from
-             * the proposed value.
+             * The difference is not zero. Add it to the difference list paired
+             * with the ticker.
              */
-            currency.subtract(considered);
-        }
-
-        /*
-         * Add a new difference pair with the value just calculated and the
-         * ticker, but only if the difference value is not zero.
-         */
-        if (currency.isNotZero()) {
             differencePairs.add(new Pair<>(currency, ticker));
         }
     }
@@ -214,13 +287,9 @@ public class ActionReportWriter extends HierarchyWriter {
                               @NotNull Portfolio portfolio)
             throws IOException {
 
-        // Write the portfolio key. Get the portfolio description.
+        // Write the portfolio key and the portfolio name.
         writer.write(String.format(requiredRebalance, "portfolio", portfolio.getKey()));
-        final PortfolioDescription description = portfolio.getDescription();
-
-        // Write the portfolio name.
-        writeName(writer, (null == description) ? null :
-                description.getName());
+        writeName(writer, portfolio.getDescription());
     }
 
     @Override
@@ -245,28 +314,50 @@ public class ActionReportWriter extends HierarchyWriter {
         writer.write(String.format(requiredRebalance, "account",
                 AccountKey.format(account.getKey().getSecond())));
 
-        // Get the account description. Is the description null?
+        /*
+         * Get the account description and use it to set the rebalance
+         * procedure.
+         */
         final AccountDescription description = account.getDescription();
-        if (null == description) {
+        setProcedure((null == description) ? null :
+                description.getRebalanceProcedure());
+
+        // Write the name of the account using its description.
+        writeName(writer, description);
+    }
+
+    /**
+     * Gets the difference between proposed and considered values in a ticker,
+     * and returns it as mutable currency.
+     *
+     * @param ticker The ticker for which to get a difference
+     * @return The difference between proposed and considered values in the
+     * ticker
+     */
+    private @NotNull MutableCurrency getDifference(@NotNull Ticker ticker) {
+
+        // Get the considered and proposed values of the ticker.
+        final Currency considered = ticker.getConsidered();
+        final Currency proposed = ticker.getProposed();
+
+        /*
+         * Create a new mutable currency with the proposed value of the ticker
+         * if the proposed value is not null. If it is null, use zero. Is the
+         * considered value of the ticker not null?
+         */
+        final MutableCurrency currency =
+                new MutableCurrency((null == proposed) ? zeroCurrency : proposed);
+        if (null != considered) {
 
             /*
-             * The account description is null. Set null as the rebalance
-             * procedure, and use null to write the name of the account.
+             * The considered value of the ticker is not null. Subtract it from
+             * the proposed value.
              */
-            setProcedure(null);
-            writeName(writer, null);
+            currency.subtract(considered);
         }
 
-        // The account description is not null.
-        else {
-
-            /*
-             * Set the rebalance procedure using the value from the account
-             * description. Write the name given in the account description.
-             */
-            setProcedure(description.getRebalanceProcedure());
-            writeName(writer, description.getName());
-        }
+        // Return the result.
+        return currency;
     }
 
     /**
@@ -312,8 +403,20 @@ public class ActionReportWriter extends HierarchyWriter {
     private void reportByCurrency(@NotNull FileWriter writer)
             throws IOException {
 
-        // Do one thing if the rebalance procedure is redistribution...
-        if (RebalanceProcedure.REDISTRIBUTE.equals(getProcedure())) {
+        /*
+         * Write the no-tickers message if there are no tickers needing
+         * rebalance by currency transfer.
+         */
+        if (byCurrency.isEmpty()) {
+            writer.write(String.format(noTickers,
+                    "redistribution of balances"));
+        }
+
+        /*
+         * Otherwise, do one thing if the rebalance procedure is
+         * redistribution...
+         */
+        else if (RebalanceProcedure.REDISTRIBUTE.equals(getProcedure())) {
             reportByRedistribution(writer);
         }
 
@@ -321,6 +424,9 @@ public class ActionReportWriter extends HierarchyWriter {
         else {
             reportByPercentage(writer);
         }
+
+        // Finish up by writing a newline.
+        writer.write("\n");
     }
 
     /**
@@ -332,9 +438,67 @@ public class ActionReportWriter extends HierarchyWriter {
     private void reportByPercentage(@NotNull FileWriter writer)
             throws IOException {
 
-        // TODO: Fill this in.
-        writer.write(String.format(temporaryReport, byCurrency.size(),
-                "by percentages"));
+        /*
+         * Step one: 1. Collect the proposed values of the tickers to be used
+         * as reallocation weights. Create a weight list, and cycle for each
+         * ticker.
+         */
+        Currency proposed;
+        final List<Double> weights = new ArrayList<>();
+        for (Ticker ticker : byCurrency) {
+
+            /*
+             * Get the proposed value of the first/next ticker, and add it as a
+             * new element of the weight list.
+             */
+            proposed = ticker.getProposed();
+            weights.add((null == proposed) ? zeroCurrency.getValue() :
+                    proposed.getValue());
+        }
+
+        // Create a percentage list that is the same size as the weight list.
+        final List<MutablePercent> percentages =
+                getInitialList(weights.size());
+
+        /*
+         * Create a new reallocator with the weight list. Can the reallocator
+         * reallocate using this weight list?
+         */
+        final Reallocator reallocator = new Reallocator(weights);
+        if (reallocator.canReallocate()) {
+
+            /*
+             * The reallocator can reallocate using the given weight list.
+             * Reallocate the percentage list. Declare a local variable to
+             * receive a ticker description.
+             */
+            reallocator.reallocate(percentages);
+            TickerDescription description;
+
+            // Cycle for each ticker.
+            int i = 0;
+            for (Ticker ticker : byCurrency) {
+
+                /*
+                 * Write about the percentage reallocated to each ticker
+                 * symbol.
+                 */
+                description = ticker.getDescription();
+                writer.write(String.format(percentageMessage,
+                        percentages.get(i++), ticker.getKey(),
+                        getName(description), getNumber(description)));
+            }
+        }
+
+        /*
+         * Reallocation cannot occur. At this time the only reason that would
+         * cause this problem is that the sum of the values assigned to tickers
+         * is not positive (i.e., it is zero).
+         */
+        else {
+            writer.write("Rebalance impossible; there is no value to " +
+                    "rebalance!\n");
+        }
     }
 
     /**
@@ -416,9 +580,48 @@ public class ActionReportWriter extends HierarchyWriter {
     private void reportNotConsidered(@NotNull FileWriter writer)
             throws IOException {
 
-        // TODO: Fill this out.
-        writer.write(String.format(temporaryReport, notConsidered.size(),
-                "and not considered for rebalance"));
+        // Are there any tickers that are not considered for rebalance?
+        boolean problems = false;
+        if (0 < notConsidered.size()) {
+
+            /*
+             * There are tickers that are not considered for rebalance. Declare
+             * a variable to receive a ticker description. Cycle for each
+             * ticker.
+             */
+            TickerDescription description;
+            for (Ticker ticker : notConsidered) {
+
+                /*
+                 * Determine if the ticker has any difference between proposed
+                 * and considered value. Is there a difference?
+                 */
+                if (getDifference(ticker).isNotZero()) {
+
+                    /*
+                     * A ticker not considered for rebalance nevertheless has a
+                     * difference between proposed and considered values. This
+                     * is a problem. Set the 'problem' flag, and get the
+                     * description from the ticker.
+                     */
+                    problems = true;
+                    description = ticker.getDescription();
+
+                    // Write about the problem.
+                    writer.write(String.format(notConsideredMessage,
+                            ticker.getKey(), getName(description),
+                            getNumber(description)));
+                }
+            }
+
+            /*
+             * Finish up by writing a newline if there were one or more
+             * problems.
+             */
+            if (problems) {
+                writer.write("\n");
+            }
+        }
     }
 
     /**
@@ -431,9 +634,20 @@ public class ActionReportWriter extends HierarchyWriter {
     private void reportNullDescription(@NotNull FileWriter writer)
             throws IOException {
 
-        // TODO: Fill this out.
-        writer.write(String.format(temporaryReport, nullDescription.size(),
-                "with null ticker descriptions"));
+        // Are there any tickers with null descriptions?
+        if (0 < nullDescription.size()) {
+
+            /*
+             * There are tickers with null descriptions. Cycle for each ticker,
+             * and write about it.
+             */
+            for (Ticker ticker : nullDescription) {
+                writer.write(String.format(nullMessage, ticker.getKey()));
+            }
+
+            // Finish up by writing a newline.
+            writer.write("\n");
+        }
     }
 
     /**
@@ -446,9 +660,29 @@ public class ActionReportWriter extends HierarchyWriter {
     private void reportUnknownDescription(@NotNull FileWriter writer)
             throws IOException {
 
-        // TODO: Fill this out.
-        writer.write(String.format(temporaryReport, unknownDescription.size(),
-                "with unknown ticker descriptions"));
+        // Are there any tickers with descriptions of an unknown type?
+        if (0 < unknownDescription.size()) {
+
+            /*
+             * There are tickers with descriptions of an unknown type. Declare
+             * a variable to receive the ticker description. Cycle for each
+             * ticker.
+             */
+            TickerDescription description;
+            for (Ticker ticker : unknownDescription) {
+
+                /*
+                 * Get the description from the first/next ticker, and describe
+                 * the ticker.
+                 */
+                description = ticker.getDescription();
+                writer.write(String.format(unknownMessage, ticker.getKey(),
+                        getName(description), getNumber(description)));
+            }
+
+            // Finish up by writing a newline.
+            writer.write("\n");
+        }
     }
 
     /**
@@ -496,22 +730,19 @@ public class ActionReportWriter extends HierarchyWriter {
 
     @Override
     protected void writeLines(@NotNull FileWriter writer,
+                              @NotNull Ticker ticker) {
+        throw new RuntimeException("The call to this method has been " +
+                "intercepted, and should not happen!");
+    }
+
+    @Override
+    protected void writeLines(@NotNull FileWriter writer,
                               @NotNull Institution institution)
             throws IOException {
 
         // Write a newline, then call the superclass method.
         writer.write("\n");
         super.writeLines(writer, institution);
-    }
-
-    @Override
-    protected void writeLines(@NotNull FileWriter writer,
-                              @NotNull Ticker ticker)
-            throws IOException {
-
-        // TODO: Delete this.
-        writer.write(String.format(requiredRebalance, "ticker",
-                ticker.getKey()));
     }
 
     // An action that adds tickers to lists
