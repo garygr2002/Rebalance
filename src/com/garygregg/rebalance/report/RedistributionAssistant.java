@@ -53,15 +53,15 @@ class RedistributionAssistant {
          * iterator to the front of the list, and use it to get the first
          * pair.
          */
-        toIterator = localList.listIterator();
-        to = toIterator.next();
+        fromIterator = localList.listIterator();
+        from = fromIterator.next();
 
         /*
          * Get an iterator to the back of the list, and use it to get the last
          * pair.
          */
-        fromIterator = localList.listIterator(list.size());
-        from = fromIterator.previous();
+        toIterator = localList.listIterator(list.size());
+        to = toIterator.previous();
     }
 
     /**
@@ -78,20 +78,20 @@ class RedistributionAssistant {
     }
 
     /**
-     * Advances the front iterator (tickers needing most value).
+     * Advances the front iterator (tickers needing to accept value).
      *
      * @return True if the iterator could be advanced, i.e., there are more
      * tickers
      */
     @SuppressWarnings("UnusedReturnValue")
-    public boolean advanceTo() {
+    public boolean advance() {
 
         // Can the front iterator be advanced?
-        final boolean result = toIterator.hasNext();
+        final boolean result = fromIterator.hasNext();
         if (result) {
 
             // The front iterator can be advanced. Advance it.
-            to = toIterator.next();
+            from = fromIterator.next();
         }
 
         // Return the result.
@@ -104,7 +104,7 @@ class RedistributionAssistant {
      * @return True if the current donor can donate currency; false otherwise
      */
     public boolean canDonate() {
-        return (0 < from.getFirst().getImmutable().compareTo(zero));
+        return (0 < to.getFirst().getImmutable().compareTo(zero));
     }
 
     /**
@@ -114,7 +114,7 @@ class RedistributionAssistant {
      * otherwise
      */
     public boolean canReceive() {
-        return (to.getFirst().getImmutable().compareTo(zero) < 0);
+        return (from.getFirst().getImmutable().compareTo(zero) < 0);
     }
 
     /**
@@ -167,19 +167,19 @@ class RedistributionAssistant {
             final MutableCurrency to = getToDifference();
 
             /*
-             * Determine the minimum of the two differences. Subtract the
-             * minimum from the donor, and add it to the receiver.
+             * Determine the minimum of the two differences. Add the minimum to
+             * the donor, and subtract it from the receiver.
              */
             result = min(from, to);
-            from.subtract(result);
-            to.add(result);
+            from.add(result);
+            to.subtract(result);
 
             /*
              * Retreat from the current donor if the current donor has nothing
              * left to transfer.
              */
             if (!canDonate()) {
-                retreatFrom();
+                retreat();
             }
 
             /*
@@ -187,7 +187,7 @@ class RedistributionAssistant {
              * that it needs.
              */
             if (!canReceive()) {
-                advanceTo();
+                advance();
             }
         }
 
@@ -223,20 +223,20 @@ class RedistributionAssistant {
     }
 
     /**
-     * Retreats the back iterator (tickers needing to donate most value).
+     * Retreats the back iterator (tickers needing to donate value).
      *
      * @return True if the iterator could be retreated, i.e., there are more
      * tickers
      */
     @SuppressWarnings("UnusedReturnValue")
-    public boolean retreatFrom() {
+    public boolean retreat() {
 
         // Can the back iterator be retreated?
-        final boolean result = fromIterator.hasPrevious();
+        final boolean result = toIterator.hasPrevious();
         if (result) {
 
             // The back iterator can be retreated. Retreat it.
-            from = fromIterator.previous();
+            to = toIterator.previous();
         }
 
         // Return the result.
