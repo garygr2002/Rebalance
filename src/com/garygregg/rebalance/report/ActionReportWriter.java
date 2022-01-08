@@ -62,7 +62,8 @@ public class ActionReportWriter extends HierarchyWriter {
             "actions for %s key '%s'";
 
     // The message used for buying and selling shares
-    private static final String sharesMessage = "\n%s%-4s %14s shares of %s";
+    private static final String sharesMessage = "\n%s%-4s %14s shares of " +
+            "ticker %s";
 
     // The message identifying a ticker
     private static final String tickerIdMessage = "%-5s ('%s'; Number %s)";
@@ -577,8 +578,15 @@ public class ActionReportWriter extends HierarchyWriter {
                 new RedistributionAssistant(differencePairs);
         differencePairs.clear();
 
-        // Declare local variables, and initialize them as necessary.
-        Ticker from, lastFrom = null;
+        /*
+         * Declare variables for the donor and recipient tickers, and
+         * initialize them from the redistribution assistant.
+         */
+        Ticker from = assistant.getFromTicker();
+        Ticker to = assistant.getToTicker();
+
+        // Declare and initialize other local variables.
+        Ticker lastFrom = null;
         MutableCurrency total = new MutableCurrency();
 
         /*
@@ -589,17 +597,13 @@ public class ActionReportWriter extends HierarchyWriter {
         boolean firstMessage = true;
         while (null != transfer) {
 
-            /*
-             * Get the first ticker acting as a donor. Was there no previous
-             * donor ticker?
-             */
-            from = assistant.getFromTicker();
+            // Was there no previous donor ticker?
             if (null == lastFrom) {
 
                 /*
                  * There was no previous donor ticker. Set the current donor
-                 * ticker as the last seen. Initialize the total transfer
-                 * amount for the new donor ticker.
+                 * ticker as the last. Initialize the total transfer amount for
+                 * the new donor ticker.
                  */
                 lastFrom = from;
                 total.set(transfer);
@@ -613,9 +617,9 @@ public class ActionReportWriter extends HierarchyWriter {
 
                 /*
                  * The current donor is not the same as the last. Write a total
-                 * message for the last donor, set the current donor as the
-                 * last seen, and reinitialize the total transfer amount for
-                 * the new donor ticker.
+                 * message for the last donor, and set the current donor as the
+                 * last. Reinitialize the total transfer amount for the new
+                 * donor ticker.
                  */
                 firstMessage = writeTotalMessage(writer, lastFrom, total);
                 lastFrom = from;
@@ -632,17 +636,21 @@ public class ActionReportWriter extends HierarchyWriter {
 
             // Write about the amount being received.
             writer.write(String.format(transferMessage, firstMessage ?
-                            "\n" : "", transfer, "to",
-                    formatTickerId(assistant.getToTicker())));
+                    "\n" : "", transfer, "to", formatTickerId(to)));
             firstMessage = false;
 
-            // Get the next currency transfer.
+            /*
+             * Reinitialize the donor and recipient tickers, and get the next
+             * transfer.
+             */
+            from = assistant.getFromTicker();
+            to = assistant.getToTicker();
             transfer = assistant.getNextTransfer();
         }
 
         /*
-         * Done with currency transfer. Write a total message for the last
-         * donor if there was as last donor.
+         * Done with currency transfers. Write a total message for the last
+         * donor if there was a last donor.
          */
         if (null != lastFrom) {
             firstMessage = writeTotalMessage(writer, lastFrom, total);
@@ -719,8 +727,8 @@ public class ActionReportWriter extends HierarchyWriter {
                 result = calculateDifference(shares, ticker);
 
                 /*
-                 * Write about the buying and/or selling required to achieve the
-                 * rebalance.
+                 * Write about the buying and/or selling required to achieve
+                 * the rebalance.
                  */
                 writer.write(String.format(sharesMessage,
                         firstMessage ? "\n" : "", result ? "Buy" : "Sell",
