@@ -17,17 +17,20 @@ import java.util.*;
 
 public class ActionReportWriter extends HierarchyWriter {
 
-    // A string to separate accounts in a report
-    private static final String accountSeparator =
-            String.format("%s\n", "-".repeat(65));
-
     // The default rebalance procedure
     private static final RebalanceProcedure defaultProcedure =
             RebalanceProcedure.PERCENT;
 
+    // The maximum expected line length
+    private static final int maxLineLength = 120;
+
+    // A string to separate accounts in a report
+    private static final String accountSeparator =
+            String.format("%s\n", "-".repeat(maxLineLength));
+
     // A string to separate institutions in a report
     private static final String institutionSeparator =
-            String.format("%s\n", "*".repeat(80));
+            String.format("%s\n", "*".repeat(maxLineLength));
 
     // The value of minus one share
     private static final Shares minusOne = new Shares(-1.);
@@ -37,7 +40,7 @@ public class ActionReportWriter extends HierarchyWriter {
 
     // The message written when there are no tickers matching given criteria
     private static final String noTickers = "There are no tickers that " +
-            "require rebalance by %s.\n";
+            "require rebalance by %s\n";
 
     // The message used for tickers not considered for rebalance
     private static final String notConsideredMessage = "Problem in ticker " +
@@ -45,27 +48,38 @@ public class ActionReportWriter extends HierarchyWriter {
 
     // The message used for unknown ticker description
     private static final String nullMessage = "Ticker %-5s does not have a " +
-            "description.\n";
+            "description\n";
 
     // The message used for percentage reallocation
     private static final String percentageMessage = "Allocate %7s%% to %-5s " +
-            "('%s'; Number: %s).\n";
+            "('%s'; Number: %s)\n";
 
     // The common portfolio/institution/account declaration string
     private static final String requiredRebalance = "Required rebalance " +
-            "actions for %s key '%s'.\n";
+            "actions for %s key '%s'\n";
+
+    // The message used for residual currency differences
+    private static final String residualMessage = "Residual of %18s in " +
+            "ticker %-5s ('%s'; Number %s)\n";
 
     // The message used for buying and selling shares
     private static final String sharesMessage = "%-4s %14s shares of %-5s " +
-            "('%s'; Number: %s).\n";
+            "('%s'; Number: %s)\n";
 
-    // A temporary report string
-    private static final String temporaryReport = "There is/are %d tickers " +
-            "that need rebalance %s.\n";
+    // The message used for the total transfer from one ticker
+    private static final String totalMessage = "Total %24s %-4s ticker %-5s " +
+            "('%s'; Number %s)\n\n";
+
+    /*
+     * The message used for transferring currency between one ticker and
+     * another
+     */
+    private static final String transferMessage = "Transfer %21s %-4s " +
+            "ticker %-5s ('%s'; Number %s)\n";
 
     // The message used for unknown ticker description
     private static final String unknownMessage = "Ticker %-5s ('%s'; Number " +
-            "%s) has a description of an unknown type.\n";
+            "%s) has a description of an unknown type\n";
 
     // The value of zero currency
     private static final Currency zeroCurrency = Currency.getZero();
@@ -223,16 +237,20 @@ public class ActionReportWriter extends HierarchyWriter {
     }
 
     /**
-     * Writes a name string.
+     * Gets the proposed value from a ticker.
      *
-     * @param writer The file writer to receive the report lines
-     * @param name   The name to write
-     * @throws IOException Indicates an I/O exception occurred
+     * @param ticker The ticker from which to get the proposed value
+     * @return The proposed value from the ticker, or a default if the proposed
+     * value is null
      */
-    private static void writeName(@NotNull FileWriter writer,
-                                  @NotNull String name)
-            throws IOException {
-        writer.write(String.format(nameMessage, name));
+    private static @NotNull Currency getProposed(@NotNull Ticker ticker) {
+
+        /*
+         * Get the proposed value from the ticker. Return zero currency if the
+         * proposed value is null. Otherwise, return the proposed value.
+         */
+        final Currency proposed = ticker.getProposed();
+        return (null == proposed) ? zeroCurrency : proposed;
     }
 
     /**
@@ -246,6 +264,19 @@ public class ActionReportWriter extends HierarchyWriter {
                                   Description<?> description)
             throws IOException {
         writeName(writer, getName(description));
+    }
+
+    /**
+     * Writes a name string.
+     *
+     * @param writer The file writer to receive the report lines
+     * @param name   The name to write
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private static void writeName(@NotNull FileWriter writer,
+                                  @NotNull String name)
+            throws IOException {
+        writer.write(String.format(nameMessage, name));
     }
 
     /**
@@ -338,15 +369,13 @@ public class ActionReportWriter extends HierarchyWriter {
 
         // Get the considered and proposed values of the ticker.
         final Currency considered = ticker.getConsidered();
-        final Currency proposed = ticker.getProposed();
+        final Currency proposed = getProposed(ticker);
 
         /*
-         * Create a new mutable currency with the proposed value of the ticker
-         * if the proposed value is not null. If it is null, use zero. Is the
-         * considered value of the ticker not null?
+         * Create a new mutable currency with the proposed value of the
+         * ticker. Is the considered value of the ticker not null?
          */
-        final MutableCurrency currency =
-                new MutableCurrency((null == proposed) ? zeroCurrency : proposed);
+        final MutableCurrency currency = new MutableCurrency(proposed);
         if (null != considered) {
 
             /*
@@ -510,9 +539,137 @@ public class ActionReportWriter extends HierarchyWriter {
     private void reportByRedistribution(@NotNull FileWriter writer)
             throws IOException {
 
-        // TODO: Fill this in.
-        writer.write(String.format(temporaryReport, byCurrency.size(),
-                "by reallocation"));
+        /*
+         * Create a difference pairs list for each element in the ticker
+         * redistribution list.
+         */
+        for (Ticker ticker : byCurrency) {
+            addDifferencePair(ticker);
+        }
+
+        /*
+         * Create a new redistribution assistant with the redistribution list,
+         * then clear the redistribution list.
+         */
+        final RedistributionAssistant assistant =
+                new RedistributionAssistant(differencePairs);
+        differencePairs.clear();
+
+        // Declare local variables, and initialize them as necessary.
+        Ticker from, lastFrom = null, to;
+        TickerDescription description;
+        MutableCurrency total = new MutableCurrency();
+
+        /*
+         * Get the first currency transfer, and cycle while transfers
+         * exist.
+         */
+        Currency transfer = assistant.getNextTransfer();
+        while (null != transfer) {
+
+            /*
+             * Get the first ticker acting as a donor. Was there no previous
+             * donor ticker?
+             */
+            from = assistant.getFromTicker();
+            if (null == lastFrom) {
+
+                /*
+                 * There was no previous donor ticker. Set the current donor
+                 * ticker as the last seen. Initialize the total transfer
+                 * amount for the new donor ticker.
+                 */
+                lastFrom = from;
+                total.set(transfer);
+            }
+
+            /*
+             * There is a previous donor ticker. Is the current donor not the
+             * same as the last?
+             */
+            else if (!lastFrom.getKey().equals(from.getKey())) {
+
+                /*
+                 * The current donor is not the same as the last. Write a total
+                 * message for the last donor, set the current donor as the
+                 * last seen, and reinitialize the total transfer amount for
+                 * the new donor ticker.
+                 */
+                writeTotalMessage(writer, lastFrom, total);
+                lastFrom = from;
+                total.set(transfer);
+            }
+
+            /*
+             * The current donor is the same as the last. Add the current
+             * transfer to the running total.
+             */
+            else {
+                total.add(transfer);
+            }
+
+            // Get the receiving ticker and its description.
+            to = assistant.getToTicker();
+            description = to.getDescription();
+
+            // Write about the amount being received.
+            writer.write(String.format(transferMessage, transfer, "to",
+                    to.getKey(), getName(description),
+                    getNumber(description)));
+
+            // Get the next currency transfer.
+            transfer = assistant.getNextTransfer();
+        }
+
+        /*
+         * Done with currency transfer. Write a total message for the last
+         * donor if there was as last donor.
+         */
+        if (null != lastFrom) {
+            writeTotalMessage(writer, lastFrom, total);
+        }
+
+        // Cycle while donor tickers remain.
+        boolean iteratorsRemain = true;
+        while (iteratorsRemain && assistant.canDonate()) {
+
+            /*
+             * Get the donor ticker, its description, and the amount it needs
+             * to donate.
+             */
+            from = assistant.getToTicker();
+            description = from.getDescription();
+            transfer = assistant.getTo();
+
+            // Write about the residual.
+            writer.write(String.format(residualMessage, transfer,
+                    from.getKey(), getName(description),
+                    getNumber(description)));
+
+            // Get the next remaining donor.
+            iteratorsRemain = assistant.retreat();
+        }
+
+        // Cycle while receiving tickers remain.
+        iteratorsRemain = true;
+        while (iteratorsRemain && assistant.canReceive()) {
+
+            /*
+             * Get the receiving ticker, its description, and the amount it
+             * needs to receive.
+             */
+            to = assistant.getFromTicker();
+            description = to.getDescription();
+            transfer = assistant.getFrom();
+
+            // Write about the residual, and get the next remaining recipient.
+            writer.write(String.format(residualMessage, transfer, to.getKey(),
+                    getName(description), getNumber(description)));
+            iteratorsRemain = assistant.advance();
+        }
+
+        // Finish with a newline.
+        writer.write("\n");
     }
 
     /**
@@ -743,6 +900,28 @@ public class ActionReportWriter extends HierarchyWriter {
         // Write a newline, then call the superclass method.
         writer.write("\n");
         super.writeLines(writer, institution);
+    }
+
+    /**
+     * Writes a total transfer message.
+     *
+     * @param writer The file writer to receive the report lines
+     * @param ticker The ticker undergoing the transfer
+     * @param total  The total amount of the transfer
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private void writeTotalMessage(@NotNull FileWriter writer,
+                                   @NotNull Ticker ticker,
+                                   @NotNull MutableCurrency total) throws IOException {
+
+        /*
+         * Get the description from the ticker, and use it write about the
+         * transfer.
+         */
+        TickerDescription description = ticker.getDescription();
+        writer.write(String.format(totalMessage, total, "from",
+                ticker.getKey(), getName(description),
+                getNumber(description)));
     }
 
     // An action that adds tickers to lists
