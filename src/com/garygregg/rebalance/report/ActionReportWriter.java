@@ -17,6 +17,10 @@ import java.util.*;
 
 public class ActionReportWriter extends HierarchyWriter {
 
+    // The message used for buying or selling funds
+    private static final String buySellMessage = "\n%s%-11s %18s of   " +
+            "ticker %s";
+
     // The default rebalance procedure
     private static final RebalanceProcedure defaultProcedure =
             RebalanceProcedure.PERCENT;
@@ -26,60 +30,56 @@ public class ActionReportWriter extends HierarchyWriter {
 
     // A string to separate accounts in a report
     private static final String accountSeparator =
-            String.format("%s\n", "-".repeat(maxLineLength));
+            String.format("\n%s", "-".repeat(maxLineLength));
 
     // A string to separate institutions in a report
     private static final String institutionSeparator =
-            String.format("%s\n", "*".repeat(maxLineLength));
+            String.format("\n%s", "*".repeat(maxLineLength));
 
     // The value of minus one share
     private static final Shares minusOne = new Shares(-1.);
 
     // The message used for reporting the name of a description
-    private static final String nameMessage = "Name: '%s'\n\n";
+    private static final String nameMessage = "\nName: '%s'";
 
     // The message written when there are no tickers matching given criteria
-    private static final String noTickers = "There are no tickers that " +
-            "require rebalance by %s\n";
+    private static final String noTickers = "\n\nThere are no tickers that " +
+            "require rebalance%s.";
 
     // The message used for tickers not considered for rebalance
-    private static final String notConsideredMessage = "Problem in ticker " +
-            "%-5s ('%s'; Number %s)!\n";
+    private static final String notConsideredMessage = "\n%sTicker %s is " +
+            "not considered for rebalance; why is it here?";
 
     // The message used for unknown ticker description
-    private static final String nullMessage = "Ticker %-5s does not have a " +
-            "description\n";
+    private static final String nullMessage = "\n%sTicker %s does not have " +
+            "a description!";
 
     // The message used for percentage reallocation
-    private static final String percentageMessage = "Allocate %7s%% to %-5s " +
-            "('%s'; Number: %s)\n";
+    private static final String percentageMessage = "\n%sAllocate %7s%% to %s";
 
     // The common portfolio/institution/account declaration string
-    private static final String requiredRebalance = "Required rebalance " +
-            "actions for %s key '%s'\n";
-
-    // The message used for residual currency differences
-    private static final String residualMessage = "Residual of %18s in " +
-            "ticker %-5s ('%s'; Number %s)\n";
+    private static final String requiredRebalance = "%sRequired rebalance " +
+            "actions for %s key '%s'";
 
     // The message used for buying and selling shares
-    private static final String sharesMessage = "%-4s %14s shares of %-5s " +
-            "('%s'; Number: %s)\n";
+    private static final String sharesMessage = "\n%s%-4s %14s shares of %s";
+
+    // The message identifying a ticker
+    private static final String tickerIdMessage = "%-5s ('%s'; Number %s)";
 
     // The message used for the total transfer from one ticker
-    private static final String totalMessage = "Total %24s %-4s ticker %-5s " +
-            "('%s'; Number %s)\n\n";
+    private static final String totalMessage = "\nTotal %24s %-4s ticker %s";
 
     /*
      * The message used for transferring currency between one ticker and
      * another
      */
-    private static final String transferMessage = "Transfer %21s %-4s " +
-            "ticker %-5s ('%s'; Number %s)\n";
+    private static final String transferMessage = "\n%sTransfer %21s %-4s " +
+            "ticker %s";
 
     // The message used for unknown ticker description
-    private static final String unknownMessage = "Ticker %-5s ('%s'; Number " +
-            "%s) has a description of an unknown type\n";
+    private static final String unknownMessage = "\n%sTicker %s has a " +
+            "description of an unknown type!";
 
     // The value of zero currency
     private static final Currency zeroCurrency = Currency.getZero();
@@ -177,6 +177,25 @@ public class ActionReportWriter extends HierarchyWriter {
 
         // Return whether the result was positive.
         return isPositive;
+    }
+
+    /**
+     * Formats the ticker ID.
+     *
+     * @param ticker The ticker for which to format an ID
+     * @return The formatted ticker ID
+     */
+    private static @NotNull String formatTickerId(
+            @NotNull Ticker ticker) {
+
+        /*
+         * Get the description from the ticker. Use the ticker description to
+         * get the name and number of the ticker. Format the ticker ID message
+         * and return it.
+         */
+        final TickerDescription description = ticker.getDescription();
+        return String.format(tickerIdMessage, ticker.getKey(),
+                getName(description), getNumber(description));
     }
 
     /**
@@ -319,8 +338,10 @@ public class ActionReportWriter extends HierarchyWriter {
             throws IOException {
 
         // Write the portfolio key and the portfolio name.
-        writer.write(String.format(requiredRebalance, "portfolio", portfolio.getKey()));
-        writeName(writer, portfolio.getDescription());
+        writer.write(String.format(requiredRebalance, "", "portfolio",
+                portfolio.getKey()));
+        writeName(writer,
+                portfolio.getDescription());
     }
 
     @Override
@@ -330,7 +351,7 @@ public class ActionReportWriter extends HierarchyWriter {
 
         // Write an institution separator before describing the institution.
         writer.write(institutionSeparator);
-        writer.write(String.format(requiredRebalance, "institution",
+        writer.write(String.format(requiredRebalance, "\n", "institution",
                 institution.getKey()));
         writeName(writer, institution.getName());
     }
@@ -342,7 +363,7 @@ public class ActionReportWriter extends HierarchyWriter {
 
         // Write the account separator followed by the account key.
         writer.write(accountSeparator);
-        writer.write(String.format(requiredRebalance, "account",
+        writer.write(String.format(requiredRebalance, "\n", "account",
                 AccountKey.format(account.getKey().getSecond())));
 
         /*
@@ -438,7 +459,7 @@ public class ActionReportWriter extends HierarchyWriter {
          */
         if (byCurrency.isEmpty()) {
             writer.write(String.format(noTickers,
-                    "redistribution of balances"));
+                    " redistribution of balances"));
         }
 
         /*
@@ -453,9 +474,6 @@ public class ActionReportWriter extends HierarchyWriter {
         else {
             reportByPercentage(writer);
         }
-
-        // Finish up by writing a newline.
-        writer.write("\n");
     }
 
     /**
@@ -494,17 +512,14 @@ public class ActionReportWriter extends HierarchyWriter {
          * reallocate using this weight list?
          */
         final Reallocator reallocator = new Reallocator(weights);
+        boolean firstMessage = true;
         if (reallocator.canReallocate()) {
 
             /*
              * The reallocator can reallocate using the given weight list.
-             * Reallocate the percentage list. Declare a local variable to
-             * receive a ticker description.
+             * Reallocate the percentage list. Cycle for each ticker.
              */
             reallocator.reallocate(percentages);
-            TickerDescription description;
-
-            // Cycle for each ticker.
             int i = 0;
             for (Ticker ticker : byCurrency) {
 
@@ -512,10 +527,10 @@ public class ActionReportWriter extends HierarchyWriter {
                  * Write about the percentage reallocated to each ticker
                  * symbol.
                  */
-                description = ticker.getDescription();
-                writer.write(String.format(percentageMessage,
-                        percentages.get(i++), ticker.getKey(),
-                        getName(description), getNumber(description)));
+                writer.write(String.format(percentageMessage, firstMessage ?
+                                "\n" : "",
+                        percentages.get(i++), formatTickerId(ticker)));
+                firstMessage = false;
             }
         }
 
@@ -556,8 +571,7 @@ public class ActionReportWriter extends HierarchyWriter {
         differencePairs.clear();
 
         // Declare local variables, and initialize them as necessary.
-        Ticker from, lastFrom = null, to;
-        TickerDescription description;
+        Ticker from, lastFrom = null;
         MutableCurrency total = new MutableCurrency();
 
         /*
@@ -565,6 +579,7 @@ public class ActionReportWriter extends HierarchyWriter {
          * exist.
          */
         Currency transfer = assistant.getNextTransfer();
+        boolean firstMessage = true;
         while (null != transfer) {
 
             /*
@@ -595,7 +610,7 @@ public class ActionReportWriter extends HierarchyWriter {
                  * last seen, and reinitialize the total transfer amount for
                  * the new donor ticker.
                  */
-                writeTotalMessage(writer, lastFrom, total);
+                firstMessage = writeTotalMessage(writer, lastFrom, total);
                 lastFrom = from;
                 total.set(transfer);
             }
@@ -608,14 +623,11 @@ public class ActionReportWriter extends HierarchyWriter {
                 total.add(transfer);
             }
 
-            // Get the receiving ticker and its description.
-            to = assistant.getToTicker();
-            description = to.getDescription();
-
             // Write about the amount being received.
-            writer.write(String.format(transferMessage, transfer, "to",
-                    to.getKey(), getName(description),
-                    getNumber(description)));
+            writer.write(String.format(transferMessage, firstMessage ?
+                            "\n" : "", transfer, "to",
+                    formatTickerId(assistant.getToTicker())));
+            firstMessage = false;
 
             // Get the next currency transfer.
             transfer = assistant.getNextTransfer();
@@ -626,50 +638,36 @@ public class ActionReportWriter extends HierarchyWriter {
          * donor if there was as last donor.
          */
         if (null != lastFrom) {
-            writeTotalMessage(writer, lastFrom, total);
-        }
-
-        // Cycle while donor tickers remain.
-        boolean iteratorsRemain = true;
-        while (iteratorsRemain && assistant.canDonate()) {
-
-            /*
-             * Get the donor ticker, its description, and the amount it needs
-             * to donate.
-             */
-            from = assistant.getToTicker();
-            description = from.getDescription();
-            transfer = assistant.getTo();
-
-            // Write about the residual.
-            writer.write(String.format(residualMessage, transfer,
-                    from.getKey(), getName(description),
-                    getNumber(description)));
-
-            // Get the next remaining donor.
-            iteratorsRemain = assistant.retreat();
+            firstMessage = writeTotalMessage(writer, lastFrom, total);
         }
 
         // Cycle while receiving tickers remain.
+        boolean iteratorsRemain = true;
+        while (iteratorsRemain && assistant.canDonate()) {
+
+            // Write about the fund to buy.
+            writer.write(String.format(buySellMessage, firstMessage ?
+                            "\n" : "", "Buy", assistant.getTo(),
+                    formatTickerId(assistant.getToTicker())));
+            firstMessage = false;
+
+            // Get the next remaining receiver.
+            iteratorsRemain = assistant.retreat();
+        }
+
+        // Cycle while donor tickers remain.
         iteratorsRemain = true;
         while (iteratorsRemain && assistant.canReceive()) {
 
-            /*
-             * Get the receiving ticker, its description, and the amount it
-             * needs to receive.
-             */
-            to = assistant.getFromTicker();
-            description = to.getDescription();
-            transfer = assistant.getFrom();
+            // Write about the funds to sell.
+            writer.write(String.format(buySellMessage, firstMessage ?
+                            "\n" : "", "Sell", assistant.getFrom(),
+                    formatTickerId(assistant.getFromTicker())));
 
-            // Write about the residual, and get the next remaining recipient.
-            writer.write(String.format(residualMessage, transfer, to.getKey(),
-                    getName(description), getNumber(description)));
+            // Get the next remaining donor.
             iteratorsRemain = assistant.advance();
+            firstMessage = false;
         }
-
-        // Finish with a newline.
-        writer.write("\n");
     }
 
     /**
@@ -686,7 +684,8 @@ public class ActionReportWriter extends HierarchyWriter {
          * rebalance by buying or selling shares.
          */
         if (byShares.isEmpty()) {
-            writer.write(String.format(noTickers, "buying or selling shares"));
+            writer.write(String.format(noTickers,
+                    " buying or selling shares"));
         }
 
         /*
@@ -696,7 +695,6 @@ public class ActionReportWriter extends HierarchyWriter {
         else {
 
             // Declare local variables. Initialize them as required.
-            TickerDescription description;
             boolean result;
             final MutableShares shares = new MutableShares();
 
@@ -704,13 +702,13 @@ public class ActionReportWriter extends HierarchyWriter {
              * Cycle for each ticker needing rebalance by buying or selling
              * shares.
              */
+            boolean firstMessage = true;
             for (Ticker ticker : byShares) {
 
                 /*
-                 * Get the description from the ticker, and recalculate the
-                 * difference between proposed and considered shares.
+                 * Recalculate the difference between proposed and considered
+                 * shares.
                  */
-                description = ticker.getDescription();
                 result = calculateDifference(shares, ticker);
 
                 /*
@@ -718,13 +716,11 @@ public class ActionReportWriter extends HierarchyWriter {
                  * rebalance.
                  */
                 writer.write(String.format(sharesMessage,
-                        result ? "Buy" : "Sell", shares, ticker.getKey(),
-                        description.getName(), description.getNumber()));
+                        firstMessage ? "\n" : "", result ? "Buy" : "Sell",
+                        shares, formatTickerId(ticker)));
+                firstMessage = false;
             }
         }
-
-        // Finish up by writing a newline.
-        writer.write("\n");
     }
 
     /**
@@ -742,11 +738,10 @@ public class ActionReportWriter extends HierarchyWriter {
         if (0 < notConsidered.size()) {
 
             /*
-             * There are tickers that are not considered for rebalance. Declare
-             * a variable to receive a ticker description. Cycle for each
-             * ticker.
+             * There are tickers that are not considered for rebalance. Cycle
+             * for each such ticker.
              */
-            TickerDescription description;
+            boolean firstMessage = true;
             for (Ticker ticker : notConsidered) {
 
                 /*
@@ -758,16 +753,12 @@ public class ActionReportWriter extends HierarchyWriter {
                     /*
                      * A ticker not considered for rebalance nevertheless has a
                      * difference between proposed and considered values. This
-                     * is a problem. Set the 'problem' flag, and get the
-                     * description from the ticker.
+                     * is a problem, so write about it.
                      */
                     problems = true;
-                    description = ticker.getDescription();
-
-                    // Write about the problem.
                     writer.write(String.format(notConsideredMessage,
-                            ticker.getKey(), getName(description),
-                            getNumber(description)));
+                            firstMessage ? "\n" : "", formatTickerId(ticker)));
+                    firstMessage = false;
                 }
             }
 
@@ -784,9 +775,6 @@ public class ActionReportWriter extends HierarchyWriter {
     /**
      * Reports tickers with null ticker descriptions but nevertheless have
      * rebalance actions.
-     *
-     * @param writer The file writer to receive the report lines
-     * @throws IOException Indicates an I/O exception occurred
      */
     private void reportNullDescription(@NotNull FileWriter writer)
             throws IOException {
@@ -794,16 +782,15 @@ public class ActionReportWriter extends HierarchyWriter {
         // Are there any tickers with null descriptions?
         if (0 < nullDescription.size()) {
 
-            /*
-             * There are tickers with null descriptions. Cycle for each ticker,
-             * and write about it.
-             */
+            // There are tickers with null descriptions. Cycle for each ticker.
+            boolean firstMessage = true;
             for (Ticker ticker : nullDescription) {
-                writer.write(String.format(nullMessage, ticker.getKey()));
-            }
 
-            // Finish up by writing a newline.
-            writer.write("\n");
+                // Write about the first/next ticker with a null description.
+                writer.write(String.format(nullMessage, firstMessage ?
+                        "\n" : "", ticker.getKey()));
+                firstMessage = false;
+            }
         }
     }
 
@@ -821,24 +808,17 @@ public class ActionReportWriter extends HierarchyWriter {
         if (0 < unknownDescription.size()) {
 
             /*
-             * There are tickers with descriptions of an unknown type. Declare
-             * a variable to receive the ticker description. Cycle for each
-             * ticker.
+             * There are tickers with descriptions of an unknown type. Cycle
+             * for each ticker.
              */
-            TickerDescription description;
+            boolean firstMessage = true;
             for (Ticker ticker : unknownDescription) {
 
-                /*
-                 * Get the description from the first/next ticker, and describe
-                 * the ticker.
-                 */
-                description = ticker.getDescription();
-                writer.write(String.format(unknownMessage, ticker.getKey(),
-                        getName(description), getNumber(description)));
+                // Describe the first/next ticker with an unknown description.
+                writer.write(String.format(unknownMessage, firstMessage ?
+                        "\n" : "", formatTickerId(ticker)));
+                firstMessage = false;
             }
-
-            // Finish up by writing a newline.
-            writer.write("\n");
         }
     }
 
@@ -908,20 +888,22 @@ public class ActionReportWriter extends HierarchyWriter {
      * @param writer The file writer to receive the report lines
      * @param ticker The ticker undergoing the transfer
      * @param total  The total amount of the transfer
+     * @return True if an extra newline should be inserted before the next
+     * message; false otherwise
      * @throws IOException Indicates an I/O exception occurred
      */
-    private void writeTotalMessage(@NotNull FileWriter writer,
-                                   @NotNull Ticker ticker,
-                                   @NotNull MutableCurrency total) throws IOException {
+    private boolean writeTotalMessage(@NotNull FileWriter writer,
+                                      @NotNull Ticker ticker,
+                                      @NotNull MutableCurrency total)
+            throws IOException {
 
         /*
-         * Get the description from the ticker, and use it write about the
-         * transfer.
+         * Write about the transfer, and return true to always write a newline
+         * before the next message.
          */
-        TickerDescription description = ticker.getDescription();
         writer.write(String.format(totalMessage, total, "from",
-                ticker.getKey(), getName(description),
-                getNumber(description)));
+                formatTickerId(ticker)));
+        return true;
     }
 
     // An action that adds tickers to lists
