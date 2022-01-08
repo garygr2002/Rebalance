@@ -181,6 +181,13 @@ public class DifferenceReportWriter extends HierarchyWriter {
     }
 
     @Override
+    protected void doPostCycle(@NotNull FileWriter writer,
+                               @NotNull Portfolio portfolio) {
+
+        // Nothing to do here.
+    }
+
+    @Override
     protected void doPreCycle(@NotNull FileWriter writer,
                               @NotNull Portfolio portfolio)
             throws IOException {

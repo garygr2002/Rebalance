@@ -48,6 +48,18 @@ abstract class HierarchyWriter extends ReportWriter {
     }
 
     /**
+     * An action to be done with a portfolio after cycling over its
+     * institutions.
+     *
+     * @param writer    The file writer to receive the report lines
+     * @param portfolio A portfolio on which to report
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    protected abstract void doPostCycle(@NotNull FileWriter writer,
+                                        @NotNull Portfolio portfolio)
+            throws IOException;
+
+    /**
      * An action to be done with a portfolio prior to cycling over its
      * institutions.
      *
@@ -144,10 +156,11 @@ abstract class HierarchyWriter extends ReportWriter {
 
         /*
          * Do the pre-cycle action for the portfolio, then cycle for each
-         * institution in the portfolio.
+         * institution in the portfolio. Do the post-cycle action.
          */
         doPreCycle(writer, portfolio);
         iterate(writer, portfolio.getChildren(), institutionAction);
+        doPostCycle(writer, portfolio);
 
         // Close the file writer and return success to our caller.
         writer.close();

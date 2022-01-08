@@ -333,6 +333,13 @@ public class ActionReportWriter extends HierarchyWriter {
     }
 
     @Override
+    protected void doPostCycle(@NotNull FileWriter writer,
+                               @NotNull Portfolio portfolio)
+            throws IOException {
+        writer.write("\n");
+    }
+
+    @Override
     protected void doPreCycle(@NotNull FileWriter writer,
                               @NotNull Portfolio portfolio)
             throws IOException {
