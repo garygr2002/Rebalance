@@ -36,8 +36,11 @@ public class ActionReportWriter extends HierarchyWriter {
     private static final String institutionSeparator =
             String.format("\n%s", "*".repeat(maxLineLength));
 
+    // The value of minus one currency
+    private static final Currency minusOneCurrency = new Currency(-1.);
+
     // The value of minus one share
-    private static final Shares minusOne = new Shares(-1.);
+    private static final Shares minusOneShare = new Shares(-1.);
 
     // The message used for reporting the name of a description
     private static final String nameMessage = "\nName: '%s'";
@@ -173,7 +176,7 @@ public class ActionReportWriter extends HierarchyWriter {
              * The result is negative. Multiply by minus one to get its
              * absolute value.
              */
-            shares.multiply(minusOne);
+            shares.multiply(minusOneShare);
         }
 
         // Return whether the result was positive.
@@ -674,9 +677,16 @@ public class ActionReportWriter extends HierarchyWriter {
         iteratorsRemain = true;
         while (iteratorsRemain && assistant.canReceive()) {
 
+            /*
+             * Negate the value in the assistant. It is negative, and we want
+             * to report a positive number for a sale.
+             */
+            total.set(assistant.getFrom());
+            total.multiply(minusOneCurrency);
+
             // Write about the funds to sell.
             writer.write(String.format(buySellMessage, firstMessage ?
-                            "\n" : "", "Sell", assistant.getFrom(),
+                            "\n" : "", "Sell", total,
                     formatTickerId(assistant.getFromTicker())));
 
             // Get the next remaining donor.
