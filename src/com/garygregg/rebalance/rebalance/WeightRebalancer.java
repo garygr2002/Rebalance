@@ -12,6 +12,9 @@ import java.util.Map;
 class WeightRebalancer extends AccountRebalancer
         implements Ticker.WeightEnumerator {
 
+    // The value of zero currency
+    private static final Currency zero = Currency.getZero();
+
     // The root rebalance node
     private final RebalanceNode root = new RebalanceNode(WeightType.ALL, 1.);
 
@@ -116,15 +119,21 @@ class WeightRebalancer extends AccountRebalancer
         }
 
         /*
-         * Reinitialize the rebalancer member variables. Set the absolute
-         * (not-relative) proposed value of the root node the same as that of
-         * the account, receiving a residual. Return null if the rebalance node
-         * class had a problem. Otherwise, return the received residual.
+         * Reinitialize the rebalancer member variables. Get the proposed value
+         * of the account.
          */
         initialize();
-        final Currency residual = root.setProposed(account.getProposed(),
-                false);
-        return RebalanceNode.hadProblem() ? null : residual;
+        Currency currency = account.getProposed();
+
+        /*
+         * Set the absolute (not-relative) proposed value of the root node the
+         * same as that of the account, receiving a residual. Return null if
+         * rebalance node class had a problem. Otherwise, return the received
+         * residual.
+         */
+        currency = root.setProposed((null == currency) ?
+                zero : currency, false);
+        return RebalanceNode.hadProblem() ? null : currency;
     }
 
     /**
