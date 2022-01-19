@@ -11,6 +11,9 @@ public class Shares extends Countable implements Comparable<Shares> {
     private static final Class<MutableShares> comparableClass =
             MutableShares.class;
 
+    // A known minus one
+    private static final Shares minusOne = new Shares(-1.);
+
     // A known one
     private static final Shares one = new Shares(1.);
 
@@ -82,6 +85,15 @@ public class Shares extends Countable implements Comparable<Shares> {
      */
     public static @NotNull Shares getMinimum() {
         return minimum;
+    }
+
+    /**
+     * Gets a known minus one.
+     *
+     * @return A known minus one
+     */
+    public static @NotNull Shares getMinusOne() {
+        return minusOne;
     }
 
     /**

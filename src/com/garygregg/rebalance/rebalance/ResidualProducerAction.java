@@ -11,8 +11,8 @@ import java.util.TreeMap;
 abstract class ResidualProducerAction
         extends ContainerNodeAction<ReceiverDelegate<?>, SetValueUtility> {
 
-    // The value of minus one as currency
-    private static final Currency minusOne = new Currency(-1.);
+    // The value of minus one
+    private static final Currency minusOne = Currency.getMinusOne();
 
     // The value of zero
     private static final Currency zero = Currency.getZero();

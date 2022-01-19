@@ -11,6 +11,9 @@ public class Currency extends Countable implements Comparable<Currency> {
     private static final Class<MutableCurrency> comparableClass =
             MutableCurrency.class;
 
+    // A known minus one
+    private static final Currency minusOne = new Currency(-1.);
+
     // A known one
     private static final Currency one = new Currency(1.);
 
@@ -82,6 +85,15 @@ public class Currency extends Countable implements Comparable<Currency> {
      */
     public static @NotNull Currency getCent() {
         return cent;
+    }
+
+    /**
+     * Gets a known minus one.
+     *
+     * @return A known minus one
+     */
+    public static @NotNull Currency getMinusOne() {
+        return minusOne;
     }
 
     /**

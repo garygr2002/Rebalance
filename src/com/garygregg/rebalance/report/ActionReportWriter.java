@@ -3,7 +3,6 @@ package com.garygregg.rebalance.report;
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.countable.*;
-import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Institution;
 import com.garygregg.rebalance.hierarchy.Portfolio;
@@ -13,7 +12,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ActionReportWriter extends HierarchyWriter {
 
@@ -37,10 +39,10 @@ public class ActionReportWriter extends HierarchyWriter {
             String.format("\n%s", "*".repeat(maxLineLength));
 
     // The value of minus one currency
-    private static final Currency minusOneCurrency = new Currency(-1.);
+    private static final Currency minusOneCurrency = Currency.getMinusOne();
 
     // The value of minus one share
-    private static final Shares minusOneShare = new Shares(-1.);
+    private static final Shares minusOneShare = Shares.getMinusOne();
 
     // The message used for reporting the name of a description
     private static final String nameMessage = "\nName: '%s'";
