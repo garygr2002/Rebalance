@@ -238,6 +238,7 @@ public class MessageLogger {
      * @param message The message to stream and log
      * @return True if the level for this message flags it as a problem
      */
+    @SuppressWarnings("UnusedReturnValue")
     public boolean streamAndLog(@NotNull Level level,
                                 @NotNull String message) {
 
