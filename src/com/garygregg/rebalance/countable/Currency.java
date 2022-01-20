@@ -32,31 +32,12 @@ public class Currency extends Countable implements Comparable<Currency> {
     private static final Currency zero = new Currency(0.);
 
     /**
-     * Constructs currency.
-     *
-     * @param value    The value of the currency
-     * @param truncate True if the value should be truncated, false if rounded
-     */
-    Currency(double value, boolean truncate) {
-        super(value, precision, truncate);
-    }
-
-    /**
      * Constructs currency with a default truncate flag.
      *
      * @param value The value of the currency
      */
     public Currency(double value) {
         super(value, precision);
-    }
-
-    /**
-     * Constructs currency from other currency.
-     *
-     * @param currency Other currency
-     */
-    Currency(@NotNull Currency currency) {
-        super(currency.getValue(), precision);
     }
 
     /**
