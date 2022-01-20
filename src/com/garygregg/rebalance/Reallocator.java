@@ -16,10 +16,6 @@ public class Reallocator {
     private final ValueExtractor<MutableCountable> forCountables =
             MutableCountable::getValue;
 
-    // A value extractor for doubles
-    private final ValueExtractor<Double> forDoubles =
-            object -> object;
-
     // The sum of the weights
     private final double weightSum;
 
@@ -37,6 +33,9 @@ public class Reallocator {
 
         // Set the member variables.
         this.weights = weights;
+
+        // Create the list of weights.
+        final ValueExtractor<Double> forDoubles = object -> object;
         this.weightSum = sum(weights, forDoubles);
     }
 
