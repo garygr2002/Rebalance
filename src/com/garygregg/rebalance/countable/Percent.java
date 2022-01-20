@@ -29,31 +29,12 @@ public class Percent extends Countable implements Comparable<Percent> {
     private static final Percent zero = new Percent(0.);
 
     /**
-     * Constructs percent.
-     *
-     * @param value    The value of the percent
-     * @param truncate True if the value should be truncated, false if rounded
-     */
-    Percent(double value, boolean truncate) {
-        super(value, precision, truncate);
-    }
-
-    /**
      * Constructs percent with a default truncate flag.
      *
      * @param value The value of the percent
      */
     public Percent(double value) {
         super(value, precision);
-    }
-
-    /**
-     * Constructs percent from other percent.
-     *
-     * @param percent Other percent
-     */
-    Percent(@NotNull Percent percent) {
-        super(percent.getValue(), precision);
     }
 
     /**
@@ -108,10 +89,11 @@ public class Percent extends Countable implements Comparable<Percent> {
     }
 
     /**
-     * Returns true the percents are one hundred, false otherwise
+     * Returns true if the percents are one hundred, false otherwise
      *
      * @return True if the percents are one hundred, false otherwise
      */
+    @SuppressWarnings("unused")
     public boolean areOneHundred() {
         return equals(getOneHundred());
     }
@@ -148,6 +130,7 @@ public class Percent extends Countable implements Comparable<Percent> {
      *
      * @return True if the percent is one hundred, false otherwise
      */
+    @SuppressWarnings("unused")
     public boolean isOneHundred() {
         return equals(getOneHundred());
     }
