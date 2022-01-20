@@ -1,5 +1,6 @@
 package com.garygregg.rebalance;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AccountKeyLibrary<ContainerType> extends
@@ -19,7 +20,8 @@ public abstract class AccountKeyLibrary<ContainerType> extends
      * @param number An account number
      * @return The account number formatted in a standardized way
      */
-    public static String format(@NotNull Long number) {
+    @Contract(pure = true)
+    public static @NotNull String format(@NotNull Long number) {
         return AccountKey.format(number);
     }
 
