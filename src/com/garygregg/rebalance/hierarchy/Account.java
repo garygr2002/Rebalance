@@ -200,6 +200,7 @@ public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
      * @return True if the ticker is synthesized, or programmatically
      * modified; false otherwise
      */
+    @SuppressWarnings("unused")
     public boolean isSynthesized() {
         return synthesized;
     }
