@@ -33,6 +33,7 @@ public class DistinguishedAccountDescription extends
      *
      * @return The corresponding portfolio key
      */
+    @SuppressWarnings("unused")
     public String getPortfolioKey() {
         return portfolioKey;
     }
