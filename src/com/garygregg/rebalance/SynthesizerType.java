@@ -30,7 +30,7 @@ public enum SynthesizerType {
     US_CAPITAL_GAINS(PERCENTAGE),
 
     // Washington Real Estate Excise Tax
-    WASHINGTON_REET(PERCENTAGE);
+    @SuppressWarnings("SpellCheckingInspection") WASHINGTON_REET(PERCENTAGE);
 
     // The parent synthesizer type
     private final SynthesizerType parent;
