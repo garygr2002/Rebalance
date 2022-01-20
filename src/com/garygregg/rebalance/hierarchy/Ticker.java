@@ -421,6 +421,7 @@ public class Ticker extends
      * @return The shares of the queryable that cannot be considered for
      * rebalance
      */
+    @SuppressWarnings("unused")
     public @NotNull Shares getNotConsideredShares() {
         return notConsidered.getShares();
     }
@@ -495,6 +496,7 @@ public class Ticker extends
      * @return True if the ticker has the indicated weight type, false
      * otherwise
      */
+    @SuppressWarnings("unused")
     public boolean hasWeightType(@NotNull WeightType type) {
 
         /*
