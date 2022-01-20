@@ -227,8 +227,8 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
     }
 
     /**
-     * Determines whether there is a match between two strings (in a case-
-     * insensitive way).
+     * Determines whether there is a match between two strings (in a
+     * case-insensitive way).
      *
      * @param first  The first string (assumed to be lower case)
      * @param second The second string (not assumed to be lower case)
