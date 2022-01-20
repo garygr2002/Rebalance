@@ -315,6 +315,7 @@ public class Hierarchy {
      * @return True if the proposed value of an aggregate matches the sum of
      * value by tax type, false otherwise
      */
+    @SuppressWarnings("unused")
     public static boolean checkTaxType(@NotNull Aggregate<?, ?, ?> aggregate) {
         return check(allProposed, taxProposed, aggregate);
     }
@@ -327,6 +328,7 @@ public class Hierarchy {
      * @return True if the proposed value of an aggregate matches the sum of
      * value by weight type, false otherwise
      */
+    @SuppressWarnings("unused")
     public static boolean checkWeightType(@NotNull Aggregate<?, ?, ?> aggregate) {
         return check(allProposed, weightProposed, aggregate);
     }
@@ -1210,6 +1212,7 @@ public class Hierarchy {
      * @return An account matching the unique combination of institution
      * mnemonic and account number, or null if there was no match
      */
+    @SuppressWarnings("unused")
     public Account getAccount(@NotNull String institutionMnemonic,
                               @NotNull Long accountNumber) {
         return getAccount(new AccountKey(institutionMnemonic, accountNumber));
@@ -1270,6 +1273,7 @@ public class Hierarchy {
      * @return A portfolio matching the mnemonic, or null if there was no
      * matching portfolio
      */
+    @SuppressWarnings("unused")
     public Portfolio getPortfolio(@NotNull String portfolioMnemonic) {
         return portfolios.get(portfolioMnemonic);
     }
