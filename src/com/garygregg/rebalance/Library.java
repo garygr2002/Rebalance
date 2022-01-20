@@ -60,6 +60,7 @@ public abstract class Library<KeyType, DescriptionType> {
      * @return True if the descriptions in the catalog have a total order,
      * false otherwise
      */
+    @SuppressWarnings("unused")
     public abstract boolean areKeysSorted();
 
     /**
