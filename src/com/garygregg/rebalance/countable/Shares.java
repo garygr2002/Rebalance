@@ -32,31 +32,12 @@ public class Shares extends Countable implements Comparable<Shares> {
     private static final Shares zero = new Shares(0.);
 
     /**
-     * Constructs shares.
-     *
-     * @param value    The value of the shares
-     * @param truncate True if the value should be truncated, false if rounded
-     */
-    Shares(double value, boolean truncate) {
-        super(value, precision, truncate);
-    }
-
-    /**
      * Constructs shares with a default truncate flag.
      *
      * @param value The value of the shares
      */
     public Shares(double value) {
         super(value, precision);
-    }
-
-    /**
-     * Constructs shares from other shares.
-     *
-     * @param shares Other shares
-     */
-    Shares(@NotNull Shares shares) {
-        super(shares.getValue(), precision);
     }
 
     /**
@@ -124,6 +105,7 @@ public class Shares extends Countable implements Comparable<Shares> {
      *
      * @return True if the shares are one, false otherwise
      */
+    @SuppressWarnings("unused")
     public boolean areOne() {
         return equals(getOne());
     }
