@@ -22,48 +22,12 @@ public class MutablePrice extends MutableCountable
     private final Container<Price> container = new Container<>(this);
 
     /**
-     * Constructs mutable price.
-     *
-     * @param value    The value of the price
-     * @param truncate True if the value should be truncated, false if rounded
-     */
-    @SuppressWarnings("unused")
-    MutablePrice(double value, boolean truncate) {
-        super(value, truncate);
-    }
-
-    /**
      * Constructs mutable price with a default truncate flag.
      *
      * @param value The value of the price
      */
     public MutablePrice(double value) {
         super(value);
-    }
-
-    /**
-     * Constructs mutable price from other mutable price.
-     *
-     * @param price Other mutable price
-     */
-    public MutablePrice(@NotNull MutablePrice price) {
-        super(price.getValue());
-    }
-
-    /**
-     * Constructs mutable price from immutable price.
-     *
-     * @param price Immutable price
-     */
-    public MutablePrice(@NotNull Price price) {
-        super(price.getValue());
-    }
-
-    /**
-     * Constructs mutable price with zero initial value.
-     */
-    public MutablePrice() {
-        this(Price.getZero());
     }
 
     /**
@@ -176,16 +140,6 @@ public class MutablePrice extends MutableCountable
         return Objects.hash(getValue());
     }
 
-    /**
-     * Returns true the shares are one, false otherwise
-     *
-     * @return True if the shares are one, false otherwise
-     */
-    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
-    public boolean isCent() {
-        return equals(Price.getCent());
-    }
-
     @Override
     @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     public boolean isNotZero() {
@@ -198,6 +152,7 @@ public class MutablePrice extends MutableCountable
      * @param price A price
      * @return The value that was set
      */
+    @SuppressWarnings("unused")
     public double multiply(@NotNull Price price) {
 
         // Multiply the value, and return the result.
@@ -211,6 +166,7 @@ public class MutablePrice extends MutableCountable
      * @param price A mutable price
      * @return The value that was set
      */
+    @SuppressWarnings("unused")
     public double multiply(@NotNull MutablePrice price) {
 
         // Multiply the value, and return the result.
