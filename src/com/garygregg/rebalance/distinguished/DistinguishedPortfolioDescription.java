@@ -11,8 +11,8 @@ public class DistinguishedPortfolioDescription extends
      * @param key   The key of the description
      * @param value The value assigned to the key
      */
-    public DistinguishedPortfolioDescription(@NotNull DistinguishedPortfolio key,
-                                             @NotNull String value) {
+    public DistinguishedPortfolioDescription(
+            @NotNull DistinguishedPortfolio key, @NotNull String value) {
         super(key, value);
     }
 }
