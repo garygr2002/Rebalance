@@ -126,7 +126,10 @@ public class DateUtilities {
                  * and the subsequence parsed as a date.
                  */
                 dates.add(new Pair<>(nextMatch, dateFormat.parse(nextMatch)));
-            } catch (@NotNull ParseException exception) {
+            }
+
+            // Catch any parse exception that may occur.
+            catch (@NotNull ParseException exception) {
 
                 /*
                  * For whatever reason the date subsequence cannot be parsed.
