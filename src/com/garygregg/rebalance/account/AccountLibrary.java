@@ -40,7 +40,8 @@ public class AccountLibrary extends AccountKeyLibrary<AccountDescription> {
      * @return An existing account description that was displaced in the
      * library because it had the same number
      */
-    AccountDescription addDescription(@NotNull AccountDescription description) {
+    AccountDescription addDescription(
+            @NotNull AccountDescription description) {
         return accounts.put(description.getKey(), description);
     }
 
