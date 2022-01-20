@@ -354,6 +354,7 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
                 hadLineProblem() ? " not" : ""));
     }
 
+    @SuppressWarnings("GrazieInspection")
     @Override
     protected void setLineNumber(int lineNumber) {
 
