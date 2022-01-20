@@ -3,7 +3,8 @@ package com.garygregg.rebalance.hierarchy;
 import com.garygregg.rebalance.*;
 import org.jetbrains.annotations.NotNull;
 
-public class Institution extends SuperAggregate<String, Account, Description<String>> {
+public class Institution extends SuperAggregate<String, Account,
+        Description<String>> {
 
     // A factory for producing artificial institutions
     private static final Factory<Institution> factoryForInstitutions =
