@@ -29,31 +29,12 @@ public class Price extends Countable implements Comparable<Price> {
     private static final Price zero = new Price(0.);
 
     /**
-     * Constructs price.
-     *
-     * @param value    The value of the price
-     * @param truncate True if the value should be truncated, false if rounded
-     */
-    Price(double value, boolean truncate) {
-        super(value, precision, truncate);
-    }
-
-    /**
      * Constructs price with a default truncate flag.
      *
      * @param value The value of the price
      */
     public Price(double value) {
         super(value, precision);
-    }
-
-    /**
-     * Constructs price from other price.
-     *
-     * @param price Other price
-     */
-    Price(@NotNull Price price) {
-        super(price.getValue(), precision);
     }
 
     /**
@@ -134,6 +115,7 @@ public class Price extends Countable implements Comparable<Price> {
      *
      * @return True if the price is a cent, false otherwise
      */
+    @SuppressWarnings("unused")
     public boolean isCent() {
         return equals(getCent());
     }
