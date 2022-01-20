@@ -204,16 +204,6 @@ public class AccountKey extends Pair<String, Long> implements
         return compare((Pair<String, Long>) this, accountKey);
     }
 
-    /**
-     * Creates a unique key from the institution mnemonic and account number.
-     *
-     * @return A unique key created from the institution mnemonic and account
-     * number
-     */
-    public String createUniqueKey() {
-        return createUniqueKey(getFirst(), getSecond());
-    }
-
     @Override
     public String toString() {
         return toString(getFirst(), getSecond());
