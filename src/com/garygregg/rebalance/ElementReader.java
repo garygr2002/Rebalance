@@ -343,8 +343,8 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
     /**
      * Calls a field processor for a given element index.
      *
-     * @param index      The given element index
-     * @param field      The field to processor
+     * @param index The given element index
+     * @param field The field to processor
      */
     protected void processField(int index, @NotNull String field) {
 
@@ -385,9 +385,10 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
 
             // The reader is not null. Go ahead and read lines.
             result = readLines(reader, continueOnFalse);
+        }
 
-            // Bad news. We could not find a reader. Was the date null?
-        } else if (null == date) {
+        // Bad news. We could not find a reader. Was the date null?
+        else if (null == date) {
 
             /*
              * The date was null, indicating there was no file with the known
@@ -396,10 +397,13 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
             logMessage(Level.SEVERE, String.format("No identifiable file of " +
                             "type '%s' could be located; check the directory.",
                     getPrefix()));
-        } else {
+        }
+
+        // The date was not null.
+        else {
 
             /*
-             * The date was not null, indicating there may be a file with the
+             * A non-null date indicates that there may be a file with the
              * known name format, but its date occurs after the given date.
              */
             logMessage(Level.SEVERE, String.format("No file of type '%s' " +
@@ -636,7 +640,7 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
         /**
          * Processes the non-blank field.
          *
-         * @param field      The field
+         * @param field The field
          */
         public abstract void processNotEmptyField(@NotNull String field);
     }
