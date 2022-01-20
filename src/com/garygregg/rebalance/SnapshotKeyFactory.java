@@ -44,13 +44,6 @@ public class SnapshotKeyFactory {
     }
 
     /**
-     * Creates a snapshot key factory.
-     */
-    public SnapshotKeyFactory() {
-        this(new Random());
-    }
-
-    /**
      * Produces a new snapshot key.
      *
      * @return A new snapshot key
