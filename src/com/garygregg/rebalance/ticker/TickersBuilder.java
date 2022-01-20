@@ -1,6 +1,5 @@
 package com.garygregg.rebalance.ticker;
 
-import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.FundType;
 import com.garygregg.rebalance.countable.Currency;
@@ -8,7 +7,6 @@ import com.garygregg.rebalance.countable.Shares;
 import com.garygregg.rebalance.interpreter.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -395,58 +393,6 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
      */
     public static Level getInconsistencyLevel() {
         return inconsistencyLevel;
-    }
-
-    /**
-     * Tests this class.
-     *
-     * @param arguments Command line arguments
-     */
-    public static void main(String[] arguments) {
-
-        /*
-         * TODO: Delete this method.
-         */
-        try {
-
-            // Create an element processor. Read lines from the file object.
-            final ElementReader<?> processor = new TickersBuilder();
-            processor.readLines();
-
-            // The ticker library should now be populated. Print its date.
-            final TickerLibrary library = TickerLibrary.getInstance();
-            System.out.printf("The date of the library is: %s.%n",
-                    DateUtilities.format(library.getDate()));
-
-            // Cycle for each ticker description in the library.
-            for (TickerDescription description : library.getCatalog()) {
-
-                // Display statistics for the first/next ticker description.
-                System.out.printf("Ticker number: %5s; " +
-                                "Name: %45s; " +
-                                "Minimum is: %12s; " +
-                                "Preferred rounding is : %7s; " +
-                                "Has stocks: %5s; " +
-                                "Has bonds: %5s; " +
-                                "Has cash: %5s; " +
-                                "Has real estate: %5s%n",
-                        description.getTicker(),
-                        description.getName(),
-                        description.getMinimum().toString(),
-                        description.getBalanceRounding().toString(),
-                        description.hasType(FundType.STOCK),
-                        description.hasType(FundType.BOND),
-                        description.hasType(FundType.CASH),
-                        description.hasType(FundType.REAL_ESTATE));
-            }
-
-            // Say whether the element processor had warning or error.
-            System.out.printf("The element processor " +
-                            "completed %s warning or error.%n",
-                    (processor.hadFileProblem() ? "with a" : "without"));
-        } catch (@NotNull IOException exception) {
-            System.err.println(exception.getMessage());
-        }
     }
 
     /**

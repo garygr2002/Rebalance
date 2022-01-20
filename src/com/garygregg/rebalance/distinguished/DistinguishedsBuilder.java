@@ -4,7 +4,6 @@ import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.interpreter.CodeInterpreter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -402,74 +401,6 @@ public class DistinguishedsBuilder extends
         processorMap.put(HoldingLineType.INSTITUTION, institutionProcessor);
         processorMap.put(HoldingLineType.PORTFOLIO, portfolioProcessor);
         processorMap.put(HoldingLineType.TICKER, tickerProcessor);
-    }
-
-    /**
-     * Describes the contents of a distinguished library.
-     *
-     * @param type    The type descriptor for the library
-     * @param keys    The keys to describe
-     * @param library The distinguished library
-     */
-    private static <T extends Comparable<T>>
-    void describeContents(@NotNull String type, @NotNull T @NotNull [] keys,
-                          @NotNull DistinguishedLibrary<T, ?, ?> library) {
-
-        /*
-         * TODO: Delete this method.
-         *
-         * Print the date of the library. Cycle for each key.
-         */
-        System.out.printf("The date of the %s library is %s.%n",
-                type, DateUtilities.format(library.getDate()));
-
-        final String prefix = String.format("Value of %s:", type);
-        for (T key : keys) {
-
-            // Describe the first/next key.
-            System.out.printf("%-21s key = %-30s; value = %s.%n",
-                    prefix, key, library.getValue(key));
-        }
-    }
-
-    /**
-     * Tests this class.
-     *
-     * @param arguments Command line arguments
-     */
-    public static void main(String[] arguments) {
-
-        /*
-         * TODO: Delete this method.
-         */
-        try {
-
-            // Create an element processor. Read lines from the file object.
-            final ElementReader<?> processor = new DistinguishedsBuilder();
-            processor.readLines();
-
-            // Describe the contents of the distinguished portfolio library.
-            describeContents("portfolio", DistinguishedPortfolio.values(),
-                    DistinguishedPortfolioLibrary.getInstance());
-
-            // Describe the contents of the distinguished institution library.
-            describeContents("institution", DistinguishedInstitution.values(),
-                    DistinguishedInstitutionLibrary.getInstance());
-
-            // Describe the contents of the distinguished account library.
-            describeContents("account", DistinguishedAccount.values(),
-                    DistinguishedAccountLibrary.getInstance());
-
-            // Say whether the element processor had warning or error.
-            System.out.printf("The element processor " +
-                            "completed %s warning or error.%n",
-                    (processor.hadFileProblem() ? "with a" : "without"));
-        }
-
-        // Catch any I/O exception that may occur.
-        catch (@NotNull IOException exception) {
-            System.err.println(exception.getMessage());
-        }
     }
 
     /**

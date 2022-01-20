@@ -50,53 +50,6 @@ public class InflationCaddy {
     }
 
     /**
-     * Tests the inflation caddy. (TODO: Delete this.)
-     *
-     * @param args Command line arguments
-     */
-    public static void main(@NotNull String[] args) {
-
-        // Get the inflation caddy instance and print the default values.
-        final InflationCaddy caddy = getInstance();
-        print(caddy);
-        stream.println();
-
-        // Set two percent inflation, and print values.
-        caddy.setPercent(2.);
-        print(caddy);
-        stream.println();
-
-        // Set average annual inflation, and print values.
-        caddy.setPercent(3.22);
-        print(caddy);
-        stream.println();
-    }
-
-    /**
-     * Prints values from an inflation caddy (TODO: Delete this).
-     *
-     * @param caddy The inflation caddy
-     */
-    private static void print(@NotNull InflationCaddy caddy) {
-
-        // Print values for annual, monthly and daily inflation.
-        print("Annual", caddy.getAnnual());
-        print("Monthly", caddy.getMonthly());
-        print("Daily", caddy.getDaily());
-    }
-
-    /**
-     * Prints an inflation value (TODO: Delete this).
-     *
-     * @param type      The type of the inflation value
-     * @param inflation The inflation value
-     */
-    private static void print(@NotNull String type, double inflation) {
-        stream.printf("%-22s: %f.%n", String.format("%s inflation rate", type),
-                inflation);
-    }
-
-    /**
      * Gets the annual inflation.
      *
      * @return The annual inflation

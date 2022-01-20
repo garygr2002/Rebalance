@@ -1,15 +1,12 @@
 package com.garygregg.rebalance.detailed;
 
 import com.garygregg.rebalance.AccountKeyLibrary;
-import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementReader;
-import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import com.garygregg.rebalance.interpreter.LongInterpreter;
 import com.garygregg.rebalance.interpreter.PositiveInterpreter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -64,71 +61,6 @@ public class DetailedsBuilder extends ElementReader<DetailedDescription> {
         }
     }
 
-    /**
-     * Displays weights for a detailed description.
-     *
-     * @param description A detailed description
-     */
-    private static void displayWeights(@NotNull DetailedDescription description) {
-
-        /*
-         * TODO: Delete this method.
-         *
-         * Print a header for the table that follows, and cycle for each weight
-         * type.
-         */
-        System.out.printf("Weights for detailed account description: %s follow:%n",
-                description.getKey());
-        for (WeightType type : WeightType.values()) {
-
-            // Print the weight assigned to each weight type.
-            System.out.printf("%-30s: %3f%n", type, description.getAllocation(type));
-        }
-    }
-
-    /**
-     * Tests this class.
-     *
-     * @param arguments Command line arguments
-     */
-    public static void main(String[] arguments) {
-
-        /*
-         * TODO: Delete this method.
-         */
-        try {
-
-            // Create an element processor. Read lines from the file object.
-            final ElementReader<?> processor = new DetailedsBuilder();
-            processor.readLines();
-
-            // The detailed library should now be populated. Print its date.
-            final DetailedLibrary library = DetailedLibrary.getInstance();
-            System.out.printf("The date of the library is: %s.%n",
-                    DateUtilities.format(library.getDate()));
-
-            // Cycle for each detailed description in the library.
-            for (DetailedDescription description : library.getCatalog()) {
-
-                // Display statistics for the first/next detailed description.
-                System.out.printf("Account institution for detail: %-12s; " +
-                                "Account number for detail: %20s; " +
-                                "Account name for detail: %-40s%n",
-                        description.getInstitution(),
-                        AccountKeyLibrary.format(description.getNumber()),
-                        description.getName());
-                displayWeights(description);
-            }
-
-            // Say whether the element processor had warning or error.
-            System.out.printf("The element processor " +
-                            "completed %s warning or error.%n",
-                    (processor.hadFileProblem() ? "with a" : "without"));
-        } catch (@NotNull IOException exception) {
-            System.err.println(exception.getMessage());
-        }
-    }
-
     @Override
     public int getMinimumFields() {
         return 3;
@@ -146,7 +78,7 @@ public class DetailedsBuilder extends ElementReader<DetailedDescription> {
     }
 
     @Override
-    protected void processElements(@NotNull String[] elements,
+    protected void processElements(@NotNull String @NotNull [] elements,
                                    int lineNumber) {
 
         /*

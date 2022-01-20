@@ -1,6 +1,8 @@
 package com.garygregg.rebalance.portfolio;
 
-import com.garygregg.rebalance.*;
+import com.garygregg.rebalance.DateInterpreter;
+import com.garygregg.rebalance.ElementReader;
+import com.garygregg.rebalance.FilingStatus;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.interpreter.BooleanInterpreter;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
@@ -8,7 +10,6 @@ import com.garygregg.rebalance.interpreter.FilingStatusInterpreter;
 import com.garygregg.rebalance.interpreter.PositiveInterpreter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -294,66 +295,6 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
         addFieldProcessor(++fieldIndex, adjustmentProcessor);
     }
 
-    /**
-     * Tests this class.
-     *
-     * @param arguments Command line arguments
-     */
-    public static void main(String[] arguments) {
-
-        /*
-         * TODO: Delete this method.
-         */
-        try {
-
-            // Create an element processor. Read lines from the file object.
-            final ElementReader<?> processor = new PortfoliosBuilder();
-            processor.readLines(new Date());
-
-            // The holding library should now be populated. Print its date.
-            final PortfolioLibrary library = PortfolioLibrary.getInstance();
-            System.out.printf("The date of the library is: %s.%n",
-                    DateUtilities.format(library.getDate()));
-
-            // Cycle for each portfolio description in the library.
-            int portfolio = 0;
-            for (PortfolioDescription description : library.getCatalog()) {
-
-                // Display statistics for the first/next portfolio description.
-                System.out.printf("Portfolio (%d) '%s' with name '%s' now " +
-                                "loaded;%nBirth date: %s; Mortality date: " +
-                                "%s;%nFiling status: %s; Monthly Social " +
-                                "Security: %s;%nCPI adjusted monthly " +
-                                "annuity: %s; Non-CPI adjusted monthly " +
-                                "income: %s; Taxable annual income: %s;%n" +
-                                "Stock: %f, Bond: %f, Cash: %f, Real " +
-                                "estate: %f;%nAdjust: %s.%n%n",
-                        ++portfolio,
-                        description.getKey(),
-                        description.getName(),
-                        DateUtilities.format(description.getBirthdate()),
-                        DateUtilities.format(description.getMortalityDate()),
-                        description.getFilingStatus(),
-                        description.getSocialSecurityMonthly(),
-                        description.getCpiMonthly(),
-                        description.getNonCpiMonthly(),
-                        description.getTaxableAnnual(),
-                        description.getAllocation(WeightType.STOCK),
-                        description.getAllocation(WeightType.BOND),
-                        description.getAllocation(WeightType.CASH),
-                        description.getAllocation(WeightType.REAL_ESTATE),
-                        description.shouldAdjust());
-            }
-
-            // Say whether the element processor had warning or error.
-            System.out.printf("The element processor " +
-                            "completed %s warning or error.%n",
-                    (processor.hadFileProblem() ? "with a" : "without"));
-        } catch (@NotNull IOException exception) {
-            System.err.println(exception.getMessage());
-        }
-    }
-
     @Override
     public int getMinimumFields() {
         return 1;
@@ -544,16 +485,16 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
         private final DoubleInterpreter interpreter =
                 new PositiveInterpreter() {
 
-            @Override
-            protected void receiveException(@NotNull Exception exception,
-                                            @NotNull String string,
-                                            Double defaultValue) {
-                logMessage(Level.WARNING, String.format("Allocation '%s' " +
-                                "at line number %d, column number %d in the " +
-                                "portfolio file cannot be parsed; using %s.",
-                        string, getRow(), getColumn(), defaultValue));
-            }
-        };
+                    @Override
+                    protected void receiveException(@NotNull Exception exception,
+                                                    @NotNull String string,
+                                                    Double defaultValue) {
+                        logMessage(Level.WARNING, String.format("Allocation '%s' " +
+                                        "at line number %d, column number %d in the " +
+                                        "portfolio file cannot be parsed; using %s.",
+                                string, getRow(), getColumn(), defaultValue));
+                    }
+                };
 
         /**
          * Gets the column.

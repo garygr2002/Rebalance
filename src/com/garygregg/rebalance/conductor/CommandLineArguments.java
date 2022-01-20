@@ -1,20 +1,15 @@
 package com.garygregg.rebalance.conductor;
 
 import com.garygregg.rebalance.CommandLineId;
-import com.garygregg.rebalance.MessageLogger;
 import com.garygregg.rebalance.Pair;
-import com.garygregg.rebalance.cla.*;
+import com.garygregg.rebalance.cla.CLAException;
+import com.garygregg.rebalance.cla.Dispatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.PrintStream;
 import java.util.*;
-import java.util.prefs.Preferences;
 
 public class CommandLineArguments<TokenType extends Enum<TokenType>> {
-
-    // The output stream
-    private static final PrintStream stream = MessageLogger.getOutputStream();
 
     // A map of token types to a list of matching dispatch actions
     private final Map<TokenType, List<Dispatch<TokenType>>> dispatchMap =
@@ -73,160 +68,6 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
     }
 
     /**
-     * Tests the command line arguments parser.
-     *
-     * @param arguments Command line arguments to test
-     */
-    private static void doTest(@NotNull String[] arguments) {
-
-        /*
-         * TODO : Delete this method.
-         *
-         * Declare and initialize a preferences object for this class.
-         */
-        final Preferences preferences =
-                Preferences.userRoot().node(
-                        CommandLineArguments.class.getName());
-
-        // Declare an 'on current' dispatch action.
-        final Dispatch<CommandLineId> onCurrent =
-                new DoublePreferenceDispatch<>(CommandLineId.CURRENT,
-                        preferences, stream, false);
-
-        // Declare an 'on destination' dispatch action.
-        final Dispatch<CommandLineId> onDestination =
-                new PreferenceDispatch<>(CommandLineId.DESTINATION,
-                        preferences, stream);
-
-        // Declare an 'on extraordinary' dispatch action.
-        final Dispatch<CommandLineId> onExtraordinary =
-                new LimitedPreferenceDispatch<>(CommandLineId.EXTRAORDINARY,
-                        preferences, stream);
-
-        // Declare an 'on high' dispatch action.
-        final Dispatch<CommandLineId> onHigh =
-                new DoublePreferenceDispatch<>(CommandLineId.HIGH, preferences,
-                        stream, false);
-
-        // Declare an 'on inflation' dispatch action.
-        final Dispatch<CommandLineId> onInflation =
-                new DoublePreferenceDispatch<>(CommandLineId.INFLATION, preferences,
-                        stream, true);
-
-        // Declare an 'on level' dispatch action.
-        final Dispatch<CommandLineId> onLevel =
-                new LevelPreferenceDispatch<>(CommandLineId.LEVEL, preferences,
-                        stream);
-
-        // Declare an 'on ordinary' dispatch action.
-        final Dispatch<CommandLineId> onOrdinary =
-                new LimitedPreferenceDispatch<>(CommandLineId.ORDINARY,
-                        preferences, stream);
-
-        // Declare an 'on none' dispatch action.
-        final Dispatch<CommandLineId> onNone = new Dispatch<>() {
-
-            @Override
-            public void dispatch(String argument) {
-                receive(getKey(), argument);
-            }
-
-            @Override
-            public @NotNull CommandLineId getKey() {
-                return CommandLineId.OTHER;
-            }
-        };
-
-        // Declare an 'on source' dispatch action.
-        final Dispatch<CommandLineId> onSource =
-                new PathPreferenceDispatch<>(CommandLineId.SOURCE, preferences,
-                        stream);
-
-        // Declare an 'on limit' dispatch action.
-        final Dispatch<CommandLineId> onXLimit =
-                new IntPreferenceDispatch<>(CommandLineId.X, preferences,
-                        stream, false);
-
-        /*
-         * Declare and initialize a dispatch list for token IDs, then add a
-         * dispatch action for the 'on current' argument.
-         */
-        final List<Dispatch<CommandLineId>> dispatchList = new ArrayList<>();
-        dispatchList.add(onCurrent);
-
-        /*
-         * Add dispatch actions for the 'on destination' and 'on extraordinary'
-         * arguments.
-         */
-        dispatchList.add(onDestination);
-        dispatchList.add(onExtraordinary);
-
-        // Add dispatch actions for the 'on high' and 'on inflation' arguments.
-        dispatchList.add(onHigh);
-        dispatchList.add(onInflation);
-
-        // Add dispatch actions for the 'on level' and 'on ordinary' arguments.
-        dispatchList.add(onLevel);
-        dispatchList.add(onOrdinary);
-
-        // Add dispatch actions for 'on source' and 'on limit' arguments.
-        dispatchList.add(onSource);
-        dispatchList.add(onXLimit);
-
-        // Create a command line argument processor using the 'on none' action.
-        final CommandLineArguments<CommandLineId> cla =
-                new CommandLineArguments<>(dispatchList, onNone);
-        try {
-
-            // Process the command line arguments.
-            cla.process(arguments);
-        }
-
-        // Catch any CLA exception that may occur.
-        catch (CLAException exception) {
-            System.err.println(exception.getMessage());
-        }
-    }
-
-    /**
-     * Tests the command line arguments parser.
-     *
-     * @param arguments Command line arguments to test
-     */
-    public static void main(@NotNull String[] arguments) {
-
-        /*
-         * TODO : Delete this method.
-         *
-         * Declare tests.
-         */
-        final String[][] tests = {
-                {},
-                {"--p=/my_path_1", "--p"},
-                {"-path", "/my_path_2", "-p"},
-                {"--d=/my_destination", "--p=/my_path_3", "--c=4327.16",
-                        "--h=4393.68", "--i=1.01", "--l=warning", "-c"},
-                {"--p=/my_p\0ath_4", "--p"},
-                {"-l", "bad_level"}
-        };
-
-        // Declare a test counter, and perform the tests.
-        int i = 0;
-        for (String[] test : tests) {
-
-            // Describe the test, perform it, then print a newline.
-            stream.printf("Performing test %d...%n", i++);
-            doTest(test);
-            stream.println();
-        }
-
-        // Perform the last test with the command line arguments.
-        stream.printf("Performing last test, %d, with command line " +
-                "arguments...%n", i);
-        doTest(arguments);
-    }
-
-    /**
      * Determines whether there is a match between two strings (in a
      * case-insensitive way).
      *
@@ -255,22 +96,6 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
 
         // Return the result.
         return result;
-    }
-
-    /**
-     * Receives an argument associated with a key.
-     *
-     * @param key      The key
-     * @param argument The argument associated with the key
-     * @param <T>      The type of the key
-     * @param <U>      The type of the argument
-     */
-    private static <T, U> void receive(T key, @NotNull U argument) {
-
-        // TODO: Delete this method.
-        stream.printf("Processing %s with argument of '%s'.%n",
-                (null == key) ? null : key.toString().toLowerCase(),
-                argument);
     }
 
     /**

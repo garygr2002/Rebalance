@@ -4,7 +4,6 @@ import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.interpreter.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -138,54 +137,6 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
         }
     }
 
-    /**
-     * Tests this class.
-     *
-     * @param arguments Command line arguments
-     */
-    public static void main(String[] arguments) {
-
-        /*
-         * TODO: Delete this method.
-         */
-        try {
-
-            // Create an element processor. Read lines from the file object.
-            final ElementReader<?> processor = new AccountsBuilder();
-            processor.readLines();
-
-            // The account library should now be populated. Print its date.
-            final AccountLibrary library = AccountLibrary.getInstance();
-            System.out.printf("The date of the library is: %s.%n",
-                    DateUtilities.format(library.getDate()));
-
-            // Cycle for each account description in the library.
-            for (AccountDescription description : library.getCatalog()) {
-
-                // Display statistics for the first/next account description.
-                System.out.printf("Institution: %-12s; " +
-                                "Account number: %20s; " +
-                                "Rebalance order: %20d; " +
-                                "Account name: %-40s; " +
-                                "Account type: %-20s; " +
-                                "Rebalance procedure: %-20s%n",
-                        description.getInstitution(),
-                        AccountKeyLibrary.format(description.getNumber()),
-                        description.getRebalanceOrder(),
-                        description.getName(),
-                        description.getType(),
-                        description.getRebalanceProcedure().toString());
-            }
-
-            // Say whether the element processor had warning or error.
-            System.out.printf("The element processor " +
-                            "completed %s warning or error.%n",
-                    (processor.hadFileProblem() ? "with a" : "without"));
-        } catch (@NotNull IOException exception) {
-            System.err.println(exception.getMessage());
-        }
-    }
-
     @Override
     public int getMinimumFields() {
         return 6;
@@ -203,7 +154,7 @@ public class AccountsBuilder extends ElementReader<AccountDescription> {
     }
 
     @Override
-    protected void processElements(@NotNull String[] elements,
+    protected void processElements(@NotNull String @NotNull [] elements,
                                    int lineNumber) {
 
         /*

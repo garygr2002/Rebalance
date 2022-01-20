@@ -1,12 +1,11 @@
 package com.garygregg.rebalance.code;
 
-import com.garygregg.rebalance.DateUtilities;
 import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.FundType;
 import com.garygregg.rebalance.interpreter.CodeInterpreter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -72,61 +71,13 @@ public class CodesBuilder extends ElementReader<CodeDescription> {
     }
 
     /**
-     * Tests this class.
-     *
-     * @param arguments Command line arguments
-     */
-    public static void main(String[] arguments) {
-
-        /*
-         * TODO: Delete this method.
-         */
-        try {
-
-            // Create an element processor. Read lines from the file object.
-            final ElementReader<?> processor = new CodesBuilder();
-            processor.readLines();
-
-            // The code library should now be populated. Print its date.
-            final CodeLibrary library = CodeLibrary.getInstance();
-            System.out.printf("The date of the library is: %s.%n",
-                    DateUtilities.format(library.getDate()));
-
-            // Cycle for each code description in the library.
-            for (CodeDescription description : library.getCatalog()) {
-
-                // Display statistics for the first/next code description.
-                System.out.printf("Code: %2s; " +
-                                "Name: %20s; " +
-                                "Subcode 1: %2s; Subcode 2: %2s;" +
-                                "Subcode 3: %2s; Subcode 4: %2s; " +
-                                "Subcode 5: %2s; Description: %s%n",
-                        description.getCode(),
-                        description.getName(),
-                        description.getSubcode(0),
-                        description.getSubcode(1),
-                        description.getSubcode(2),
-                        description.getSubcode(3),
-                        description.getSubcode(4),
-                        description.getDescription());
-            }
-
-            // Say whether the element processor had warning or error.
-            System.out.printf("The element processor completed %s warning " +
-                            "or error.%n",
-                    (processor.hadFileProblem() ? "with a" : "without"));
-        } catch (@NotNull IOException exception) {
-            System.err.println(exception.getMessage());
-        }
-    }
-
-    /**
      * Processes a description.
      *
      * @param description The description to processes
      * @return A processed description
      */
-    private static String processDescription(@NotNull String description) {
+    @Contract(pure = true)
+    private static @NotNull String processDescription(@NotNull String description) {
         return description.replace(";", ",");
     }
 
@@ -147,7 +98,8 @@ public class CodesBuilder extends ElementReader<CodeDescription> {
     }
 
     @Override
-    protected void processElements(@NotNull String[] elements, int lineNumber) {
+    protected void processElements(@NotNull String @NotNull [] elements,
+                                   int lineNumber) {
 
         /*
          * Set the line number, get the code, and create a new code description

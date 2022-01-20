@@ -3,23 +3,17 @@ package com.garygregg.rebalance.hierarchy;
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.account.AccountLibrary;
-import com.garygregg.rebalance.account.AccountsBuilder;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.ICountable;
 import com.garygregg.rebalance.countable.MutableCurrency;
-import com.garygregg.rebalance.holding.BasesBuilder;
 import com.garygregg.rebalance.holding.HoldingDescription;
 import com.garygregg.rebalance.holding.HoldingLibrary;
-import com.garygregg.rebalance.holding.ValuationsBuilder;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
-import com.garygregg.rebalance.portfolio.PortfoliosBuilder;
 import com.garygregg.rebalance.ticker.TickerDescription;
 import com.garygregg.rebalance.ticker.TickerLibrary;
-import com.garygregg.rebalance.ticker.TickersBuilder;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -334,20 +328,6 @@ public class Hierarchy {
     }
 
     /**
-     * Creates an element reader for test purposes.
-     *
-     * @param holdingType A holding type
-     * @return An element reader corresponding to the holding type
-     */
-    private static @NotNull ElementReader<?> createReader(
-            @NotNull HoldingType holdingType) {
-
-        // TODO: Delete this.
-        return (HoldingType.BASIS.equals(holdingType)) ?
-                new BasesBuilder() : new ValuationsBuilder();
-    }
-
-    /**
      * Gets a hierarchy instance for a given holding type.
      *
      * @param type The given holding type
@@ -377,33 +357,6 @@ public class Hierarchy {
     }
 
     /**
-     * Initializes the parent tracker. TODO: Delete this method.
-     */
-    private static void initialize() {
-
-        // Get the parent tracker instance and clear its associations.
-        final ParentTracker tracker = ParentTracker.getInstance();
-        tracker.clearAssociations();
-
-        /*
-         * Add line code associations for the portfolio library. Add the single
-         * line code for institutions.
-         */
-        tracker.addAssociations(PortfolioLibrary.getInstance(),
-                HoldingLineType.PORTFOLIO);
-        tracker.addAssociation('I', HoldingLineType.INSTITUTION);
-
-        /*
-         * Set the distinguished account library in the parent tracker
-         * with the account library instance. Add line code associations
-         * for the ticker library.
-         */
-        tracker.setAccountLibrary(AccountLibrary.getInstance());
-        tracker.addAssociations(TickerLibrary.getInstance(),
-                HoldingLineType.TICKER);
-    }
-
-    /**
      * Locks all aggregate hierarchy objects in a collection.
      *
      * @param collection A collection of aggregate hierarchy objects
@@ -414,116 +367,6 @@ public class Hierarchy {
         // Cycle for each aggregate, and lock it.
         for (Aggregate<?, ?, ?> aggregate : collection) {
             aggregate.lockChildren();
-        }
-    }
-
-    /**
-     * Tests this class.
-     *
-     * @param arguments Command line arguments
-     */
-    public static void main(String[] arguments) {
-
-        /*
-         * TODO: Delete this method.
-         */
-        try {
-
-            /*
-             * Initialize the parent tracker. Declare and initialize the
-             * holding type.
-             */
-            initialize();
-            final HoldingType holdingType = HoldingType.VALUATION;
-
-            // Create a valuation builder and read available valuation lines.
-            final ElementReader<?> holdings = createReader(holdingType);
-            holdings.readLines();
-
-            // The holding library should now be populated. Get its date.
-            final HoldingLibrary library =
-                    HoldingLibrary.getInstance(holdingType);
-            final Date date = library.getDate();
-
-            /*
-             * Print the date of the holding library, and whether problems
-             * were detected.
-             */
-            System.out.printf("The date of the holding library is: %s; " +
-                            "problems were%s detected.%n",
-                    DateUtilities.format(date),
-                    (holdings.hadFileProblem() ? "" : " not"));
-
-            /*
-             * Create a 'portfolios' builder. Read lines from a portfolio
-             * description file with date less than or equal to our holding
-             * library date.
-             */
-            final ElementReader<?> portfolios = new PortfoliosBuilder();
-            portfolios.readLines(date);
-
-            /*
-             * Print the date of the portfolio library, and whether problems
-             * were detected.
-             */
-            System.out.printf("The date of the portfolio library is: %s; " +
-                            "problems were%s detected.%n",
-                    DateUtilities.format(
-                            PortfolioLibrary.getInstance().getDate()),
-                    (portfolios.hadFileProblem() ? "" : " not"));
-
-            /*
-             * Create an 'accounts' builder. Read lines from an account
-             * description file with date less than or equal to our holding
-             * library date.
-             */
-            final ElementReader<?> accounts = new AccountsBuilder();
-            accounts.readLines(date);
-
-            /*
-             * Print the date of the account library, and whether problems
-             * were detected.
-             */
-            System.out.printf("The date of the account library is: %s; " +
-                            "problems were%s detected.%n",
-                    DateUtilities.format(
-                            AccountLibrary.getInstance().getDate()),
-                    (accounts.hadFileProblem() ? "" : " not"));
-
-            /*
-             * Create a ticker builder. Read lines from a ticker description
-             * file with date less than or equal to our holding library date.
-             */
-            final ElementReader<?> tickers = new TickersBuilder();
-            tickers.readLines(date);
-
-            /*
-             * Print the date of the ticker library, and whether problems were
-             * detected.
-             */
-            System.out.printf("The date of the ticker library is: %s; " +
-                            "problems were%s detected.%n",
-                    DateUtilities.format(
-                            TickerLibrary.getInstance().getDate()),
-                    (tickers.hadFileProblem() ? "" : " not"));
-
-            // Get a hierarchy instance and build it.
-            final Hierarchy hierarchy = Hierarchy.getInstance(holdingType);
-            hierarchy.buildHierarchy();
-
-            /*
-             * Say whether there was a problem loading the hierarchy, then
-             * clear the hierarchy.
-             */
-            System.out.printf("Problems were%s detected while loading " +
-                            "holdings into the hierarchy.%n",
-                    hierarchy.hadProblem() ? "" : " not");
-            hierarchy.clearHierarchy();
-
-        } catch (@NotNull IOException exception) {
-
-            // Catch and report any I/O exception that may occur.
-            System.err.println(exception.getMessage());
         }
     }
 
