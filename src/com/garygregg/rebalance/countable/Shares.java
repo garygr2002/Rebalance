@@ -116,10 +116,12 @@ public class Shares extends Countable implements Comparable<Shares> {
     }
 
     @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object object) {
-        return ICountable.areEqual(this, object, this.getClass(),
-                comparableClass, getPrecision());
+
+        // This method has been auto-generated.
+        if (this == object) return true;
+        if (!(object instanceof Shares)) return false;
+        return isEqual(object);
     }
 
     @Override
@@ -130,6 +132,12 @@ public class Shares extends Countable implements Comparable<Shares> {
     @Override
     public int hashCode() {
         return Objects.hash(getValue());
+    }
+
+    @Override
+    public boolean isEqual(Object object) {
+        return ICountable.areEqual(this, object, this.getClass(),
+                comparableClass, getPrecision());
     }
 
     @Override

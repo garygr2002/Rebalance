@@ -921,7 +921,7 @@ class RebalanceNode implements CurrencyReceiver {
          */
         final Currency residual = bestScore.getResidual();
         final Currency afterRebalance = getProposed(residual);
-        if (!afterRebalance.equals(beforeRebalance)) {
+        if (!afterRebalance.isEqual(beforeRebalance)) {
 
             /*
              * The resulting sum after rebalance is not equal to the sum before

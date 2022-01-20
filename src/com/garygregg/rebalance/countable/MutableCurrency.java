@@ -140,10 +140,12 @@ public class MutableCurrency extends MutableCountable
     }
 
     @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object object) {
-        return ICountable.areEqual(this, object, this.getClass(),
-                comparableClass, getPrecision());
+
+        // This method has been auto-generated.
+        if (this == object) return true;
+        if (!(object instanceof MutableCurrency)) return false;
+        return isEqual(object);
     }
 
     /**
@@ -170,15 +172,20 @@ public class MutableCurrency extends MutableCountable
      *
      * @return True if the shares are one, false otherwise
      */
-    @SuppressWarnings({"EqualsBetweenInconvertibleTypes", "unused"})
+    @SuppressWarnings("unused")
     public boolean isCent() {
-        return equals(Currency.getCent());
+        return isEqual(Currency.getCent());
     }
 
     @Override
-    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+    public boolean isEqual(Object object) {
+        return ICountable.areEqual(this, object, this.getClass(),
+                comparableClass, getPrecision());
+    }
+
+    @Override
     public boolean isNotZero() {
-        return !equals(Currency.getZero());
+        return !isEqual(Currency.getZero());
     }
 
     /**

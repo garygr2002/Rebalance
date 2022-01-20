@@ -110,7 +110,7 @@ public interface ICountable {
      * @param precision The maximum and minimum digits of the format precision
      * @return A number format
      */
-    static NumberFormat createFormat(int precision) {
+    static @NotNull NumberFormat createFormat(int precision) {
 
         /*
          * Declare and initialize the format. Get the precision from the
@@ -136,8 +136,8 @@ public interface ICountable {
      * @return True if the class matches one or both of the given
      * alternatives, false if neither
      */
-    static boolean doesClassMatch(Object object, Class<?> first,
-                                  Class<?> second) {
+    static boolean doesClassMatch(@NotNull Object object,
+                                  @NotNull Class<?> first, Class<?> second) {
 
         /*
          * Get the class of the object, and return whether it is assignable to
@@ -241,6 +241,14 @@ public interface ICountable {
      * @return The value of the countable
      */
     double getValue();
+
+    /**
+     * Determine whether another object equals this countable.
+     *
+     * @param object The object to test
+     * @return True if the object equals this object; false otherwise
+     */
+    boolean isEqual(Object object);
 
     /**
      * Returns true if the countable is not zero, false otherwise.

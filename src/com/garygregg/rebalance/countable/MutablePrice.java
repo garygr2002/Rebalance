@@ -115,10 +115,12 @@ public class MutablePrice extends MutableCountable
     }
 
     @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object object) {
-        return ICountable.areEqual(this, object, this.getClass(),
-                comparableClass, getPrecision());
+
+        // This method has been auto-generated.
+        if (this == object) return true;
+        if (!(object instanceof MutablePercent)) return false;
+        return isEqual(object);
     }
 
     /**
@@ -141,9 +143,14 @@ public class MutablePrice extends MutableCountable
     }
 
     @Override
-    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+    public boolean isEqual(Object object) {
+        return ICountable.areEqual(this, object, this.getClass(),
+                comparableClass, getPrecision());
+    }
+
+    @Override
     public boolean isNotZero() {
-        return !equals(Price.getZero());
+        return !isEqual(Price.getZero());
     }
 
     /**

@@ -106,10 +106,12 @@ public class Currency extends Countable implements Comparable<Currency> {
     }
 
     @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object object) {
-        return ICountable.areEqual(this, object, this.getClass(),
-                comparableClass, getPrecision());
+
+        // This method has been auto-generated.
+        if (this == object) return true;
+        if (!(object instanceof Currency)) return false;
+        return isEqual(object);
     }
 
     @Override
@@ -123,8 +125,14 @@ public class Currency extends Countable implements Comparable<Currency> {
     }
 
     @Override
+    public boolean isEqual(Object object) {
+        return ICountable.areEqual(this, object, this.getClass(),
+                comparableClass, getPrecision());
+    }
+
+    @Override
     public boolean isNotZero() {
-        return !equals(getZero());
+        return !isEqual(getZero());
     }
 
     @Override

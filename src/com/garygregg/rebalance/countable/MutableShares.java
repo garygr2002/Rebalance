@@ -104,10 +104,12 @@ public class MutableShares extends MutableCountable
     }
 
     @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object object) {
-        return ICountable.areEqual(this, object, this.getClass(),
-                comparableClass, getPrecision());
+
+        // This method has been auto-generated.
+        if (this == object) return true;
+        if (!(object instanceof MutablePercent)) return false;
+        return isEqual(object);
     }
 
     /**
@@ -130,9 +132,14 @@ public class MutableShares extends MutableCountable
     }
 
     @Override
-    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+    public boolean isEqual(Object object) {
+        return ICountable.areEqual(this, object, this.getClass(),
+                comparableClass, getPrecision());
+    }
+
+    @Override
     public boolean isNotZero() {
-        return !equals(Shares.getZero());
+        return !isEqual(Shares.getZero());
     }
 
     /**
@@ -140,9 +147,8 @@ public class MutableShares extends MutableCountable
      *
      * @return True if the shares are one, false otherwise
      */
-    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     public boolean isOne() {
-        return equals(Shares.getOne());
+        return isEqual(Shares.getOne());
     }
 
     /**

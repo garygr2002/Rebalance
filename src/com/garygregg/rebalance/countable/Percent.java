@@ -104,10 +104,12 @@ public class Percent extends Countable implements Comparable<Percent> {
     }
 
     @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object object) {
-        return ICountable.areEqual(this, object, this.getClass(),
-                comparableClass, getPrecision());
+
+        // This method has been auto-generated.
+        if (this == object) return true;
+        if (!(object instanceof Percent)) return false;
+        return isEqual(object);
     }
 
     @Override
@@ -118,6 +120,12 @@ public class Percent extends Countable implements Comparable<Percent> {
     @Override
     public int hashCode() {
         return Objects.hash(getValue());
+    }
+
+    @Override
+    public boolean isEqual(Object object) {
+        return ICountable.areEqual(this, object, this.getClass(),
+                comparableClass, getPrecision());
     }
 
     @Override

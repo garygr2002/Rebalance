@@ -295,10 +295,12 @@ public class Hierarchy {
      * @param aggregate The aggregate argument
      * @return True if the functions return the same value, false otherwise
      */
-    private static boolean check(@NotNull OneParameterFunction<Currency, Aggregate<?, ?, ?>> first,
-                                 @NotNull OneParameterFunction<Currency, Aggregate<?, ?, ?>> second,
+    private static boolean check(@NotNull OneParameterFunction<Currency,
+            Aggregate<?, ?, ?>> first,
+                                 @NotNull OneParameterFunction<Currency,
+                                         Aggregate<?, ?, ?>> second,
                                  @NotNull Aggregate<?, ?, ?> aggregate) {
-        return first.invoke(aggregate).equals(second.invoke(aggregate));
+        return first.invoke(aggregate).isEqual(second.invoke(aggregate));
     }
 
     /**
@@ -1310,8 +1312,8 @@ public class Hierarchy {
             actualTotal.add(notConsidered);
 
             // Does the actual total not match the expected total?
-            //noinspection EqualsBetweenInconvertibleTypes,AssignmentUsedAsCondition
-            if (result = (!actualTotal.equals(expectedTotal))) {
+            //noinspection AssignmentUsedAsCondition
+            if (result = (!actualTotal.isEqual(expectedTotal))) {
 
                 /*
                  * The actual total does not match the expected total. Log a

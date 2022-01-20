@@ -734,7 +734,7 @@ public class Ticker extends
         }
 
         // The price is not null, but is it zero?
-        else if (Price.getZero().equals(price)) {
+        else if (Price.getZero().isEqual(price)) {
 
             /*
              * The price is zero. Set the minimum number of shares to the

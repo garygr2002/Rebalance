@@ -10,21 +10,16 @@ public class Price extends Countable implements Comparable<Price> {
     // A class comparable to this one
     private static final Class<MutablePrice> comparableClass =
             MutablePrice.class;
-
     // A known one
     private static final Price one = new Price(1.);
-
     // The precision of price
     private static final int precision = ICountable.getPricePrecision();
-
     // Our number formatter
     private static final NumberFormat formatter =
             ICountable.createFormat(precision);
-
     // A known cent
     private static final Price cent =
             new Price(1. / ICountable.calculateFactor(precision));
-
     // A known zero
     private static final Price zero = new Price(0.);
 
@@ -94,10 +89,12 @@ public class Price extends Countable implements Comparable<Price> {
     }
 
     @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object object) {
-        return ICountable.areEqual(this, object, this.getClass(),
-                comparableClass, getPrecision());
+
+        // This method has been auto-generated.
+        if (this == object) return true;
+        if (!(object instanceof Price)) return false;
+        return isEqual(object);
     }
 
     @Override
@@ -118,6 +115,12 @@ public class Price extends Countable implements Comparable<Price> {
     @SuppressWarnings("unused")
     public boolean isCent() {
         return equals(getCent());
+    }
+
+    @Override
+    public boolean isEqual(Object object) {
+        return ICountable.areEqual(this, object, this.getClass(),
+                comparableClass, getPrecision());
     }
 
     @Override
