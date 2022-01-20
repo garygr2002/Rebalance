@@ -76,6 +76,7 @@ public class CodeDescription implements Description<Character> {
      * @param index The given index
      * @return The subcode associated with the given index
      */
+    @SuppressWarnings("unused")
     public Character getSubcode(int index) {
         return isIndexOkay(index) ? subcodes[index] : null;
     }

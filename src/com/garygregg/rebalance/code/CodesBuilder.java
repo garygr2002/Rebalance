@@ -200,11 +200,13 @@ public class CodesBuilder extends ElementReader<CodeDescription> {
                             "it was already set to %s.",
                     type.toString(), description.getCode(),
                     description.getCode()));
-        } else {
+        }
+
+        // The fund type is not already set in the fund description.
+        else {
 
             /*
-             * The fund type is not already set. All is well. Log an
-             * informational message, and set the fund type in the
+             * Log an informational message, and set the fund type in the
              * description.
              */
             logMessage(getOrdinary(), String.format("Setting fund type %s " +
