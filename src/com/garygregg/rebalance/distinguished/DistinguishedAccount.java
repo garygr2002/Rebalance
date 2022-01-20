@@ -60,5 +60,5 @@ public enum DistinguishedAccount {
     SOCIAL_SECURITY,
 
     // Washington Real Estate Excise Tax
-    WASHINGTON_REET
+    @SuppressWarnings("SpellCheckingInspection") WASHINGTON_REET
 }
