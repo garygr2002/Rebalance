@@ -22,17 +22,6 @@ public class MutablePercent extends MutableCountable
     private final Container<Percent> container = new Container<>(this);
 
     /**
-     * Constructs mutable percent.
-     *
-     * @param value    The value of the percent
-     * @param truncate True if the value should be truncated, false if rounded
-     */
-    @SuppressWarnings("unused")
-    MutablePercent(double value, boolean truncate) {
-        super(value, truncate);
-    }
-
-    /**
      * Constructs mutable percent with a default truncate flag.
      *
      * @param value The value of the percent
@@ -42,28 +31,12 @@ public class MutablePercent extends MutableCountable
     }
 
     /**
-     * Constructs mutable percent from other mutable percent.
-     *
-     * @param percent Other mutable percent
-     */
-    public MutablePercent(@NotNull MutablePercent percent) {
-        super(percent.getValue());
-    }
-
-    /**
      * Constructs mutable percent from immutable percent.
      *
      * @param percent Immutable percent
      */
     public MutablePercent(@NotNull Percent percent) {
         super(percent.getValue());
-    }
-
-    /**
-     * Constructs percent with zero initial value.
-     */
-    public MutablePercent() {
-        this(Percent.getZero());
     }
 
     /**
@@ -151,7 +124,7 @@ public class MutablePercent extends MutableCountable
      *
      * @return True if the percent is one hundred, false otherwise
      */
-    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+    @SuppressWarnings({"EqualsBetweenInconvertibleTypes", "unused"})
     public boolean isOneHundred() {
         return equals(Percent.getOneHundred());
     }
