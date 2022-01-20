@@ -23,11 +23,20 @@ class BalanceableWriter {
     // The format for a heading line
     private static final String headingFormat;
 
+    // What is a newline?
+    private static final String newline = "\n";
+
+    // What are two newlines?
+    private static final String doubleNewLine = newline.repeat(2);
+
     // The format for a number line
     private static final String numberFormat;
 
     // The format for a summary line
     private static final String summaryFormat;
+
+    // A format for two concatenated strings
+    private static final String twoStringFormat = "%s%s";
 
     // The number of value columns in a table
     private static final int valueColumns = 4;
@@ -47,7 +56,6 @@ class BalanceableWriter {
 
     // The valuator for balance-able values ('considered' or proposed)
     private final Valuator valuator;
-
     // The recipient for writer output
     private final FileWriter writer;
 
@@ -308,11 +316,10 @@ class BalanceableWriter {
                                  @NotNull WeightType type) throws IOException {
 
         // Declare and initialize the format, and write the description line.
-        final String format = "%s%s";
         getWriter().write(String.format(getSummaryFormat(),
-                String.format(format, type.getSoftName(), ":"),
+                String.format(twoStringFormat, type.getSoftName(), ":"),
                 getValuator().getValue(portfolio, type),
-                String.format(format, map.get(type), "%")));
+                String.format(twoStringFormat, map.get(type), "%")));
     }
 
     /**
@@ -349,14 +356,15 @@ class BalanceableWriter {
 
         /*
          * Get the file writer. Write a descriptive message about the table we
-         * are about to write.
+         * are about to write, followed by two newlines.
          */
         final FileWriter writer = getWriter();
-        writer.write("Holdings that can be rebalanced:\n\n");
+        writer.write(String.format(twoStringFormat,
+                "Holdings that can be rebalanced:", doubleNewLine));
 
         // Write the institution table followed by a newline.
         writeTable(portfolio);
-        writer.write("\n");
+        writer.write(newline);
 
         // Write the portfolio breakdown percentages, and return to caller.
         writePercentages(portfolio);
@@ -434,5 +442,14 @@ class BalanceableWriter {
                 valuator.getValue(portfolio, CategoryType.TAX_DEFERRED),
                 valuator.getValue(portfolio, CategoryType.TAX_PAID),
                 valuator.getValue(portfolio, CategoryType.ALL)));
+
+        /*
+         * Write a newline, followed by an informational message about the
+         * 'Total' column in the table, followed by another newline.
+         */
+        writer.write(newline);
+        writer.write(String.format(twoStringFormat, "The 'Total' column, " +
+                        "above, may not reflect the sum of the first three.",
+                newline));
     }
 }
