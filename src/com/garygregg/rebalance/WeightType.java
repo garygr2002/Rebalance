@@ -171,6 +171,7 @@ public enum WeightType {
      *
      * @return A list of level zero weight types
      */
+    @SuppressWarnings("unused")
     public static @NotNull List<WeightType> getLevelZero() {
         return levelZero;
     }
@@ -315,6 +316,7 @@ public enum WeightType {
      *
      * @return True if the weight type is a high level weight type
      */
+    @SuppressWarnings("unused")
     public boolean isHighLevel() {
         return isHighLevel(this);
     }
@@ -324,6 +326,7 @@ public enum WeightType {
      *
      * @return True if the weight type is a level one weight type
      */
+    @SuppressWarnings("unused")
     public boolean isLevelOne() {
         return isLevelOne(this);
     }
@@ -333,6 +336,7 @@ public enum WeightType {
      *
      * @return True if the weight type is a level zero weight type
      */
+    @SuppressWarnings("unused")
     public boolean isLevelZero() {
         return isLevelZero(this);
     }
