@@ -22,17 +22,6 @@ public class MutableCurrency extends MutableCountable
     private final Container<Currency> container = new Container<>(this);
 
     /**
-     * Constructs mutable currency.
-     *
-     * @param value    The value of the currency
-     * @param truncate True if the value should be truncated, false if rounded
-     */
-    @SuppressWarnings("unused")
-    MutableCurrency(double value, boolean truncate) {
-        super(value, truncate);
-    }
-
-    /**
      * Constructs mutable currency with a default truncate flag.
      *
      * @param value The value of the currency
@@ -181,7 +170,7 @@ public class MutableCurrency extends MutableCountable
      *
      * @return True if the shares are one, false otherwise
      */
-    @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+    @SuppressWarnings({"EqualsBetweenInconvertibleTypes", "unused"})
     public boolean isCent() {
         return equals(Currency.getCent());
     }
@@ -212,6 +201,7 @@ public class MutableCurrency extends MutableCountable
      * @param currency A currency
      * @return The value that was set
      */
+    @SuppressWarnings("unused")
     public double multiply(@NotNull MutableCurrency currency) {
 
         // Multiply the value, and return the result.
