@@ -12,5 +12,5 @@ public enum FilingStatus {
     SEPARATE,
 
     // Ummm...Single (searching for a meaningful comment!)
-    SINGLE
+    @SuppressWarnings("SpellCheckingInspection") SINGLE
 }
