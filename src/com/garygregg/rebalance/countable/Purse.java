@@ -56,7 +56,8 @@ public class Purse {
      *
      * @param countable    The existing countable
      * @param newValue     The value to use
-     * @param factory      A factory for producing a new countable, if necessary
+     * @param factory      A factory for producing a new countable, if
+     *                     necessary
      * @param setIfNotNull True to set an existing countable, false otherwise
      * @param <T>          Any type that extends mutable countable
      * @return The existing countable if it had not been null, or the newly
@@ -255,6 +256,4 @@ public class Purse {
          */
         void performReset();
     }
-
-
 }
