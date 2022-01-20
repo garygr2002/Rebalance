@@ -69,6 +69,7 @@ public class AccountDescription implements Comparable<AccountDescription>,
      * @param accountNumber The number of the referenced account
      * @return True if the account number had not already been added
      */
+    @SuppressWarnings("UnusedReturnValue")
     boolean addReferencedAccount(@NotNull Long accountNumber) {
         return referencedAccounts.add(accountNumber);
     }
