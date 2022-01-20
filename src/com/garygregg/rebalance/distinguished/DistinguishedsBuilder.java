@@ -516,16 +516,19 @@ public class DistinguishedsBuilder extends
             logMessage(Level.WARNING, String.format("Line code '%s' is not " +
                     "recognized at line number %d in distinguished " +
                     "file.", lineCode, lineNumber));
-        } else {
+        }
 
-            // The line type is recognized. Get the key string.
+        // The line type is recognized.
+        else {
+
+            // Get the key string.
             final String keyString =
                     elements[DistinguishedFields.KEY.getPosition()];
 
             /*
              * Create a new value. Note: the tracker is creating a 'key' for a
-             * library other than one of the distinguished value libraries. For a
-             * distinguished value library the key is actually a value.
+             * library other than one of the distinguished value libraries. For
+             * a distinguished value library the key is actually a value.
              */
             final Pair<String, String> value = tracker.constructKey(lineCode,
                     elements[DistinguishedFields.VALUE.getPosition()]);
