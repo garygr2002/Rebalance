@@ -916,12 +916,9 @@ public class Hierarchy {
 
             /*
              * Check and report recursively with the first/next child if the
-             * child itself is an aggregate.
-             *
-             * TODO:
-             *
-             * Is there a better way to do this rather than checking if the
-             * child is an aggregate instance, then casting it if so?
+             * child itself is an aggregate. Question: Is there a better way
+             * to do this rather than checking if the child is an aggregate
+             * instance, than casting it if so?
              */
             if (child instanceof Aggregate) {
                 checkAndReport((Aggregate<?, ?, ?>) child);

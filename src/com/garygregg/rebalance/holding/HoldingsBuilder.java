@@ -1,14 +1,11 @@
 package com.garygregg.rebalance.holding;
 
 import com.garygregg.rebalance.*;
-import com.garygregg.rebalance.account.AccountLibrary;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Shares;
 import com.garygregg.rebalance.interpreter.CodeInterpreter;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import com.garygregg.rebalance.interpreter.PositiveInterpreter;
-import com.garygregg.rebalance.portfolio.PortfolioLibrary;
-import com.garygregg.rebalance.ticker.TickerLibrary;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
@@ -163,59 +160,6 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
         addFieldProcessor(++fieldIndex, priceProcessor);
         addFieldProcessor(++fieldIndex, valueProcessor);
         addFieldProcessor(++fieldIndex, weightProcessor);
-    }
-
-    /**
-     * Gets a string representation of the parent of a holding description.
-     *
-     * @param description A holding description
-     * @return A string representation of the holding description
-     */
-    protected static @NotNull String getParent(@NotNull HoldingDescription
-                                                       description) {
-
-        /*
-         * TODO: Delete this whole method.
-         *
-         * Get the key and line type of the holding description.
-         */
-        final HoldingKey key = description.getHoldingParentChild();
-        final HoldingLineType lineType = description.getLineType();
-
-        /*
-         * Format the parent of holding key as an account key if the line type
-         * is 'ticker'. Otherwise, just output the parent itself.
-         */
-        return ((null != lineType) &&
-                (lineType.equals(HoldingLineType.TICKER))) ?
-                AccountKey.toString(key.getFirst()) : key.getFirst();
-    }
-
-    /**
-     * Initializes the parent tracker. TODO: Delete this method.
-     */
-    protected static void initialize() {
-
-        // Get the parent tracker instance and clear its associations.
-        final ParentTracker tracker = ParentTracker.getInstance();
-        tracker.clearAssociations();
-
-        /*
-         * Add line code associations for the portfolio library. Add the single
-         * line code for institutions.
-         */
-        tracker.addAssociations(PortfolioLibrary.getInstance(),
-                HoldingLineType.PORTFOLIO);
-        tracker.addAssociation('I', HoldingLineType.INSTITUTION);
-
-        /*
-         * Set the distinguished account library in the parent tracker
-         * with the account library instance. Add line code associations
-         * for the ticker library.
-         */
-        tracker.setAccountLibrary(AccountLibrary.getInstance());
-        tracker.addAssociations(TickerLibrary.getInstance(),
-                HoldingLineType.TICKER);
     }
 
     /**

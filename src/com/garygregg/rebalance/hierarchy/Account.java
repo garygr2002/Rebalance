@@ -27,9 +27,11 @@ public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
 
         /*
          * Load up the synthesizer map with the synthesizers that can be
-         * instantiated.
-         *
-         * TODO: Add new synthesizers to the map as they are developed.
+         * instantiated. Note: Future work may include the following
+         * synthesizers: 1) Percentage (consider Averaging for base), 2)
+         * Commission (or 'Agent Commision' - use Percentage for base), 3)
+         * CapitalGains (use Percentage for base), 4) WashingtonREET (use
+         * Percentage for base).
          */
         synthesizerMap.put(SynthesizerType.AVERAGING, new Averaging());
         synthesizerMap.put(SynthesizerType.CPI_ANNUITY, new CpiAnnuity());
