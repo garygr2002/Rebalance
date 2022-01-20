@@ -30,30 +30,6 @@ public class TickerDescription implements Description<String> {
     private final Set<FundType> types = new TreeSet<>();
 
     /**
-     * Constructs the ticker description with a default minimum investment.
-     *
-     * @param ticker The ticker tag
-     * @param number The number
-     * @param name   The name
-     */
-    TickerDescription(@NotNull String ticker, Integer number, String name) {
-        this(ticker, number, name, 0.);
-    }
-
-    /**
-     * Constructs the ticker description with a default balance rounding.
-     *
-     * @param ticker  The ticker tag
-     * @param number  The number
-     * @param name    The name
-     * @param minimum The minimum investment in the ticker
-     */
-    TickerDescription(@NotNull String ticker, Integer number, String name,
-                      double minimum) {
-        this(ticker, number, name, minimum, 0.001);
-    }
-
-    /**
      * Constructs the ticker description.
      *
      * @param ticker          The ticker tag
@@ -74,65 +50,12 @@ public class TickerDescription implements Description<String> {
     }
 
     /**
-     * Adds implied supertypes to the ticker description.
-     *
-     * @param type A fund subtype
-     */
-    @SuppressWarnings("unused")
-    private void addSuperTypes(@NotNull FundType type) {
-
-        // Switch on the supertype.
-        switch (type) {
-
-            /*
-             * Add the bond type for the corporate, inflation-adjusted,
-             * mortgage, short, and treasury types.
-             */
-            case CORPORATE:
-            case INFLATION:
-            case MORTGAGE:
-            case SHORT:
-            case TREASURY:
-                types.add(FundType.BOND);
-                break;
-
-            /*
-             * Add the stock type for growth, growth-and-value, large,
-             * medium, not-large, small, and value types.
-             */
-            case GROWTH:
-            case GROWTH_AND_VALUE:
-            case LARGE:
-            case MEDIUM:
-            case NOT_LARGE:
-            case SMALL:
-            case VALUE:
-                types.add(FundType.STOCK);
-                break;
-
-            /*
-             * Add the bond and corporate types for the high-yield type.
-             */
-            case HIGH:
-                types.add(FundType.BOND);
-                types.add(FundType.CORPORATE);
-                break;
-        }
-    }
-
-    /**
      * Adds a type to the fund or ETF description.
      *
      * @param type The type to add to the fund or ETF description
      */
     protected void addType(@NotNull FundType type) {
-
-        /*
-         * Add the given type. For now, do not add implied supertypes, but
-         * keep the code around.
-         */
         types.add(type);
-        // addSuperTypes(type);
     }
 
     /**
@@ -209,6 +132,7 @@ public class TickerDescription implements Description<String> {
      *
      * @return True if the ticker is a money fund, false otherwise
      */
+    @SuppressWarnings("unused")
     public boolean isMoneyFund() {
 
         /*
