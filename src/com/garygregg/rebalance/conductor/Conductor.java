@@ -366,8 +366,8 @@ public class Conductor implements Dispatch<CommandLineId> {
                 preferences, outputStream, false));
 
         // Add a preference dispatch for the expected annual inflation.
-        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.INFLATION,
-                preferences, outputStream, true));
+        dispatchList.add(new DoublePreferenceDispatch<>(
+                CommandLineId.INFLATION, preferences, outputStream, true));
 
         // Add a preference dispatch for the desired logging level.
         dispatchList.add(new LevelPreferenceDispatch<>(CommandLineId.LEVEL,
@@ -633,7 +633,8 @@ public class Conductor implements Dispatch<CommandLineId> {
      * Tests a preference against null.
      *
      * @param missingPreferences A list of missing preferences
-     * @param commandLineId      A command line ID corresponding to the preference
+     * @param commandLineId      A command line ID corresponding to the
+     *                           preference
      * @param preference         The preference object
      */
     @SuppressWarnings("SameParameterValue")

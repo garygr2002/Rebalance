@@ -60,7 +60,8 @@ class CopyVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public @NotNull FileVisitResult preVisitDirectory(@NotNull Path source,
-                                                      @NotNull BasicFileAttributes attributes)
+                                                      @NotNull BasicFileAttributes
+                                                              attributes)
             throws IOException {
 
         /*
@@ -92,7 +93,8 @@ class CopyVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public @NotNull FileVisitResult visitFile(@NotNull Path source,
-                                              @NotNull BasicFileAttributes attributes)
+                                              @NotNull BasicFileAttributes
+                                                      attributes)
             throws IOException {
 
         // Is the source path a directory?

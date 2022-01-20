@@ -37,8 +37,8 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      * Constructs the command line arguments parser.
      *
      * @param dispatchList A list of dispatch actions
-     * @param onNone       A dispatch action to take when there are no command line
-     *                     options (null for no action)
+     * @param onNone       A dispatch action to take when there are no command
+     *                     line options (null for no action)
      */
     public CommandLineArguments(@NotNull List<Dispatch<TokenType>> dispatchList,
                                 Dispatch<TokenType> onNone) {
@@ -257,8 +257,8 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         catch (@NotNull NumberFormatException exception) {
 
             /*
-             * Lookup the option ID for the argument. Add a new token with the ID
-             * and the argument.
+             * Lookup the option ID for the argument. Add a new token with the
+             * ID and the argument.
              */
             final TokenType id = optionLookup.get(match(argument.toLowerCase()));
             tokens.add(new Token<>(id, argument));
