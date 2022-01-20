@@ -6,16 +6,6 @@ public abstract class MutableCountable implements IMutableCountable {
     private double value;
 
     /**
-     * Constructs a mutable countable.
-     *
-     * @param value    The value of the countable
-     * @param truncate True if the value should be truncated, false if rounded
-     */
-    MutableCountable(double value, boolean truncate) {
-        set(value, truncate);
-    }
-
-    /**
      * Constructs a mutable countable with a default truncate flag.
      *
      * @param value The value of the countable
