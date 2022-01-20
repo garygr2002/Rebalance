@@ -14,8 +14,8 @@ abstract class BreakdownManager<EnumType extends Enum<EnumType>,
     private final AddOperation addOperation = new AddOperation();
 
     // Our list of breakdown lists
-    private final List<List<IBreakdown<EnumType, HierarchyType>>> breakdownLists =
-            new ArrayList<>();
+    private final List<List<IBreakdown<EnumType, HierarchyType>>>
+            breakdownLists = new ArrayList<>();
 
     // Our operation to clear a breakdown
     private final Operation<EnumType, HierarchyType> clearOperation =
