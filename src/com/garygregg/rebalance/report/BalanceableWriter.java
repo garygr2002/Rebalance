@@ -448,8 +448,8 @@ class BalanceableWriter {
          * 'Total' column in the table, followed by another newline.
          */
         writer.write(newline);
-        writer.write(String.format(twoStringFormat, "The 'Total' column, " +
-                        "above, may not reflect the sum of the first three.",
+        writer.write(String.format(twoStringFormat, "The 'Total' column may " +
+                "not equal the sum of the numeric columns preceding it.",
                 newline));
     }
 }
