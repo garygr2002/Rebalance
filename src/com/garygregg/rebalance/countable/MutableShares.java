@@ -22,17 +22,6 @@ public class MutableShares extends MutableCountable
     private final Container<Shares> container = new Container<>(this);
 
     /**
-     * Constructs mutable shares.
-     *
-     * @param value    The value of the shares
-     * @param truncate True if the value should be truncated, false if rounded
-     */
-    @SuppressWarnings("unused")
-    public MutableShares(double value, boolean truncate) {
-        super(value, truncate);
-    }
-
-    /**
      * Constructs mutable shares with a default truncate flag.
      *
      * @param value The value of the shares
