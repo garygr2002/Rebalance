@@ -46,9 +46,9 @@ public class DistinguishedsBuilder extends
                  * institution. Log this as an error.
                  */
                 logMessage(Level.SEVERE, String.format("The institution key " +
-                                "'%s' named at line %d does not represent any " +
-                                "known, distinguished institution.", keyString,
-                        lineNumber));
+                                "'%s' named at line %d does not represent " +
+                                "any known, distinguished institution.",
+                        keyString, lineNumber));
             }
 
             // The string represents a known distinguished institution key.
@@ -238,8 +238,8 @@ public class DistinguishedsBuilder extends
                         final String accountNumber = value.getSecond();
 
                         /*
-                         * Are the key elements okay according to the distinguished
-                         * account library?
+                         * Are the key elements okay according to the
+                         * distinguished account library?
                          */
                         if (accountLibrary.areKeyElementsOkay(institution,
                                 accountNumber)) {
@@ -251,16 +251,15 @@ public class DistinguishedsBuilder extends
                              * named institution, and account number converted
                              * to a long integer.
                              */
-                            description =
-                                    new DistinguishedAccountDescription(
-                                            distinguishedAccount, new AccountKey(
-                                            institution,
-                                            AccountKey.parseLong(
-                                                    accountNumber)), portfolioKey);
+                            description = new DistinguishedAccountDescription(
+                                    distinguishedAccount,
+                                    new AccountKey(institution,
+                                            AccountKey.parseLong(accountNumber)),
+                                    portfolioKey);
 
                             /*
-                             * Add the new description to the distinguished account
-                             * library. Log exit information.
+                             * Add the new description to the distinguished
+                             * account library. Log exit information.
                              */
                             accountLibrary.addDescription(description);
                             logMessage(getOrdinary(),
@@ -282,9 +281,9 @@ public class DistinguishedsBuilder extends
                         else {
 
                             // Log an error message.
-                            logMessage(Level.SEVERE, String.format("There is " +
-                                    "something wrong with key '%s' in its " +
-                                    "distinguished account description " +
+                            logMessage(Level.SEVERE, String.format("There " +
+                                    "is something wrong with key '%s' in " +
+                                    "its distinguished account description " +
                                     "at line %d.", value, lineNumber));
                         }
                     }
@@ -320,9 +319,9 @@ public class DistinguishedsBuilder extends
                  * portfolio. Log this as an error.
                  */
                 logMessage(Level.SEVERE, String.format("The portfolio key " +
-                                "'%s' named at line %d does not represent any " +
-                                "known, distinguished portfolio.", keyString,
-                        lineNumber));
+                                "'%s' named at line %d does not represent " +
+                                "any known, distinguished portfolio.",
+                        keyString, lineNumber));
             }
 
             // The string represents a known distinguished portfolio key.
@@ -451,9 +450,9 @@ public class DistinguishedsBuilder extends
 
                 // The description is null. This is an error. Log it.
                 logMessage(Level.SEVERE, String.format("Could not create " +
-                                "description with key '%s', and value '%s' for line " +
-                                "holding type %s at line number %d.", keyString, value,
-                        holdingLineType, lineNumber));
+                                "description with key '%s', and value '%s' " +
+                                "for line holding type %s at line number %d.",
+                        keyString, value, holdingLineType, lineNumber));
             }
 
             // The description is not null.

@@ -11,8 +11,9 @@ public class DistinguishedInstitutionDescription extends
      * @param key   The key of the description
      * @param value The value assigned to the key
      */
-    public DistinguishedInstitutionDescription(@NotNull DistinguishedInstitution key,
-                                               @NotNull String value) {
+    public DistinguishedInstitutionDescription(
+            @NotNull DistinguishedInstitution key,
+            @NotNull String value) {
         super(key, value);
     }
 }
