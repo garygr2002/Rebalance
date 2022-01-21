@@ -82,7 +82,7 @@ class Use extends PreferenceDispatch<CommandLineId> {
     }
 
     @Override
-    protected void put(@NotNull String value) throws CLAException {
+    protected void put(@NotNull String value) {
         getPreferences().put(getKeyName(CommandLineId.DESTINATION), value);
     }
 }
