@@ -14,7 +14,8 @@ public class DetailedLibrary extends AccountKeyLibrary<DetailedDescription> {
     private static final DetailedLibrary library = new DetailedLibrary();
 
     // A map of account numbers to detailed description objects
-    private final Map<AccountKey, DetailedDescription> detaileds = new TreeMap<>();
+    private final Map<AccountKey, DetailedDescription> detaileds =
+            new TreeMap<>();
 
     /**
      * Constructs the detailed library.
@@ -40,7 +41,8 @@ public class DetailedLibrary extends AccountKeyLibrary<DetailedDescription> {
      * @return An existing detailed description that was displaced in the
      * library because it had the same number
      */
-    DetailedDescription addDescription(@NotNull DetailedDescription description) {
+    DetailedDescription addDescription(@NotNull DetailedDescription
+                                               description) {
         return detaileds.put(description.getKey(), description);
     }
 

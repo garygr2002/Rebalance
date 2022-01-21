@@ -103,12 +103,12 @@ public class DetailedsBuilder extends ElementReader<DetailedDescription> {
         if (null != library.addDescription(description)) {
 
             /*
-             * Log a message describing where the duplicate detailed description
-             * occurs.
+             * Log a message describing where the duplicate detailed
+             * description occurs.
              */
-            logMessage(getInformationLevel(), String.format("Replacing details " +
-                            "with account number '%s' at line number %d in " +
-                            "detailed file.",
+            logMessage(getInformationLevel(), String.format("Replacing " +
+                            "details with account number '%s' at line " +
+                            "number %d in detailed file.",
                     AccountKeyLibrary.format(description.getNumber()),
                     lineNumber));
         }
