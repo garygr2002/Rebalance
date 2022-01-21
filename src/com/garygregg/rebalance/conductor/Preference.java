@@ -39,7 +39,7 @@ class Preference extends Informer implements Dispatch<CommandLineId> {
     }
 
     @Override
-    public void dispatch(String argument) throws CLAException {
+    public void dispatch(String argument) {
 
         /*
          * Get the preference manager. Display the preference for logging
