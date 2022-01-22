@@ -44,8 +44,7 @@ class SetValueUtility {
      * @return The next element, or null if there are no more elements
      */
     public @Nullable MutableCurrency getNextElement() {
-        return ((null != list) && (index < list.size())) ?
-                list.get(index++) : null;
+        return (index < list.size()) ? list.get(index++) : null;
     }
 
     /**
