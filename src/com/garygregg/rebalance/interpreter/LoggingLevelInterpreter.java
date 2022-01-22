@@ -38,13 +38,6 @@ public class LoggingLevelInterpreter extends Interpreter<Level> {
     };
 
     /**
-     * Constructs the logging level interpreter.
-     */
-    public LoggingLevelInterpreter() {
-        super();
-    }
-
-    /**
      * Gets a logging level corresponding to an integer value.
      *
      * @param value An integer value
