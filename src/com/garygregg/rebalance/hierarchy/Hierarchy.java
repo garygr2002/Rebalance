@@ -183,8 +183,8 @@ public class Hierarchy {
     private final Map<AccountKey, Account> accounts = new HashMap<>();
 
     // A map of holding line types to add actions
-    private final HashMap<HoldingLineType,
-            OneParameterAction<HoldingDescription>> addMap = new HashMap<>();
+    private final Map<HoldingLineType, OneParameterAction<HoldingDescription>>
+            addMap = new HashMap<>();
 
     // A stack of aggregates
     private final Stack<Aggregate<?, ?, ?>> aggregates = new Stack<>();
