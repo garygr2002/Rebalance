@@ -111,9 +111,9 @@ public class Pair<FirstType, SecondType> {
     }
 
     /**
-     * Processes null arguments for <code>combine</code>.
+     * Processes null arguments for {@code combine}.
      *
-     * @param argument An argument to <code>combine</code>
+     * @param argument An argument to {@code combine}
      * @return A string representation of the argument
      */
     private static @NotNull String process(Object argument) {

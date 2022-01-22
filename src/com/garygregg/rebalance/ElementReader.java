@@ -432,7 +432,7 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
 
     /**
      * Reads lines from a configuration file with a date flag that occurs on,
-     * or before the current date.  Uses a default <code>continueOnFalse</code>
+     * or before the current date.  Uses a default {@code continueOnFalse}
      * flag.
      *
      * @return True if one or more lines had an error, false otherwise
@@ -446,7 +446,7 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
 
     /**
      * Reads lines from a configuration file with a date flag that occurs on,
-     * or before a given date. Uses a default <code>continueOnFalse</code>
+     * or before a given date. Uses a default {@code continueOnFalse}
      * flag.
      *
      * @param date The most recent file may not be later than this date
