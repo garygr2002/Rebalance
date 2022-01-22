@@ -187,6 +187,7 @@ public class DistinguishedsBuilder extends
                                 "create a distinguished account without a " +
                                 "corresponding distinguished portfolio at " +
                                 "line %d.", lineNumber));
+                        //noinspection ConstantConditions
                         return description;
                     }
 
