@@ -164,7 +164,8 @@ abstract class AccountRebalancer extends Rebalancer {
      * @param weightMap A weight map
      * @param procedure An overlay procedure
      */
-    private static void adjust(@NotNull Map<WeightType, Double> weightMap,
+    private static void adjust(@NotNull Map<? super WeightType, Double>
+                                       weightMap,
                                @NotNull OverlayProcedure procedure) {
 
         /*
@@ -201,8 +202,8 @@ abstract class AccountRebalancer extends Rebalancer {
      * @param weightMap A weight map
      * @param ratio     The ratio for adjustment
      */
-    private static void adjust(@NotNull Map<WeightType, Double> weightMap,
-                               double ratio) {
+    private static void adjust(@NotNull Map<? super WeightType, Double>
+                                       weightMap, double ratio) {
 
         /*
          * Declare and initialize a sum for all the level zero weight types.
@@ -421,7 +422,8 @@ abstract class AccountRebalancer extends Rebalancer {
     private static <IdentifierType, ProductType> @NotNull
             Map<IdentifierType, ProductType> createMap(
             @NotNull IdentifierType @NotNull [] values,
-            @NotNull Factory<IdentifierType, ProductType> factory) {
+            AccountRebalancer.@NotNull Factory<IdentifierType,
+                    ? extends ProductType> factory) {
 
         // Create a new map, and cycle for each possible value.
         final Map<IdentifierType, ProductType> map = new HashMap<>();
@@ -508,8 +510,8 @@ abstract class AccountRebalancer extends Rebalancer {
      *
      * @param weightMap A weight map
      */
-    private static void initializeMap(@NotNull Map<WeightType, Double>
-                                              weightMap) {
+    private static void initializeMap(@NotNull Map<? super WeightType,
+            ? super Double> weightMap) {
 
         // This is the only place default weight values should be hard-coded.
         weightMap.put(WeightType.ALL, everything);
@@ -549,8 +551,9 @@ abstract class AccountRebalancer extends Rebalancer {
      */
     private static <DescriptionType extends Description<?>,
             WrapperType extends ValueWrapper<?, DescriptionType>>
-    void overlay(@NotNull Map<WeightType, Double> weightMap,
-                 @NotNull Iterable<Pair<WeightType, WrapperType>> pairs) {
+    void overlay(@NotNull Map<? super WeightType, ? super Double> weightMap,
+                 @NotNull Iterable<? extends Pair<WeightType,
+                         WrapperType>> pairs) {
 
         // Cycle for each pair in the list, and overlay the value.
         for (Pair<WeightType, WrapperType> pair : pairs) {
@@ -566,7 +569,7 @@ abstract class AccountRebalancer extends Rebalancer {
      * @param wrapper    A value wrapper
      */
     private static void overlayValue(
-            @NotNull Map<WeightType, Double> weightMap,
+            @NotNull Map<? super WeightType, ? super Double> weightMap,
             @NotNull WeightType weightType,
             @NotNull ValueWrapper<?, ?> wrapper) {
 
@@ -593,8 +596,8 @@ abstract class AccountRebalancer extends Rebalancer {
      */
     private static <DescriptionType extends Description<?>,
             WrapperType extends ValueWrapper<?, DescriptionType>>
-    boolean setDescription(@NotNull Iterable<Pair<WeightType, WrapperType>> pairs,
-                           DescriptionType description) {
+    boolean setDescription(@NotNull Iterable<? extends Pair<WeightType,
+            WrapperType>> pairs, DescriptionType description) {
 
         // Set the description in the second element of each pair.
         for (Pair<WeightType, WrapperType> pair : pairs) {

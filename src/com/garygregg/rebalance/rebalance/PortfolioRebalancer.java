@@ -128,7 +128,7 @@ public class PortfolioRebalancer extends Rebalancer {
      * @param collection A collection of accounts.
      */
     private static @NotNull List<Account> createAccountList(
-            @NotNull Collection<Account> collection) {
+            @NotNull Collection<? extends Account> collection) {
 
         /*
          * Load the collection of accounts into a list. Sort the list by

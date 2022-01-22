@@ -30,7 +30,8 @@ public class Pair<FirstType, SecondType> {
      *
      * @param pair Another pair of the same type
      */
-    public Pair(@NotNull Pair<FirstType, SecondType> pair) {
+    public Pair(@NotNull Pair<? extends FirstType,
+            ? extends SecondType> pair) {
         this(pair.getFirst(), pair.getSecond());
     }
 
@@ -56,7 +57,8 @@ public class Pair<FirstType, SecondType> {
      * values are equal, positive if the first value is greater than the second
      */
     protected static <S extends Comparable<S>, T extends Comparable<T>>
-    int compare(@NotNull Pair<S, T> pair1, @NotNull Pair<S, T> pair2) {
+    int compare(@NotNull Pair<? extends S, ? extends T> pair1,
+                @NotNull Pair<S, ? extends T> pair2) {
 
         // Compare the first element of the two pairs. Are they equal?
         int result = compare(pair1.getFirst(), pair2.getFirst());

@@ -34,7 +34,7 @@ abstract class HierarchyWriter extends ReportWriter {
      * @throws IOException Indicates an I/O exception occurred
      */
     protected static <T> void iterate(@NotNull FileWriter writer,
-                                      @NotNull Iterable<T> iterable,
+                                      @NotNull Iterable<? extends T> iterable,
                                       @NotNull Action<T> action)
             throws IOException {
 

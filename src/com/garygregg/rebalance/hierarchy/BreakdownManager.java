@@ -200,7 +200,8 @@ abstract class BreakdownManager<EnumType extends Enum<EnumType>,
         private EnumType type;
 
         @Override
-        public void perform(@NotNull IBreakdown<EnumType, HierarchyType> breakdown) {
+        public void perform(@NotNull IBreakdown<EnumType, HierarchyType>
+                                            breakdown) {
 
             // Perform the operation if the hierarchy object is not null.
             if (null != hierarchyObject) {

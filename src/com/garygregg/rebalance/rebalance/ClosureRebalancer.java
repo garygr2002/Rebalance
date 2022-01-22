@@ -156,7 +156,7 @@ class ClosureRebalancer extends WeightRebalancer {
      * @param weightMap The weight map to modify
      * @param portfolio A portfolio
      */
-    private void subtract(@NotNull Map<WeightType, Double> weightMap,
+    private void subtract(@NotNull Map<? super WeightType, Double> weightMap,
                           @NotNull Portfolio portfolio) {
 
         /*

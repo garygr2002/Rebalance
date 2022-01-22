@@ -365,7 +365,7 @@ abstract class ResidualProducerAction
      *
      * @param list The currency list
      */
-    public void setList(@NotNull List<MutableCurrency> list) {
+    public void setList(@NotNull List<? extends MutableCurrency> list) {
         utility.setList(list);
     }
 

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 public class LazyBoy<T> {
 
     // A factory for producing objects of our type
-    private final Factory<T> factory;
+    private final @NotNull Factory<? extends T> factory;
 
     // A cached object produced by the factory
     private T object;
@@ -15,7 +15,7 @@ public class LazyBoy<T> {
      *
      * @param factory A factory for producing objects of our type
      */
-    public LazyBoy(@NotNull Factory<T> factory) {
+    public LazyBoy(@NotNull Factory<? extends T> factory) {
 
         // Set the factory, and clear this lazy boy.
         this.factory = factory;

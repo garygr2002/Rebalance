@@ -82,7 +82,7 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
      *                    occurs
      * @param <T>         The key type
      */
-    protected <T> void checkKey(@NotNull Library<T, ?> library,
+    protected <T> void checkKey(@NotNull Library<? extends T, ?> library,
                                 @NotNull Description<T> description,
                                 int lineNumber) {
 

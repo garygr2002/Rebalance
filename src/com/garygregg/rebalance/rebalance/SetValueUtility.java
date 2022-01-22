@@ -19,7 +19,7 @@ class SetValueUtility {
     private int index;
 
     // A currency list
-    private List<MutableCurrency> list;
+    private @NotNull List<? extends MutableCurrency> list;
 
     /*
      * True if the values in the currency list are to be interpreted as
@@ -97,7 +97,7 @@ class SetValueUtility {
      *
      * @param list A currency list
      */
-    public void setList(@NotNull List<MutableCurrency> list) {
+    public void setList(@NotNull List<? extends MutableCurrency> list) {
 
         // Set the list and reset the element index.
         this.list = list;

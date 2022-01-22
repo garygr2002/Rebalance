@@ -84,7 +84,8 @@ class Averaging extends Synthesizer {
      * @param valuator         A valuator for hierarchy objects
      * @return The sum of the values in the collection
      */
-    private static double sum(@NotNull Collection<Common<?, ?, ?>> hierarchyObjects,
+    private static double sum(@NotNull Collection<? extends Common<?, ?, ?>>
+                                      hierarchyObjects,
                               @NotNull Valuator valuator) {
 
         // Declare and initialize the sum. Are there any hierarchy objects?

@@ -662,7 +662,8 @@ public class Conductor implements Dispatch<CommandLineId> {
      * @param preference         The preference object
      */
     @SuppressWarnings("SameParameterValue")
-    private static void test(@NotNull Collection<String> missingPreferences,
+    private static void test(@NotNull Collection<? super String>
+                                         missingPreferences,
                              @NotNull CommandLineId commandLineId,
                              Object preference) {
 

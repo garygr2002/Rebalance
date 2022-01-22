@@ -236,7 +236,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      *                 argument
      * @param argument The command line argument
      */
-    private void processArgument(@NotNull Collection<Token<TokenType>> tokens,
+    private void processArgument(@NotNull Collection<? super Token<TokenType>> tokens,
                                  @NotNull String argument) {
 
         /*
@@ -274,7 +274,8 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      *                 option
      * @param argument The command line argument containing the option
      */
-    private void processOption(@NotNull Collection<Token<TokenType>> tokens,
+    private void processOption(@NotNull Collection<? super Token<TokenType>>
+                                       tokens,
                                @NotNull String argument) {
 
         /*

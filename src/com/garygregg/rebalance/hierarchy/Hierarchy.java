@@ -295,10 +295,10 @@ public class Hierarchy {
      * @param aggregate The aggregate argument
      * @return True if the functions return the same value, false otherwise
      */
-    private static boolean check(@NotNull OneParameterFunction<Currency,
-            Aggregate<?, ?, ?>> first,
-                                 @NotNull OneParameterFunction<Currency,
-                                         Aggregate<?, ?, ?>> second,
+    private static boolean check(Hierarchy.@NotNull OneParameterFunction<?
+            extends Currency, Aggregate<?, ?, ?>> first,
+                                 Hierarchy.@NotNull OneParameterFunction<Currency,
+                                         ? super Aggregate<?, ?, ?>> second,
                                  @NotNull Aggregate<?, ?, ?> aggregate) {
         return first.invoke(aggregate).isEqual(second.invoke(aggregate));
     }
@@ -382,7 +382,8 @@ public class Hierarchy {
      * @param <T>             A hierarchy object type
      */
     private static <T extends Common<?, ?, ?>> void set(
-            @NotNull TwoParameterAction<T, ICountable> action,
+            Hierarchy.@NotNull TwoParameterAction<T,
+                    ? super ICountable> action,
             @NotNull T hierarchyObject,
             ICountable countable) {
 
@@ -877,8 +878,12 @@ public class Hierarchy {
      * @param second    The second function
      * @param aggregate The aggregate argument
      */
-    private void checkAndReport(@NotNull OneParameterFunction<Currency, Aggregate<?, ?, ?>> first,
-                                @NotNull OneParameterFunction<Currency, Aggregate<?, ?, ?>> second,
+    private void checkAndReport(Hierarchy.@NotNull
+                                        OneParameterFunction<? extends Currency,
+            Aggregate<?, ?, ?>> first,
+                                Hierarchy.@NotNull
+                                        OneParameterFunction<Currency,
+            ? super Aggregate<?, ?, ?>> second,
                                 @NotNull Aggregate<?, ?, ?> aggregate) {
 
         // Does the check fail?
@@ -976,7 +981,7 @@ public class Hierarchy {
      *            take holding descriptions as an argument)
      */
     private void dispatchAction(@NotNull Map<HoldingLineType,
-            @NotNull OneParameterAction<HoldingDescription>> map) {
+            ? extends @NotNull OneParameterAction<HoldingDescription>> map) {
 
         /*
          * Declare a variable to contain a holding line type. Get the holding
