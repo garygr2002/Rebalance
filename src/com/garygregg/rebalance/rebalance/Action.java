@@ -24,7 +24,7 @@ abstract class Action<ParentType, ChildType> {
      * @param parent The parent
      * @return The children of the parent
      */
-    public final @NotNull Collection<ChildType> getChildren(
+    public @NotNull Collection<ChildType> getChildren(
             @NotNull ParentType parent) {
 
         // Set the parent, then called the overridden method.

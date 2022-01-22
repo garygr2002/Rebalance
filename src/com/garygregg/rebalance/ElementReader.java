@@ -629,7 +629,7 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
             extends FieldProcessor<TargetType> {
 
         @Override
-        public final void processField(@NotNull String field) {
+        public void processField(@NotNull String field) {
 
             // Process the field if it is not blank.
             if (!field.trim().isBlank()) {

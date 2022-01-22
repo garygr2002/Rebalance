@@ -648,7 +648,7 @@ abstract class AccountRebalancer extends Rebalancer {
      * @return True if the account was successfully rebalanced; false
      * otherwise
      */
-    public final boolean rebalance(@NotNull Account account) {
+    public boolean rebalance(@NotNull Account account) {
 
         // Declare and initialize local variables.
         final AccountKey key = account.getKey();
