@@ -787,7 +787,7 @@ public class ActionReportWriter extends HierarchyWriter {
 
         // Are there any tickers that are not considered for rebalance?
         boolean problems = false;
-        if (0 < notConsidered.size()) {
+        if (!notConsidered.isEmpty()) {
 
             /*
              * There are tickers that are not considered for rebalance. Cycle
@@ -832,7 +832,7 @@ public class ActionReportWriter extends HierarchyWriter {
             throws IOException {
 
         // Are there any tickers with null descriptions?
-        if (0 < nullDescription.size()) {
+        if (!nullDescription.isEmpty()) {
 
             // There are tickers with null descriptions. Cycle for each ticker.
             boolean firstMessage = true;
@@ -857,7 +857,7 @@ public class ActionReportWriter extends HierarchyWriter {
             throws IOException {
 
         // Are there any tickers with descriptions of an unknown type?
-        if (0 < unknownDescription.size()) {
+        if (!unknownDescription.isEmpty()) {
 
             /*
              * There are tickers with descriptions of an unknown type. Cycle
