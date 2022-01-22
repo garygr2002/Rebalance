@@ -254,7 +254,7 @@ public class ActionReportWriter extends HierarchyWriter {
              * list using one hundred percent.
              */
             int i = 0;
-            list.add(i, new MutablePercent(Math.abs(100.)));
+            list.add(i, new MutablePercent(100.0));
 
             // Cycle for any remaining positions, and add zero percent.
             for (++i; i < size; ++i) {
