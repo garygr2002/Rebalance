@@ -988,6 +988,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
         super.stopProcessing();
     }
 
+    @FunctionalInterface
     private interface ConsistencyChecker {
 
         /**
@@ -999,6 +1000,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
         boolean check(@NotNull TickerDescription description);
     }
 
+    @FunctionalInterface
     private interface CountChecker {
 
         /**
@@ -1010,6 +1012,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
         boolean check(int count);
     }
 
+    @FunctionalInterface
     private interface TickerFactory {
 
         /**

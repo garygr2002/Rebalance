@@ -2,6 +2,7 @@ package com.garygregg.rebalance.countable;
 
 import org.jetbrains.annotations.NotNull;
 
+@FunctionalInterface
 interface Factory<T> {
 
     /**

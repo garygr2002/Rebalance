@@ -840,6 +840,7 @@ public class Ticker extends
         proposed.setValueAdjustShares(getValue(queryable.getProposed()));
     }
 
+    @FunctionalInterface
     private interface Function<T> {
 
         /**

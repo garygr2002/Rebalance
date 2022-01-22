@@ -306,6 +306,7 @@ abstract class Annuity extends Synthesizer {
         return result;
     }
 
+    @FunctionalInterface
     private interface Inflation {
 
         /**

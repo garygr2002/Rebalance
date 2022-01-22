@@ -1023,6 +1023,7 @@ public class Conductor implements Dispatch<CommandLineId> {
         messageLogger.setLogger(logger);
     }
 
+    @FunctionalInterface
     private interface Action<T> {
 
         /**
@@ -1033,6 +1034,7 @@ public class Conductor implements Dispatch<CommandLineId> {
         void perform(@NotNull T argument);
     }
 
+    @FunctionalInterface
     private interface Factory {
 
         /**

@@ -704,6 +704,7 @@ abstract class AccountRebalancer extends Rebalancer {
         getLogger().resetProblem();
     }
 
+    @FunctionalInterface
     private interface Factory<IdentifierType, ProductType> {
 
         /**

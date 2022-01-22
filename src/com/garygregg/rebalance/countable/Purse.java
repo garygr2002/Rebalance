@@ -231,6 +231,7 @@ public class Purse {
         setValue(newValue, forShares);
     }
 
+    @FunctionalInterface
     private interface Factory<T> {
 
         /**

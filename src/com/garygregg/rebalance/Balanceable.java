@@ -3,6 +3,7 @@ package com.garygregg.rebalance;
 import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
 
+@FunctionalInterface
 public interface Balanceable {
 
     /**

@@ -352,6 +352,7 @@ class UnbalanceableWriter {
         writer.write(String.format(numberFormat, name, total));
     }
 
+    @FunctionalInterface
     private interface NameGetter<T> {
 
         /**
@@ -363,6 +364,7 @@ class UnbalanceableWriter {
         @NotNull String getName(@NotNull T object);
     }
 
+    @FunctionalInterface
     private interface VisitationAction<Aggregate> {
 
         /**

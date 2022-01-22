@@ -167,6 +167,7 @@ abstract class HierarchyWriter extends ReportWriter {
         return true;
     }
 
+    @FunctionalInterface
     protected interface Action<T> {
 
         /**

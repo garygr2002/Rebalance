@@ -1374,6 +1374,7 @@ public class Hierarchy {
         return result;
     }
 
+    @FunctionalInterface
     private interface OneParameterAction<T> {
 
         /**
@@ -1402,6 +1403,7 @@ public class Hierarchy {
         @NotNull S invoke(@NotNull T argument);
     }
 
+    @FunctionalInterface
     private interface TwoParameterAction<S, T> {
 
         /**

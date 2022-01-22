@@ -181,6 +181,7 @@ abstract class BreakdownManager<EnumType extends Enum<EnumType>,
         PROPOSED
     }
 
+    @FunctionalInterface
     private interface Operation<S extends Enum<S>, T extends Common<?, ?, ?>> {
 
         /**

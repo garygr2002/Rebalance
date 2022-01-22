@@ -2,6 +2,7 @@ package com.garygregg.rebalance;
 
 import org.jetbrains.annotations.NotNull;
 
+@FunctionalInterface
 public interface Factory<T> {
 
     /**

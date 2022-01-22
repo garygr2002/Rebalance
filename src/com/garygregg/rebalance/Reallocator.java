@@ -232,6 +232,7 @@ public class Reallocator {
         }
     }
 
+    @FunctionalInterface
     private interface ValueExtractor<T> {
 
         /**

@@ -2,6 +2,7 @@ package com.garygregg.rebalance.rebalance;
 
 import org.jetbrains.annotations.NotNull;
 
+@FunctionalInterface
 interface NodeAction<ArgumentType> {
 
     /**
