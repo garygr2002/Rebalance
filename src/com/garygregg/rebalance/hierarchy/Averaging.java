@@ -7,7 +7,10 @@ import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 
 class Averaging extends Synthesizer {
@@ -152,10 +155,10 @@ class Averaging extends Synthesizer {
             final MessageLogger logger = getLogger();
 
             /*
-             * Declare a list to receive house price estimates. Cycle for each
-             * estimate account key.
+             * Declare a collection to receive house price estimates. Cycle for
+             * each estimate account key.
              */
-            final List<Common<?, ?, ?>> estimateList = new ArrayList<>();
+            final Collection<Common<?, ?, ?>> estimates = new ArrayList<>();
             for (AccountKey estimateKey : estimateKeys) {
 
                 /*
@@ -171,9 +174,9 @@ class Averaging extends Synthesizer {
                             "account is missing.", estimateKey));
                 }
 
-                // The estimate is not null. Add it to the account list.
+                // The estimate is not null. Add it to the account collection.
                 else {
-                    estimateList.add(estimate);
+                    estimates.add(estimate);
                 }
             }
 
@@ -181,8 +184,8 @@ class Averaging extends Synthesizer {
              * Set the 'considered' and 'not considered' values in the target
              * account by averaging the estimates. Re-initialize the result.
              */
-            setValuation(account, sum(estimateList, byConsidered),
-                    sum(estimateList, byNotConsidered), estimateList.size());
+            setValuation(account, sum(estimates, byConsidered),
+                    sum(estimates, byNotConsidered), estimates.size());
             result = !logger.hadProblem1();
         }
 

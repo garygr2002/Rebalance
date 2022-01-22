@@ -3,16 +3,16 @@ package com.garygregg.rebalance.cla;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.prefs.Preferences;
 
 public class LimitedPreferenceDispatch<KeyType extends Enum<KeyType>> extends
         LevelPreferenceDispatch<KeyType> {
 
-    // The set of acceptable levels
-    private static final Set<Level> acceptableLevelSet = new HashSet<>();
+    // The collection of acceptable levels
+    private static final Collection<Level> acceptableLevels = new HashSet<>();
 
     static {
 
@@ -50,7 +50,7 @@ public class LimitedPreferenceDispatch<KeyType extends Enum<KeyType>> extends
          * Try to add the given level to the acceptable level set, and throw a
          * new illegal argument exception if the level is already present.
          */
-        if (!acceptableLevelSet.add(level)) {
+        if (!acceptableLevels.add(level)) {
             throw new IllegalArgumentException(String.format("An attempt " +
                     "has been made to insert duplicate level '%s' in the " +
                     "set of limited logging levels.", level));
@@ -65,7 +65,7 @@ public class LimitedPreferenceDispatch<KeyType extends Enum<KeyType>> extends
          * contained in the acceptable level set?
          */
         super.checkLevel(level);
-        if (!acceptableLevelSet.contains(level)) {
+        if (!acceptableLevels.contains(level)) {
 
             /*
              * The given logging level is not contained in the acceptable level

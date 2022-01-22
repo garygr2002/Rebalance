@@ -4,7 +4,6 @@ import com.garygregg.rebalance.countable.MutableCountable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class Reallocator {
@@ -63,19 +62,19 @@ public class Reallocator {
     }
 
     /**
-     * Sums a collection given the collection and a value extractor.
+     * Sums an iterable given the iterable and a value extractor.
      *
-     * @param collection The collection
-     * @param extractor  A value extractor
-     * @param <T>        Any type from which value can be extracted
-     * @return The sum of value in the given collection
+     * @param iterable  The iterable
+     * @param extractor A value extractor
+     * @param <T>       Any type from which value can be extracted
+     * @return The sum of value in the given iterable
      */
-    private static <T> double sum(@NotNull Collection<? extends T> collection,
+    private static <T> double sum(@NotNull Iterable<? extends T> iterable,
                                   @NotNull ValueExtractor<T> extractor) {
 
-        // Initialize the result and cycle for each element in the collection.
+        // Initialize the result and cycle for each element in the iterable.
         double result = 0.;
-        for (T element : collection) {
+        for (T element : iterable) {
 
             /*
              * Use the value extractor to extract value from the first/next

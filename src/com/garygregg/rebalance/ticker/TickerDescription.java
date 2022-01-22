@@ -6,7 +6,7 @@ import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Shares;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.Collection;
 import java.util.TreeSet;
 
 public class TickerDescription implements Description<String> {
@@ -26,8 +26,8 @@ public class TickerDescription implements Description<String> {
     // The ticker
     private final String ticker;
 
-    // A set of types for the ticker
-    private final Set<FundType> types = new TreeSet<>();
+    // A collection of types for the ticker
+    private final Collection<FundType> types = new TreeSet<>();
 
     /**
      * Constructs the ticker description.

@@ -40,7 +40,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
      * @param onNone       A dispatch action to take when there are no command
      *                     line options (null for no action)
      */
-    public CommandLineArguments(@NotNull List<Dispatch<TokenType>> dispatchList,
+    public CommandLineArguments(@NotNull Iterable<Dispatch<TokenType>> dispatchList,
                                 Dispatch<TokenType> onNone) {
 
         /*
@@ -68,30 +68,31 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
     }
 
     /**
-     * Determines whether there is a match between two strings (in a
-     * case-insensitive way).
+     * Determines whether there is a match between a character sequence and a
+     * string (in a case-insensitive way).
      *
-     * @param first  The first string (assumed to be lower case)
-     * @param second The second string (not assumed to be lower case)
-     * @return True if the strings match, false otherwise
+     * @param sequence The character sequence (assumed to be lower case)
+     * @param string   The string (not assumed to be lower case)
+     * @return True if the character sequence and the string match; false
+     * otherwise
      */
-    private static boolean match(@NotNull String first,
-                                 @NotNull String second) {
+    private static boolean match(@NotNull CharSequence sequence,
+                                 @NotNull String string) {
 
-        // Initialize the result. Convert the second string to lower case.
+        // Initialize the result. Convert the string to lower case.
         boolean result = true;
-        second = second.toLowerCase();
+        string = string.toLowerCase();
 
         /*
-         * Get the length of the smaller of the two strings. Cycle for each
-         * character position that both strings have, or until there fails to
+         * Get the length of the smaller of the two arguments. Cycle for each
+         * character position that both arguments have, or until there fails to
          * be a match at any position.
          */
-        final int length = Math.min(first.length(), second.length());
+        final int length = Math.min(sequence.length(), string.length());
         for (int i = 0; (i < length) && result; ++i) {
 
             // Compare the first/next character position.
-            result = first.charAt(i) == second.charAt(i);
+            result = sequence.charAt(i) == string.charAt(i);
         }
 
         // Return the result.
@@ -231,10 +232,11 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
     /**
      * Processes a command line argument.
      *
-     * @param tokens   A list of tokens to receive the command line argument
+     * @param tokens   A collection of tokens to receive the command line
+     *                 argument
      * @param argument The command line argument
      */
-    private void processArgument(@NotNull List<Token<TokenType>> tokens,
+    private void processArgument(@NotNull Collection<Token<TokenType>> tokens,
                                  @NotNull String argument) {
 
         /*
@@ -268,10 +270,11 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
     /**
      * Processes a command line option.
      *
-     * @param tokens   A list of tokens to receive the command line option
+     * @param tokens   A collection of tokens to receive the command line
+     *                 option
      * @param argument The command line argument containing the option
      */
-    private void processOption(@NotNull List<Token<TokenType>> tokens,
+    private void processOption(@NotNull Collection<Token<TokenType>> tokens,
                                @NotNull String argument) {
 
         /*

@@ -103,7 +103,7 @@ class RebalanceNode implements CurrencyReceiver {
     private final SumAction sumProposedAction = new SumProposedAction();
 
     // The tickers in the node
-    private final SortedSet<TickerDelegate> tickerSet =
+    private final Collection<TickerDelegate> tickers =
             new TreeSet<>(Comparator.comparing(tickerDelegate ->
                     tickerDelegate.getReceiver().getKey()));
 
@@ -171,17 +171,17 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Performs an action on each object in a collection.
+     * Performs an action on each object in an iterable.
      *
-     * @param collection The collection
-     * @param action     The action to perform on each object in the collection
-     * @param <T>        An arbitrary type
+     * @param iterable The iterable
+     * @param action   The action to perform on each object in the iterable
+     * @param <T>      An arbitrary type
      */
-    private static <T> void doAction(@NotNull Collection<? extends T> collection,
+    private static <T> void doAction(@NotNull Iterable<? extends T> iterable,
                                      @NotNull NodeAction<T> action) {
 
-        // Cycle for each object in the collection, and perform the action.
-        for (T object : collection) {
+        // Cycle for each object in the iterable, and perform the action.
+        for (T object : iterable) {
             action.doAction(object);
         }
     }
@@ -261,14 +261,15 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Determines if any receiver delegate in a collection has positive weight.
+     * Determines if any receiver delegate in an iterable object has positive
+     * weight.
      *
-     * @param delegates A collection of delegates
-     * @return True if any receiver delegate in the collection has positive
+     * @param delegates An iterable of delegates
+     * @return True if any receiver delegate in the iterable has positive
      * weight; false otherwise
      */
     private static <T extends ReceiverDelegate<?>> boolean hasAnyWeight(
-            @NotNull Collection<T> delegates) {
+            @NotNull Iterable<T> delegates) {
 
         /*
          * Declare and initialize the result. Get an iterator for the receiver
@@ -287,13 +288,13 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Determines if no receiver delegate in a collection has a snapshot.
+     * Determines if no receiver delegate in an iterable object has a snapshot.
      *
-     * @return True if no receiver delegate has a snapshots; false if any have
+     * @return True if no receiver delegate has a snapshot; false if any have
      * one or more snapshots.
      */
     private static <T extends ReceiverDelegate<?>>
-    boolean hasNoSnapshots(@NotNull Collection<T> delegates) {
+    boolean hasNoSnapshots(@NotNull Iterable<T> delegates) {
 
         /*
          * Initialize the result. Get a receiver delegate iterator. Cycle while
@@ -416,7 +417,7 @@ class RebalanceNode implements CurrencyReceiver {
      */
     @SuppressWarnings("UnusedReturnValue")
     public boolean addTicker(@NotNull Ticker ticker) {
-        return tickerSet.add(new TickerDelegate(ticker));
+        return tickers.add(new TickerDelegate(ticker));
     }
 
     /**
@@ -474,7 +475,7 @@ class RebalanceNode implements CurrencyReceiver {
 
         // Clear both the children and the tickers.
         children.clear();
-        tickerSet.clear();
+        tickers.clear();
     }
 
     @Override
@@ -492,8 +493,8 @@ class RebalanceNode implements CurrencyReceiver {
     /**
      * Creates a weight list.
      *
-     * @param delegates            A collection of receiver delegates from
-     *                             which to gather weights
+     * @param delegates            An iterable of receiver delegates from which
+     *                             to gather weights
      * @param considerationPattern A bit pattern determining from which receiver
      *                             delegates weights are gathered: the least
      *                             significant bit refers to the first delegate
@@ -502,7 +503,7 @@ class RebalanceNode implements CurrencyReceiver {
      * @return A weight list gathered from the receiver delegates
      */
     private <T extends ReceiverDelegate<?>> @NotNull List<Double>
-    createWeightList(@NotNull Collection<T> delegates,
+    createWeightList(@NotNull Iterable<T> delegates,
                      int considerationPattern) {
 
         /*
@@ -560,7 +561,7 @@ class RebalanceNode implements CurrencyReceiver {
      */
     private @NotNull Collection<? extends ReceiverDelegate<?>>
     getCollection() {
-        return childValues.isEmpty() ? tickerSet : childValues;
+        return childValues.isEmpty() ? tickers : childValues;
     }
 
     @Override
@@ -669,8 +670,8 @@ class RebalanceNode implements CurrencyReceiver {
              * No child has positive weight. Check the tickers for snapshots if
              * any has weight.
              */
-            else if (hasAnyWeight(tickerSet)) {
-                result = hasNoSnapshots(tickerSet);
+            else if (hasAnyWeight(tickers)) {
+                result = hasNoSnapshots(tickers);
             }
         }
 
@@ -974,8 +975,8 @@ class RebalanceNode implements CurrencyReceiver {
          * No child has positive weight. Rebalance using the tickers if any has
          * weight.
          */
-        else if (hasAnyWeight(tickerSet)) {
-            residual = rebalance(tickerSet, currency, isRelative);
+        else if (hasAnyWeight(tickers)) {
+            residual = rebalance(tickers, currency, isRelative);
         }
 
         // Return the residual.

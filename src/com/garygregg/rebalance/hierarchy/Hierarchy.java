@@ -359,15 +359,15 @@ public class Hierarchy {
     }
 
     /**
-     * Locks all aggregate hierarchy objects in a collection.
+     * Locks all aggregate hierarchy objects in an iterable.
      *
-     * @param collection A collection of aggregate hierarchy objects
+     * @param iterable An iterable of aggregate hierarchy objects
      */
-    private static void lock(@NotNull Collection<? extends Aggregate<?, ?, ?>>
-                                     collection) {
+    private static void lock(@NotNull Iterable<? extends Aggregate<?, ?, ?>>
+                                     iterable) {
 
         // Cycle for each aggregate, and lock it.
-        for (Aggregate<?, ?, ?> aggregate : collection) {
+        for (Aggregate<?, ?, ?> aggregate : iterable) {
             aggregate.lockChildren();
         }
     }
@@ -935,7 +935,7 @@ public class Hierarchy {
      * @param holding The holding description
      * @param other   The other description
      */
-    private void checkEqualNames(@NotNull HoldingDescription holding,
+    private void checkEqualNames(@NotNull Description<Integer> holding,
                                  @NotNull Description<?> other) {
 
         // Get the names of the two descriptions. Are the names not equal?

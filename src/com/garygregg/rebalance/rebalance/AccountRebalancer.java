@@ -12,26 +12,23 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 abstract class AccountRebalancer extends Rebalancer {
 
-    // A list of weight types to account valuation pairs
-    private final static List<Pair<WeightType, ValueFromAccount>> accountList =
-            new ArrayList<>();
+    // A collection of weight types to account valuation pairs
+    private final static Collection<Pair<WeightType, ValueFromAccount>>
+            accountCollection = new ArrayList<>();
 
     // Our factory for creating value-from-account objects
     private static final Factory<FundType, ValueFromAccount>
             accountValueFactory = ValueFromAccount::new;
 
-    // A list of weight types to detailed valuation pairs
-    private final static List<Pair<WeightType, ValueFromDetailed>>
-            detailedList = new ArrayList<>();
+    // A collection of weight types to detailed valuation pairs
+    private final static Collection<Pair<WeightType, ValueFromDetailed>>
+            detailedCollection = new ArrayList<>();
 
     // Our factory for creating value-from-detailed objects
     private static final Factory<WeightType, ValueFromDetailed>
@@ -74,28 +71,31 @@ abstract class AccountRebalancer extends Rebalancer {
                                     @NotNull Account account) {
 
                     /*
-                     * Set the descriptions in the account list, and overlay the weight
-                     * map if the description is not null.
+                     * Set the descriptions in the account collection, and overlay the
+                     * weight map if the description is not null.
                      */
-                    if (setDescription(accountList,
+                    if (setDescription(accountCollection,
                             account.getDescription())) {
-                        AccountRebalancer.overlay(weightMap, accountList);
+                        AccountRebalancer.overlay(weightMap,
+                                accountCollection);
                     }
 
                     /*
-                     * Set the descriptions in the detailed list, and overlay the weight
-                     * map a second time if the description is not null.
+                     * Set the descriptions in the detailed collection, and
+                     * overlay the weight map a second time if the description
+                     * is not null.
                      */
-                    if (setDescription(detailedList,
+                    if (setDescription(detailedCollection,
                             DetailedLibrary.getInstance().
                                     getDescription(account.getKey()))) {
-                        AccountRebalancer.overlay(weightMap, detailedList);
+                        AccountRebalancer.overlay(weightMap,
+                                detailedCollection);
                     }
                 }
             };
 
     // A list of weight types to portfolio valuation pairs
-    private final static List<Pair<WeightType, ValueFromPortfolio>>
+    private final static Collection<Pair<WeightType, ValueFromPortfolio>>
             portfolioList = new ArrayList<>();
 
     // The closure overlay procedure
@@ -251,19 +251,19 @@ abstract class AccountRebalancer extends Rebalancer {
     private static void buildAccountList() {
 
         // 1
-        accountList.add(new Pair<>(WeightType.BOND,
+        accountCollection.add(new Pair<>(WeightType.BOND,
                 valueFromAccountMap.get(FundType.BOND)));
 
         // 2
-        accountList.add(new Pair<>(WeightType.CASH,
+        accountCollection.add(new Pair<>(WeightType.CASH,
                 valueFromAccountMap.get(FundType.CASH)));
 
         // 3
-        accountList.add(new Pair<>(WeightType.REAL_ESTATE,
+        accountCollection.add(new Pair<>(WeightType.REAL_ESTATE,
                 valueFromAccountMap.get(FundType.REAL_ESTATE)));
 
         // 4
-        accountList.add(new Pair<>(WeightType.STOCK,
+        accountCollection.add(new Pair<>(WeightType.STOCK,
                 valueFromAccountMap.get(FundType.STOCK)));
     }
 
@@ -274,99 +274,123 @@ abstract class AccountRebalancer extends Rebalancer {
 
         // 1
         WeightType type = WeightType.BOND;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 2
         type = WeightType.BOND_CORPORATE;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 3
         type = WeightType.BOND_FOREIGN;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 4
         type = WeightType.BOND_GOVERNMENT;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 5
         type = WeightType.BOND_HIGH;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 6
         type = WeightType.BOND_INFLATION;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 7
         type = WeightType.BOND_MORTGAGE;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 8
         type = WeightType.BOND_SHORT;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 9
         type = WeightType.BOND_UNCATEGORIZED;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 10
         type = WeightType.CASH;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 11
         type = WeightType.CASH_GOVERNMENT;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 12
         type = WeightType.CASH_UNCATEGORIZED;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 13
         type = WeightType.REAL_ESTATE;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 14
         type = WeightType.STOCK;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 15
         type = WeightType.STOCK_DOMESTIC;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 16
         type = WeightType.STOCK_FOREIGN;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 17
         type = WeightType.STOCK_LARGE;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 18
         type = WeightType.STOCK_GROWTH;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 19
         type = WeightType.STOCK_GROWTH_AND_VALUE;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 20
         type = WeightType.STOCK_GROWTH_OR_VALUE;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 21
         type = WeightType.STOCK_MEDIUM;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 22
         type = WeightType.STOCK_NOT_LARGE;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 23
         type = WeightType.STOCK_SMALL;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
 
         // 24
         type = WeightType.STOCK_VALUE;
-        detailedList.add(new Pair<>(type, valueFromDetailedMap.get(type)));
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
     }
 
     /**
@@ -526,7 +550,7 @@ abstract class AccountRebalancer extends Rebalancer {
     private static <DescriptionType extends Description<?>,
             WrapperType extends ValueWrapper<?, DescriptionType>>
     void overlay(@NotNull Map<WeightType, Double> weightMap,
-                 @NotNull List<Pair<WeightType, WrapperType>> pairs) {
+                 @NotNull Iterable<Pair<WeightType, WrapperType>> pairs) {
 
         // Cycle for each pair in the list, and overlay the value.
         for (Pair<WeightType, WrapperType> pair : pairs) {
@@ -559,16 +583,17 @@ abstract class AccountRebalancer extends Rebalancer {
     }
 
     /**
-     * Sets the description in a list of value wrappers.
+     * Sets the description in an iterable of value wrappers.
      *
-     * @param pairs             A list of weight type to value wrapper pairs
+     * @param pairs             An iterable of weight type to value wrapper
+     *                          pairs
      * @param <DescriptionType> The description type
      * @param <WrapperType>     The wrapper type
      * @return True if the given description was not null; false otherwise
      */
     private static <DescriptionType extends Description<?>,
             WrapperType extends ValueWrapper<?, DescriptionType>>
-    boolean setDescription(@NotNull List<Pair<WeightType, WrapperType>> pairs,
+    boolean setDescription(@NotNull Iterable<Pair<WeightType, WrapperType>> pairs,
                            DescriptionType description) {
 
         // Set the description in the second element of each pair.

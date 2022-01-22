@@ -9,10 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 
 class Backup extends Informer implements Dispatch<CommandLineId> {
 
@@ -60,13 +57,13 @@ class Backup extends Informer implements Dispatch<CommandLineId> {
             }
 
             /*
-             * Create a new copy visitor with the destination and the source
+             * Create a new file visitor with the destination and the source
              * as strings.
              */
-            final CopyVisitor copyVisitor =
+            final FileVisitor<Path> copyVisitor =
                     new CopyVisitor(destination.toString(), source.toString());
 
-            // Walk the file tree of the source with the copy visitor.
+            // Walk the file tree of the source with the file visitor.
             Files.walkFileTree(source, copyVisitor);
             printNoException(getKey().toString());
         }

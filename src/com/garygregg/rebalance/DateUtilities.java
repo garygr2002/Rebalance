@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -107,7 +106,7 @@ public class DateUtilities {
          * Declare and initialize the result. Find matches for the date regular
          * expression.
          */
-        final List<Pair<String, Date>> dates = new ArrayList<>();
+        final Collection<Pair<String, Date>> dates = new ArrayList<>();
         final Matcher matcher = pattern.matcher(string);
 
         /*

@@ -32,10 +32,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.*;
 import java.util.prefs.Preferences;
 
@@ -296,11 +293,11 @@ public class Conductor implements Dispatch<CommandLineId> {
     private static void checkPreferences() throws CLAException {
 
         /*
-         * Get a preference manager instance. Create a list of missing
+         * Get a preference manager instance. Create a collection of missing
          * preference names.
          */
         final PreferenceManager manager = PreferenceManager.getInstance();
-        final List<String> missingPreferences = new ArrayList<>();
+        final Collection<String> missingPreferences = new ArrayList<>();
 
         /*
          * Currently, test only that the source preference has been set.
@@ -609,16 +606,16 @@ public class Conductor implements Dispatch<CommandLineId> {
     /**
      * Iterates over a list, and performs an action on each element.
      *
-     * @param list   The list
-     * @param action The action to perform on each element in the list
-     * @param <T>    The type of elements in the list
+     * @param iterable The iterable
+     * @param action   The action to perform on each element in the iterable
+     * @param <T>      The type of elements in the iterable
      */
     @SuppressWarnings("SameParameterValue")
-    private static <T> void iterate(@NotNull List<T> list,
+    private static <T> void iterate(@NotNull Iterable<T> iterable,
                                     @NotNull Action<? super T> action) {
 
-        // Cycle for each element in the list, and perform the action
-        for (T element : list) {
+        // Cycle for each element in the iterable, and perform the action.
+        for (T element : iterable) {
             action.perform(element);
         }
     }
@@ -659,18 +656,18 @@ public class Conductor implements Dispatch<CommandLineId> {
     /**
      * Tests a preference against null.
      *
-     * @param missingPreferences A list of missing preferences
+     * @param missingPreferences A collection of missing preferences
      * @param commandLineId      A command line ID corresponding to the
      *                           preference
      * @param preference         The preference object
      */
     @SuppressWarnings("SameParameterValue")
-    private static void test(@NotNull List<String> missingPreferences,
+    private static void test(@NotNull Collection<String> missingPreferences,
                              @NotNull CommandLineId commandLineId,
                              Object preference) {
 
         /*
-         * Add the name of the command line ID to the list of missing
+         * Add the name of the command line ID to the collection of missing
          * preferences if the preference object is null.
          */
         if (null == preference) {
