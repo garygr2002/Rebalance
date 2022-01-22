@@ -289,7 +289,7 @@ public class PortfolioRebalancer extends Rebalancer {
      */
     @SuppressWarnings("unused")
     public boolean rebalanceByAccount() {
-        return this.rebalanceByAccount(Hierarchy.getInstance());
+        return rebalanceByAccount(Hierarchy.getInstance());
     }
 
     /**
@@ -317,6 +317,6 @@ public class PortfolioRebalancer extends Rebalancer {
      */
     @SuppressWarnings("unused")
     public boolean rebalanceByInstitution() {
-        return this.rebalanceByInstitution(Hierarchy.getInstance());
+        return rebalanceByInstitution(Hierarchy.getInstance());
     }
 }

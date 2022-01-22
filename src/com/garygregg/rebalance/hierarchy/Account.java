@@ -226,7 +226,7 @@ public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
      * Sets the account as synthesized, or programmatically modified.
      */
     void setSynthesized() {
-        this.synthesized = true;
+        synthesized = true;
     }
 
     @Override

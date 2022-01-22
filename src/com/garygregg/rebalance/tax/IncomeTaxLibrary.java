@@ -61,7 +61,7 @@ public abstract class IncomeTaxLibrary extends TaxLibrary {
      * Clears the standard deduction.
      */
     void clearStandardDeduction() {
-        this.standardDeduction = null;
+        standardDeduction = null;
     }
 
     /**

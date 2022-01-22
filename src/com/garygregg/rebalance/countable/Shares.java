@@ -136,8 +136,8 @@ public class Shares extends Countable implements Comparable<Shares> {
 
     @Override
     public boolean isEqual(Object object) {
-        return ICountable.areEqual(this, object, this.getClass(),
-                comparableClass, getPrecision());
+        return ICountable.areEqual(this, object, getClass(), comparableClass,
+                getPrecision());
     }
 
     @Override

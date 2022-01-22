@@ -421,7 +421,7 @@ abstract class ReportWriter extends ElementProcessor {
      *                 proposed)
      */
     void setBalanceable(@NotNull Valuator valuator) {
-        this.balanceable = valuator;
+        balanceable = valuator;
     }
 
     /**

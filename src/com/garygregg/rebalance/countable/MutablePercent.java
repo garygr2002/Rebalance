@@ -117,8 +117,8 @@ public class MutablePercent extends MutableCountable
 
     @Override
     public boolean isEqual(Object object) {
-        return ICountable.areEqual(this, object, this.getClass(),
-                comparableClass, getPrecision());
+        return ICountable.areEqual(this, object, getClass(), comparableClass,
+                getPrecision());
     }
 
     @Override
