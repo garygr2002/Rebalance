@@ -16,11 +16,11 @@ import java.util.logging.Level;
 class Averaging extends Synthesizer {
 
     // Value by 'considered'
-    private final static Valuator byConsidered =
+    private static final Valuator byConsidered =
             ValueByConsidered.getInstance();
 
     // Value by 'not considered'
-    private final static Valuator byNotConsidered =
+    private static final Valuator byNotConsidered =
             ValueByNotConsidered.getInstance();
 
     /**

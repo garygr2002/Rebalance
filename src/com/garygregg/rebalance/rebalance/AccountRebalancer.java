@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 abstract class AccountRebalancer extends Rebalancer {
 
     // A collection of weight types to account valuation pairs
-    private final static Collection<Pair<WeightType, ValueFromAccount>>
+    private static final Collection<Pair<WeightType, ValueFromAccount>>
             accountCollection = new ArrayList<>();
 
     // Our factory for creating value-from-account objects
@@ -27,7 +27,7 @@ abstract class AccountRebalancer extends Rebalancer {
             accountValueFactory = ValueFromAccount::new;
 
     // A collection of weight types to detailed valuation pairs
-    private final static Collection<Pair<WeightType, ValueFromDetailed>>
+    private static final Collection<Pair<WeightType, ValueFromDetailed>>
             detailedCollection = new ArrayList<>();
 
     // Our factory for creating value-from-detailed objects
@@ -95,7 +95,7 @@ abstract class AccountRebalancer extends Rebalancer {
             };
 
     // A list of weight types to portfolio valuation pairs
-    private final static Collection<Pair<WeightType, ValueFromPortfolio>>
+    private static final Collection<Pair<WeightType, ValueFromPortfolio>>
             portfolioList = new ArrayList<>();
 
     // The closure overlay procedure
@@ -816,7 +816,7 @@ abstract class AccountRebalancer extends Rebalancer {
         }
     }
 
-    private static abstract class ValueWrapper<IdentifierType,
+    private abstract static class ValueWrapper<IdentifierType,
             DescriptionType extends Description<?>> {
 
         // The identifier for the wrapper

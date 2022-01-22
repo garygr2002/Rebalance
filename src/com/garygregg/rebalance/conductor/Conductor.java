@@ -43,7 +43,7 @@ public class Conductor implements Dispatch<CommandLineId> {
             new BuildOptionAction();
 
     // The format for reporting the date of a library
-    private final static String dateMessageFormat =
+    private static final String dateMessageFormat =
             "The date of the %s library/libraries is/are: %s.";
 
     // The default name of this program

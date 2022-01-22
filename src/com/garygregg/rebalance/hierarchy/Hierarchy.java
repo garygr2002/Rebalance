@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 public class Hierarchy {
 
     // The logging level for ordinary informational messages
-    final static Level ordinary = MessageLogger.getOrdinary();
+    private static final Level ordinary = MessageLogger.getOrdinary();
 
     // A function that returns 'considered' value
     private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> allConsidered =

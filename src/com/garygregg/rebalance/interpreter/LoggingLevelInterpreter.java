@@ -9,7 +9,7 @@ import java.util.logging.Level;
 public class LoggingLevelInterpreter extends Interpreter<Level> {
 
     // A map of integer values to the levels with which they correspond
-    private final static Map<Integer, Level> levelMap = new HashMap<>();
+    private static final Map<Integer, Level> levelMap = new HashMap<>();
 
     static {
 

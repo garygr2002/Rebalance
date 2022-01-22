@@ -24,7 +24,7 @@ class RebalanceNode implements CurrencyReceiver {
             new DecimalFormat("0.00");
 
     // The logging level for extraordinary informational messages
-    private final static Level extraordinary = MessageLogger.getOrdinary();
+    private static final Level extraordinary = MessageLogger.getOrdinary();
 
     // An action to calculate initial residual and deviation
     private static final InitialScoreAction initialScoreAction =
@@ -55,7 +55,7 @@ class RebalanceNode implements CurrencyReceiver {
     private static final MessageLogger messageLogger = new MessageLogger();
 
     // The logging level for ordinary informational messages
-    private final static Level ordinary = MessageLogger.getOrdinary();
+    private static final Level ordinary = MessageLogger.getOrdinary();
 
     // An action to notify delegates to recover their snapshots
     private static final SnapshotAction recoverSnapshotAction =
