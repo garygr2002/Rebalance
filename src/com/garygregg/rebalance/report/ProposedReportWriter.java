@@ -20,63 +20,6 @@ public class ProposedReportWriter extends ReportWriter {
         super(ValueByProposed.getInstance());
     }
 
-    @Override
-    protected @NotNull String getPrefix() {
-        return "proposed";
-    }
-
-    @Override
-    protected boolean writeBetween(@NotNull FileWriter writer,
-                                   @NotNull Portfolio portfolio)
-            throws IOException {
-
-        /*
-         * Call the superclass method, receiving its result to return. Write a
-         * newline.
-         */
-        final boolean result = super.writeBetween(writer, portfolio);
-        writer.write("\n");
-
-        /*
-         * Declare and initialize the number of accounts with non-zero
-         * rebalance residuals. Cycle for each institution in the given
-         * portfolio.
-         */
-        int accountsWithNonZeroResiduals = 0;
-        for (Institution institution : portfolio.getChildren()) {
-
-            /*
-             * Write institution-specific information for the first/next
-             * institution, incrementing the number of accounts with non-zero
-             * rebalance residuals as we go.
-             */
-            accountsWithNonZeroResiduals += writeInstitution(writer,
-                    institution);
-        }
-
-        /*
-         * Write a line describing a condition of no accounts with non-zero
-         * rebalance residuals.
-         */
-        if (0 == accountsWithNonZeroResiduals) {
-            writer.write("There are no accounts with rebalance residuals; " +
-                    "good news!\n");
-        }
-
-        /*
-         * Write a line describing a condition of one or more accounts with
-         * non-zero rebalance residuals.
-         */
-        else {
-            writer.write(String.format("\nThere are %s accounts with " +
-                    "non-zero rebalance residuals; sorry about " +
-                    "that.\n", accountsWithNonZeroResiduals));
-        }
-
-        // Declare the return value received from the superclass.
-        return result;
-    }
-
     /**
      * Writes institution-specific information between the balanceable and
      * unbalanceable sections of the report.
@@ -87,8 +30,8 @@ public class ProposedReportWriter extends ReportWriter {
      * rebalance residuals
      * @throws IOException Indicates an I/O exception occurred
      */
-    private int writeInstitution(@NotNull FileWriter writer,
-                                 @NotNull Institution institution)
+    private static int writeInstitution(@NotNull FileWriter writer,
+                                        @NotNull Institution institution)
             throws IOException {
 
         // Declare local variables.
@@ -147,5 +90,62 @@ public class ProposedReportWriter extends ReportWriter {
 
         // Return the number of accounts with non-zero residuals.
         return accountsWithNonZeroResiduals;
+    }
+
+    @Override
+    protected @NotNull String getPrefix() {
+        return "proposed";
+    }
+
+    @Override
+    protected boolean writeBetween(@NotNull FileWriter writer,
+                                   @NotNull Portfolio portfolio)
+            throws IOException {
+
+        /*
+         * Call the superclass method, receiving its result to return. Write a
+         * newline.
+         */
+        final boolean result = super.writeBetween(writer, portfolio);
+        writer.write("\n");
+
+        /*
+         * Declare and initialize the number of accounts with non-zero
+         * rebalance residuals. Cycle for each institution in the given
+         * portfolio.
+         */
+        int accountsWithNonZeroResiduals = 0;
+        for (Institution institution : portfolio.getChildren()) {
+
+            /*
+             * Write institution-specific information for the first/next
+             * institution, incrementing the number of accounts with non-zero
+             * rebalance residuals as we go.
+             */
+            accountsWithNonZeroResiduals += writeInstitution(writer,
+                    institution);
+        }
+
+        /*
+         * Write a line describing a condition of no accounts with non-zero
+         * rebalance residuals.
+         */
+        if (0 == accountsWithNonZeroResiduals) {
+            writer.write("There are no accounts with rebalance residuals; " +
+                    "good news!\n");
+        }
+
+        /*
+         * Write a line describing a condition of one or more accounts with
+         * non-zero rebalance residuals.
+         */
+        else {
+            writer.write(String.format("\nThere are %s accounts with " +
+                    "non-zero rebalance residuals; sorry about " +
+                    "that.\n", accountsWithNonZeroResiduals));
+        }
+
+        // Declare the return value received from the superclass.
+        return result;
     }
 }

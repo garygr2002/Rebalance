@@ -227,6 +227,134 @@ abstract class ReportWriter extends ElementProcessor {
     }
 
     /**
+     * Writes dates for each known element reader.
+     *
+     * @param writer The file writer to receive the dates
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private static void writeDates(@NotNull FileWriter writer)
+            throws IOException {
+
+        // Write the date of the valuation library.
+        writeDate(writer, HoldingLibrary.getInstance(HoldingType.VALUATION),
+                "holding");
+
+        // Write the date of the basis library.
+        writeDate(writer, HoldingLibrary.getInstance(HoldingType.BASIS),
+                "basis");
+
+        // Write the dates of the code library, the portfolio library.
+        writeDate(writer, CodeLibrary.getInstance(), "code");
+        writeDate(writer, PortfolioLibrary.getInstance(), "portfolio");
+
+        /*
+         * Write the dates of the account library, the detailed library, and
+         * the ticker library.
+         */
+        writeDate(writer, AccountLibrary.getInstance(), "account");
+        writeDate(writer, DetailedLibrary.getInstance(), "detailed");
+        writeDate(writer, TickerLibrary.getInstance(), "ticker");
+    }
+
+    /**
+     * Writes a portfolio-specific description to a file writer.
+     *
+     * @param writer    The file writer to receive the description
+     * @param portfolio The portfolio to use
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private static void writeDescription(@NotNull Writer writer,
+                                         @NotNull Portfolio portfolio)
+            throws IOException {
+
+        /*
+         * Declare and initialize investor birthdate and projected mortality
+         * date.
+         */
+        Date birthdate = null;
+        Date mortalityDate = null;
+
+        /*
+         * Declare and initialize CPI-adjusted, and non-CPI-adjusted monthly
+         * income.
+         */
+        Currency cpiMonthly = null;
+        Currency nonCpiMonthly = null;
+
+        /*
+         * Declare and initialize Social Security monthly and taxable annual
+         * income.
+         */
+        Currency socialSecurityMonthly = null;
+        Currency taxableAnnual = null;
+
+        // Get the expected inflation rate.
+        final Double inflation =
+                PreferenceManager.getInstance().getInflation();
+
+        // Get the description from the portfolio. Is the description not null?
+        final PortfolioDescription description = portfolio.getDescription();
+        if (null != description) {
+
+            /*
+             * The portfolio description is not null. Get the birthdate and
+             * projected mortality date.
+             */
+            birthdate = description.getBirthdate();
+            mortalityDate = description.getMortalityDate();
+
+            // Get the CPI-adjusted and non-CPI-adjusted monthly income.
+            cpiMonthly = description.getCpiMonthly();
+            nonCpiMonthly = description.getNonCpiMonthly();
+
+            // Get the Social Security monthly and taxable annual income.
+            socialSecurityMonthly = description.getSocialSecurityMonthly();
+            taxableAnnual = description.getTaxableAnnual();
+        }
+
+        // Declare needed string.
+        final String format = "%-37s %s.\n";
+        final String unavailable = "unavailable";
+
+        // Format and write the birthdate message.
+        writer.write(String.format(format, "Investor birthday is:", (null == birthdate) ?
+                unavailable : DateUtilities.format(birthdate)));
+
+        // Format and write the projected mortality date message.
+        writer.write(String.format(format, "Investor projected mortality " +
+                "date is:", (null == mortalityDate) ?
+                unavailable : DateUtilities.format(mortalityDate)));
+
+        // Format and write the CPI-adjusted monthly income.
+        writer.write(String.format(format, "CPI adjusted monthly income is:",
+                (null == cpiMonthly) ? unavailable : cpiMonthly));
+
+        // Format and write the non-CPI adjusted monthly income.
+        writer.write(String.format(format, "Non-CPI adjusted monthly " +
+                "income is:", (null == nonCpiMonthly) ?
+                unavailable : nonCpiMonthly));
+
+        // Format and write the Social Security monthly income.
+        writer.write(String.format(format, "Social Security monthly income " +
+                "is:", (null == socialSecurityMonthly) ? unavailable :
+                socialSecurityMonthly));
+
+        // Format and write the taxable annual income.
+        writer.write(String.format(format, "Taxable annual income is:",
+                (null == taxableAnnual) ? unavailable : taxableAnnual));
+
+        /*
+         * Format and write the expected annual rate of inflation. Finish by
+         * writing a newline.
+         */
+        writer.write(String.format(format, "Expected annual rate of " +
+                "inflation is:", (null == inflation) ?
+                unavailable :
+                String.format("%s%%", Percent.format(inflation))));
+        writer.write("\n");
+    }
+
+    /**
      * Gets the valuator for balanceable assets ('considered' or proposed)
      *
      * @return The valuator for balanceable assets ('considered' or proposed)
@@ -321,133 +449,6 @@ abstract class ReportWriter extends ElementProcessor {
 
         // The default is to do nothing.
         return true;
-    }
-
-    /**
-     * Writes dates for each known element reader.
-     *
-     * @param writer The file writer to receive the dates
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private void writeDates(@NotNull FileWriter writer) throws IOException {
-
-        // Write the date of the valuation library.
-        writeDate(writer, HoldingLibrary.getInstance(HoldingType.VALUATION),
-                "holding");
-
-        // Write the date of the basis library.
-        writeDate(writer, HoldingLibrary.getInstance(HoldingType.BASIS),
-                "basis");
-
-        // Write the dates of the code library, the portfolio library.
-        writeDate(writer, CodeLibrary.getInstance(), "code");
-        writeDate(writer, PortfolioLibrary.getInstance(), "portfolio");
-
-        /*
-         * Write the dates of the account library, the detailed library, and
-         * the ticker library.
-         */
-        writeDate(writer, AccountLibrary.getInstance(), "account");
-        writeDate(writer, DetailedLibrary.getInstance(), "detailed");
-        writeDate(writer, TickerLibrary.getInstance(), "ticker");
-    }
-
-    /**
-     * Writes a portfolio-specific description to a file writer.
-     *
-     * @param writer    The file writer to receive the description
-     * @param portfolio The portfolio to use
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private void writeDescription(@NotNull Writer writer,
-                                  @NotNull Portfolio portfolio)
-            throws IOException {
-
-        /*
-         * Declare and initialize investor birthdate and projected mortality
-         * date.
-         */
-        Date birthdate = null;
-        Date mortalityDate = null;
-
-        /*
-         * Declare and initialize CPI-adjusted, and non-CPI-adjusted monthly
-         * income.
-         */
-        Currency cpiMonthly = null;
-        Currency nonCpiMonthly = null;
-
-        /*
-         * Declare and initialize Social Security monthly and taxable annual
-         * income.
-         */
-        Currency socialSecurityMonthly = null;
-        Currency taxableAnnual = null;
-
-        // Get the expected inflation rate.
-        final Double inflation =
-                PreferenceManager.getInstance().getInflation();
-
-        // Get the description from the portfolio. Is the description not null?
-        final PortfolioDescription description = portfolio.getDescription();
-        if (null != description) {
-
-            /*
-             * The portfolio description is not null. Get the birthdate and
-             * projected mortality date.
-             */
-            birthdate = description.getBirthdate();
-            mortalityDate = description.getMortalityDate();
-
-            // Get the CPI-adjusted and non-CPI-adjusted monthly income.
-            cpiMonthly = description.getCpiMonthly();
-            nonCpiMonthly = description.getNonCpiMonthly();
-
-            // Get the Social Security monthly and taxable annual income.
-            socialSecurityMonthly = description.getSocialSecurityMonthly();
-            taxableAnnual = description.getTaxableAnnual();
-        }
-
-        // Declare needed string.
-        final String format = "%-37s %s.\n";
-        final String unavailable = "unavailable";
-
-        // Format and write the birthdate message.
-        writer.write(String.format(format, "Investor birthday is:", (null == birthdate) ?
-                unavailable : DateUtilities.format(birthdate)));
-
-        // Format and write the projected mortality date message.
-        writer.write(String.format(format, "Investor projected mortality " +
-                "date is:", (null == mortalityDate) ?
-                unavailable : DateUtilities.format(mortalityDate)));
-
-        // Format and write the CPI-adjusted monthly income.
-        writer.write(String.format(format, "CPI adjusted monthly income is:",
-                (null == cpiMonthly) ? unavailable : cpiMonthly));
-
-        // Format and write the non-CPI adjusted monthly income.
-        writer.write(String.format(format, "Non-CPI adjusted monthly " +
-                "income is:", (null == nonCpiMonthly) ?
-                unavailable : nonCpiMonthly));
-
-        // Format and write the Social Security monthly income.
-        writer.write(String.format(format, "Social Security monthly income " +
-                "is:", (null == socialSecurityMonthly) ? unavailable :
-                socialSecurityMonthly));
-
-        // Format and write the taxable annual income.
-        writer.write(String.format(format, "Taxable annual income is:",
-                (null == taxableAnnual) ? unavailable : taxableAnnual));
-
-        /*
-         * Format and write the expected annual rate of inflation. Finish by
-         * writing a newline.
-         */
-        writer.write(String.format(format, "Expected annual rate of " +
-                "inflation is:", (null == inflation) ?
-                unavailable :
-                String.format("%s%%", Percent.format(inflation))));
-        writer.write("\n");
     }
 
     /**

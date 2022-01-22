@@ -580,6 +580,33 @@ public class Conductor implements Dispatch<CommandLineId> {
     }
 
     /**
+     * Initializes the parent tracker.
+     */
+    private static void initialize() {
+
+        // Get the parent tracker instance and clear its associations.
+        final ParentTracker tracker = ParentTracker.getInstance();
+        tracker.clearAssociations();
+
+        /*
+         * Add line code associations for the portfolio library. Add the single
+         * line code for institutions.
+         */
+        tracker.addAssociations(PortfolioLibrary.getInstance(),
+                HoldingLineType.PORTFOLIO);
+        tracker.addAssociation('I', HoldingLineType.INSTITUTION);
+
+        /*
+         * Set the distinguished account library in the parent tracker
+         * with the account library instance. Add line code associations
+         * for the ticker library.
+         */
+        tracker.setAccountLibrary(AccountLibrary.getInstance());
+        tracker.addAssociations(TickerLibrary.getInstance(),
+                HoldingLineType.TICKER);
+    }
+
+    /**
      * Iterates over a list, and performs an action on each element.
      *
      * @param list   The list
@@ -987,33 +1014,6 @@ public class Conductor implements Dispatch<CommandLineId> {
      */
     public @NotNull MessageLogger getMessageLogger() {
         return messageLogger;
-    }
-
-    /**
-     * Initializes the parent tracker.
-     */
-    private void initialize() {
-
-        // Get the parent tracker instance and clear its associations.
-        final ParentTracker tracker = ParentTracker.getInstance();
-        tracker.clearAssociations();
-
-        /*
-         * Add line code associations for the portfolio library. Add the single
-         * line code for institutions.
-         */
-        tracker.addAssociations(PortfolioLibrary.getInstance(),
-                HoldingLineType.PORTFOLIO);
-        tracker.addAssociation('I', HoldingLineType.INSTITUTION);
-
-        /*
-         * Set the distinguished account library in the parent tracker
-         * with the account library instance. Add line code associations
-         * for the ticker library.
-         */
-        tracker.setAccountLibrary(AccountLibrary.getInstance());
-        tracker.addAssociations(TickerLibrary.getInstance(),
-                HoldingLineType.TICKER);
     }
 
     /**

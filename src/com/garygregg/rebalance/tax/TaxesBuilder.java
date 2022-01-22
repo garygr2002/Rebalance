@@ -12,7 +12,7 @@ import java.util.logging.Level;
 abstract class TaxesBuilder extends ElementReader<TaxDescription> {
 
     // A blank string
-    private final String blank = "";
+    private static final String blank = "";
 
     // The tax library instance
     private final TaxLibrary library = getLibrary();

@@ -34,6 +34,15 @@ public abstract class ElementProcessor {
     }
 
     /**
+     * Gets the logging level for information.
+     *
+     * @return The logging level for information
+     */
+    protected static @NotNull Level getInformationLevel() {
+        return informationLevel;
+    }
+
+    /**
      * Gets the date utilities object.
      *
      * @return The date utilities object
@@ -50,15 +59,6 @@ public abstract class ElementProcessor {
     protected abstract String getFileType();
 
     /**
-     * Gets the logging level for information.
-     *
-     * @return The logging level for information
-     */
-    protected @NotNull Level getInformationLevel() {
-        return informationLevel;
-    }
-
-    /**
      * Gets the prefix for configuration files of a subclass.
      *
      * @return The prefix for configuration files of a subclass
@@ -70,6 +70,7 @@ public abstract class ElementProcessor {
      *
      * @return True if there was a problem processing a file, false otherwise
      */
+    @SuppressWarnings("unused")
     public boolean hadFileProblem() {
         return messageLogger.hadProblem1();
     }

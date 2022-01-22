@@ -104,6 +104,24 @@ class BalanceableWriter {
     }
 
     /**
+     * Gets the format for a heading line.
+     *
+     * @return The format for a heading line
+     */
+    private static String getHeadingFormat() {
+        return headingFormat;
+    }
+
+    /**
+     * Gets the format for a number line.
+     *
+     * @return The format for a number line
+     */
+    private static String getNumberFormat() {
+        return numberFormat;
+    }
+
+    /**
      * Gets the format for a summary line.
      *
      * @return The format for a summary line
@@ -128,15 +146,6 @@ class BalanceableWriter {
      */
     private static @NotNull WeightType[] getWeightTypes() {
         return weightTypes;
-    }
-
-    /**
-     * Gets the format for a heading line.
-     *
-     * @return The format for a heading line
-     */
-    private String getHeadingFormat() {
-        return headingFormat;
     }
 
     /**
@@ -184,15 +193,6 @@ class BalanceableWriter {
 
         // Return the list of sorted institutions.
         return institutions;
-    }
-
-    /**
-     * Gets the format for a number line.
-     *
-     * @return The format for a number line
-     */
-    private String getNumberFormat() {
-        return numberFormat;
     }
 
     /**
@@ -449,7 +449,7 @@ class BalanceableWriter {
          */
         writer.write(newline);
         writer.write(String.format(twoStringFormat, "The 'Total' column may " +
-                "not equal the sum of the numeric columns preceding it.",
+                        "not equal the sum of the numeric columns preceding it.",
                 newline));
     }
 }

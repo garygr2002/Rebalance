@@ -278,7 +278,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
          * Find the separator in the command line option. Is there no
          * separator?
          */
-        final int equalsIndex = argument.indexOf("=");
+        final int equalsIndex = argument.indexOf('=');
         if (equalsIndex < 0) {
 
             /*

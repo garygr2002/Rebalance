@@ -57,6 +57,17 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
     }
 
     /**
+     * Gets the level associated with a value.
+     *
+     * @param value The level associated with the given value
+     * @return The level associated with the given value, or null if there is
+     * no such associated level
+     */
+    private static Level get(int value) {
+        return getLevel(value);
+    }
+
+    /**
      * Gets a level corresponding to an integer value.
      *
      * @param value An integer value
@@ -119,17 +130,6 @@ public class LevelPreferenceDispatch<KeyType extends Enum<KeyType>>
 
         // Return the result.
         return result;
-    }
-
-    /**
-     * Gets the level associated with a value.
-     *
-     * @param value The level associated with the given value
-     * @return The level associated with the given value, or null if there is
-     * no such associated level
-     */
-    private Level get(int value) {
-        return getLevel(value);
     }
 
     @Override

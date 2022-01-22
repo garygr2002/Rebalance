@@ -23,6 +23,15 @@ public class DoublePreferenceDispatch<KeyType extends Enum<KeyType>>
         super(key, preferences, stream, flag);
     }
 
+    /**
+     * Gets the default value to use in case of no current preference.
+     *
+     * @return The default value to use in case of no current preference
+     */
+    public static double getDefaultValue() {
+        return Double.MIN_VALUE;
+    }
+
     @Override
     protected String get() {
 
@@ -40,15 +49,6 @@ public class DoublePreferenceDispatch<KeyType extends Enum<KeyType>>
          */
         return (0 == Double.compare(preference, defaultValue)) ? null :
                 Double.toString(preference);
-    }
-
-    /**
-     * Gets the default value to use in case of no current preference.
-     *
-     * @return The default value to use in case of no current preference
-     */
-    public double getDefaultValue() {
-        return Double.MIN_VALUE;
     }
 
     @Override

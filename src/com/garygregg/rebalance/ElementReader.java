@@ -27,6 +27,15 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
     }
 
     /**
+     * Gets the logging level for ordinary, non-warning activity.
+     *
+     * @return The logging level for ordinary, non-warning activity
+     */
+    protected static @NotNull Level getOrdinary() {
+        return Level.FINE;
+    }
+
+    /**
      * Preprocesses elements for element processors.
      *
      * @param elements The elements to preprocess.
@@ -306,15 +315,6 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
 
         // Return the result.
         return result;
-    }
-
-    /**
-     * Gets the logging level for ordinary, non-warning activity.
-     *
-     * @return The logging level for ordinary, non-warning activity
-     */
-    protected @NotNull Level getOrdinary() {
-        return Level.FINE;
     }
 
     /**

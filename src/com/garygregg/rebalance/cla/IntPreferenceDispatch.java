@@ -28,6 +28,15 @@ public class IntPreferenceDispatch<KeyType extends Enum<KeyType>>
         super(key, preferences, stream, flag);
     }
 
+    /**
+     * Gets the default value to use in case of no current preference.
+     *
+     * @return The default value to use in case of no current preference
+     */
+    protected static int getDefaultValue() {
+        return Integer.MIN_VALUE;
+    }
+
     @Override
     protected String get() {
 
@@ -45,15 +54,6 @@ public class IntPreferenceDispatch<KeyType extends Enum<KeyType>>
          */
         return (preference == defaultValue) ? null :
                 Integer.toString(preference);
-    }
-
-    /**
-     * Gets the default value to use in case of no current preference.
-     *
-     * @return The default value to use in case of no current preference
-     */
-    protected int getDefaultValue() {
-        return Integer.MIN_VALUE;
     }
 
     @Override

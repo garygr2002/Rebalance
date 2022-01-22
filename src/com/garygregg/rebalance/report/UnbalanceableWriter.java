@@ -98,6 +98,15 @@ class UnbalanceableWriter {
     }
 
     /**
+     * Gets the format for a heading line.
+     *
+     * @return The format for a heading line
+     */
+    private static String getHeadingFormat() {
+        return headingFormat;
+    }
+
+    /**
      * Gets the length of a long table field.
      *
      * @return The length of a long table field
@@ -107,12 +116,43 @@ class UnbalanceableWriter {
     }
 
     /**
+     * Gets the format for a number line.
+     *
+     * @return The format for a number line
+     */
+    private static String getNumberFormat() {
+        return numberFormat;
+    }
+
+    /**
      * Gets the length of a short table field.
      *
      * @return The length of a short table field
      */
     public static int getShortFieldLength() {
         return shortFieldLength;
+    }
+
+    /**
+     * Visits children of an aggregate.
+     *
+     * @param action      The visitation action to perform
+     * @param aggregate   The aggregate
+     * @param <ChildType> The type of children of the aggregate
+     * @param <T>         The type of the aggregate
+     */
+    private static <ChildType extends Queryable<?, ?>,
+            T extends Queryable<?, ChildType>> void visitAggregate(
+            @NotNull VisitationAction<ChildType> action,
+            @NotNull T aggregate) {
+
+        // Get the children of the aggregate, and cycle for each.
+        final Collection<ChildType> children = aggregate.getChildren();
+        for (ChildType child : children) {
+
+            // Visit the first/next child.
+            action.visitChild(child);
+        }
     }
 
     /***
@@ -175,30 +215,12 @@ class UnbalanceableWriter {
     }
 
     /**
-     * Gets the format for a heading line.
-     *
-     * @return The format for a heading line
-     */
-    private String getHeadingFormat() {
-        return headingFormat;
-    }
-
-    /**
      * Gets an iterator for the list of holdings.
      *
      * @return An iterator for the list of holdings
      */
     private @NotNull Iterator<Pair<Currency, String>> getHoldings() {
         return holdingList.listIterator();
-    }
-
-    /**
-     * Gets the format for a number line.
-     *
-     * @return The format for a number line
-     */
-    private String getNumberFormat() {
-        return numberFormat;
     }
 
     /**
@@ -234,28 +256,6 @@ class UnbalanceableWriter {
      */
     private void visit(@NotNull Institution institution) {
         visitAggregate(visitAccount, institution);
-    }
-
-    /**
-     * Visits children of an aggregate.
-     *
-     * @param action      The visitation action to perform
-     * @param aggregate   The aggregate
-     * @param <ChildType> The type of children of the aggregate
-     * @param <T>         The type of the aggregate
-     */
-    private <ChildType extends Queryable<?, ?>,
-            T extends Queryable<?, ChildType>> void visitAggregate(
-            @NotNull VisitationAction<ChildType> action,
-            @NotNull T aggregate) {
-
-        // Get the children of the aggregate, and cycle for each.
-        final Collection<ChildType> children = aggregate.getChildren();
-        for (ChildType child : children) {
-
-            // Visit the first/next child.
-            action.visitChild(child);
-        }
     }
 
     /**

@@ -205,6 +205,39 @@ public class ActionReportWriter extends HierarchyWriter {
     }
 
     /**
+     * Gets the difference between proposed and considered values in a ticker,
+     * and returns it as mutable currency.
+     *
+     * @param ticker The ticker for which to get a difference
+     * @return The difference between proposed and considered values in the
+     * ticker
+     */
+    private static @NotNull MutableCurrency getDifference(
+            @NotNull Ticker ticker) {
+
+        // Get the considered and proposed values of the ticker.
+        final Currency considered = ticker.getConsidered();
+        final Currency proposed = getProposed(ticker);
+
+        /*
+         * Create a new mutable currency with the proposed value of the
+         * ticker. Is the considered value of the ticker not null?
+         */
+        final MutableCurrency currency = new MutableCurrency(proposed);
+        if (null != considered) {
+
+            /*
+             * The considered value of the ticker is not null. Subtract it from
+             * the proposed value.
+             */
+            currency.subtract(considered);
+        }
+
+        // Return the result.
+        return currency;
+    }
+
+    /**
      * Gets an initial percentage list.
      *
      * @param size The size of the desired list
@@ -305,6 +338,30 @@ public class ActionReportWriter extends HierarchyWriter {
     }
 
     /**
+     * Writes a total transfer message.
+     *
+     * @param writer The file writer to receive the report lines
+     * @param ticker The ticker undergoing the transfer
+     * @param total  The total amount of the transfer
+     * @return True if an extra newline should be inserted before the next
+     * message; false otherwise
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private static boolean writeTotalMessage(@NotNull FileWriter writer,
+                                             @NotNull Ticker ticker,
+                                             @NotNull MutableCurrency total)
+            throws IOException {
+
+        /*
+         * Write about the transfer, and return true to always write a newline
+         * before the next message.
+         */
+        writer.write(String.format(totalMessage, total, "from",
+                formatTickerId(ticker)));
+        return true;
+    }
+
+    /**
      * Adds a difference pair.
      *
      * @param ticker The ticker for which to add a difference pair
@@ -389,38 +446,6 @@ public class ActionReportWriter extends HierarchyWriter {
 
         // Write the name of the account using its description.
         writeName(writer, description);
-    }
-
-    /**
-     * Gets the difference between proposed and considered values in a ticker,
-     * and returns it as mutable currency.
-     *
-     * @param ticker The ticker for which to get a difference
-     * @return The difference between proposed and considered values in the
-     * ticker
-     */
-    private @NotNull MutableCurrency getDifference(@NotNull Ticker ticker) {
-
-        // Get the considered and proposed values of the ticker.
-        final Currency considered = ticker.getConsidered();
-        final Currency proposed = getProposed(ticker);
-
-        /*
-         * Create a new mutable currency with the proposed value of the
-         * ticker. Is the considered value of the ticker not null?
-         */
-        final MutableCurrency currency = new MutableCurrency(proposed);
-        if (null != considered) {
-
-            /*
-             * The considered value of the ticker is not null. Subtract it from
-             * the proposed value.
-             */
-            currency.subtract(considered);
-        }
-
-        // Return the result.
-        return currency;
     }
 
     /**
@@ -907,30 +932,6 @@ public class ActionReportWriter extends HierarchyWriter {
         // Write a newline, then call the superclass method.
         writer.write("\n");
         super.writeLines(writer, institution);
-    }
-
-    /**
-     * Writes a total transfer message.
-     *
-     * @param writer The file writer to receive the report lines
-     * @param ticker The ticker undergoing the transfer
-     * @param total  The total amount of the transfer
-     * @return True if an extra newline should be inserted before the next
-     * message; false otherwise
-     * @throws IOException Indicates an I/O exception occurred
-     */
-    private boolean writeTotalMessage(@NotNull FileWriter writer,
-                                      @NotNull Ticker ticker,
-                                      @NotNull MutableCurrency total)
-            throws IOException {
-
-        /*
-         * Write about the transfer, and return true to always write a newline
-         * before the next message.
-         */
-        writer.write(String.format(totalMessage, total, "from",
-                formatTickerId(ticker)));
-        return true;
     }
 
     // An action that adds tickers to lists

@@ -37,6 +37,27 @@ abstract class Annuity extends Synthesizer {
     }
 
     /**
+     * Calculates a geometric sum of currency.
+     *
+     * @param payment The payments
+     * @param rate    The rate
+     * @param periods The number of periods
+     * @return A geometric sum of the payments for the number of periods
+     */
+    private static double geometricSum(double payment, double rate,
+                                       long periods) {
+
+        /*
+         * Declare and initialize the 'forbidden' rate, and calculate the
+         * geometric sum.
+         */
+        final double forbiddenRate = 1.;
+        return (forbiddenRate == rate) ? payment * periods :
+                ((payment - payment * Math.pow(rate, periods + 1)) /
+                        (forbiddenRate - rate));
+    }
+
+    /**
      * Gets the default inflation.
      *
      * @return The default inflation
@@ -186,26 +207,6 @@ abstract class Annuity extends Synthesizer {
 
         // Return the result.
         return result;
-    }
-
-    /**
-     * Calculates a geometric sum of currency.
-     *
-     * @param payment The payments
-     * @param rate    The rate
-     * @param periods The number of periods
-     * @return A geometric sum of the payments for the number of periods
-     */
-    private double geometricSum(double payment, double rate, long periods) {
-
-        /*
-         * Declare and initialize the 'forbidden' rate, and calculate the
-         * geometric sum.
-         */
-        final double forbiddenRate = 1.;
-        return (forbiddenRate == rate) ? payment * periods :
-                ((payment - payment * Math.pow(rate, periods + 1)) /
-                        (forbiddenRate - rate));
     }
 
     /**
