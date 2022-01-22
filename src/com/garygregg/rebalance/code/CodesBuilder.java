@@ -17,8 +17,7 @@ public class CodesBuilder extends ElementReader<CodeDescription> {
 
                 @Override
                 public void processField(@NotNull String field) {
-                    getTarget().setDescription(
-                            CodesBuilder.processDescription(field));
+                    getTarget().setDescription(processDescription(field));
                 }
             };
 

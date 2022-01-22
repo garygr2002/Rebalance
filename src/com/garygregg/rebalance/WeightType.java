@@ -75,7 +75,7 @@ public enum WeightType {
     STOCK_SMALL("Stock small-cap", STOCK_NOT_LARGE),
 
     // Tickers must contain fund type GROWTH_AND_VALUE.
-    STOCK_GROWTH_AND_VALUE ("Stock growth and value", STOCK_LARGE,
+    STOCK_GROWTH_AND_VALUE("Stock growth and value", STOCK_LARGE,
             STOCK_NOT_LARGE, STOCK_MEDIUM, STOCK_SMALL),
 
     // Tickers must contain fund type GROWTH or fund type VALUE.
@@ -94,7 +94,7 @@ public enum WeightType {
     private static final List<WeightType> levelOne;
 
     // A list of level zero weight types
-    private static final List<WeightType> levelZero = List.of(WeightType.ALL);
+    private static final List<WeightType> levelZero = List.of(ALL);
 
     // The number of children of the weight type that has the most
     private static final int maxChildren;
@@ -142,7 +142,7 @@ public enum WeightType {
          * Cycle for each weight type.
          */
         final List<WeightType> levelOne = new ArrayList<>();
-        for (WeightType type : WeightType.values()) {
+        for (WeightType type : values()) {
 
             /*
              * Add the first/next weight type to the level one list if it
@@ -207,7 +207,7 @@ public enum WeightType {
          * for each weight type.
          */
         WeightType[] parents;
-        for (WeightType type : WeightType.values()) {
+        for (WeightType type : values()) {
 
             // Get the parents of the first/next type. Cycle for each parent.
             parents = type.getParents();

@@ -85,8 +85,8 @@ public class DateUtilities {
     private static @NotNull String constructFilename(@NotNull String prefix,
                                                      @NotNull Date date,
                                                      @NotNull String fileType) {
-        return constructFilename(prefix,
-                DateUtilities.getDateFormat().format(date), fileType);
+        return constructFilename(prefix, getDateFormat().format(date),
+                fileType);
     }
 
     /**

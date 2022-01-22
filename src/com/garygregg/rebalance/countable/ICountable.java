@@ -86,7 +86,7 @@ public interface ICountable {
             final ICountable countableTwo = (ICountable) objectTwo;
 
             // Reset the result based on a value comparison.
-            result = ICountable.areEqual(countableOne.getValue(),
+            result = areEqual(countableOne.getValue(),
                     countableTwo.getValue(), precision);
         }
 
