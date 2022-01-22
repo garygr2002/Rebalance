@@ -1163,7 +1163,7 @@ public class Hierarchy {
      * @return True if the requested number of aggregates were popped and
      * set, false if fewer were popped and set
      */
-    @SuppressWarnings({"UnusedReturnValue"})
+    @SuppressWarnings("UnusedReturnValue")
     private boolean popAndSum(int count) {
 
         /*
@@ -1275,7 +1275,7 @@ public class Hierarchy {
      * considered' together) matches the currently set sum in the aggregate;
      * false otherwise
      */
-    @SuppressWarnings({"UnusedReturnValue"})
+    @SuppressWarnings("UnusedReturnValue")
     private <T extends Common<?, ?, ?>>
     boolean sum(@NotNull Aggregate<?, T, ?> aggregate) {
 
@@ -1348,7 +1348,7 @@ public class Hierarchy {
      * children ('considered' plus 'not considered' together) matches the
      * currently set sum in the aggregate; false otherwise
      */
-    @SuppressWarnings({"UnusedReturnValue"})
+    @SuppressWarnings("UnusedReturnValue")
     private <T extends Common<?, ?, ?>>
     boolean sumIfChildren(@NotNull Aggregate<?, T, ?> aggregate) {
 
