@@ -106,7 +106,7 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
      * @return A non-blank error message if the threshold is negative; a blank
      * string otherwise
      */
-    private @NotNull String checkThreshold(
+    private static @NotNull String checkThreshold(
             @NotNull TaxDescription description) {
 
         // Get the threshold, and format a message.

@@ -339,22 +339,12 @@ public class ParentTracker {
         }
 
         /**
-         * Decrements the currently expected holding line.
-         *
-         * @return True if the currently expected holding line could be
-         * decremented, false otherwise
-         */
-        public boolean decrement() {
-            return doTestAndAct(forDecrement);
-        }
-
-        /**
          * Performs a test, and if the test is valid performs an action.
          *
          * @param testAndAct A test and act object
          * @return True if the test was true, false otherwise
          */
-        private boolean doTestAndAct(@NotNull TestAndAct testAndAct) {
+        private static boolean doTestAndAct(@NotNull TestAndAct testAndAct) {
 
             // Perform the test. Was the test valid?
             final boolean result = testAndAct.test();
@@ -366,6 +356,16 @@ public class ParentTracker {
 
             // Return the result of the test.
             return result;
+        }
+
+        /**
+         * Decrements the currently expected holding line.
+         *
+         * @return True if the currently expected holding line could be
+         * decremented, false otherwise
+         */
+        public boolean decrement() {
+            return doTestAndAct(forDecrement);
         }
 
         /**
