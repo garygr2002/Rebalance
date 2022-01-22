@@ -171,7 +171,7 @@ public class ActionReportWriter extends HierarchyWriter {
 
         // Determine if the result is positive. Is the result negative?
         final boolean isPositive =
-                zeroShares.compareTo(shares.getImmutable()) <= 0;
+                0 >= zeroShares.compareTo(shares.getImmutable());
         if (!isPositive) {
 
             /*

@@ -54,9 +54,10 @@ public class Reallocator {
              * Throw a new illegal argument exception if the first/next list
              * element is negative.
              */
-            if ((element = list.get(i)) < 0.) {
+            if (0. > (element = list.get(i))) {
                 throw new IllegalArgumentException(String.format("Detected " +
-                        "negative element %f at index %d in list.", element, i));
+                        "negative element %f at index %d in list.",
+                        element, i));
             }
         }
     }
@@ -190,7 +191,7 @@ public class Reallocator {
                  * The difference is not zero. Determine if we need to add, or
                  * subtract value.
                  */
-                final int addOrSubtract = (difference < 0.) ? -1 : 1;
+                final int addOrSubtract = (0. > difference) ? -1 : 1;
 
                 /*
                  * Sort the list based on how much was added, or taken away
@@ -198,7 +199,7 @@ public class Reallocator {
                  * negative, it means we need to subtract value. So sort the
                  * values so that those with most added occur first.
                  */
-                list.sort((addOrSubtract < 0.) ?
+                list.sort((0. > addOrSubtract) ?
                         (first, second) -> (int) Math.signum(first.getFirst() -
                                 second.getFirst()) :
 

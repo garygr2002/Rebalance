@@ -842,7 +842,7 @@ class RebalanceNode implements CurrencyReceiver {
              * deviation from an ideal rebalance. It cannot be helped.
              */
             while (iterator.hasNext() &&
-                    (idealScore.compareTo(bestScore) < 0)) {
+                    (0 > idealScore.compareTo(bestScore))) {
 
                 /*
                  * Okay, we are inside the loop. This means two things: 1)
@@ -858,7 +858,7 @@ class RebalanceNode implements CurrencyReceiver {
                  * which involves dynamic programming. Fix it later.)
                  */
                 currentScore = rebalance(delegates, residual, iterator.next());
-                if (currentScore.compareTo(bestScore) < 0) {
+                if (0 > currentScore.compareTo(bestScore)) {
 
                     /*
                      * The current reallocation score is the best seen so far.

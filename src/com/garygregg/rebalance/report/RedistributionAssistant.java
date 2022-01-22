@@ -117,7 +117,7 @@ class RedistributionAssistant {
      * otherwise
      */
     public boolean canReceive() {
-        return (from.getFirst().getImmutable().compareTo(zero) < 0);
+        return (0 > from.getFirst().getImmutable().compareTo(zero));
     }
 
     /**

@@ -283,7 +283,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
          * separator?
          */
         final int equalsIndex = argument.indexOf('=');
-        if (equalsIndex < 0) {
+        if (0 > equalsIndex) {
 
             /*
              * There is no separator. Treat the whole option as a single

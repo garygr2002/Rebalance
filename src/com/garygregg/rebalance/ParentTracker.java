@@ -161,7 +161,7 @@ public class ParentTracker {
          * Try to pop the actives stack twice, removing the bad assumption
          * and a sibling of the bad assumption.
          */
-        for (int i = 0; !actives.isEmpty() && (i < 2); ++i) {
+        for (int i = 0; !actives.isEmpty() && (2 > i); ++i) {
             actives.pop();
         }
 
@@ -393,7 +393,7 @@ public class ParentTracker {
              * is non-null, and equals the given holding line type.
              */
             final HoldingLineType current = hierarchy[currentlyExpecting];
-            return (current != null) && current.equals(holdingLineType);
+            return (null != current) && current.equals(holdingLineType);
         }
 
         /**

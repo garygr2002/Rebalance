@@ -268,7 +268,7 @@ public class DifferenceReportWriter extends HierarchyWriter {
 
             // Write the line.
             writer.write(String.format(format, lineCode, fieldSeparator, key,
-                    (name == null) ? "<name missing>" : name, proposed,
+                    (null == name) ? "<name missing>" : name, proposed,
                     fieldSeparator, considered, fieldSeparator, difference));
         }
     }

@@ -111,7 +111,7 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
 
         // Get the threshold, and format a message.
         final Currency threshold = description.getThreshold();
-        return (threshold.compareTo(Currency.getZero()) < 0) ?
+        return (0 > threshold.compareTo(Currency.getZero())) ?
                 String.format("threshold is negative, %s", threshold) : blank;
     }
 
@@ -197,7 +197,7 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
          * blank message.
          */
         final String taxMessage =
-                (taxRate.compareTo(Percent.getZero()) < 0) ?
+                (0 > taxRate.compareTo(Percent.getZero())) ?
                         String.format("tax rate is below acceptable range, %s",
                                 taxRate) : blank;
 
@@ -227,7 +227,7 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
          * blank message.
          */
         final String taxMessage =
-                (Percent.getOneHundred().compareTo(taxRate) < 0) ?
+                (0 > Percent.getOneHundred().compareTo(taxRate)) ?
                         String.format("tax rate is above acceptable range, %s",
                                 taxRate) : blank;
 

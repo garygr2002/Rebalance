@@ -409,7 +409,7 @@ abstract class ResidualProducerAction
          * Set the negative flag in the utility if the residual is less than
          * zero. Set the residual in the container, and reset the action.
          */
-        utility.setNegative(residual.compareTo(zero) < 0);
+        utility.setNegative(0 > residual.compareTo(zero));
         utility.setResidual(residual);
         reset();
     }

@@ -11,7 +11,7 @@ class ConsiderationSetterAction
     @Override
     public void doAction(@NotNull ReceiverDelegate<?> delegate) {
         delegate.setConsidered(
-                (getConsiderationPattern() & (1 << (iteration++))) != 0);
+                0 != (getConsiderationPattern() & (1 << (iteration++))));
     }
 
     /**
