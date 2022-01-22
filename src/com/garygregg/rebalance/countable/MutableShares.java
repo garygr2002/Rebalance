@@ -31,15 +31,6 @@ public class MutableShares extends MutableCountable
     }
 
     /**
-     * Constructs mutable shares from other mutable shares.
-     *
-     * @param shares Other mutable shares
-     */
-    public MutableShares(@NotNull MutableShares shares) {
-        super(shares.getValue());
-    }
-
-    /**
      * Constructs mutable shares from immutable shares.
      *
      * @param shares Immutable shares
