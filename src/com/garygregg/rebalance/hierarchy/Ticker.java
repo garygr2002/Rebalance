@@ -7,6 +7,7 @@ import com.garygregg.rebalance.ticker.TickerDescription;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -33,7 +34,8 @@ public class Ticker extends
     private static final double zeroShares = Shares.getZero().getValue();
 
     // The map of weight type to activities
-    private final Map<WeightType, Activity> associationMap = new HashMap<>();
+    private final Map<WeightType, Activity> associationMap =
+            new EnumMap<>(WeightType.class);
 
     // Our ceiling function
     private final SharesFunction ceiling = new SharesFunction() {

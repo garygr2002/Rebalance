@@ -266,11 +266,11 @@ class BalanceableWriter {
             percentages.get(0).set(defaultPercent);
         }
 
-        /*
-         * Create a map of weights to percentages. Cycle for each highest level
-         * weight type.
-         */
-        final Map<WeightType, MutablePercent> map = new HashMap<>();
+        // Create a map of weights to percentages.
+        final Map<WeightType, MutablePercent> map =
+                new EnumMap<>(WeightType.class);
+
+        // Cycle for each highest level weight type.
         final int typesLength = types.length;
         for (i = 0; i < typesLength; ++i) {
 

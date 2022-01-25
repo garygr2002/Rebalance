@@ -4,7 +4,7 @@ import com.garygregg.rebalance.HoldingType;
 import com.garygregg.rebalance.Library;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -16,7 +16,7 @@ public class HoldingLibrary extends Library<Integer, HoldingDescription> {
 
     // The map of holding libraries
     private static final Map<HoldingType, HoldingLibrary> libraryMap =
-            new HashMap<>();
+            new EnumMap<>(HoldingType.class);
 
     static {
 

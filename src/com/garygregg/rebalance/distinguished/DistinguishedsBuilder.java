@@ -5,7 +5,7 @@ import com.garygregg.rebalance.interpreter.CodeInterpreter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -130,7 +130,7 @@ public class DistinguishedsBuilder extends
 
     // The processor map
     private final Map<HoldingLineType, ElementProcessor<?>> processorMap =
-            new HashMap<>();
+            new EnumMap<>(HoldingLineType.class);
 
     // The element processor for portfolios
     private final ElementProcessor<DistinguishedTickers>

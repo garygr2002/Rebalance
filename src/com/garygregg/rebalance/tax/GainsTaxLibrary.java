@@ -3,14 +3,14 @@ package com.garygregg.rebalance.tax;
 import com.garygregg.rebalance.FilingStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public abstract class GainsTaxLibrary extends TaxLibrary {
 
     // The capital gains tax library vending map
     private static final Map<FilingStatus, GainsTaxLibrary> libraryMap
-            = new HashMap<>();
+            = new EnumMap<>(FilingStatus.class);
 
     /**
      * Adds a capital tax library.

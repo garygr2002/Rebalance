@@ -199,7 +199,7 @@ public enum WeightType {
          * Declare and initialize a map with weight type keys and integer
          * values. Declare an integer to receive a count.
          */
-        final Map<WeightType, Integer> map = new HashMap<>();
+        final Map<WeightType, Integer> map = new EnumMap<>(WeightType.class);
         Integer count;
 
         /*

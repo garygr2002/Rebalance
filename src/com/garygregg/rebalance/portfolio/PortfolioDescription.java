@@ -7,13 +7,14 @@ import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class PortfolioDescription implements Description<String> {
 
     // A map of weight types to their desired allocation weights
-    private final Map<WeightType, Double> allocation = new HashMap<>();
+    private final Map<WeightType, Double> allocation =
+            new EnumMap<>(WeightType.class);
 
     // The mnemonic of the portfolio
     private final String mnemonic;

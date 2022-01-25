@@ -83,7 +83,7 @@ public class Hierarchy {
 
     // The map of hierarchies
     private static final Map<HoldingType, Hierarchy> hierarchyMap =
-            new HashMap<>();
+            new EnumMap<>(HoldingType.class);
 
     // A function that returns 'considered' value for all tax types
     private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>>
@@ -193,7 +193,7 @@ public class Hierarchy {
 
     // A map of holding line types to add actions
     private final Map<HoldingLineType, OneParameterAction<HoldingDescription>>
-            addMap = new HashMap<>();
+            addMap = new EnumMap<>(HoldingLineType.class);
 
     // A stack of aggregates
     private final Stack<Aggregate<?, ?, ?>> aggregates = new Stack<>();

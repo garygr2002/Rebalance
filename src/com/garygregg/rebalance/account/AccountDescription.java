@@ -3,7 +3,7 @@ package com.garygregg.rebalance.account;
 import com.garygregg.rebalance.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -15,7 +15,8 @@ public class AccountDescription implements Comparable<AccountDescription>,
     private final Long accountNumber;
 
     // A map of fund types to their desired allocation weights
-    private final Map<FundType, Double> allocation = new HashMap<>();
+    private final Map<FundType, Double> allocation =
+            new EnumMap<>(FundType.class);
 
     // The description key
     private final AccountKey key;

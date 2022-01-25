@@ -462,11 +462,14 @@ abstract class AccountRebalancer extends Rebalancer {
             @NotNull Account account, @NotNull OverlayProcedure procedure,
             boolean adjust) {
 
+        // Declare an empty weight map.
+        final Map<WeightType, Double> weightMap =
+                new EnumMap<>(WeightType.class);
+
         /*
-         * Declare an empty weight map, and initialize it. Perform the given
-         * overlay procedure with the initialized weight map and the account.
+         * Initialize the weight map. Perform the given overlay procedure with
+         * the initialized weight map and the account.
          */
-        final Map<WeightType, Double> weightMap = new HashMap<>();
         initializeMap(weightMap);
         procedure.overlay(weightMap, account);
 

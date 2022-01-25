@@ -5,13 +5,14 @@ import com.garygregg.rebalance.Description;
 import com.garygregg.rebalance.WeightType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class DetailedDescription implements Description<AccountKey> {
 
     // A map of weight types to their desired allocation weights
-    private final Map<WeightType, Double> allocation = new HashMap<>();
+    private final Map<WeightType, Double> allocation =
+            new EnumMap<>(WeightType.class);
 
     // The description key
     private final AccountKey key;

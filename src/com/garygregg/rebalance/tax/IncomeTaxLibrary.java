@@ -4,14 +4,14 @@ import com.garygregg.rebalance.FilingStatus;
 import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public abstract class IncomeTaxLibrary extends TaxLibrary {
 
     // The income tax library vending map
     private static final Map<FilingStatus, IncomeTaxLibrary> libraryMap
-            = new HashMap<>();
+            = new EnumMap<>(FilingStatus.class);
 
     // The standard deduction for the library
     private Currency standardDeduction;

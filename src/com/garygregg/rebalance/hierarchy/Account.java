@@ -7,7 +7,7 @@ import com.garygregg.rebalance.portfolio.PortfolioDescription;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
@@ -21,7 +21,7 @@ public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
 
     // A map of synthesizer types to synthesizer instances
     private static final Map<SynthesizerType, Synthesizer>
-            synthesizerMap = new HashMap<>();
+            synthesizerMap = new EnumMap<>(SynthesizerType.class);
 
     static {
 

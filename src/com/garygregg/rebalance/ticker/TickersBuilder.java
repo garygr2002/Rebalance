@@ -129,7 +129,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
 
     // A map of base fund types to consistency checkers
     private final Map<FundType, ConsistencyChecker> consistencyCheckers =
-            new HashMap<>();
+            new EnumMap<>(FundType.class);
 
     // The ETF ticker factory
     private final TickerFactory etfFactory = (ticker, number, name, minimum, balanceRounding, lineNumber) -> {
