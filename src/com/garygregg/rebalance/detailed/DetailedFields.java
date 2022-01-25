@@ -91,13 +91,13 @@ enum DetailedFields {
     PERCENTAGE_REAL_ESTATE(26, WeightType.REAL_ESTATE);
 
     // The position of the field in the data file
-    final int position;
+    private final int position;
 
     /*
      * The weight type associated with fields for desired percentages
      * (null for other fields)
      */
-    final WeightType type;
+    private final WeightType type;
 
     /**
      * Constructs the enumerator of the detailed fields.

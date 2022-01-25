@@ -165,7 +165,7 @@ class BalanceableWriter {
         institutions.sort(new Comparator<>() {
 
             // We use the balanceable valuator for this sort
-            final Valuator valuator = getValuator();
+            private final Valuator valuator = getValuator();
 
             @Override
             public int compare(@NotNull Institution first,

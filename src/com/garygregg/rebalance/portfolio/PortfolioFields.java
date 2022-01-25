@@ -47,13 +47,13 @@ enum PortfolioFields {
     ADJUST(13, null);
 
     // The position of the field in the data file
-    final int position;
+    private final int position;
 
     /*
      * The weight type associated with fields for desired percentages
      * (null for other fields)
      */
-    final WeightType type;
+    private final WeightType type;
 
     /**
      * Constructs the portfolio fields enumerator.

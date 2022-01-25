@@ -41,13 +41,13 @@ enum AccountFields {
     TAX_TYPE(4, null);
 
     // The position of the field in the data file
-    final int position;
+    private final int position;
 
     /*
      * The fund type associated with fields for desired percentages
      * (null for other fields)
      */
-    final FundType type;
+    private final FundType type;
 
     /**
      * Constructs the account fields enumerator.

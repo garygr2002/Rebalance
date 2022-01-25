@@ -9,7 +9,7 @@ public enum TaxFields {
     THRESHOLD(0);
 
     // The position of the field in the data file
-    final int position;
+    private final int position;
 
     /**
      * Constructs the tax fields enumerator.
