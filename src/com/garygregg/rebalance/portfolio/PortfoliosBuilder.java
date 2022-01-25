@@ -492,7 +492,7 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                         logMessage(Level.WARNING, String.format("Allocation '%s' " +
                                         "at line number %d, column number %d in the " +
                                         "portfolio file cannot be parsed; using %s.",
-                                string, getRow(), getColumn(), defaultValue));
+                                string, getRow(), super.getColumn(), defaultValue));
                     }
                 };
 
