@@ -3,6 +3,7 @@ package com.garygregg.rebalance.distinguished;
 import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.interpreter.CodeInterpreter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -137,7 +138,7 @@ public class DistinguishedsBuilder extends
             DistinguishedTickers.class) {
 
         @Override
-        public DistinguishedDescription<DistinguishedTickers, ?>
+        public @Nullable DistinguishedDescription<DistinguishedTickers, ?>
         process(@NotNull String keyString,
                 @NotNull Pair<String, String> value,
                 int lineNumber) {
@@ -153,6 +154,7 @@ public class DistinguishedsBuilder extends
             return null;
         }
     };
+
     // The parent tracker
     private final ParentTracker tracker = ParentTracker.getInstance();
 
