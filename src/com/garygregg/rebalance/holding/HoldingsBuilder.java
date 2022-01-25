@@ -210,8 +210,8 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
 
             // The line type is not known. Log a warning and return.
             logMessage(Level.WARNING, String.format("Line code '%s' is not " +
-                            "recognized at line number %d in the %s file.", lineCode,
-                    lineNumber, getPrefix()));
+                            "recognized at line number %d in the %s file.",
+                    lineCode, lineNumber, getPrefix()));
             return;
         }
 
@@ -223,8 +223,8 @@ abstract class HoldingsBuilder extends ElementReader<HoldingDescription> {
          * Create a new holding description with the key. Set the line type
          * of the description.
          */
-        final HoldingDescription description = new HoldingDescription(lineNumber,
-                key);
+        final HoldingDescription description =
+                new HoldingDescription(lineNumber, key);
         description.setLineType(lineType);
 
         /*
