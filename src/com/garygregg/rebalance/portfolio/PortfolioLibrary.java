@@ -13,7 +13,8 @@ public class PortfolioLibrary extends Library<String, PortfolioDescription> {
     private static final PortfolioLibrary library = new PortfolioLibrary();
 
     // A map of portfolio names to portfolio description objects
-    private final Map<String, PortfolioDescription> portfolios = new TreeMap<>();
+    private final Map<String, PortfolioDescription> portfolios =
+            new TreeMap<>();
 
     /**
      * Constructs the portfolio library.

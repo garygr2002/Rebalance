@@ -27,9 +27,9 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                                                 @NotNull String string,
                                                 Boolean defaultValue) {
                     logMessage(Level.WARNING, String.format("Adjustment " +
-                                    "flag '%s' at line number %d in portfolio file " +
-                                    "cannot be parsed; using %s.",
-                            string, getRow(), defaultValue));
+                                    "flag '%s' at line number %d in " +
+                                    "portfolio file cannot be parsed; using " +
+                                    "%s.", string, getRow(), defaultValue));
                 }
             };
 
@@ -113,9 +113,10 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                 protected void receiveException(@NotNull Exception exception,
                                                 @NotNull String string,
                                                 FilingStatus defaultValue) {
-                    logMessage(Level.WARNING, String.format("Filing status '%s' at " +
-                            "line number %d in portfolio file cannot be parsed; " +
-                            "using %s.", string, getRow(), defaultValue));
+                    logMessage(Level.WARNING, String.format("Filing status " +
+                            "'%s' at line number %d in portfolio file " +
+                            "cannot be parsed; using %s.", string, getRow(),
+                            defaultValue));
                 }
             };
 
@@ -383,8 +384,8 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
 
         // Log some exit information.
         logMessage(getOrdinary(), String.format("Load of metadata for " +
-                        "portfolio with mnemonic '%s' at line %d was%s successful.",
-                description.getKey(), lineNumber,
+                        "portfolio with mnemonic '%s' at line %d was%s " +
+                        "successful.", description.getKey(), lineNumber,
                 hadLineProblem() ? " not" : ""));
     }
 
@@ -489,10 +490,11 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                     protected void receiveException(@NotNull Exception exception,
                                                     @NotNull String string,
                                                     Double defaultValue) {
-                        logMessage(Level.WARNING, String.format("Allocation '%s' " +
-                                        "at line number %d, column number %d in the " +
-                                        "portfolio file cannot be parsed; using %s.",
-                                string, getRow(), super.getColumn(), defaultValue));
+                        logMessage(Level.WARNING, String.format("Allocation " +
+                                        "'%s' at line number %d, column " +
+                                        "number %d in the portfolio file " +
+                                        "cannot be parsed; using %s.", string,
+                                getRow(), super.getColumn(), defaultValue));
                     }
                 };
 
