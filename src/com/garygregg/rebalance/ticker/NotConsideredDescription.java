@@ -13,8 +13,9 @@ public class NotConsideredDescription extends TickerDescription {
      * @param minimum         The minimum investment in the ticker
      * @param balanceRounding The preferred round number of shares to hold
      */
-    NotConsideredDescription(@NotNull String ticker, Integer number, String name,
-                    double minimum, double balanceRounding) {
+    NotConsideredDescription(@NotNull String ticker, Integer number,
+                             String name, double minimum,
+                             double balanceRounding) {
         super(ticker, number, name, minimum, balanceRounding);
     }
 

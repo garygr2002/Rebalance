@@ -22,7 +22,8 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
     private static final List<FundType> baseList = Arrays.asList(base);
 
     // A map of character codes to fund types
-    private static final Map<Character, FundType> baseTypeMap = new HashMap<>();
+    private static final Map<Character, FundType> baseTypeMap =
+            new HashMap<>();
 
     // A bond ticker may contain one of these bond subtypes
     private static final FundType[] bond = {FundType.CORPORATE,
@@ -132,15 +133,16 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
             new EnumMap<>(FundType.class);
 
     // The ETF ticker factory
-    private final TickerFactory etfFactory = (ticker, number, name, minimum, balanceRounding, lineNumber) -> {
+    private final TickerFactory etfFactory = (ticker, number, name, minimum,
+                                              balanceRounding, lineNumber) -> {
 
         // Check for non-zero minimum.
         if (zero.areNotEqual(minimum)) {
 
             // Non-zero minimum detected. Log a warning.
             logMessage(Level.WARNING, String.format("Non-zero minimums " +
-                            "for ETFs are not currently supported - received %f " +
-                            "at line number %d; using a default.",
+                            "for ETFs are not currently supported - " +
+                            "received %f at line number %d; using a default.",
                     minimum, lineNumber));
         }
 
@@ -170,7 +172,10 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
                             baseTypeMap.get(codeInterpreter.interpret(field));
                     if (null == fundType) {
 
-                        // The fund type is null. Issue a warning, and skip the code.
+                        /*
+                         * The fund type is null. Issue a warning, and skip the
+                         * code.
+                         */
                         logMessage(Level.WARNING, String.format("No fund " +
                                         "type for unrecognized code '%s' at " +
                                         "line number %d in the ticker file; " +
@@ -308,7 +313,9 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
     private final ConsistencyChecker stockChecker = this::checkStock;
 
     // The stock ticker factory
-    private final TickerFactory stockFactory = (ticker, number, name, minimum, balanceRounding, lineNumber) -> {
+    private final TickerFactory stockFactory = (ticker, number, name, minimum,
+                                                balanceRounding,
+                                                lineNumber) -> {
 
         // Check for non-zero minimum.
         if (zero.areNotEqual(minimum)) {
@@ -876,8 +883,8 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
             if (null != library.addDescription(description)) {
 
                 /*
-                 * Log a message describing where the duplicate account description
-                 * occurs.
+                 * Log a message describing where the duplicate account
+                 * description occurs.
                  */
                 logMessage(getInformationLevel(), String.format("Replacing " +
                         "ticker with symbol '%s' at line number %d in " +
@@ -893,27 +900,27 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
             final int numberOfTickerFields = TickerFields.values().length;
 
             /*
-             * The fields-to-process is the minimum of the number of line elements
-             * and the number of ticker fields.
+             * The fields-to-process is the minimum of the number of line
+             * elements and the number of ticker fields.
              */
             final int fieldsToProcess = Math.min(elementsLength,
                     numberOfTickerFields);
 
             /*
-             * Log a warning if the fields-to-process is less than the number of
-             * line elements.
+             * Log a warning if the fields-to-process is less than the number
+             * of line elements.
              */
             if (fieldsToProcess < elementsLength) {
-                logMessage(Level.WARNING, String.format("There are %d ticker " +
-                                "line elements but only %d ticker fields at " +
-                                "line number %d; you might want to check " +
-                                "that.", elementsLength, numberOfTickerFields,
-                        lineNumber));
+                logMessage(Level.WARNING, String.format("There are %d " +
+                                "ticker line elements but only %d ticker " +
+                                "fields at line number %d; you might want " +
+                                "to check that.", elementsLength,
+                        numberOfTickerFields, lineNumber));
             }
 
             /*
-             * Or log a different warning if the fields-to-process is less than the
-             * number of ticker fields.
+             * Or log a different warning if the fields-to-process is less than
+             * the number of ticker fields.
              */
             else if (fieldsToProcess < numberOfTickerFields) {
                 logMessage(Level.WARNING, String.format("There are %d " +
