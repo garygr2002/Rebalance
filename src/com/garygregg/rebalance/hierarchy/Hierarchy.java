@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Hierarchy {
+public final class Hierarchy {
 
     // The logging level for ordinary informational messages
     private static final Level ordinary = MessageLogger.getOrdinary();

@@ -3,7 +3,7 @@ package com.garygregg.rebalance.tax;
 import com.garygregg.rebalance.FilingStatus;
 import org.jetbrains.annotations.NotNull;
 
-public class GainsJointTaxLibrary extends GainsTaxLibrary {
+public final class GainsJointTaxLibrary extends GainsTaxLibrary {
 
     // The singleton capital gains tax library, married-filing-jointly
     private static final GainsJointTaxLibrary library =

@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class DetailedLibrary extends AccountKeyLibrary<DetailedDescription> {
+public final class DetailedLibrary
+        extends AccountKeyLibrary<DetailedDescription> {
 
     // The singleton detailed library
     private static final DetailedLibrary library = new DetailedLibrary();

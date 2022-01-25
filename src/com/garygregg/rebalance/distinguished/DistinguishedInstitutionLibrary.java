@@ -2,7 +2,7 @@ package com.garygregg.rebalance.distinguished;
 
 import org.jetbrains.annotations.NotNull;
 
-public class DistinguishedInstitutionLibrary extends
+public final class DistinguishedInstitutionLibrary extends
         DistinguishedLibrary<DistinguishedInstitution,
                 DistinguishedInstitutionDescription, String> {
 

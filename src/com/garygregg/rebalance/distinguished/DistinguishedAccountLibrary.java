@@ -4,7 +4,7 @@ import com.garygregg.rebalance.AccountKey;
 import com.garygregg.rebalance.account.AccountLibrary;
 import org.jetbrains.annotations.NotNull;
 
-public class DistinguishedAccountLibrary extends
+public final class DistinguishedAccountLibrary extends
         DistinguishedLibrary<DistinguishedAccount,
                 DistinguishedAccountDescription, AccountKey> {
 

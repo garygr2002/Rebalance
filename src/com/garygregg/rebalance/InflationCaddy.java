@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
 
-public class InflationCaddy {
+public final class InflationCaddy {
 
     // The singleton inflation caddy instance
     private static final InflationCaddy instance = new InflationCaddy();

@@ -3,7 +3,7 @@ package com.garygregg.rebalance.distinguished;
 import com.garygregg.rebalance.portfolio.PortfolioLibrary;
 import org.jetbrains.annotations.NotNull;
 
-public class DistinguishedPortfolioLibrary extends
+public final class DistinguishedPortfolioLibrary extends
         DistinguishedLibrary<DistinguishedPortfolio,
                 DistinguishedPortfolioDescription, String> {
 

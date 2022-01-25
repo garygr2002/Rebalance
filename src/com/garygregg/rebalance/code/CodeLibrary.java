@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class CodeLibrary extends Library<Character, CodeDescription> {
+public final class CodeLibrary extends Library<Character, CodeDescription> {
 
     // The default key
     private static final Character defaultKey = '\0';

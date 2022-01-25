@@ -3,7 +3,7 @@ package com.garygregg.rebalance.tax;
 import com.garygregg.rebalance.FilingStatus;
 import org.jetbrains.annotations.NotNull;
 
-public class IncomeSeparateTaxLibrary extends IncomeTaxLibrary {
+public final class IncomeSeparateTaxLibrary extends IncomeTaxLibrary {
 
     // The singleton income tax library, married-filing-separately
     private static final IncomeSeparateTaxLibrary library =

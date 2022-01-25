@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-public class ParentTracker {
+public final class ParentTracker {
 
     // An instance of the parent tracker.
     private static ParentTracker instance;

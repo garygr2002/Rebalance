@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class PortfolioLibrary extends Library<String, PortfolioDescription> {
+public final class PortfolioLibrary
+        extends Library<String, PortfolioDescription> {
 
     // The singleton portfolio library
     private static final PortfolioLibrary library = new PortfolioLibrary();

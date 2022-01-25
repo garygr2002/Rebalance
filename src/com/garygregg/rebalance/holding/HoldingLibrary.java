@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class HoldingLibrary extends Library<Integer, HoldingDescription> {
+public final class HoldingLibrary
+        extends Library<Integer, HoldingDescription> {
 
     // The default key
     private static final int defaultKey = Integer.MIN_VALUE;

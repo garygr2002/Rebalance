@@ -6,7 +6,7 @@ import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
 import org.jetbrains.annotations.NotNull;
 
-public class ValueByConsidered implements Valuator {
+public final class ValueByConsidered implements Valuator {
 
     // An instance of the value-by-considered valuator
     private static final Valuator instance = new ValueByConsidered();

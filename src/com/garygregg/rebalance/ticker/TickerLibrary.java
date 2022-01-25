@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class TickerLibrary extends Library<String, TickerDescription> {
+public final class TickerLibrary extends Library<String, TickerDescription> {
 
     // The singleton ticker library
     private static final TickerLibrary library = new TickerLibrary();
