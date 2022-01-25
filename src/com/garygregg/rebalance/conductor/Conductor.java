@@ -192,7 +192,7 @@ public class Conductor implements Dispatch<CommandLineId> {
                     "[%1$tF %1$tT] [%2$s: %3$s]%n%4$s%n";
 
             @Override
-            public synchronized String format(@NotNull LogRecord logRecord) {
+            public String format(@NotNull LogRecord logRecord) {
 
                 /*
                  * Split the logger name into elements and get the number of
