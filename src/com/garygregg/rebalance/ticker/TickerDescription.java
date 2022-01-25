@@ -7,6 +7,7 @@ import com.garygregg.rebalance.countable.Shares;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.TreeSet;
 
 public class TickerDescription implements Description<String> {
@@ -27,7 +28,7 @@ public class TickerDescription implements Description<String> {
     private final String ticker;
 
     // A collection of types for the ticker
-    private final Collection<FundType> types = new TreeSet<>();
+    private final Collection<FundType> types = EnumSet.noneOf(FundType.class);
 
     /**
      * Constructs the ticker description.
