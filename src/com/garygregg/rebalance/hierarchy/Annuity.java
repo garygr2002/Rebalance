@@ -115,8 +115,8 @@ abstract class Annuity extends Synthesizer {
          * valuation date, using 'now' if the given valuation date is null.
          */
         double result = 0.;
-        final LocalDate localValuation = (null == valuation) ? LocalDate.now() :
-                convert(valuation);
+        final LocalDate localValuation = (null == valuation) ?
+                LocalDate.now() : convert(valuation);
 
         /*
          * Calculate the local annuity start date, using the valuation date if
@@ -161,8 +161,8 @@ abstract class Annuity extends Synthesizer {
              * after the start date. Does the first payment occur after the end
              * date?
              */
-            final LocalDate firstPayment =
-                    calculationStart.with(TemporalAdjusters.firstDayOfNextMonth());
+            final LocalDate firstPayment = calculationStart.with(
+                    TemporalAdjusters.firstDayOfNextMonth());
             if (firstPayment.isAfter(calculationEnd)) {
 
                 /*
@@ -216,8 +216,8 @@ abstract class Annuity extends Synthesizer {
      *                    data
      * @return The monthly income of the annuity
      */
-    protected abstract @NotNull Currency getMonthlyIncome(@NotNull PortfolioDescription
-                                                                  description);
+    protected abstract @NotNull Currency getMonthlyIncome(
+            @NotNull PortfolioDescription description);
 
     /**
      * Gets the start date of the annuity.
@@ -241,8 +241,8 @@ abstract class Annuity extends Synthesizer {
      *
      * @param currency  The currency to reduce
      * @param inflation The inflation figure getter
-     * @param periods   The number of periods of compounding (duration of period
-     *                  is defined by the figure getter)
+     * @param periods   The number of periods of compounding (duration of
+     *                  period is defined by the figure getter)
      * @return The value of the currency reduced due to inflation
      */
     @SuppressWarnings("SameParameterValue")

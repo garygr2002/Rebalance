@@ -7,7 +7,8 @@ class TaxBreakdownManager<HierarchyType extends Aggregate<?, ?, ?>>
         extends BreakdownManager<TaxType, HierarchyType> {
 
     @Override
-    protected @NotNull Breakdown<TaxType, HierarchyType> createByConsidered() {
+    protected @NotNull
+    Breakdown<TaxType, HierarchyType> createByConsidered() {
         return new Breakdown<>() {
 
             @Override
@@ -19,7 +20,8 @@ class TaxBreakdownManager<HierarchyType extends Aggregate<?, ?, ?>>
     }
 
     @Override
-    protected @NotNull Breakdown<TaxType, HierarchyType> createByNotConsidered() {
+    protected @NotNull
+    Breakdown<TaxType, HierarchyType> createByNotConsidered() {
         return new Breakdown<>() {
 
             @Override
@@ -31,7 +33,8 @@ class TaxBreakdownManager<HierarchyType extends Aggregate<?, ?, ?>>
     }
 
     @Override
-    protected @NotNull Breakdown<TaxType, HierarchyType> createByProposed() {
+    protected @NotNull
+    Breakdown<TaxType, HierarchyType> createByProposed() {
         return new Breakdown<>() {
 
             @Override

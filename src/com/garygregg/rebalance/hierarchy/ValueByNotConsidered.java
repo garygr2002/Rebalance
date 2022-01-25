@@ -32,52 +32,62 @@ public class ValueByNotConsidered implements Valuator {
     }
 
     @Override
-    public @NotNull Currency getValue(@NotNull Account account, @NotNull CategoryType type) {
+    public @NotNull Currency getValue(
+            @NotNull Account account, @NotNull CategoryType type) {
         return account.getNotConsidered(type);
     }
 
     @Override
-    public @NotNull Currency getValue(@NotNull Institution institution, @NotNull CategoryType type) {
+    public @NotNull Currency getValue(
+            @NotNull Institution institution, @NotNull CategoryType type) {
         return institution.getNotConsidered(type);
     }
 
     @Override
-    public @NotNull Currency getValue(@NotNull Portfolio portfolio, @NotNull CategoryType type) {
+    public @NotNull Currency getValue(
+            @NotNull Portfolio portfolio, @NotNull CategoryType type) {
         return portfolio.getNotConsidered(type);
     }
 
     @Override
-    public @NotNull Currency getValue(@NotNull Account account, @NotNull TaxType type) {
+    public @NotNull Currency getValue(
+            @NotNull Account account, @NotNull TaxType type) {
         return account.getNotConsidered(type);
     }
 
     @Override
-    public @NotNull Currency getValue(@NotNull Institution institution, @NotNull TaxType type) {
+    public @NotNull Currency getValue(
+            @NotNull Institution institution, @NotNull TaxType type) {
         return institution.getNotConsidered(type);
     }
 
     @Override
-    public @NotNull Currency getValue(@NotNull Portfolio portfolio, @NotNull TaxType type) {
+    public @NotNull Currency getValue(
+            @NotNull Portfolio portfolio, @NotNull TaxType type) {
         return portfolio.getNotConsidered(type);
     }
 
     @Override
-    public @NotNull Currency getValue(@NotNull Ticker ticker, @NotNull WeightType type) {
+    public @NotNull Currency getValue(
+            @NotNull Ticker ticker, @NotNull WeightType type) {
         return ticker.getNotConsidered(type);
     }
 
     @Override
-    public @NotNull Currency getValue(@NotNull Account account, @NotNull WeightType type) {
+    public @NotNull Currency getValue(
+            @NotNull Account account, @NotNull WeightType type) {
         return account.getNotConsidered(type);
     }
 
     @Override
-    public @NotNull Currency getValue(@NotNull Institution institution, @NotNull WeightType type) {
+    public @NotNull Currency getValue(
+            @NotNull Institution institution, @NotNull WeightType type) {
         return institution.getNotConsidered(type);
     }
 
     @Override
-    public @NotNull Currency getValue(@NotNull Portfolio portfolio, @NotNull WeightType type) {
+    public @NotNull Currency getValue(
+            @NotNull Portfolio portfolio, @NotNull WeightType type) {
         return portfolio.getNotConsidered(type);
     }
 }

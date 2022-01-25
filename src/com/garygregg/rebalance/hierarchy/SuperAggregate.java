@@ -177,8 +177,8 @@ abstract class SuperAggregate<KeyType,
      *
      * @param type A category type
      * @return The proposed value of the hierarchy object, relative to the
-     * value in the hierarchy object that is considered for rebalance and specific
-     * to the given category type
+     * value in the hierarchy object that is considered for rebalance and
+     * specific to the given category type
      */
     public @NotNull Currency getProposed(@NotNull CategoryType type) {
         return getCategoryTypeManager().getProposed(type);
@@ -190,8 +190,8 @@ abstract class SuperAggregate<KeyType,
      *
      * @param type A tax type
      * @return The proposed value of the hierarchy object, relative to the
-     * value in the hierarchy object that is considered for rebalance and specific
-     * to the given tax type
+     * value in the hierarchy object that is considered for rebalance and
+     * specific to the given tax type
      */
     public @NotNull Currency getProposed(@NotNull TaxType type) {
         return getTaxTypeManager().getProposed(type);

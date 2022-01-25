@@ -73,8 +73,8 @@ abstract class BreakdownManager<EnumType extends Enum<EnumType>,
     public void add(EnumType type, @NotNull HierarchyType hierarchyObject) {
 
         /*
-         * Set the hierarchy object and type in the 'add' operation, and perform
-         * the operation for each active breakdown.
+         * Set the hierarchy object and type in the 'add' operation, and
+         * perform the operation for each active breakdown.
          */
         addOperation.setHierarchyObject(hierarchyObject);
         addOperation.setType(type);
@@ -91,21 +91,24 @@ abstract class BreakdownManager<EnumType extends Enum<EnumType>,
      *
      * @return The breakdown for 'considered' values
      */
-    protected abstract @NotNull Breakdown<EnumType, HierarchyType> createByConsidered();
+    protected abstract @NotNull
+    Breakdown<EnumType, HierarchyType> createByConsidered();
 
     /**
      * Creates the breakdown for 'not considered' values.
      *
      * @return The breakdown for 'not considered' values
      */
-    protected abstract @NotNull Breakdown<EnumType, HierarchyType> createByNotConsidered();
+    protected abstract @NotNull
+    Breakdown<EnumType, HierarchyType> createByNotConsidered();
 
     /**
      * Creates the breakdown for proposed values.
      *
      * @return The breakdown for proposed values
      */
-    protected abstract @NotNull Breakdown<EnumType, HierarchyType> createByProposed();
+    protected abstract @NotNull
+    Breakdown<EnumType, HierarchyType> createByProposed();
 
     /**
      * Perform an operation for each active breakdown.

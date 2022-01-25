@@ -7,7 +7,8 @@ class CategoryBreakdownManager<HierarchyType extends Aggregate<?, ?, ?>>
         extends BreakdownManager<CategoryType, HierarchyType> {
 
     @Override
-    protected @NotNull Breakdown<CategoryType, HierarchyType> createByConsidered() {
+    protected @NotNull Breakdown<CategoryType, HierarchyType>
+    createByConsidered() {
         return new Breakdown<>() {
 
             @Override
@@ -19,7 +20,8 @@ class CategoryBreakdownManager<HierarchyType extends Aggregate<?, ?, ?>>
     }
 
     @Override
-    protected @NotNull Breakdown<CategoryType, HierarchyType> createByNotConsidered() {
+    protected @NotNull Breakdown<CategoryType, HierarchyType>
+    createByNotConsidered() {
         return new Breakdown<>() {
 
             @Override
@@ -31,7 +33,8 @@ class CategoryBreakdownManager<HierarchyType extends Aggregate<?, ?, ?>>
     }
 
     @Override
-    protected @NotNull Breakdown<CategoryType, HierarchyType> createByProposed() {
+    protected @NotNull Breakdown<CategoryType, HierarchyType>
+    createByProposed() {
         return new Breakdown<>() {
 
             @Override

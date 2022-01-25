@@ -37,7 +37,8 @@ public class Account extends Aggregate<AccountKey, Ticker, AccountDescription>
         synthesizerMap.put(SynthesizerType.CPI_ANNUITY, new CpiAnnuity());
         synthesizerMap.put(SynthesizerType.NEGATION, new Negation());
         synthesizerMap.put(SynthesizerType.NO_CPI_ANNUITY, new NoCpiAnnuity());
-        synthesizerMap.put(SynthesizerType.SOCIAL_SECURITY, new SocialSecurity());
+        synthesizerMap.put(SynthesizerType.SOCIAL_SECURITY,
+                new SocialSecurity());
     }
 
     // The date the account was valued

@@ -7,7 +7,8 @@ class WeightBreakdownManager<HierarchyType extends Common<?, ?, ?>>
         extends BreakdownManager<WeightType, HierarchyType> {
 
     @Override
-    protected @NotNull Breakdown<WeightType, HierarchyType> createByConsidered() {
+    protected @NotNull
+    Breakdown<WeightType, HierarchyType> createByConsidered() {
         return new Breakdown<>() {
 
             @Override
@@ -19,7 +20,8 @@ class WeightBreakdownManager<HierarchyType extends Common<?, ?, ?>>
     }
 
     @Override
-    protected @NotNull Breakdown<WeightType, HierarchyType> createByNotConsidered() {
+    protected @NotNull
+    Breakdown<WeightType, HierarchyType> createByNotConsidered() {
         return new Breakdown<>() {
 
             @Override
@@ -31,7 +33,8 @@ class WeightBreakdownManager<HierarchyType extends Common<?, ?, ?>>
     }
 
     @Override
-    protected @NotNull Breakdown<WeightType, HierarchyType> createByProposed() {
+    protected @NotNull
+    Breakdown<WeightType, HierarchyType> createByProposed() {
         return new Breakdown<>() {
 
             @Override

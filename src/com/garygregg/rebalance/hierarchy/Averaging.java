@@ -69,7 +69,8 @@ class Averaging extends Synthesizer {
                  * Add a new account key to the set consisting of the
                  * institution mnemonic and the referenced account number.
                  */
-                keys.add(new AccountKey(institutionMnemonic, referencedAccount));
+                keys.add(new AccountKey(institutionMnemonic,
+                        referencedAccount));
             }
         }
 
@@ -122,7 +123,8 @@ class Averaging extends Synthesizer {
      *
      * @param account                The account to set
      * @param considered             The considered valuation of the account
-     * @param notConsidered          The not-considered valuation of the account
+     * @param notConsidered          The not-considered valuation of the
+     *                               account
      * @param referencedAccountCount The number of referenced accounts
      */
     protected void setValuation(@NotNull Account account,

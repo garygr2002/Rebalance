@@ -13,6 +13,7 @@ import com.garygregg.rebalance.portfolio.PortfolioLibrary;
 import com.garygregg.rebalance.ticker.TickerDescription;
 import com.garygregg.rebalance.ticker.TickerLibrary;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -24,8 +25,8 @@ public class Hierarchy {
     private static final Level ordinary = MessageLogger.getOrdinary();
 
     // A function that returns 'considered' value
-    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> allConsidered =
-            new OneParameterFunction<>() {
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>>
+            allConsidered = new OneParameterFunction<>() {
 
                 @Override
                 public @NotNull String getDescription() {
@@ -33,7 +34,8 @@ public class Hierarchy {
                 }
 
                 @Override
-                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                public @NotNull
+                Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
 
                     // Return zero if the valuation is null.
                     final Currency result = aggregate.getConsidered();
@@ -42,8 +44,8 @@ public class Hierarchy {
             };
 
     // A function that returns 'not considered' value
-    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> allNotConsidered =
-            new OneParameterFunction<>() {
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>>
+            allNotConsidered = new OneParameterFunction<>() {
 
                 @Override
                 public @NotNull String getDescription() {
@@ -51,7 +53,8 @@ public class Hierarchy {
                 }
 
                 @Override
-                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                public @NotNull
+                Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
 
                     // Return zero if the valuation is null.
                     final Currency result = aggregate.getNotConsidered();
@@ -60,8 +63,8 @@ public class Hierarchy {
             };
 
     // A function that returns proposed value
-    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> allProposed =
-            new OneParameterFunction<>() {
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>>
+            allProposed = new OneParameterFunction<>() {
 
                 @Override
                 public @NotNull String getDescription() {
@@ -69,7 +72,8 @@ public class Hierarchy {
                 }
 
                 @Override
-                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                public @NotNull
+                Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
 
                     // Return zero if the valuation is null.
                     final Currency result = aggregate.getProposed();
@@ -82,8 +86,8 @@ public class Hierarchy {
             new HashMap<>();
 
     // A function that returns 'considered' value for all tax types
-    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> taxConsidered =
-            new OneParameterFunction<>() {
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>>
+            taxConsidered = new OneParameterFunction<>() {
 
                 @Override
                 public @NotNull String getDescription() {
@@ -91,14 +95,15 @@ public class Hierarchy {
                 }
 
                 @Override
-                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                public @NotNull
+                Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
                     return aggregate.getConsidered(TaxType.ALL);
                 }
             };
 
     // A function that returns 'not considered' value for all tax types
-    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> taxNotConsidered =
-            new OneParameterFunction<>() {
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>>
+            taxNotConsidered = new OneParameterFunction<>() {
 
                 @Override
                 public @NotNull String getDescription() {
@@ -106,14 +111,15 @@ public class Hierarchy {
                 }
 
                 @Override
-                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                public @NotNull
+                Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
                     return aggregate.getNotConsidered(TaxType.ALL);
                 }
             };
 
     // A function that returns proposed value for all tax types
-    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> taxProposed =
-            new OneParameterFunction<>() {
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>>
+            taxProposed = new OneParameterFunction<>() {
 
                 @Override
                 public @NotNull String getDescription() {
@@ -121,14 +127,15 @@ public class Hierarchy {
                 }
 
                 @Override
-                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                public @NotNull
+                Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
                     return aggregate.getProposed(TaxType.ALL);
                 }
             };
 
     // A function that returns 'considered' value for all weight types
-    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>> weightConsidered =
-            new OneParameterFunction<>() {
+    private static final OneParameterFunction<Currency, Aggregate<?, ?, ?>>
+            weightConsidered = new OneParameterFunction<>() {
 
                 @Override
                 public @NotNull String getDescription() {
@@ -136,7 +143,8 @@ public class Hierarchy {
                 }
 
                 @Override
-                public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+                public @NotNull
+                Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
                     return aggregate.getConsidered(WeightType.ALL);
                 }
             };
@@ -166,7 +174,8 @@ public class Hierarchy {
         }
 
         @Override
-        public @NotNull Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
+        public @NotNull
+        Currency invoke(@NotNull Aggregate<?, ?, ?> aggregate) {
             return aggregate.getProposed(WeightType.ALL);
         }
     };
@@ -202,8 +211,8 @@ public class Hierarchy {
     private final Map<String, Portfolio> portfolios = new HashMap<>();
 
     // Sets the 'considered' value of a hierarchy object given a non-null value
-    private final TwoParameterAction<Common<?, ?, ?>, ICountable> setConsidered =
-            (argument1, argument2) ->
+    private final TwoParameterAction<Common<?, ?, ?>, ICountable>
+            setConsidered = (argument1, argument2) ->
                     argument1.setConsidered(argument2.getValue());
 
     // Sets the 'considered' shares of a ticker given a non-null value
@@ -214,8 +223,8 @@ public class Hierarchy {
      * Sets the 'not considered' value of a hierarchy object given a non-null
      * value
      */
-    private final TwoParameterAction<Common<?, ?, ?>, ICountable> setNotConsidered =
-            (argument1, argument2) ->
+    private final TwoParameterAction<Common<?, ?, ?>, ICountable>
+            setNotConsidered = (argument1, argument2) ->
                     argument1.setNotConsidered(argument2.getValue());
 
     // An action to add an institution
@@ -223,13 +232,14 @@ public class Hierarchy {
             this::addInstitution;
 
     // Sets the 'not considered' shares of a ticker given a non-null value
-    private final TwoParameterAction<Ticker, ICountable> setNotConsideredShares =
-            (argument1, argument2) ->
+    private final TwoParameterAction<Ticker, ICountable>
+            setNotConsideredShares = (argument1, argument2) ->
                     argument1.setNotConsideredShares(argument2.getValue());
 
     // Sets the price of a ticker given a non-null value
-    private final TwoParameterAction<Ticker, ICountable> setPrice =
-            (argument1, argument2) -> argument1.setPrice(argument2.getValue());
+    private final TwoParameterAction<Ticker, ICountable>
+            setPrice = (argument1, argument2) ->
+            argument1.setPrice(argument2.getValue());
 
     // An action to add a ticker
     private final OneParameterAction<HoldingDescription> addTickerAction =
@@ -325,7 +335,8 @@ public class Hierarchy {
      * value by weight type, false otherwise
      */
     @SuppressWarnings("unused")
-    public static boolean checkWeightType(@NotNull Aggregate<?, ?, ?> aggregate) {
+    public static
+    boolean checkWeightType(@NotNull Aggregate<?, ?, ?> aggregate) {
         return check(allProposed, weightProposed, aggregate);
     }
 
@@ -400,7 +411,7 @@ public class Hierarchy {
      * @param second The second value
      * @return The sum of the values, or null if both values were null
      */
-    private static Currency sum(Currency first, Currency second) {
+    private static @Nullable Currency sum(Currency first, Currency second) {
 
         // Declare and initialize the result. Is the first value not null?
         MutableCurrency result = null;
@@ -601,9 +612,9 @@ public class Hierarchy {
                      * this class is correct. Log an error.
                      */
                     logMessage(Level.SEVERE, String.format("A hierarchy " +
-                                    "object of type '%s' and key '%s' cannot be " +
-                                    "made a child of an aggregate of type '%s' and " +
-                                    "key '%s'.",
+                                    "object of type '%s' and key '%s' " +
+                                    "cannot be made a child of an aggregate " +
+                                    "of type '%s' and key '%s'.",
                             hierarchyObject.getClass().getSimpleName(),
                             hierarchyObject.getKey(),
                             aggregate.getClass().getSimpleName(),
@@ -755,10 +766,14 @@ public class Hierarchy {
      */
     private void addTicker(@NotNull HoldingDescription holdingDescription) {
 
-        // Get the holding key from the description. Build a key description.
-        final HoldingKey holdingKey = holdingDescription.getHoldingParentChild();
+        // Get the holding key from the description.
+        final HoldingKey holdingKey =
+                holdingDescription.getHoldingParentChild();
+
+        // Build a key description.
         final String keyDescription = Pair.combine(
-                AccountKey.createKey(holdingKey.getFirst()), holdingKey.getSecond());
+                AccountKey.createKey(holdingKey.getFirst()),
+                holdingKey.getSecond());
 
         // Log information.
         logMessage(getOrdinary(), String.format("Observed ticker with " +
@@ -891,10 +906,10 @@ public class Hierarchy {
 
             // The check fails. Log a warning with specifics.
             logMessage(Level.WARNING, String.format("Mismatch in value: %s " +
-                            "for '%s' and %s for '%s' in aggregate with key '%s'.",
-                    first.invoke(aggregate), first.getDescription(),
-                    second.invoke(aggregate), second.getDescription(),
-                    aggregate.getKey()));
+                            "for '%s' and %s for '%s' in aggregate with key " +
+                            "'%s'.", first.invoke(aggregate),
+                    first.getDescription(), second.invoke(aggregate),
+                    second.getDescription(), aggregate.getKey()));
         }
     }
 
@@ -1007,8 +1022,8 @@ public class Hierarchy {
                  * this holding description. Log an error.
                  */
                 logMessage(Level.SEVERE, String.format("Holding description " +
-                                "with key '%s' has a null line type; skipping.",
-                        description.getKey()));
+                                "with key '%s' has a null line type; " +
+                                "skipping.", description.getKey()));
             }
 
             // The line type is not null.
@@ -1325,9 +1340,9 @@ public class Hierarchy {
                  * warning.
                  */
                 logMessage(Level.WARNING, String.format("The sum %s of the " +
-                                "children of aggregate of type '%s' and key '%s' " +
-                                "does not match the expected value, %s.", actualTotal,
-                        aggregate.getClass().getSimpleName(),
+                                "children of aggregate of type '%s' and key " +
+                                "'%s' does not match the expected value, %s.",
+                        actualTotal, aggregate.getClass().getSimpleName(),
                         aggregate.getKey(), expectedTotal));
             }
         }

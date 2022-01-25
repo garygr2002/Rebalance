@@ -69,7 +69,10 @@ public class Ticker extends
         }
     };
 
-    // A map of snapshot keys to the of the number of proposed shares in the snapshot
+    /*
+     * A map of snapshot keys to the of the number of proposed shares in the
+     * snapshot
+     */
     private final Map<SnapshotKey, Double> snapshotMap = new HashMap<>();
 
     // The rebalancing weight of the ticker
@@ -106,7 +109,8 @@ public class Ticker extends
                 new Association(FundType.INFLATION, WeightType.BOND_INFLATION),
                 new Association(FundType.MORTGAGE, WeightType.BOND_MORTGAGE),
                 new Association(FundType.SHORT, WeightType.BOND_SHORT),
-                new Association(FundType.TREASURY, WeightType.BOND_GOVERNMENT)));
+                new Association(FundType.TREASURY,
+                        WeightType.BOND_GOVERNMENT)));
 
         // Level 3 (Bond subtypes).
         associationMap.put(type = WeightType.BOND_CORPORATE,
@@ -156,8 +160,10 @@ public class Ticker extends
                         new Association(FundType.LARGE, WeightType.STOCK_LARGE),
                         new Association(FundType.NOT_LARGE,
                                 WeightType.STOCK_NOT_LARGE),
-                        new Association(FundType.MEDIUM, WeightType.STOCK_NOT_LARGE),
-                        new Association(FundType.SMALL, WeightType.STOCK_NOT_LARGE)));
+                        new Association(FundType.MEDIUM,
+                                WeightType.STOCK_NOT_LARGE),
+                        new Association(FundType.SMALL,
+                                WeightType.STOCK_NOT_LARGE)));
 
         /*
          * Level 3 (Stock subtype - Foreign stock): Large, not-large, medium
@@ -165,11 +171,14 @@ public class Ticker extends
          */
         associationMap.put(type = WeightType.STOCK_FOREIGN,
                 new Activity(type, null,
-                        new Association(FundType.LARGE, WeightType.STOCK_LARGE),
+                        new Association(FundType.LARGE,
+                                WeightType.STOCK_LARGE),
                         new Association(FundType.NOT_LARGE,
                                 WeightType.STOCK_NOT_LARGE),
-                        new Association(FundType.MEDIUM, WeightType.STOCK_NOT_LARGE),
-                        new Association(FundType.SMALL, WeightType.STOCK_NOT_LARGE)));
+                        new Association(FundType.MEDIUM,
+                                WeightType.STOCK_NOT_LARGE),
+                        new Association(FundType.SMALL,
+                                WeightType.STOCK_NOT_LARGE)));
 
         /*
          * Level 4 (Domestic or foreign stock subtype - Large stocks): Growth
