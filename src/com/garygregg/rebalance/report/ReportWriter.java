@@ -207,7 +207,7 @@ abstract class ReportWriter extends ElementProcessor {
         final String tag = String.format("The date of the %s is:",
                 description);
 
-        // Write the tag to the write along with the date.
+        // Write the tag to the writer along with the date.
         writer.write(String.format("%-37s %s.\n", tag,
                 DateUtilities.format(date)));
     }
