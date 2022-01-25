@@ -3,10 +3,10 @@ package com.garygregg.rebalance.portfolio;
 import com.garygregg.rebalance.DateInterpreter;
 import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.FilingStatus;
+import com.garygregg.rebalance.FilingStatusInterpreter;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.interpreter.BooleanInterpreter;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
-import com.garygregg.rebalance.interpreter.FilingStatusInterpreter;
 import com.garygregg.rebalance.interpreter.PositiveInterpreter;
 import org.jetbrains.annotations.NotNull;
 

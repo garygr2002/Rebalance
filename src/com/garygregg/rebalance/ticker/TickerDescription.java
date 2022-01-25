@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.TreeSet;
 
 public class TickerDescription implements Description<String> {
 

@@ -1,6 +1,6 @@
-package com.garygregg.rebalance.interpreter;
+package com.garygregg.rebalance;
 
-import com.garygregg.rebalance.SynthesizerType;
+import com.garygregg.rebalance.interpreter.Interpreter;
 import org.jetbrains.annotations.NotNull;
 
 public class SynthesizerTypeInterpreter extends Interpreter<SynthesizerType> {
