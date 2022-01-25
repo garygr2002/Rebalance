@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.MONTHS;
 
+@SuppressWarnings("FloatingPointEquality")
 abstract class Annuity extends Synthesizer {
 
     // The daily inflation getter
@@ -52,6 +53,7 @@ abstract class Annuity extends Synthesizer {
          * geometric sum.
          */
         final double forbiddenRate = 1.;
+        //noinspection FloatingPointEquality
         return (forbiddenRate == rate) ? payment * periods :
                 ((payment - payment * Math.pow(rate, periods + 1)) /
                         (forbiddenRate - rate));
