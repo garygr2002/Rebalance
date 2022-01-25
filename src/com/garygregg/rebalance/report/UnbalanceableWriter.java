@@ -91,7 +91,7 @@ class UnbalanceableWriter {
      *                     false otherwise
      * @return A table format
      */
-    private static String constructFormat(boolean rightJustify) {
+    private static @NotNull String constructFormat(boolean rightJustify) {
         return String.format("%%-%ds ", getLongFieldLength()) +
                 String.format("%%%s%ds%n", rightJustify ? "" : "-",
                         getShortFieldLength());

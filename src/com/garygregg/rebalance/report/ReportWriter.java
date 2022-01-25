@@ -158,8 +158,8 @@ abstract class ReportWriter extends ElementProcessor {
 
         /*
          * Get the description of the portfolio, and the name of the portfolio
-         * from its description. Use the key of the portfolio if its description
-         * is null.
+         * from its description. Use the key of the portfolio if its
+         * description is null.
          */
         final PortfolioDescription description = portfolio.getDescription();
         return (null == description) ? portfolio.getKey() :
@@ -200,13 +200,14 @@ abstract class ReportWriter extends ElementProcessor {
      */
     private static void writeDate(@NotNull FileWriter writer,
                                   @NotNull Date date,
-                                  @NotNull String description) throws IOException {
+                                  @NotNull String description)
+            throws IOException {
 
-        /*
-         * Format the description in a tag of fixed length, then write the
-         * tag to the writer along with the date.
-         */
-        final String tag = String.format("The date of the %s is:", description);
+        // Format the description in a tag of fixed length.
+        final String tag = String.format("The date of the %s is:",
+                description);
+
+        // Write the tag to the write along with the date.
         writer.write(String.format("%-37s %s.\n", tag,
                 DateUtilities.format(date)));
     }
@@ -221,7 +222,8 @@ abstract class ReportWriter extends ElementProcessor {
      */
     private static void writeDate(@NotNull FileWriter writer,
                                   @NotNull Library<?, ?> library,
-                                  @NotNull String description) throws IOException {
+                                  @NotNull String description)
+            throws IOException {
         writeDate(writer, library.getDate(), String.format("%s %s",
                 description, "library"));
     }
@@ -317,8 +319,9 @@ abstract class ReportWriter extends ElementProcessor {
         final String unavailable = "unavailable";
 
         // Format and write the birthdate message.
-        writer.write(String.format(format, "Investor birthday is:", (null == birthdate) ?
-                unavailable : DateUtilities.format(birthdate)));
+        writer.write(String.format(format, "Investor birthday is:",
+                (null == birthdate) ? unavailable :
+                        DateUtilities.format(birthdate)));
 
         // Format and write the projected mortality date message.
         writer.write(String.format(format, "Investor projected mortality " +

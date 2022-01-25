@@ -152,7 +152,8 @@ class BalanceableWriter {
      * Creates a list of institutions included in a portfolio, sorts them by
      * descending balanceable value, and returns the list.
      */
-    private @NotNull List<Institution> getInstitutions(@NotNull Portfolio portfolio) {
+    private @NotNull List<Institution> getInstitutions(
+            @NotNull Portfolio portfolio) {
 
         /*
          * Create a list of the children of the portfolio. These will be
@@ -328,7 +329,8 @@ class BalanceableWriter {
      * @param portfolio The portfolio for which to breakdown percentages
      * @throws IOException Indicates an I/O exception occurred
      */
-    private void writePercentages(@NotNull Portfolio portfolio) throws IOException {
+    private void writePercentages(@NotNull Portfolio portfolio)
+            throws IOException {
 
         /*
          * Get the percentage breakdown of the portfolio by highest-level
@@ -426,7 +428,8 @@ class BalanceableWriter {
                  */
                 writer.write(String.format(numberFormat, institution.getKey(),
                         valuator.getValue(institution, CategoryType.TAXABLE),
-                        valuator.getValue(institution, CategoryType.TAX_DEFERRED),
+                        valuator.getValue(institution,
+                                CategoryType.TAX_DEFERRED),
                         valuator.getValue(institution, CategoryType.TAX_PAID),
                         valuator.getValue(institution, CategoryType.ALL)));
             }
@@ -449,7 +452,7 @@ class BalanceableWriter {
          */
         writer.write(newline);
         writer.write(String.format(twoStringFormat, "The 'Total' column may " +
-                        "not equal the sum of the numeric columns preceding it.",
-                newline));
+                        "not equal the sum of the numeric columns preceding " +
+                        "it.", newline));
     }
 }
