@@ -18,6 +18,7 @@ public class IncomeJointTaxesBuilder extends IncomeTaxesBuilder {
 
     @Override
     protected @NotNull Logger getReadingLogger() {
-        return Logger.getLogger(IncomeJointTaxesBuilder.class.getCanonicalName());
+        return Logger.getLogger(
+                IncomeJointTaxesBuilder.class.getCanonicalName());
     }
 }

@@ -55,9 +55,10 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
      *
      * @param thresholdMessage A threshold message
      * @param taxRateMessage   A tax rate message
-     * @param lineNumber       The line number from which the given tax description
-     *                         was read
-     * @param description      The tax description to add if both messages are blank
+     * @param lineNumber       The line number from which the given tax
+     *                         description was read
+     * @param description      The tax description to add if both messages are
+     *                         blank
      */
     protected void checkAndAdd(@NotNull String thresholdMessage,
                                @NotNull String taxRateMessage,
@@ -87,8 +88,8 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
              * occurs.
              */
             logMessage(getInformationLevel(), String.format("Replacing tax " +
-                            "bracket with threshold '%s' at line number %d in " +
-                            "%s file.", description.getKey(), lineNumber,
+                            "bracket with threshold '%s' at line number %d " +
+                            "in %s file.", description.getKey(), lineNumber,
                     getPrefix()));
         }
 
