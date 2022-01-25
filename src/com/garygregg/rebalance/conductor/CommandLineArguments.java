@@ -8,8 +8,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class CommandLineArguments<TokenType extends Enum<TokenType>> {
+
+    // A regular expression: Hyphens before a command line command
+    private static final Pattern hyphensBeforeCommand =
+            Pattern.compile("^-|(?<=^-)-");
 
     // A map of token types to a list of matching dispatch actions
     private final Map<TokenType, List<Dispatch<TokenType>>> dispatchMap =
@@ -328,7 +333,7 @@ public class CommandLineArguments<TokenType extends Enum<TokenType>> {
         for (String string : arguments) {
 
             // Identify how many hyphens precede the command.
-            split = string.trim().split("^-|(?<=^-)-");
+            split = hyphensBeforeCommand.split(string.trim());
             switch (splitLength = split.length) {
 
                 case 0:
