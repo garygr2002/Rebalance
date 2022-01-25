@@ -107,8 +107,8 @@ class ClosureRebalancer extends WeightRebalancer {
     }
 
     @Override
-    protected @NotNull Map<WeightType, Double> getWeights(@NotNull Account account,
-                                                          boolean adjust) {
+    protected @NotNull Map<WeightType, Double> getWeights(
+            @NotNull Account account, boolean adjust) {
 
         // Get the weights-for-closure.
         final Map<WeightType, Double> weightMap = getWeightsForClosure(account,

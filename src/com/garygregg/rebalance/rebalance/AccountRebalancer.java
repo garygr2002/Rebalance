@@ -71,8 +71,8 @@ abstract class AccountRebalancer extends Rebalancer {
                                     @NotNull Account account) {
 
                     /*
-                     * Set the descriptions in the account collection, and overlay the
-                     * weight map if the description is not null.
+                     * Set the descriptions in the account collection, and
+                     * overlay the weight map if the description is not null.
                      */
                     if (setDescription(accountCollection,
                             account.getDescription())) {
@@ -112,8 +112,8 @@ abstract class AccountRebalancer extends Rebalancer {
                                     @NotNull Account account) {
 
                     /*
-                     * Set the descriptions in the portfolio list, and overlay the
-                     * weight map if the description is not null.
+                     * Set the descriptions in the portfolio list, and
+                     * overlay the weight map if the description is not null.
                      */
                     if (setDescription(portfolioList,
                             account.getPortfolioDescription())) {
@@ -678,8 +678,8 @@ abstract class AccountRebalancer extends Rebalancer {
             if (residual.isNotZero()) {
 
                 // Drat, the residual is not zero. Stream and log a message.
-                logger.log(extraordinary, String.format("BAD NEWS...You will " +
-                        "not like this: Rebalancing has discovered " +
+                logger.log(extraordinary, String.format("BAD NEWS...You " +
+                        "will not like this: Rebalancing has discovered " +
                         "a non-zero residual %s for account %s; " +
                         "deal with it.", residual, account));
             }
@@ -766,7 +766,8 @@ abstract class AccountRebalancer extends Rebalancer {
         }
     }
 
-    private static class ValueFromDetailed extends ValueWrapper<WeightType, DetailedDescription> {
+    private static class ValueFromDetailed extends
+            ValueWrapper<WeightType, DetailedDescription> {
 
         /**
          * Constructs the value-from-detailed valuator.

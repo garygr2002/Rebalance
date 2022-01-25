@@ -495,10 +495,10 @@ class RebalanceNode implements CurrencyReceiver {
      *
      * @param delegates            An iterable of receiver delegates from which
      *                             to gather weights
-     * @param considerationPattern A bit pattern determining from which receiver
-     *                             delegates weights are gathered: the least
-     *                             significant bit refers to the first delegate
-     *                             enumerated in the given collection
+     * @param considerationPattern A bit pattern determining from which
+     *                             receiver delegates weights are gathered: the
+     *                             least significant bit refers to the first
+     *                             delegate enumerated in the given collection
      * @param <T>                  An arbitrary receiver delegate type
      * @return A weight list gathered from the receiver delegates
      */
