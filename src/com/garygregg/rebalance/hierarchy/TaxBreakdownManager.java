@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.TaxType;
+import com.garygregg.rebalance.toolkit.TaxType;
 import org.jetbrains.annotations.NotNull;
 
 class TaxBreakdownManager<HierarchyType extends Aggregate<?, ?, ?>>

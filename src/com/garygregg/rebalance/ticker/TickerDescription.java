@@ -1,9 +1,9 @@
 package com.garygregg.rebalance.ticker;
 
-import com.garygregg.rebalance.Description;
-import com.garygregg.rebalance.FundType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Shares;
+import com.garygregg.rebalance.toolkit.Description;
+import com.garygregg.rebalance.toolkit.FundType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

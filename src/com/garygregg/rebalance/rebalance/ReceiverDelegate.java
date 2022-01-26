@@ -1,8 +1,8 @@
 package com.garygregg.rebalance.rebalance;
 
-import com.garygregg.rebalance.CurrencyReceiver;
-import com.garygregg.rebalance.SnapshotKey;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.toolkit.CurrencyReceiver;
+import com.garygregg.rebalance.toolkit.SnapshotKey;
 import org.jetbrains.annotations.NotNull;
 
 abstract class ReceiverDelegate<T extends CurrencyReceiver> implements

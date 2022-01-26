@@ -1,9 +1,9 @@
 package com.garygregg.rebalance.conductor;
 
-import com.garygregg.rebalance.CommandLineId;
-import com.garygregg.rebalance.PreferenceManager;
 import com.garygregg.rebalance.cla.CLAException;
 import com.garygregg.rebalance.cla.PreferenceDispatch;
+import com.garygregg.rebalance.toolkit.CommandLineId;
+import com.garygregg.rebalance.toolkit.PreferenceManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

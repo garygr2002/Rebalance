@@ -1,7 +1,7 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.*;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
+import com.garygregg.rebalance.toolkit.*;
 import org.jetbrains.annotations.NotNull;
 
 public class Portfolio

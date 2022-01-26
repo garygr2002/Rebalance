@@ -1,7 +1,7 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.toolkit.WeightType;
 import org.jetbrains.annotations.NotNull;
 
 class FullValueBreakdownManager<HierarchyType extends Common<?, ?, ?>>

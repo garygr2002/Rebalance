@@ -1,9 +1,9 @@
 package com.garygregg.rebalance.portfolio;
 
-import com.garygregg.rebalance.Description;
-import com.garygregg.rebalance.FilingStatus;
-import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.toolkit.Description;
+import com.garygregg.rebalance.toolkit.FilingStatus;
+import com.garygregg.rebalance.toolkit.WeightType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;

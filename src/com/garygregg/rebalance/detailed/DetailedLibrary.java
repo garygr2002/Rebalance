@@ -1,7 +1,7 @@
 package com.garygregg.rebalance.detailed;
 
-import com.garygregg.rebalance.AccountKey;
-import com.garygregg.rebalance.AccountKeyLibrary;
+import com.garygregg.rebalance.toolkit.AccountKey;
+import com.garygregg.rebalance.toolkit.AccountKeyLibrary;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;

@@ -1,9 +1,9 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.CategoryType;
-import com.garygregg.rebalance.Description;
-import com.garygregg.rebalance.TaxType;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.toolkit.CategoryType;
+import com.garygregg.rebalance.toolkit.Description;
+import com.garygregg.rebalance.toolkit.TaxType;
 import org.jetbrains.annotations.NotNull;
 
 abstract class SuperAggregate<KeyType,

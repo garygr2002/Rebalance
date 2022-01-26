@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.code;
 
-import com.garygregg.rebalance.Library;
+import com.garygregg.rebalance.toolkit.Library;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;

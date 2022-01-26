@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.holding;
 
-import com.garygregg.rebalance.HoldingType;
+import com.garygregg.rebalance.toolkit.HoldingType;
 import org.jetbrains.annotations.NotNull;
 
 public class BasesBuilder extends HoldingsBuilder {

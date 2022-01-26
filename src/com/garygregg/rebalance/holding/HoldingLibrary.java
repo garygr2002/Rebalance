@@ -1,7 +1,7 @@
 package com.garygregg.rebalance.holding;
 
-import com.garygregg.rebalance.HoldingType;
-import com.garygregg.rebalance.Library;
+import com.garygregg.rebalance.toolkit.HoldingType;
+import com.garygregg.rebalance.toolkit.Library;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;

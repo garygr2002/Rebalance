@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.distinguished;
 
-import com.garygregg.rebalance.Description;
+import com.garygregg.rebalance.toolkit.Description;
 import org.jetbrains.annotations.NotNull;
 
 class DistinguishedDescription<KeyType, ValueType>

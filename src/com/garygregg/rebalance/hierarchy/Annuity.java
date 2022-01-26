@@ -1,9 +1,9 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.InflationCaddy;
-import com.garygregg.rebalance.SynthesizerType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
+import com.garygregg.rebalance.toolkit.InflationCaddy;
+import com.garygregg.rebalance.toolkit.SynthesizerType;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;

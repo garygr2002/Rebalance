@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.detailed;
 
-import com.garygregg.rebalance.WeightType;
+import com.garygregg.rebalance.toolkit.WeightType;
 
 enum DetailedFields {
 

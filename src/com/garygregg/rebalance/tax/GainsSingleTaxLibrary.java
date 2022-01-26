@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.tax;
 
-import com.garygregg.rebalance.FilingStatus;
+import com.garygregg.rebalance.toolkit.FilingStatus;
 import org.jetbrains.annotations.NotNull;
 
 public final class GainsSingleTaxLibrary extends GainsTaxLibrary {

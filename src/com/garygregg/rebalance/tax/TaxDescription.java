@@ -1,8 +1,8 @@
 package com.garygregg.rebalance.tax;
 
-import com.garygregg.rebalance.Description;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Percent;
+import com.garygregg.rebalance.toolkit.Description;
 import org.jetbrains.annotations.NotNull;
 
 public class TaxDescription implements Description<Currency> {

@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.SynthesizerType;
+import com.garygregg.rebalance.toolkit.SynthesizerType;
 import org.jetbrains.annotations.NotNull;
 
 class Negation extends Averaging {

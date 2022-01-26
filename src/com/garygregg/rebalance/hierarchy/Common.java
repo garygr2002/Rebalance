@@ -1,9 +1,9 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.Description;
-import com.garygregg.rebalance.HoldingLineType;
-import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.toolkit.Description;
+import com.garygregg.rebalance.toolkit.HoldingLineType;
+import com.garygregg.rebalance.toolkit.WeightType;
 import org.jetbrains.annotations.NotNull;
 
 abstract class Common<KeyType,

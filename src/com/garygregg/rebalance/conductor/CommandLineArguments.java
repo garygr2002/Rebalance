@@ -1,9 +1,9 @@
 package com.garygregg.rebalance.conductor;
 
-import com.garygregg.rebalance.CommandLineId;
-import com.garygregg.rebalance.Pair;
 import com.garygregg.rebalance.cla.CLAException;
 import com.garygregg.rebalance.cla.Dispatch;
+import com.garygregg.rebalance.toolkit.CommandLineId;
+import com.garygregg.rebalance.toolkit.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

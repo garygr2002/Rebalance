@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.rebalance;
 
-import com.garygregg.rebalance.SnapshotKey;
+import com.garygregg.rebalance.toolkit.SnapshotKey;
 import org.jetbrains.annotations.NotNull;
 
 abstract class SnapshotAction

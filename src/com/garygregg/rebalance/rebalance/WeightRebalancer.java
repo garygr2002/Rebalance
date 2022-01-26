@@ -1,10 +1,10 @@
 package com.garygregg.rebalance.rebalance;
 
-import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Ticker;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
+import com.garygregg.rebalance.toolkit.WeightType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;

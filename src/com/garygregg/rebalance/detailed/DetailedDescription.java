@@ -1,8 +1,8 @@
 package com.garygregg.rebalance.detailed;
 
-import com.garygregg.rebalance.AccountKey;
-import com.garygregg.rebalance.Description;
-import com.garygregg.rebalance.WeightType;
+import com.garygregg.rebalance.toolkit.AccountKey;
+import com.garygregg.rebalance.toolkit.Description;
+import com.garygregg.rebalance.toolkit.WeightType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;

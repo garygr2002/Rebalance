@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.account;
 
-import com.garygregg.rebalance.FundType;
+import com.garygregg.rebalance.toolkit.FundType;
 
 enum AccountFields {
 

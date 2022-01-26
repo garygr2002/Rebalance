@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.distinguished;
 
-import com.garygregg.rebalance.AccountKey;
+import com.garygregg.rebalance.toolkit.AccountKey;
 import org.jetbrains.annotations.NotNull;
 
 public class DistinguishedAccountDescription extends

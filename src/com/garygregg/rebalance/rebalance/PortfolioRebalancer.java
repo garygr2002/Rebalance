@@ -1,12 +1,12 @@
 package com.garygregg.rebalance.rebalance;
 
-import com.garygregg.rebalance.AccountKey;
-import com.garygregg.rebalance.BreakdownType;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Hierarchy;
 import com.garygregg.rebalance.hierarchy.Institution;
 import com.garygregg.rebalance.hierarchy.Portfolio;
+import com.garygregg.rebalance.toolkit.AccountKey;
+import com.garygregg.rebalance.toolkit.BreakdownType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;

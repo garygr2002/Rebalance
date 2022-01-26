@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.WeightType;
+import com.garygregg.rebalance.toolkit.WeightType;
 import org.jetbrains.annotations.NotNull;
 
 class WeightBreakdownManager<HierarchyType extends Common<?, ?, ?>>

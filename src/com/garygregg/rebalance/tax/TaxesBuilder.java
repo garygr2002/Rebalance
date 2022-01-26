@@ -1,10 +1,10 @@
 package com.garygregg.rebalance.tax;
 
-import com.garygregg.rebalance.ElementReader;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Percent;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import com.garygregg.rebalance.interpreter.PositiveInterpreter;
+import com.garygregg.rebalance.toolkit.ElementReader;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;

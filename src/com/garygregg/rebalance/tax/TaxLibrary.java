@@ -1,8 +1,8 @@
 package com.garygregg.rebalance.tax;
 
-import com.garygregg.rebalance.FilingStatus;
-import com.garygregg.rebalance.Library;
 import com.garygregg.rebalance.countable.Currency;
+import com.garygregg.rebalance.toolkit.FilingStatus;
+import com.garygregg.rebalance.toolkit.Library;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;

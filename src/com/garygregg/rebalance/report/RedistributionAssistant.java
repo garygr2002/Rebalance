@@ -1,9 +1,9 @@
 package com.garygregg.rebalance.report;
 
-import com.garygregg.rebalance.Pair;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.hierarchy.Ticker;
+import com.garygregg.rebalance.toolkit.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

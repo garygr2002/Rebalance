@@ -1,11 +1,11 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.CategoryType;
-import com.garygregg.rebalance.Description;
-import com.garygregg.rebalance.TaxType;
-import com.garygregg.rebalance.WeightType;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
+import com.garygregg.rebalance.toolkit.CategoryType;
+import com.garygregg.rebalance.toolkit.Description;
+import com.garygregg.rebalance.toolkit.TaxType;
+import com.garygregg.rebalance.toolkit.WeightType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,11 +1,11 @@
 package com.garygregg.rebalance.report;
 
-import com.garygregg.rebalance.Pair;
 import com.garygregg.rebalance.account.AccountDescription;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.hierarchy.*;
 import com.garygregg.rebalance.ticker.TickerDescription;
+import com.garygregg.rebalance.toolkit.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileWriter;

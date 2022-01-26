@@ -1,6 +1,6 @@
 package com.garygregg.rebalance.hierarchy;
 
-import com.garygregg.rebalance.CategoryType;
+import com.garygregg.rebalance.toolkit.CategoryType;
 import org.jetbrains.annotations.NotNull;
 
 class CategoryBreakdownManager<HierarchyType extends Aggregate<?, ?, ?>>
