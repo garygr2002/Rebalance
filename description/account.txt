@@ -1,1 +1,69 @@
-Add description of account_yyyymmmdd.csv here.
+The account file contains information about accounts that are required to
+identify and rebalance them. Institution names are included in order to build
+an account key containing both the institution name and account number. In this
+way the account key is unique.
+
+Description of CSV files in format account_yyyymmdd.csv (identified by year,
+month and day of file generation, as noted)
+
+Note: Until alignment ends, integral fields may be left-padded with zeros or
+blanks, as noted. Unconstrained types, enumerated types, and floating point
+types are padded neither left nor right. Integral and floating point fields are
+aligned-right. Unconstrained and enumerated types are left-aligned.
+
+ 1. Institution: length - 12, position - 1; type - unconstrained
+
+    The institution where the account is held
+
+ 2. Number: length - 16, position - 14; type - long, zero padding
+
+    The number of the account, unique to the identified institution
+
+ 3. Rebalance order: length - 8, position - 31; type - integer, zero padding
+
+    The rebalance order of the account - accounts with the same declared order
+    are rebalanced in the order they occur in this data file
+
+ 4. Name: length - 42, position - 40; type - unconstrained
+
+    The name of the account (should match the name in the holding file)
+
+ 5. Tax type: length - 14, position: 83; type - Tax type enumerator
+
+    The tax type of the account
+
+ 6. Rebalance procedure: length - 14, position: 98; type - Rebalance procedure
+    enumerator
+
+    The rebalance procedure of the account
+
+ 7. Percentage equities: length - 6, position: 113; type - Two-precision
+    floating
+
+    The desired percentage of stocks in the account
+
+ 8. Percentage bonds: length - 6, position: 120; type - Two-precision floating
+
+    The desired percentage of bonds in the account
+
+ 9. Percentage cash: length - 6, position: 127; type - Two-precision floating
+
+    The desire percentage of cash in the account
+
+10: Percentage real estate: length - 6, position: 134, type - Two-precision
+    floating (alignment ends here)
+
+    The desired percentage of real estate in the account
+
+11. Synthesizer type (optional): length - 16, position: 141; type - Synthesizer
+    type enumerator
+
+    The type of synthesizer to use for account value when the valuation of the
+    account is not explicitly provided
+
+12. Referenced accounts (multiple, optional): length - 16; type - long, no
+    padding
+
+    Accounts in the same institution that the given account references; the
+    interpretation of the referenced account(s) is specific to the specified
+    synthesizer type

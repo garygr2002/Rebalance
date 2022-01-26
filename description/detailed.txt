@@ -1,1 +1,142 @@
-Add description of detailed_yyyymmdd.csv here.
+The detailed file contains optional rebalance percentages, indexed by
+institution and account number. If there is an entry for a uniquely
+identified account in this file, then the rebalance percentages identified in
+this file override the level 1 (stocks, bonds, cash, real estate) percentages
+identified in the account file.
+
+Description of CSV files in format detailed_yyyymmdd.csv (identified by year,
+month and day of file generation, as noted)
+
+Note: Until alignment ends, integral fields may be left-padded with zeros or
+blanks, as noted. Unconstrained types, enumerated types, and floating point
+types are padded neither left nor right. Integral and floating point fields are
+aligned-right. Unconstrained and enumerated types are left-aligned.
+
+ 1. Institution: length - 12, position - 1; type - unconstrained
+
+    The institution where the account is held
+
+ 2. Number: length - 16, position - 14; type - long, zero padding
+
+    The number of the account, unique to the identified institution
+
+ 3. Name: length - 42, position - 31; type - unconstrained
+
+    The name of the account (should match the name in the account file)
+
+ 4. Percentage stock: length - 6, position - 74; type - two-precision floating
+
+    Desired percentage stocks
+
+ 5. Percentage stock domestic: length - 6, position - 81; type - Two-precision
+    floating
+
+    Desired percentage domestic stocks
+
+ 6. Percentage stock foreign: length - 6, position - 88; type - Two-precision
+    floating
+
+    Desired percentage of foreign stocks
+
+ 7. Percentage stock large: length - 6, position - 95; type - Two-precision
+    floating
+
+    Desired percentage of large stocks
+
+ 8. Percentage stock not large: length - 6, position - 102; type - Two-precision
+    floating
+
+    Desired percentage of not-large stocks
+
+ 9. Percentage stock medium: length - 6, position - 109; type - Two-precision
+    floating
+
+    Desired percentage of medium stocks
+
+10. Percentage stock small: length - 6, position - 116; type - Two-precision
+    floating
+
+    Desired percentage of small stocks
+
+11. Percentage stock growth and value: length - 6, position - 123; type - Two-precision
+    floating
+
+    Desired percentage of growth and value stocks
+
+12. Percentage stock growth or value: length - 6, position - 130; type - Two-precision
+    floating
+
+    Desired percentage of growth or value stocks
+
+13. Percentage stock growth: length - 6, position - 137; type - Two-precision
+    floating
+
+    Desired percentage of growth stocks
+
+14. Percentage stock value: length - 6, position - 144; type - Two-precision
+    floating
+
+    Desired percentage of value stocks
+
+15. Percentage bond: length - 6, position - 151; type - Two-precision floating
+
+    Desired percentage of bonds
+
+16. Percentage bond corporate: length - 6, position - 158; type - Two-precision
+    floating
+
+    Desired percentage of corporate bonds
+
+17. Percentage bond foreign: length - 6, position - 165; type - Two-precision
+    floating
+
+    Desired percentage of foreign bonds
+
+18. Percentage bond government: length - 6, position - 172; type - Two-precision
+    floating
+
+    Desired percentage of government bonds
+
+19. Percentage bond high: length - 6, position - 179; type - Two-precision
+    floating
+
+    Desired percentage of high-yield bonds
+
+20. Percentage bond inflation: length - 6, position - 186; type - Two-precision
+    floating
+
+    Desired percentage of inflation-protected bonds
+
+21. Percentage bond mortgage: length - 6, position - 193; type - Two-precision
+    floating
+
+    Desired percentage of mortgage-backed bonds
+
+22. Percentage bond short: length - 6, position - 200; type - Two-precision
+    floating
+
+    Desired percentage of short-term bonds
+
+23. Percentage bond uncategorized: length - 6, position - 207; type -
+    Two-precision floating
+
+    Desired percentage of uncategorized bonds
+
+24. Percentage cash: length - 6, position - 214; type - Two-precision floating
+
+    Desired percentage of cash
+
+25. Percentage cash government: length - 6, position - 221; type -
+    Two-precision floating
+
+    Desired percentage of cash in government securities
+
+26. Percentage cash uncategorized: length - 6, position - 228; type -
+    Two-precision floating
+
+    Desired percentage of cash in uncategorized securities
+
+27. Percentage real estate: length - 6, position - 235; type - Two-precision
+    floating (alignment ends here)
+
+    Desired percentage of real estate

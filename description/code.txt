@@ -1,1 +1,46 @@
-Add description of code_yyyymmdd.csv here.
+The code file contains descriptions of single-character codes that refer to one
+of two overloaded meanings: 1) the portfolio, institution, account, ticker
+hierarchy of investment classification, or; 2) a mapping to specific categories
+of fund types. This file may be used for whatever programmatic purposes are
+desirable.
+
+Description of CSV files in format code_yyyymmdd.csv (identified by year, month
+and day of file generation, as noted)
+
+Note: Until alignment ends, integral fields may be left-padded with zeros or
+blanks, as noted. Unconstrained types, enumerated types, and floating point
+types are padded neither left nor right. Integral and floating point fields are
+aligned-right. Unconstrained and enumerated types are left-aligned.
+
+ 1. Code: length - 1, position - 1; type - character
+
+    The unique code
+
+ 2. Name: length - 22, position - 2; type - unconstrained
+
+    The name of the code
+
+ 3. Subcode 1: length - 1, position - 25; type - character
+
+    Associated subcode 1
+
+ 4. Subcode 2: length - 1, position - 27; type - character
+
+    Associated subcode 2
+
+ 5. Subcode 3: length - 1, position - 29; type - character
+
+    Associated subcode 3
+
+ 6. Subcode 4: length - 1, position - 31; type - character
+
+    Associated subcode 4
+
+ 7. Subcode 5: length - 1, position - 33; type - character
+
+    Associated subcode 5
+
+ 8. Description: length - 80, position - 35; type - unconstrained (alignment
+    ends here)
+
+    A description of the code based on related codes
