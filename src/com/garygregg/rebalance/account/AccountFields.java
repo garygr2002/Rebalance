@@ -27,7 +27,7 @@ enum AccountFields {
 
     /*
      * The rebalance order of the account; accounts with the same declared
-     * order are rebalance in the order they occur in the data file
+     * order are rebalanced in the order they occur in the data file
      */
     REBALANCE_ORDER(2, null),
 
