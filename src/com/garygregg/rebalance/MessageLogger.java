@@ -113,8 +113,9 @@ public class MessageLogger {
      * @param defaultStream A default non-null print stream
      * @return A non-null print stream, either the candidate or the default
      */
-    private static @NotNull PrintStream getStream(PrintStream candidate,
-                                                  @NotNull PrintStream defaultStream) {
+    private static @NotNull
+    PrintStream getStream(PrintStream candidate,
+                          @NotNull PrintStream defaultStream) {
         return (null == candidate) ? defaultStream : candidate;
     }
 

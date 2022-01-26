@@ -11,7 +11,8 @@ public class SnapshotKeyFactory {
      * The two largest prime numbers that are less than or equal to
      * 2^(Integer.SIZE - 1), or Integer.MAX_VALUE
      */
-    private static final List<Long> bigPrimes = List.of(2147483647L, 2147483629L);
+    private static final List<Long> bigPrimes =
+            List.of(2147483647L, 2147483629L);
 
     // The value to add to the current key
     private static final long addend = bigPrimes.get(0);

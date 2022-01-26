@@ -27,7 +27,8 @@ public abstract class Library<KeyType, DescriptionType> {
      * Adds a line code to the library.
      *
      * @param lineCode A line code to add to the library
-     * @return True if the library did not already contain the line code, false otherwise
+     * @return True if the library did not already contain the line code,
+     * false otherwise
      */
     @SuppressWarnings("UnusedReturnValue")
     protected boolean addLineCode(char lineCode) {

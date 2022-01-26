@@ -67,9 +67,9 @@ public class DateUtilities {
      * @param fileType The file type
      * @return A file name
      */
-    private static @NotNull String constructFilename(@NotNull String prefix,
-                                                     @NotNull String suffix,
-                                                     @NotNull String fileType) {
+    private static @NotNull
+    String constructFilename(@NotNull String prefix, @NotNull String suffix,
+                             @NotNull String fileType) {
         return prefix + getSeparator() + suffix +
                 getExtensionSeparator() + fileType;
     }
@@ -82,9 +82,9 @@ public class DateUtilities {
      * @param fileType The file type
      * @return A file name
      */
-    private static @NotNull String constructFilename(@NotNull String prefix,
-                                                     @NotNull Date date,
-                                                     @NotNull String fileType) {
+    private static @NotNull
+    String constructFilename(@NotNull String prefix, @NotNull Date date,
+                             @NotNull String fileType) {
         return constructFilename(prefix, getDateFormat().format(date),
                 fileType);
     }

@@ -37,7 +37,8 @@ public final class ParentTracker {
      * @return An instance of the parent tracker
      */
     public static @NotNull ParentTracker getInstance() {
-        return (null == instance) ? (instance = new ParentTracker()) : instance;
+        return (null == instance) ?
+                (instance = new ParentTracker()) : instance;
     }
 
     /**
@@ -226,10 +227,10 @@ public final class ParentTracker {
 
             /*
              * The combination of last and new tops-of-stack make acceptable
-             * keys for the account library...and we are also seeking an account
-             * line. Push a unique key consisting of the last top-of-stack (as
-             * an institution mnemonic), and the new top-of-stack (as an
-             * account number).
+             * keys for the account library...and we are also seeking an
+             * account line. Push a unique key consisting of the last
+             * top-of-stack (as an institution mnemonic), and the new
+             * top-of-stack (as an account number).
              */
             actives.push(AccountKey.createUniqueKey(lastActive,
                     AccountKey.parseLong(newActive)));

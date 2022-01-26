@@ -165,9 +165,9 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
                 logMessage(continueOnFalse ? Level.WARNING : Level.SEVERE,
                         String.format("File at line " +
                                         "%d contains insufficient elements, " +
-                                        "needs at least %d, only %d given; %s.",
-                                lineNumber, minimumFields, fieldCount,
-                                continueOnFalse ?
+                                        "needs at least %d, only %d given; " +
+                                        "%s.", lineNumber, minimumFields,
+                                fieldCount, continueOnFalse ?
                                         "skipping line" : "stopping"));
             }
 
@@ -219,9 +219,11 @@ public abstract class ElementReader<DescriptionType extends Description<?>>
      *
      * @param directory The directory from which to return a reader
      * @param date      The given date (maybe null)
-     * @return A file reader for the thus described file, or null if none exists
+     * @return A file reader for the thus described file, or null if none
+     * exists
      */
-    private FileReader getMostRecentReader(@NotNull File directory, Date date) {
+    private FileReader getMostRecentReader(@NotNull File directory,
+                                           Date date) {
 
         // Get the date utilities object. Declare and initialize the result.
         final DateUtilities utilities = getDateUtilities();
