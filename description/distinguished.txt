@@ -1,1 +1,32 @@
-Add description of distinguished_yyyymmdd.csv here.
+The distinguished file contains maps of programmatically-usable key names to
+actual (and presumably sensitive) portfolio, institution, or account keys that
+should not be hard-coded, and visible in a public code base (such as GitHub). A
+query of the distinguished library using a programmatically-usable key will
+make the sensitive information available at program execution using the
+sensitive data files from which they were read. This data file is organized as
+a hierarchy. All accounts are assumed contained in the most recently declared
+institution, and all institutions are assumed held in the most recently
+declared portfolio.
+
+Description of CSV files in format distinguished_yyyymmdd.csv (identified by
+year, month and day of file generation, as noted)
+
+Note: Until alignment ends, integral fields may be left-padded with zeros or
+blanks, as noted. Unconstrained types, enumerated types, and floating point
+types are padded neither left nor right. Integral and floating point fields are
+aligned-right. Unconstrained and enumerated types are left-aligned.
+
+ 1. Line type: length - 1, position - 1; type - character
+
+    The holding type: a character code identifying distinguished portfolio,
+    distinguished institution, or distinguished account
+
+ 2. Key: length - 24, position - 3; type - unconstrained
+
+    The key of the holding: The programmatically usable value
+
+ 3. Value: length - 52, position - 28; type - unconstrained for portfolios and
+    institutions; long, zero-padding to 16 characters for accounts
+
+    The name of the holding: The actual, presumably sensitive portfolio key,
+    institution name, or account number
