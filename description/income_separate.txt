@@ -1,1 +1,21 @@
-Add description of income_separate_yyyymmdd.csv here.
+The income_separate file contains the income tax percentage for the
+married-filing-separately filing status that begins at the income level by
+which the percentage is indexed. The information is assumed to be current for
+the tax year that matches the year for which the file was generated.
+
+Description of CSV files in format income_separate_yyyymmdd.csv (identified by
+year, month and day of file generation, as noted)
+
+Note: Until alignment ends, integral fields may be left-padded with zeros or
+blanks, as noted. Unconstrained types, enumerated types, and floating point
+types are padded neither left nor right. Integral and floating point fields are
+aligned-right. Unconstrained and enumerated types are left-aligned.
+
+ 1. Threshold: length - 16, position - 1; type - Two-precision floating
+
+    The threshold for the tax rate
+
+ 2. Tax rate: length - 8, position - 18; type - Three-precision floating
+    (alignment ends here)
+
+    The tax rate for the threshold
