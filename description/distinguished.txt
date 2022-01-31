@@ -23,7 +23,7 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
 
  2. Key: length - 24, position - 3; type - unconstrained
 
-    The key of the holding: The programmatically usable value
+    The key of the holding: The unique, programmatically usable value
 
  3. Value: length - 52, position - 28; type - unconstrained for portfolios and
     institutions; long, zero-padding to 16 characters for accounts

@@ -11,11 +11,11 @@ blanks, as noted. Unconstrained types, enumerated types, and floating point
 types are padded neither left nor right. Integral and floating point fields are
 aligned-right. Unconstrained and enumerated types are left-aligned.
 
- 1. Threshold: length - 16, position - 1; type - Two-precision floating
+ 1. Threshold: length - 16, position - 1; type - two-precision floating
 
-    The threshold for the tax rate
+    The unique threshold for the tax rate
 
- 2. Tax rate: length - 8, position - 18; type - Three-precision floating
+ 2. Tax rate: length - 8, position - 18; type - three-precision floating
     (alignment ends here)
 
     The tax rate for the threshold

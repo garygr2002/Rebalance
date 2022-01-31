@@ -32,30 +32,34 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
 
     The tax type of the account
 
- 6. Rebalance procedure: length - 14, position: 98; type - Rebalance procedure
+ 6. Rebalance procedure: length - 14, position: 98; type - rebalance procedure
     enumerator
 
     The rebalance procedure of the account
 
- 7. Percentage equities: length - 6, position: 113; type - Two-precision
+ 7. Weight equities: length - 6, position: 113; type - two-precision
     floating
 
-    The desired percentage of stocks in the account
+    The desired weight of stocks (equities) in the account (can be a percentage
+    if sum of all weights is 100)
 
- 8. Percentage bonds: length - 6, position: 120; type - Two-precision floating
+ 8. Weight bonds: length - 6, position: 120; type - two-precision floating
 
-    The desired percentage of bonds in the account
+    The desired weight of bonds in the account (can be a percentage if sum of
+    all weights is 100)
 
- 9. Percentage cash: length - 6, position: 127; type - Two-precision floating
+ 9. Weight cash: length - 6, position: 127; type - two-precision floating
 
-    The desire percentage of cash in the account
+    The desire weight of cash in the account (can be a percentage if sum of all
+    weights is 100)
 
-10: Percentage real estate: length - 6, position: 134, type - Two-precision
+10: Weight real estate: length - 6, position: 134, type - two-precision
     floating (alignment ends here)
 
-    The desired percentage of real estate in the account
+    The desired weight of real estate in the account (can be a percentage if
+    sum of all weights is 100)
 
-11. Synthesizer type (optional): length - 16, position: 141; type - Synthesizer
+11. Synthesizer type (optional): length - 16, position: 141; type - synthesizer
     type enumerator
 
     The type of synthesizer to use for account value when the valuation of the

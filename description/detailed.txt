@@ -4,6 +4,12 @@ identified account in this file, then the rebalance percentages identified in
 this file override the level 1 (stocks, bonds, cash, real estate) percentages
 identified in the account file.
 
+Weights are relative only within their level categories. Level 1: stocks,
+bonds, cash, or real estate; level 2: stock, bond, cash, or real estate
+subtypes (stock subtypes are 'domestic' or 'foreign'); level 3: stock subtypes
+large, not large, medium or small; level 4: stock subtypes growth-and-value, or
+growth-or-value; level 5: stock subtypes growth or value
+
 Description of CSV files in format detailed_yyyymmdd.csv (identified by year,
 month and day of file generation, as noted)
 
@@ -24,119 +30,139 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
 
     The name of the account (should match the name in the account file)
 
- 4. Percentage stock: length - 6, position - 74; type - two-precision floating
+ 4. Weight stock: length - 6, position - 74; type - two-precision floating
 
-    Desired percentage stocks
+    Desired weight stocks (can be a percentage if total in level is 100)
 
- 5. Percentage stock domestic: length - 6, position - 81; type - Two-precision
+ 5. Weight stock domestic: length - 6, position - 81; type - two-precision
     floating
 
-    Desired percentage domestic stocks
+    Desired weight domestic stocks (can be a percentage if total in level is
+    100)
 
- 6. Percentage stock foreign: length - 6, position - 88; type - Two-precision
+ 6. Weight stock foreign: length - 6, position - 88; type - two-precision
     floating
 
-    Desired percentage of foreign stocks
+    Desired weight of foreign stocks (can be a percentage if total in level is
+    100)
 
- 7. Percentage stock large: length - 6, position - 95; type - Two-precision
+ 7. Weight stock large: length - 6, position - 95; type - two-precision
     floating
 
-    Desired percentage of large stocks
+    Desired weight of large stocks (can be a percentage if total in level is
+    100)
 
- 8. Percentage stock not large: length - 6, position - 102; type - Two-precision
+ 8. Weight stock not large: length - 6, position - 102; type -
+    two-precision floating
+
+    Desired weight of not-large stocks (can be a percentage if total in level
+    is 100)
+
+ 9. Weight stock medium: length - 6, position - 109; type - two-precision
     floating
 
-    Desired percentage of not-large stocks
+    Desired weight of medium stocks (can be a percentage if total in level is
+    100)
 
- 9. Percentage stock medium: length - 6, position - 109; type - Two-precision
+10. Weight stock small: length - 6, position - 116; type - two-precision
     floating
 
-    Desired percentage of medium stocks
+    Desired weight of small stocks (can be a percentage if total in level is
+    100)
 
-10. Percentage stock small: length - 6, position - 116; type - Two-precision
+11. Weight stock growth and value: length - 6, position - 123; type -
+    two-precision floating
+
+    Desired weight of growth and value stocks (can be a percentage if total in
+    level is 100)
+
+12. Weight stock growth or value: length - 6, position - 130; type -
+    two-precision floating
+
+    Desired weight of growth or value stocks (can be a percentage if total in
+    level is 100)
+
+13. Weight stock growth: length - 6, position - 137; type - two-precision
     floating
 
-    Desired percentage of small stocks
+    Desired weight of growth stocks (can be a percentage if total in level is
+    100)
 
-11. Percentage stock growth and value: length - 6, position - 123; type - Two-precision
+14. Weight stock value: length - 6, position - 144; type - two-precision
     floating
 
-    Desired percentage of growth and value stocks
+    Desired weight of value stocks (can be a percentage if total in level is
+    100)
 
-12. Percentage stock growth or value: length - 6, position - 130; type - Two-precision
+15. Weight bond: length - 6, position - 151; type - two-precision floating
+
+    Desired weight of bonds (can be a percentage if total in level is 100)
+
+16. Weight bond corporate: length - 6, position - 158; type - two-precision
     floating
 
-    Desired percentage of growth or value stocks
+    Desired weight of corporate bonds (can be a percentage if total in level is
+    100)
 
-13. Percentage stock growth: length - 6, position - 137; type - Two-precision
+17. Weight bond foreign: length - 6, position - 165; type - two-precision
     floating
 
-    Desired percentage of growth stocks
+    Desired weight of foreign bonds (can be a percentage if total in level is
+    100)
 
-14. Percentage stock value: length - 6, position - 144; type - Two-precision
+18. Weight bond government: length - 6, position - 172; type - two-precision
     floating
 
-    Desired percentage of value stocks
+    Desired weight of government bonds (can be a percentage if total in level
+    is 100)
 
-15. Percentage bond: length - 6, position - 151; type - Two-precision floating
-
-    Desired percentage of bonds
-
-16. Percentage bond corporate: length - 6, position - 158; type - Two-precision
+19. Weight bond high: length - 6, position - 179; type - two-precision
     floating
 
-    Desired percentage of corporate bonds
+    Desired weight of high-yield bonds (can be a percentage if total in level
+    is 100)
 
-17. Percentage bond foreign: length - 6, position - 165; type - Two-precision
+20. Weight bond inflation: length - 6, position - 186; type - two-precision
     floating
 
-    Desired percentage of foreign bonds
+    Desired weight of inflation-protected bonds (can be a percentage if total in
+    level is 100)
 
-18. Percentage bond government: length - 6, position - 172; type - Two-precision
+21. Weight bond mortgage: length - 6, position - 193; type - two-precision
     floating
 
-    Desired percentage of government bonds
+    Desired weight of mortgage-backed bonds (can be a percentage if total in
+    level is 100)
 
-19. Percentage bond high: length - 6, position - 179; type - Two-precision
+22. Weight bond short: length - 6, position - 200; type - two-precision
     floating
 
-    Desired percentage of high-yield bonds
+    Desired weight of short-term bonds (can be a percentage if total in level
+    is 100)
 
-20. Percentage bond inflation: length - 6, position - 186; type - Two-precision
-    floating
+23. Weight bond uncategorized: length - 6, position - 207; type -
+    two-precision floating
 
-    Desired percentage of inflation-protected bonds
+    Desired weight of uncategorized bonds (can be a percentage if total in
+    level is 100)
 
-21. Percentage bond mortgage: length - 6, position - 193; type - Two-precision
-    floating
+24. Weight cash: length - 6, position - 214; type - two-precision floating
 
-    Desired percentage of mortgage-backed bonds
+    Desired weight of cash (can be a percentage if total in level is 100)
 
-22. Percentage bond short: length - 6, position - 200; type - Two-precision
-    floating
+25. Weight cash government: length - 6, position - 221; type -
+    two-precision floating
 
-    Desired percentage of short-term bonds
+    Desired weight of cash in government securities (can be a percentage if
+    total in level is 100)
 
-23. Percentage bond uncategorized: length - 6, position - 207; type -
-    Two-precision floating
+26. Weight cash uncategorized: length - 6, position - 228; type -
+    two-precision floating
 
-    Desired percentage of uncategorized bonds
+    Desired weight of cash in uncategorized securities (can be a percentage if
+    total in level is 100)
 
-24. Percentage cash: length - 6, position - 214; type - Two-precision floating
-
-    Desired percentage of cash
-
-25. Percentage cash government: length - 6, position - 221; type -
-    Two-precision floating
-
-    Desired percentage of cash in government securities
-
-26. Percentage cash uncategorized: length - 6, position - 228; type -
-    Two-precision floating
-
-    Desired percentage of cash in uncategorized securities
-
-27. Percentage real estate: length - 6, position - 235; type - Two-precision
+27. Weight real estate: length - 6, position - 235; type - two-precision
     floating (alignment ends here)
 
-    Desired percentage of real estate
+    Desired weight of real estate (can be a percentage if total in level is 100)
