@@ -82,5 +82,4 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
     Adjust desired equity percentage for relative market valuation, true/false;
     for "relative market valuation," we mean the current value of the S&P 500
     index versus its record high; the adjustment, if it occurs, is a formula
-    that is hard-coded (alignment ends here)
-
+    that is hard-coded (column alignment ends here)

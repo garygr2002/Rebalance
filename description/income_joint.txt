@@ -16,6 +16,6 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
     The unique threshold for the tax rate
 
  2. Tax rate: length - 8, position - 18; type - three-precision floating
-    (alignment ends here)
+    (column alignment ends here)
 
     The tax rate for the threshold

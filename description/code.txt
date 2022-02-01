@@ -40,7 +40,7 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
 
     Associated subcode 5
 
- 8. Description: length - 80, position - 35; type - unconstrained (alignment
-    ends here)
+ 8. Description: length - 80, position - 35; type - unconstrained (column
+    alignment ends here)
 
     A description of the code based on related codes

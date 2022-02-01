@@ -163,6 +163,6 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
     total in level is 100)
 
 27. Weight real estate: length - 6, position - 235; type - two-precision
-    floating (alignment ends here)
+    floating (column alignment ends here)
 
     Desired weight of real estate (can be a percentage if total in level is 100)

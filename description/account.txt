@@ -54,7 +54,7 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
     weights is 100)
 
 10: Weight real estate: length - 6, position: 134, type - two-precision
-    floating (alignment ends here)
+    floating (column alignment ends here)
 
     The desired weight of real estate in the account (can be a percentage if
     sum of all weights is 100)

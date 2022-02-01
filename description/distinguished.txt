@@ -26,7 +26,8 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
     The key of the holding: The unique, programmatically usable value
 
  3. Value: length - 52, position - 28; type - unconstrained for portfolios and
-    institutions; long, zero-padding to 16 characters for accounts
+    institutions; long, zero-padding to 16 characters for accounts (column
+    alignment ends here)
 
     The name of the holding: The actual, presumably sensitive portfolio key,
     institution name, or account number

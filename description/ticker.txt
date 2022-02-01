@@ -63,4 +63,4 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
     Subcode for contained securities - level 4: as a stock subtype, code for
     relative valuation based on earnings, i.e., growth-and-value (mixed),
     growth-or-value (one or the other), growth specifically, or value
-    specifically (alignment ends here)
+    specifically (column alignment ends here)
