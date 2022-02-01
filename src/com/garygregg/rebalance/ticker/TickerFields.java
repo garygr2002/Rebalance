@@ -3,18 +3,19 @@ package com.garygregg.rebalance.ticker;
 enum TickerFields {
 
     /*
-     * The code of the fund: F = Open-end; J = Home equity, loan or pension;
-     * Q = Individual stock; X = ETFs
+     * The code of the ticker: F = mutual fund or sub-account that can be
+     * considered for rebalance; 'J' = sub-account that cannot be considered
+     * for rebalance; 'Q' = single stock; 'X' = exchange-traded ticker
      */
     CODE(0),
 
-    // The minimum investment in the fund
+    // The minimum investment in the ticker
     MINIMUM(4),
 
-    // The name of the fund
+    // The name of the ticker
     NAME(3),
 
-    // The number of the fund
+    // The number of the ticker
     NUMBER(2),
 
     // The preferred round number of shares to hold
@@ -32,14 +33,14 @@ enum TickerFields {
     // Subcode #4 for contained securities
     SUBCODE_4(9),
 
-    // The ticker of the fund (and the key)
+    // The unique ticker ID (and the key)
     TICKER(1);
 
     // The position of the field in the data file
     private final int position;
 
     /**
-     * Constructs the fund fields enumerator.
+     * Constructs the ticker fields enumerator.
      *
      * @param position The position of the field in the data file
      */
