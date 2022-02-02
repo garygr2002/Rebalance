@@ -58,12 +58,12 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the current value of the S&P 500.
+     * Gets the last close of the S&P 500.
      *
-     * @return The current value of the S&P 500
+     * @return The last close of the S&P 500
      */
-    public Double getCurrent() {
-        return getDouble(CommandLineId.CURRENT);
+    public Double getClose() {
+        return getDouble(CommandLineId.CLOSE);
     }
 
     /**
@@ -103,9 +103,9 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the high value of the S&P 500.
+     * Gets the high of the S&P 500.
      *
-     * @return The high value of the S&P 500
+     * @return The high of the S&P 500
      */
     public Double getHigh() {
         return getDouble(CommandLineId.HIGH);
@@ -221,12 +221,12 @@ public class PreferenceManager {
     }
 
     /**
-     * Sets the current value of the S&P 500.
+     * Sets the last close of the S&P 500.
      *
-     * @param value The current value of the S&P 500
+     * @param value The last close of the S&P 500
      */
-    public void setCurrent(Double value) {
-        setDouble(CommandLineId.CURRENT, value);
+    public void setClose(Double value) {
+        setDouble(CommandLineId.CLOSE, value);
     }
 
     /**
@@ -259,9 +259,9 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the high value of the S&P 500.
+     * Sets the high of the S&P 500.
      *
-     * @param value The high value of the S&P 500
+     * @param value The high of the S&P 500
      */
     public void setHigh(Double value) {
         setDouble(CommandLineId.HIGH, value);

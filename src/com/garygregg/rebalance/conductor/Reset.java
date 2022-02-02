@@ -25,9 +25,9 @@ class Reset extends Informer implements Dispatch<CommandLineId> {
      */
     private static void resetPreferences() {
 
-        // Get the preference manager, and reset the S&P 500 current level.
+        // Get the preference manager, and reset the S&P 500 last close.
         final PreferenceManager manager = PreferenceManager.getInstance();
-        manager.setCurrent(null);
+        manager.setClose(null);
 
         /*
          * Set the backup destination and the logging level for extraordinary

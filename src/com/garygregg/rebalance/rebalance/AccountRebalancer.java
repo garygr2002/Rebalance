@@ -169,29 +169,27 @@ abstract class AccountRebalancer extends Rebalancer {
                                @NotNull OverlayProcedure procedure) {
 
         /*
-         * Get the preference manager, and the current S&P 500 setting from the
-         * manager. Is the current S&P 500 value set?
+         * Get the preference manager, and the S&P 500 last close from the
+         * manager. Is the last close of S&P 500 set?
          */
         final PreferenceManager manager = PreferenceManager.getInstance();
-        final Double current = manager.getCurrent();
-        if (null != current) {
+        final Double close = manager.getClose();
+        if (null != close) {
 
             /*
-             * The current S&P 500 value is set. Get the high S&P 500 setting
-             * from the manager. Is the high S&P 500 value set, and is its
-             * value not zero?
+             * The last close of S&P 500 is set. Get the S&P 500 high from the
+             * manager. Is the S&P 500 high set, and is its value not zero?
              */
             final Double high = manager.getHigh();
             if (!((null == high) || (0. == high))) {
 
                 /*
-                 * The high S&P 500 value is set, and its value is not zero.
-                 * Subtract the current value from the high value and divide
-                 * the result by the high value. Adjust the weights in the
-                 * weight map with this ratio.
+                 * The S&P 500 high is set, and its value is not zero. Subtract
+                 * the last close from the high, and divide the result by the
+                 * high. Adjust the weights in the weight map with this ratio.
                  */
                 adjust(weightMap,
-                        procedure.adjustEquity((high - current) / high));
+                        procedure.adjustEquity((high - close) / high));
             }
         }
     }

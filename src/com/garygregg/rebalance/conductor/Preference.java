@@ -69,9 +69,9 @@ class Preference extends Informer implements Dispatch<CommandLineId> {
         displayPreference(CommandLineId.HIGH,
                 formatPreference(manager.getHigh()));
 
-        // Display the preference for S&P 500 current.
-        displayPreference(CommandLineId.CURRENT,
-                formatPreference(manager.getCurrent()));
+        // Display the preference for S&P 500 last close.
+        displayPreference(CommandLineId.CLOSE,
+                formatPreference(manager.getClose()));
 
         /*
          * Display the preference for the limit of allowed receiver delegates.

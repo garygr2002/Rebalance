@@ -41,13 +41,13 @@ public enum CommandLineId {
     @SuppressWarnings("SpellCheckingInspection")
     INFLATION("annual inflation rate", "fltn", true),
 
-    // High S&P 500 value (double, 2 decimal precision)
+    // High S&P 500 (double, 2 decimal precision)
     @SuppressWarnings("SpellCheckingInspection")
     HIGH("S&P 500 high", "sphg", true),
 
-    // Current S&P 500 value (double, 2 decimal precision)
+    // Last close of the S&P 500 (double, 2 decimal precision)
     @SuppressWarnings("SpellCheckingInspection")
-    CURRENT("S&P 500 current", "spcr", true),
+    CLOSE("S&P 500 last close", "spcl", true),
 
     // The limit of allowed receiver delegates
     @SuppressWarnings("SpellCheckingInspection")

@@ -343,8 +343,8 @@ public class Conductor implements Dispatch<CommandLineId> {
         final Preferences preferences = preferenceManager.getPreferences();
         final PrintStream outputStream = MessageLogger.getOutputStream();
 
-        // Add a dispatch for the S&P 500 current value.
-        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.CURRENT,
+        // Add a dispatch for the S&P 500 last close.
+        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.CLOSE,
                 preferences, outputStream, false));
 
         // Add a preference dispatch for the data directory backup.
@@ -358,7 +358,7 @@ public class Conductor implements Dispatch<CommandLineId> {
         dispatchList.add(new LimitedPreferenceDispatch<>(
                 CommandLineId.EXTRAORDINARY, preferences, outputStream));
 
-        // Add a preference dispatch for the S&P 500 high value.
+        // Add a preference dispatch for the S&P 500 high.
         dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.HIGH,
                 preferences, outputStream, false));
 
