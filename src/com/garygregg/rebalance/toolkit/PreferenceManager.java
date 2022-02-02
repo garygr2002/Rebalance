@@ -12,9 +12,6 @@ import java.util.prefs.Preferences;
 
 public class PreferenceManager {
 
-    // The default ratio of S&P 500 today divided by S&P 500 last close
-    private static final double defaultChangeToday = 1.;
-
     // A single instance of the preference manager
     private static final PreferenceManager instance = new PreferenceManager();
 
@@ -23,8 +20,42 @@ public class PreferenceManager {
             Preferences.userRoot().node(
                     PreferenceManager.class.getName());
 
+    // The ratio of S&P last close divided by S&P 500 high
+    private double changeLastClose = calculateChange(null, null);
+
     // The ratio of S&P 500 today divided by S&P 500 last close
-    private double changeToday = defaultChangeToday;
+    private double changeToday = calculateChange(null, null);
+
+    // The S&P last close as a percent of the S&P 500 high
+    private double percentLastClose = calculatePercent(changeLastClose);
+
+    // The S&P 500 today as a percent of the S&P 500 last close
+    private double percentToday = calculatePercent(changeToday);
+
+    /**
+     * Calculates a ratio.
+     *
+     * @param numerator   The numerator of the ratio
+     * @param denominator The denominator of the ratio
+     * @return The ratio of the numerator divided the denominator, or a default
+     * if either the numerator or denominator are null
+     */
+    @Contract(pure = true)
+    private static @NotNull Double calculateChange(Double numerator,
+                                                   Double denominator) {
+        return ((null == numerator)) || (null == denominator) ?
+                1. : numerator / denominator;
+    }
+
+    /**
+     * Calculates a percent from a ratio.
+     *
+     * @param ratio The ratio
+     * @return A percent calculated from the ratio
+     */
+    private static double calculatePercent(double ratio) {
+        return 1. - ratio;
+    }
 
     /**
      * Gets the default double.
@@ -61,6 +92,15 @@ public class PreferenceManager {
      */
     public static @NotNull PreferenceManager getInstance() {
         return instance;
+    }
+
+    /**
+     * Gets the ratio of the S&P 500 last close divided by the S&P 500 high.
+     *
+     * @return The ratio of the S&P 500 last close divided by the S&P 500 high
+     */
+    public double getChangeLastClose() {
+        return changeLastClose;
     }
 
     /**
@@ -200,6 +240,24 @@ public class PreferenceManager {
     }
 
     /**
+     * Gets the S&P 500 last close as a percent of the S&P 500 high.
+     *
+     * @return The S&P 500 last close as a percent of the S&P 500 high
+     */
+    public double getPercentLastClose() {
+        return percentLastClose;
+    }
+
+    /**
+     * Gets the S&P 500 today as a percent of the S&P 500 last close.
+     *
+     * @return The S&P 500 today as a percent of the S&P 500 last close
+     */
+    public double getPercentToday() {
+        return percentToday;
+    }
+
+    /**
      * Gets the preferences object used by the preference manager.
      *
      * @return The preferences object used by the preference manager
@@ -245,29 +303,23 @@ public class PreferenceManager {
     }
 
     /**
+     * Gets the ratio of the S&P 500 last close divided by the S&P 500 high.
+     */
+    private void setChangeLastClose() {
+
+        // Calculate the S&P last close change and percentage.
+        changeLastClose = calculateChange(getClose(), getHigh());
+        percentLastClose = calculatePercent(changeLastClose);
+    }
+
+    /**
      * Gets the ratio of the S&P 500 today divided by the S&P 500 last close.
      */
     private void setChangeToday() {
 
-        // Get the S&P 500 last close and the S&P 500 today.
-        final Double close = getClose();
-        final Double today = getToday();
-
-        /*
-         * Set the change today as the default change today if either the
-         * last close or today is null.
-         */
-        if ((null == close) || (null == today)) {
-            changeToday = defaultChangeToday;
-        }
-
-        /*
-         * Otherwise, set the change today as the ratio of today divided by
-         * the last close.
-         */
-        else {
-            changeToday = today / close;
-        }
+        // Calculate the S&P 500 today change and percentage.
+        changeToday = calculateChange(getToday(), getClose());
+        percentToday = calculatePercent(changeToday);
     }
 
     /**
@@ -277,8 +329,12 @@ public class PreferenceManager {
      */
     public void setClose(Double value) {
 
-        // Set the S&P 500 close, then set the change today.
+        /*
+         * Set the S&P 500 close, then set the change last close and the
+         * change today.
+         */
         setDouble(CommandLineId.CLOSE, value);
+        setChangeLastClose();
         setChangeToday();
     }
 
@@ -317,7 +373,10 @@ public class PreferenceManager {
      * @param value The high of the S&P 500
      */
     public void setHigh(Double value) {
+
+        // Set the S&P 500 high, then set the change last close.
         setDouble(CommandLineId.HIGH, value);
+        setChangeLastClose();
     }
 
     /**
