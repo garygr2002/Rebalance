@@ -12,6 +12,9 @@ import java.util.prefs.Preferences;
 
 public class PreferenceManager {
 
+    // The default ratio of S&P 500 today divided by S&P 500 last close
+    private static final double defaultChangeToday = 1.;
+
     // A single instance of the preference manager
     private static final PreferenceManager instance = new PreferenceManager();
 
@@ -19,6 +22,9 @@ public class PreferenceManager {
     private final Preferences preferences =
             Preferences.userRoot().node(
                     PreferenceManager.class.getName());
+
+    // The ratio of S&P 500 today divided by S&P 500 last close
+    private double changeToday = defaultChangeToday;
 
     /**
      * Gets the default double.
@@ -55,6 +61,15 @@ public class PreferenceManager {
      */
     public static @NotNull PreferenceManager getInstance() {
         return instance;
+    }
+
+    /**
+     * Gets the ratio of the S&P 500 today divided by the S&P 500 last close.
+     *
+     * @return The ratio of the S&P 500 today divided by the S&P 500 last close
+     */
+    public double getChangeToday() {
+        return changeToday;
     }
 
     /**
@@ -230,12 +245,41 @@ public class PreferenceManager {
     }
 
     /**
+     * Gets the ratio of the S&P 500 today divided by the S&P 500 last close.
+     */
+    private void setChangeToday() {
+
+        // Get the S&P 500 last close and the S&P 500 today.
+        final Double close = getClose();
+        final Double today = getToday();
+
+        /*
+         * Set the change today as the default change today if either the
+         * last close or today is null.
+         */
+        if ((null == close) || (null == today)) {
+            changeToday = defaultChangeToday;
+        }
+
+        /*
+         * Otherwise, set the change today as the ratio of today divided by
+         * the last close.
+         */
+        else {
+            changeToday = today / close;
+        }
+    }
+
+    /**
      * Sets the last close of the S&P 500.
      *
      * @param value The last close of the S&P 500
      */
     public void setClose(Double value) {
+
+        // Set the S&P 500 close, then set the change today.
         setDouble(CommandLineId.CLOSE, value);
+        setChangeToday();
     }
 
     /**
@@ -359,6 +403,9 @@ public class PreferenceManager {
      * @param value The S&P 500 today
      */
     public void setToday(Double value) {
+
+        // Set the S&P 500 today, then set the change today.
         setDouble(CommandLineId.TODAY, value);
+        setChangeToday();
     }
 }
