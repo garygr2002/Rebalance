@@ -221,6 +221,15 @@ public class PreferenceManager {
     }
 
     /**
+     * Gets the S&P 500 today.
+     *
+     * @return The S&P 500 today
+     */
+    public Double getToday() {
+        return getDouble(CommandLineId.TODAY);
+    }
+
+    /**
      * Sets the last close of the S&P 500.
      *
      * @param value The last close of the S&P 500
@@ -342,5 +351,14 @@ public class PreferenceManager {
      */
     public void setSource(Path value) {
         setPath(CommandLineId.SOURCE, value);
+    }
+
+    /**
+     * Sets the S&P 500 today.
+     *
+     * @param value The S&P 500 today
+     */
+    public void setToday(Double value) {
+        setDouble(CommandLineId.TODAY, value);
     }
 }

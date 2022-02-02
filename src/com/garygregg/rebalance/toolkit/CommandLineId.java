@@ -49,6 +49,10 @@ public enum CommandLineId {
     @SuppressWarnings("SpellCheckingInspection")
     CLOSE("S&P 500 last close", "spcl", true),
 
+    // The S&P 500 today (double, 2 decimal precision)
+    @SuppressWarnings("SpellCheckingInspection")
+    TODAY("S&P 500 today", "sptd", true),
+
     // The limit of allowed receiver delegates
     @SuppressWarnings("SpellCheckingInspection")
     X("rebalance limit of funds per account", "ncnt", true),

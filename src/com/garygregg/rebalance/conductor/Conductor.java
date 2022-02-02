@@ -381,6 +381,10 @@ public class Conductor implements Dispatch<CommandLineId> {
         dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.SOURCE,
                 preferences, outputStream));
 
+        // Add a dispatch for the S&P 500 today.
+        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.TODAY,
+                preferences, outputStream, false));
+
         // Add a preference dispatch for limit of allowed receiver delegates.
         dispatchList.add(new IntPreferenceDispatch<>(CommandLineId.X,
                 preferences, outputStream, false));

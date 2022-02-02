@@ -36,7 +36,7 @@ class Reset extends Informer implements Dispatch<CommandLineId> {
         manager.setDestination(null);
         manager.setExtraordinary(null);
 
-        // Set the S&P 500 high level and the expected annual inflation rate.
+        // Set the S&P 500 high and the expected annual inflation rate.
         manager.setHigh(null);
         manager.setInflation(null);
 
@@ -48,11 +48,12 @@ class Reset extends Informer implements Dispatch<CommandLineId> {
         manager.setLimit(null);
 
         /*
-         * Set the logging level for ordinary informational messages and the
-         * path of the data files.
+         * Set the logging level for ordinary informational messages, the path
+         * of the data files, and the S&P 500 today.
          */
         manager.setOrdinary(null);
         manager.setSource(null);
+        manager.setToday(null);
     }
 
     @Override
