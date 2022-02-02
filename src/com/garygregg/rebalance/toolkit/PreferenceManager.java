@@ -300,7 +300,14 @@ public class PreferenceManager {
      * @return The S&P 500 today
      */
     public Double getToday() {
-        return getDouble(CommandLineId.TODAY);
+
+        /*
+         * Get the value of the S&P 500 today. Return the value of the S&P 500
+         * last close if the value today is null. Otherwise, return the
+         * explicit value of the S&P 500 today.
+         */
+        final Double today = getDouble(CommandLineId.TODAY);
+        return (null == today) ? getClose() : today;
     }
 
     /**
