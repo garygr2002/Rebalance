@@ -19,10 +19,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
+import java.text.Format;
 import java.util.Date;
 import java.util.logging.Logger;
 
 abstract class ReportWriter extends ElementProcessor {
+
+    // A format for S&P 500 values
+    private static final Format sAndP500Format = new DecimalFormat("#.##");
 
     // The valuator for not balanceable assets
     private final Valuator notBalanceable = ValueByNotConsidered.getInstance();
@@ -290,10 +295,6 @@ abstract class ReportWriter extends ElementProcessor {
         Currency socialSecurityMonthly = null;
         Currency taxableAnnual = null;
 
-        // Get the expected inflation rate.
-        final Double inflation =
-                PreferenceManager.getInstance().getInflation();
-
         // Get the description from the portfolio. Is the description not null?
         final PortfolioDescription description = portfolio.getDescription();
         if (null != description) {
@@ -346,14 +347,67 @@ abstract class ReportWriter extends ElementProcessor {
         writer.write(String.format(format, "Taxable annual income is:",
                 (null == taxableAnnual) ? unavailable : taxableAnnual));
 
+        // Write a newline, followed by the preferences.
+        writer.write("\n");
+        writePreferences(writer, format, unavailable);
+    }
+
+    /**
+     * Writes preferences.
+     *
+     * @param writer      The file writer to receive the description
+     * @param format      The format for the lines
+     * @param unavailable A string to use if a preference is null
+     * @throws IOException Indicates an I/O exception occurred
+     */
+    private static void writePreferences(@NotNull Writer writer,
+                                         @SuppressWarnings("SameParameterValue")
+                                                 String format,
+                                         @SuppressWarnings("SameParameterValue")
+                                                 String unavailable)
+            throws IOException {
+
         /*
-         * Format and write the expected annual rate of inflation. Finish by
-         * writing a newline.
+         * Get an instance of the preference manager. Use the preference
+         * manager to get the expected annual inflation rate.
          */
+        final PreferenceManager manager = PreferenceManager.getInstance();
+        Double doubleValue = manager.getInflation();
+
+        // Format and write the inflation rate.
         writer.write(String.format(format, "Expected annual rate of " +
-                "inflation is:", (null == inflation) ?
+                "inflation is:", (null == doubleValue) ?
                 unavailable :
-                String.format("%s%%", Percent.format(inflation))));
+                String.format("%s%%", Percent.format(doubleValue))));
+
+        /*
+         * Use the preference manager to get the S&P 500 high. Format and write
+         * the S&P 500 high.
+         */
+        doubleValue = manager.getHigh();
+        writer.write(String.format(format, "S&P 500 high is: ",
+                (null == doubleValue) ? unavailable : String.format("%s",
+                        sAndP500Format.format(doubleValue))));
+
+        /*
+         * Use the preference manager to get the S&P 500 last close. Format and
+         * write the S&P 500 last close.
+         */
+        doubleValue = manager.getClose();
+        writer.write(String.format(format, "S&P 500 last close is: ",
+                (null == doubleValue) ? unavailable : String.format("%s",
+                        sAndP500Format.format(doubleValue))));
+
+        /*
+         * Use the preference manager to get the S&P 500 today. Format and
+         * write the S&P 500 today.
+         */
+        doubleValue = manager.getToday();
+        writer.write(String.format(format, "S&P 500 today is: ",
+                (null == doubleValue) ? unavailable : String.format("%s",
+                        sAndP500Format.format(doubleValue))));
+
+        // Finish by writing a newline.
         writer.write("\n");
     }
 
