@@ -20,17 +20,17 @@ public class PreferenceManager {
             Preferences.userRoot().node(
                     PreferenceManager.class.getName());
 
-    // The ratio of the S&P 500 today divided by S&P 500 high
-    private double changeHigh = calculateChange(getToday(), getHigh());
+    // The ratio of the S&P 500 last close divided by S&P 500 high
+    private double changeLastClose = calculateChange(getClose(), getHigh());
 
-    // The percent change from the S&P 500 high to the S&P 500 today
-    private double percentHigh = calculatePercent(changeHigh);
+    // The percent change from the S&P 500 high to the S&P 500 last close
+    private double percentLastClose = calculatePercent(changeLastClose);
 
     // The ratio of the S&P 500 today divided by S&P 500 last close
-    private double changeLastClose = calculateChange(getToday(), getClose());
+    private double changeToday = calculateChange(getToday(), getHigh());
 
     // The percent change from the S&P 500 last close to the S&P 500 today
-    private double percentLastClose = calculatePercent(changeLastClose);
+    private double percentToday = calculatePercent(changeToday);
 
     /**
      * Calculates a ratio.
@@ -95,21 +95,23 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the ratio of the S&P 500 today divided by the S&P 500 high.
+     * Gets the ratio of the S&P 500 last close divided by the S&P 500 high
      *
-     * @return The ratio of the S&P 500 today divided by the S&P 500 high
+     * @return The ratio of the S&P 500 last close divided by the S&P 500 high
      */
-    public double getChangeHigh() {
-        return changeHigh;
+    @SuppressWarnings("unused")
+    public double getChangeLastClose() {
+        return changeLastClose;
     }
 
     /**
-     * Gets the ratio of the S&P 500 today divided by the S&P 500 last close.
+     * Gets the ratio of the S&P 500 today divided by the S&P 500 last close
      *
      * @return The ratio of the S&P 500 today divided by the S&P 500 last close
      */
-    public double getChangeLastClose() {
-        return changeLastClose;
+    @SuppressWarnings("unused")
+    public double getChangeToday() {
+        return changeToday;
     }
 
     /**
@@ -240,22 +242,24 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the percent change from the S&P 500 high to the S&P 500 today.
+     * Gets the percent change from the S&P 500 high to the S&P 500 last close
      *
-     * @return The percent change from the S&P 500 high to the S&P 500 today
+     * @return The percent change from the S&P 500 high to the S&P 500 last
+     * close
      */
-    public double getPercentHigh() {
-        return percentHigh;
+    public double getPercentLastClose() {
+        return percentLastClose;
     }
 
     /**
-     * Gets the percent change from the S&P 500 last close to the S&P 500 today
+     * Gets the percent change from the S&P 500 last close to the S&P 500
+     * today.
      *
      * @return The percent change from the S&P 500 last close to the S&P 500
      * today
      */
-    public double getPercentLastClose() {
-        return percentLastClose;
+    public double getPercentToday() {
+        return percentToday;
     }
 
     /**
@@ -311,9 +315,25 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the ratio of the S&P 500 last close divided by the S&P 500 high.
+     * Sets both the ratio of the S&P 500 last close divided by the S&P 500
+     * high, and the ratio of the S&P 500 today divided by the S&P 500 last
+     * close.
      */
-    private void setChangeLastClose() {
+    public void setChangeBoth() {
+
+        /*
+         * Clear the value of the S&P 500 today. Set the change last close and
+         * the change today.
+         */
+        setDouble(CommandLineId.TODAY, null);
+        setChangeLastClose();
+        setChangeToday();
+    }
+
+    /**
+     * Sets the ratio of the S&P 500 last close divided by the S&P 500 high.
+     */
+    public void setChangeLastClose() {
 
         // Calculate the S&P last close change and percentage.
         changeLastClose = calculateChange(getClose(), getHigh());
@@ -321,13 +341,13 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the ratio of the S&P 500 today divided by the S&P 500 last close.
+     * Sets the ratio of the S&P 500 today divided by the S&P 500 last close.
      */
-    private void setChangeToday() {
+    public void setChangeToday() {
 
         // Calculate the S&P 500 today change and percentage.
-        changeHigh = calculateChange(getToday(), getClose());
-        percentHigh = calculatePercent(changeHigh);
+        changeToday = calculateChange(getToday(), getClose());
+        percentToday = calculatePercent(changeToday);
     }
 
     /**
@@ -338,12 +358,11 @@ public class PreferenceManager {
     public void setClose(Double value) {
 
         /*
-         * Set the S&P 500 close, then set the change last close and the
-         * change today.
+         * Set the S&P 500 close. Set both the change last close and the change
+         * today.
          */
         setDouble(CommandLineId.CLOSE, value);
-        setChangeLastClose();
-        setChangeToday();
+        setChangeBoth();
     }
 
     /**
