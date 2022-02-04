@@ -183,7 +183,7 @@ abstract class AccountRebalancer extends Rebalancer {
          * than all the weight), and the new non-stock weight. Put the new
          * stock weight in the weight map.
          */
-        final double newStock = Math.max((oldStock / all + ratio) * all, all);
+        final double newStock = Math.min((oldStock / all + ratio) * all, all);
         final double newNonStock = all - newStock;
         weightMap.put(type, newStock);
 
