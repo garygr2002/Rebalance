@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 abstract class ReportWriter extends ElementProcessor {
 
     // A format for S&P 500 values
-    private static final Format sAndP500Format = new DecimalFormat("#.##");
+    private static final Format sAndP500Format = new DecimalFormat("0.00");
 
     // The valuator for not balanceable assets
     private final Valuator notBalanceable = ValueByNotConsidered.getInstance();
