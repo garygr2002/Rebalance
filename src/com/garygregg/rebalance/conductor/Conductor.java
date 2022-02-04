@@ -344,8 +344,14 @@ public class Conductor implements Dispatch<CommandLineId> {
         final PrintStream outputStream = MessageLogger.getOutputStream();
 
         // Add a dispatch for the S&P 500 last close.
-        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.CLOSE,
-                preferences, outputStream, false));
+        dispatchList.add(new OnPutPreferenceDispatch<>(CommandLineId.CLOSE,
+                preferences, outputStream, false) {
+
+            @Override
+            protected void onPut() {
+                preferenceManager.setChangeBoth();
+            }
+        });
 
         // Add a preference dispatch for the data directory backup.
         dispatchList.add(new PreferenceDispatch<>(CommandLineId.DESTINATION,
@@ -359,8 +365,14 @@ public class Conductor implements Dispatch<CommandLineId> {
                 CommandLineId.EXTRAORDINARY, preferences, outputStream));
 
         // Add a preference dispatch for the S&P 500 high.
-        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.HIGH,
-                preferences, outputStream, false));
+        dispatchList.add(new OnPutPreferenceDispatch<>(CommandLineId.HIGH,
+                preferences, outputStream, false) {
+
+            @Override
+            protected void onPut() {
+                preferenceManager.setChangeLastClose();
+            }
+        });
 
         // Add a preference dispatch for the expected annual inflation.
         dispatchList.add(new DoublePreferenceDispatch<>(
@@ -376,14 +388,19 @@ public class Conductor implements Dispatch<CommandLineId> {
         dispatchList.add(new LimitedPreferenceDispatch<>(
                 CommandLineId.ORDINARY, preferences, outputStream));
 
-
         // Add a preference dispatch for source data directory.
         dispatchList.add(new PathPreferenceDispatch<>(CommandLineId.SOURCE,
                 preferences, outputStream));
 
         // Add a dispatch for the S&P 500 today.
-        dispatchList.add(new DoublePreferenceDispatch<>(CommandLineId.TODAY,
-                preferences, outputStream, false));
+        dispatchList.add(new OnPutPreferenceDispatch<>(CommandLineId.TODAY,
+                preferences, outputStream, false) {
+
+            @Override
+            protected void onPut() {
+                preferenceManager.setChangeToday();
+            }
+        });
 
         // Add a preference dispatch for limit of allowed receiver delegates.
         dispatchList.add(new IntPreferenceDispatch<>(CommandLineId.X,
@@ -667,7 +684,7 @@ public class Conductor implements Dispatch<CommandLineId> {
      */
     @SuppressWarnings("SameParameterValue")
     private static void test(@NotNull Collection<? super String>
-                                         missingPreferences,
+                                     missingPreferences,
                              @NotNull CommandLineId commandLineId,
                              Object preference) {
 
