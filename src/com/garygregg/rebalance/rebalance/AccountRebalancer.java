@@ -162,7 +162,10 @@ abstract class AccountRebalancer extends Rebalancer {
      * Adjust a weight map for relative market valuation.
      *
      * @param weightMap A weight map
-     * @param ratio     The ratio for adjustment
+     * @param ratio     The ratio for adjustment, a value that is added to the
+     *                  current percentage for equities in the weight map
+     *                  (example: If 50.0% equities with a ratio equals 0.2,
+     *                  the new equity percentage becomes 50.02%)
      */
     private static void adjust(@NotNull Map<? super WeightType, Double>
                                        weightMap, double ratio) {
@@ -179,11 +182,13 @@ abstract class AccountRebalancer extends Rebalancer {
         final double oldNonStock = all - oldStock;
 
         /*
-         * Calculate the new stock weight (making sure that it is not greater
-         * than all the weight), and the new non-stock weight. Put the new
-         * stock weight in the weight map.
+         * Calculate the new stock weight, making sure that it is not less than
+         * zero, and not greater than all the weight.
          */
-        final double newStock = Math.min((oldStock / all + ratio) * all, all);
+        final double newStock = Math.max(0., Math.min((oldStock / all + ratio)
+                * all, all));
+
+        // Put the new stock weight in the weight map.
         final double newNonStock = all - newStock;
         weightMap.put(type, newStock);
 
