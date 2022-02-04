@@ -216,7 +216,7 @@ abstract class AccountRebalancer extends Rebalancer {
          * Get the percent change since the last close. Is the percent change
          * something other than zero?
          */
-        double change = PreferenceManager.getInstance().getPercentLastClose();
+        double change = PreferenceManager.getInstance().getPercentToday();
         if (0. != change) {
 
             /*
@@ -253,7 +253,7 @@ abstract class AccountRebalancer extends Rebalancer {
                                      @NotNull OverlayProcedure procedure) {
 
         /*
-         * Get the percent change in the S&P 500 today versus the S&P 500
+         * Get the percent change in the S&P 500 last close versus the S&P 500
          * high. Is the ratio greater than zero? Note: Positive ratio means a
          * decrease in valuation. Semantically, the value of the S&P 500 today
          * cannot be greater than the S&P 500 high. So the ratio will not be
@@ -261,7 +261,8 @@ abstract class AccountRebalancer extends Rebalancer {
          * valuation of the S&P 500 is at a new high. In this case the ratio
          * will be zero and no adjustment needs to be made.
          */
-        final double ratio = PreferenceManager.getInstance().getPercentHigh();
+        final double ratio =
+                PreferenceManager.getInstance().getPercentLastClose();
         if (0. < ratio) {
 
             /*
@@ -514,7 +515,10 @@ abstract class AccountRebalancer extends Rebalancer {
             adjustVsClose(weightMap, stock);
         }
 
-        // Adjust the weight map for high market valuation if so indicated.
+        /*
+         * Adjust the weight map for the market valuation at the last close
+         * versus the market valuation at the high (if so indicated).
+         */
         if (adjust) {
             adjustVsHigh(weightMap, procedure);
         }
