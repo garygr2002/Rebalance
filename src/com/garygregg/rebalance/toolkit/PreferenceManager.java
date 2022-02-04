@@ -27,7 +27,7 @@ public class PreferenceManager {
     private double percentLastClose = calculatePercent(changeLastClose);
 
     // The ratio of the S&P 500 today divided by S&P 500 last close
-    private double changeToday = calculateChange(getToday(), getHigh());
+    private double changeToday = calculateChange(getToday(), getClose());
 
     // The percent change from the S&P 500 last close to the S&P 500 today
     private double percentToday = calculatePercent(changeToday);
