@@ -19,41 +19,44 @@ public class PreferenceManager {
     private final Preferences preferences =
             Preferences.userRoot().node(
                     PreferenceManager.class.getName());
-
-    // The ratio of the S&P 500 last close divided by S&P 500 high
-    private double changeLastClose = calculateChange(getClose(), getHigh());
-
-    // The percent change from the S&P 500 high to the S&P 500 last close
-    private double percentLastClose = calculatePercent(changeLastClose);
-
-    // The ratio of the S&P 500 today divided by S&P 500 last close
-    private double changeToday = calculateChange(getToday(), getClose());
-
-    // The percent change from the S&P 500 last close to the S&P 500 today
-    private double percentToday = calculatePercent(changeToday);
-
-    /**
-     * Calculates a ratio.
-     *
-     * @param numerator   The numerator of the ratio
-     * @param denominator The denominator of the ratio
-     * @return The ratio of the numerator divided the denominator, or a default
-     * if either the numerator or denominator are null
+    /*
+     * A fixer for S&P 500 high less than S&P 500 today when today has been
+     * most recently set
      */
-    @Contract(pure = true)
-    private static @NotNull Double calculateChange(Double numerator,
-                                                   Double denominator) {
-        return ((null == numerator)) || (null == denominator) ?
-                1. : numerator / denominator;
-    }
+    private final ProblemFixer onSetToday = (high, today) ->
+            setDouble(CommandLineId.HIGH, today);
+
+    // The ratio of the S&P 500 'today' divided by S&P 500 last close
+    private double ratioTodayToClose = calculateRatio(getClose());
+
+    /*
+     * The difference between the S&P 500 last close and the S&P 500 today
+     * divided by the S&P 500 last close
+     */
+    private double fractionTodayOfClose = calculateFraction(ratioTodayToClose);
+
+    /*
+     * A fixer for S&P 500 high less than S&P 500 today when the high has been
+     * most recently set
+     */
+    private final ProblemFixer onSetHigh = (high, today) -> setClose(high);
+
+    // The ratio of the S&P 500 'today' of the S&P 500 high
+    private double ratioTodayToHigh = calculateRatio(getHigh());
+
+    /*
+     * The difference between the S&P 500 high and the S&P 500 today divided by
+     * the S&P 500 last high
+     */
+    private double fractionTodayOfHigh = calculateFraction(ratioTodayToHigh);
 
     /**
-     * Calculates a percent from a ratio.
+     * Calculates a fraction from a ratio.
      *
      * @param ratio The ratio
-     * @return A percent calculated from the ratio
+     * @return A fraction calculated from the ratio
      */
-    private static double calculatePercent(double ratio) {
+    private static double calculateFraction(double ratio) {
         return 1. - ratio;
     }
 
@@ -95,23 +98,47 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the ratio of the S&P 500 last close divided by the S&P 500 high
+     * Calculates a ratio.
      *
-     * @return The ratio of the S&P 500 last close divided by the S&P 500 high
+     * @param denominator The denominator of the ratio
+     * @return The ratio of the S&P 500 today divided the denominator
      */
-    @SuppressWarnings("unused")
-    public double getChangeLastClose() {
-        return changeLastClose;
-    }
+    private double calculateRatio(Double denominator) {
 
-    /**
-     * Gets the ratio of the S&P 500 today divided by the S&P 500 last close
-     *
-     * @return The ratio of the S&P 500 today divided by the S&P 500 last close
-     */
-    @SuppressWarnings("unused")
-    public double getChangeToday() {
-        return changeToday;
+        // Declare and initialize the result. Is the denominator not null?
+        double result = 1.;
+        if (denominator != null) {
+
+            /*
+             * The denominator is not null. Reinitialize the result to a
+             * maximum double if the denominator is zero.
+             */
+            if (0. == denominator) {
+                result = Double.MAX_VALUE;
+            }
+
+            // The denominator is neither null nor zero.
+            else {
+
+                /*
+                 * Get the value for the S&P 500 today. Is the S&P 500 today
+                 * not null?
+                 */
+                final Double today = getToday();
+                if (null != today) {
+
+                    /*
+                     * The S&P 500 today is not null. Reinitialize the result
+                     * to the ratio of the ratio of the S&P 500 today and the
+                     * denominator.
+                     */
+                    result = today / denominator;
+                }
+            }
+        }
+
+        // Return the result.
+        return result;
     }
 
     /**
@@ -157,6 +184,29 @@ public class PreferenceManager {
      */
     public Level getExtraordinary() {
         return getLevel(CommandLineId.EXTRAORDINARY);
+    }
+
+    /**
+     * Gets the difference between the S&P 500 last close and the S&P 500 today
+     * divided by the S&P 500 last close.
+     *
+     * @return The difference between the S&P 500 last close and the S&P 500
+     * today divided by the S&P 500 last close
+     */
+    @SuppressWarnings("unused")
+    public double getFractionClose() {
+        return fractionTodayOfClose;
+    }
+
+    /**
+     * Gets the difference between the S&P 500 high and the S&P 500 today
+     * divided by the S&P 500 high.
+     *
+     * @return The difference between the S&P 500 high and the S&P 500 today
+     * divided by the S&P 500 high
+     */
+    public double getFractionHigh() {
+        return fractionTodayOfHigh;
     }
 
     /**
@@ -242,33 +292,31 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the percent change from the S&P 500 high to the S&P 500 last close
-     *
-     * @return The percent change from the S&P 500 high to the S&P 500 last
-     * close
-     */
-    public double getPercentLastClose() {
-        return percentLastClose;
-    }
-
-    /**
-     * Gets the percent change from the S&P 500 last close to the S&P 500
-     * today.
-     *
-     * @return The percent change from the S&P 500 last close to the S&P 500
-     * today
-     */
-    public double getPercentToday() {
-        return percentToday;
-    }
-
-    /**
      * Gets the preferences object used by the preference manager.
      *
      * @return The preferences object used by the preference manager
      */
     public @NotNull Preferences getPreferences() {
         return preferences;
+    }
+
+    /**
+     * Gets the ratio of the S&P 500 today divided by the S&P 500 last close
+     *
+     * @return The ratio of the S&P 500 today divided by the S&P 500 last close
+     */
+    public double getRatioVersusClose() {
+        return ratioTodayToClose;
+    }
+
+    /**
+     * Gets the ratio of the S&P 500 today divided by the S&P 500 high
+     *
+     * @return The ratio of the S&P 500 today divided by the S&P 500 high
+     */
+    @SuppressWarnings("unused")
+    public double getRatioVersusHigh() {
+        return ratioTodayToHigh;
     }
 
     /**
@@ -304,50 +352,20 @@ public class PreferenceManager {
      * @return The S&P 500 today
      */
     public Double getToday() {
+        return getDouble(CommandLineId.TODAY);
+    }
+
+    /**
+     * Recalculates high versus today.
+     */
+    private void recalculateHighVersusToday() {
 
         /*
-         * Get the value of the S&P 500 today. Return the value of the S&P 500
-         * last close if the value today is null. Otherwise, return the
-         * explicit value of the S&P 500 today.
+         * Recalculate the S&P 500 high to today ratio, and the S&P 500 high to
+         * today fraction.
          */
-        final Double today = getDouble(CommandLineId.TODAY);
-        return (null == today) ? getClose() : today;
-    }
-
-    /**
-     * Sets both the ratio of the S&P 500 last close divided by the S&P 500
-     * high, and the ratio of the S&P 500 today divided by the S&P 500 last
-     * close.
-     */
-    public void setChangeBoth() {
-
-        /*
-         * Clear the value of the S&P 500 today. Set the change last close and
-         * the change today.
-         */
-        setDouble(CommandLineId.TODAY, null);
-        setChangeLastClose();
-        setChangeToday();
-    }
-
-    /**
-     * Sets the ratio of the S&P 500 last close divided by the S&P 500 high.
-     */
-    public void setChangeLastClose() {
-
-        // Calculate the S&P last close change and percentage.
-        changeLastClose = calculateChange(getClose(), getHigh());
-        percentLastClose = calculatePercent(changeLastClose);
-    }
-
-    /**
-     * Sets the ratio of the S&P 500 today divided by the S&P 500 last close.
-     */
-    public void setChangeToday() {
-
-        // Calculate the S&P 500 today change and percentage.
-        changeToday = calculateChange(getToday(), getClose());
-        percentToday = calculatePercent(changeToday);
+        ratioTodayToHigh = calculateRatio(getHigh());
+        fractionTodayOfHigh = calculateFraction(ratioTodayToHigh);
     }
 
     /**
@@ -358,11 +376,11 @@ public class PreferenceManager {
     public void setClose(Double value) {
 
         /*
-         * Set the S&P 500 close. Set both the change last close and the change
-         * today.
+         * Set the new value for the S&P 500 last close, and signal that the
+         * value has changed.
          */
         setDouble(CommandLineId.CLOSE, value);
-        setChangeBoth();
+        signalChangeClose();
     }
 
     /**
@@ -401,9 +419,12 @@ public class PreferenceManager {
      */
     public void setHigh(Double value) {
 
-        // Set the S&P 500 high, then set the change last close.
+        /*
+         * Set the new value for the S&P 500 high, and signal that the value
+         * has changed.
+         */
         setDouble(CommandLineId.HIGH, value);
-        setChangeLastClose();
+        signalChangeHigh();
     }
 
     /**
@@ -490,8 +511,104 @@ public class PreferenceManager {
      */
     public void setToday(Double value) {
 
-        // Set the S&P 500 today, then set the change today.
+        /*
+         * Set the new value for the S&P 500 today, and signal that the value
+         * has changed.
+         */
         setDouble(CommandLineId.TODAY, value);
-        setChangeToday();
+        signalChangeToday();
+    }
+
+    /**
+     * Signals that the S&P 500 last close has changed.
+     */
+    public void signalChangeClose() {
+
+        /*
+         * Set the S&P 500 today the same as the S&P 500 last close, and signal
+         * that the S&P 500 today has changed.
+         */
+        setDouble(CommandLineId.TODAY, getClose());
+        signalChangeToday();
+    }
+
+    /**
+     * Signals that the S&P 500 high has changed.
+     */
+    public void signalChangeHigh() {
+
+        /*
+         * Test the new S&P 500 high against the S&P 500 today, and take a
+         * corrective action if high is less than today. Was the corrective
+         * action not required?
+         */
+        if (!testHighVsToday(onSetHigh)) {
+
+            /*
+             * The corrective action was not required. Recalculate the S&P 500
+             * high versus today.
+             */
+            recalculateHighVersusToday();
+        }
+    }
+
+    /**
+     * Signals that the S&P 500 today has changed.
+     */
+    public void signalChangeToday() {
+
+        /*
+         * Test the new S&P 500 today against the S&P 500 high, and take a
+         * corrective action if high is less than today. Recalculate the S&P
+         * 500 high to last close ratio, and the S&P 500 high to last close
+         * fraction.
+         */
+        testHighVsToday(onSetToday);
+        ratioTodayToClose = calculateRatio(getClose());
+        fractionTodayOfClose = calculateFraction(ratioTodayToClose);
+    }
+
+    /**
+     * Tests the S&P 500 high versus the S&P 500 today, and calls a procedure
+     * to fix the problem if the high is less than today.
+     *
+     * @param fixer The fixer to use if there is a problem
+     * @return True if a problem was detected and fixed; false otherwise
+     */
+    private boolean testHighVsToday(@NotNull ProblemFixer fixer) {
+
+        // Get the S&P 500 high and the S&P 500 today.
+        final Double high = getHigh();
+        final Double today = getToday();
+
+        /*
+         * Determine if there is a problem that needs to be fixed. Does a
+         * problem need to be fixed?
+         */
+        final boolean fixed = (!((null == high) || (null == today))) &&
+                (high < today);
+        if (fixed) {
+
+            /*
+             * A problem needs to be fixed. Fix the problem, and recalculate
+             * the S&P 500 high versus today.
+             */
+            fixer.fixIt(high, today);
+            recalculateHighVersusToday();
+        }
+
+        // Return whether there was a problem detected, and fixed.
+        return fixed;
+    }
+
+    private interface ProblemFixer {
+
+        /**
+         * Fixes a problem if the S&P 500 high is less than the S&P 500 today.
+         *
+         * @param high  The S&P 500 high
+         * @param today The S&P 500 today
+         */
+        void fixIt(double high, double today);
     }
 }
