@@ -12,7 +12,8 @@ public abstract class Countable implements ICountable {
      * @param precision The precision of the countable
      * @param truncate  True if the value should be truncated, false if rounded
      */
-    Countable(double value, int precision, boolean truncate) {
+    Countable(double value, int precision,
+              @SuppressWarnings("SameParameterValue") boolean truncate) {
         this.value = truncate ? ICountable.truncate(value, precision) :
                 ICountable.round(value, precision);
     }
