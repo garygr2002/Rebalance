@@ -107,7 +107,7 @@ public class PreferenceManager {
 
         // Declare and initialize the result. Is the denominator not null?
         double result = 1.;
-        if (denominator != null) {
+        if (null != denominator) {
 
             /*
              * The denominator is not null. Reinitialize the result to a
