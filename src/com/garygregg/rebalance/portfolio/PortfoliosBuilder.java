@@ -494,7 +494,7 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                                         "'%s' at line number %d, column " +
                                         "number %d in the portfolio file " +
                                         "cannot be parsed; using %s.", string,
-                                getRow(), super.getColumn(), defaultValue));
+                                getRow(), getColumn(), defaultValue));
                     }
                 };
 
