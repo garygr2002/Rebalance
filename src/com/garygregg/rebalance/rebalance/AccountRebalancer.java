@@ -46,6 +46,10 @@ abstract class AccountRebalancer extends Rebalancer {
     private static final List<WeightType> levelOne =
             WeightType.getLevelOne();
 
+    // The preference manager
+    private static final PreferenceManager manager =
+            PreferenceManager.getInstance();
+
     // The distinguished value for nothing
     private static final double nothing = Percent.getZero().getValue();
 
@@ -177,106 +181,76 @@ abstract class AccountRebalancer extends Rebalancer {
         final double all = sumWeights(weightMap);
         WeightType type = WeightType.STOCK;
 
-        // Get the old stock weight. Calculate the old non-stock weight.
-        final double oldStock = weightMap.get(type);
-        final double oldNonStock = all - oldStock;
-
         /*
-         * Calculate the new stock weight, making sure that it is not less than
-         * zero, and not greater than all the weight.
+         * Get the old stock weight, and calculate the new stock weight. Make
+         * sure that the new stock weight is not less than zero, and not
+         * greater than all the weight.
          */
+        final double oldStock = weightMap.get(type);
         final double newStock = Math.max(0., Math.min((oldStock / all + ratio)
                 * all, all));
 
-        // Put the new stock weight in the weight map.
-        final double newNonStock = all - newStock;
-        weightMap.put(type, newStock);
-
         /*
-         * Calculate the non-stock ratio. Put the new bond weight in the weight
-         * map.
+         * Put the new stock weight in the weight map. Calculate the old
+         * non-stock weight. Is the old non-stock weight not equal to zero?
          */
-        final double nonStockRatio = newNonStock / oldNonStock;
-        type = WeightType.BOND;
-        weightMap.put(type, weightMap.get(type) * nonStockRatio);
+        weightMap.put(type, newStock);
+        final double oldNonStock = all - oldStock;
+        if (0 != oldNonStock) {
 
-        // Put the new cash weight in the weight map.
-        type = WeightType.CASH;
-        weightMap.put(type, weightMap.get(type) * nonStockRatio);
+            /*
+             * The old non-stock weight is not equal to zero. Calculate the
+             * non-stock ratio. Calculate the new bond weight, and put it in
+             * the weight map.
+             */
+            final double nonStockRatio = (all - newStock) / oldNonStock;
+            type = WeightType.BOND;
+            weightMap.put(type, weightMap.get(type) * nonStockRatio);
 
-        // Put the new real-estate weight in the weight map.
-        type = WeightType.REAL_ESTATE;
-        weightMap.put(type, weightMap.get(type) * nonStockRatio);
+            // Calculate the new cash weight, and put it in the weight map.
+            type = WeightType.CASH;
+            weightMap.put(type, weightMap.get(type) * nonStockRatio);
+
+            /*
+             * Calculate the new real-estate weight, and put it in the weight
+             * map.
+             */
+            type = WeightType.REAL_ESTATE;
+            weightMap.put(type, weightMap.get(type) * nonStockRatio);
+        }
     }
 
     /**
      * Adjust a weight map for market valuation today versus last close.
      *
-     * @param weightMap   A weight map
-     * @param weightStock The existing weight of stock
-     */
-    private static void adjustVsClose(@NotNull Map<? super WeightType, Double>
-                                              weightMap, double weightStock) {
-
-        /*
-         * Get the percent change since the last close. Is the percent change
-         * something other than zero?
-         */
-        double change = PreferenceManager.getInstance().getPercentToday();
-        if (0. != change) {
-
-            /*
-             * The percent change is something other than zero. Calculate the
-             * percent stock given the stock weight and the sum of the level
-             * one weights in the weight map. Reinterpret the change as a
-             * factor to apply to the percent stock.
-             */
-            final double percentStock = weightStock / sumWeights(weightMap);
-            change = 1. - change;
-
-            /*
-             * Now use the percent stock and the change to calculate an adjustment
-             * factor. Is the adjustment factor not zero?
-             */
-            final double adjustment = percentStock / (percentStock + change -
-                    percentStock * change) - percentStock;
-            if (0. != adjustment) {
-
-                // The adjustment is not zero. Apply it.
-                adjust(weightMap, adjustment);
-            }
-        }
-    }
-
-    /**
-     * Adjust a weight map for market valuation today versus high.
-     *
      * @param weightMap A weight map
-     * @param procedure An overlay procedure
      */
-    private static void adjustVsHigh(@NotNull Map<? super WeightType, Double>
-                                             weightMap,
-                                     @NotNull OverlayProcedure procedure) {
+    private static void adjustVsClose(@NotNull Map<? super WeightType,
+            Double> weightMap) {
 
         /*
-         * Get the percent change in the S&P 500 last close versus the S&P 500
-         * high. Is the ratio greater than zero? Note: Positive ratio means a
-         * decrease in valuation. Semantically, the value of the S&P 500 today
-         * cannot be greater than the S&P 500 high. So the ratio will not be
-         * negative if that rule holds. It is possible, however, that today the
-         * valuation of the S&P 500 is at a new high. In this case the ratio
-         * will be zero and no adjustment needs to be made.
+         * Get the ratio of the S&P 500 today versus S&P 500 last close. Is the
+         * ratio something other than one?
          */
-        final double ratio =
-                PreferenceManager.getInstance().getPercentLastClose();
-        if (0. < ratio) {
+        final double ratio = manager.getRatioVersusClose();
+        if (1. != ratio) {
 
             /*
-             * The percent change in the S&P 500 today versus the S&P 500 high
-             * is greater than zero (again, meaning a decrease). Adjust the
-             * weight map using the ratio.
+             * The ratio of the S&P 500 today versus S&P 500 last close is
+             * something other than one. Calculate the existing percentage of
+             * equities. Is the percentage something other than zero?
              */
-            adjust(weightMap, procedure.adjustEquity(ratio));
+            final double percentStock = weightMap.get(WeightType.STOCK) /
+                    sumWeights(weightMap);
+            if (0. != percentStock) {
+
+                /*
+                 * The existing percentage of equities is something other than
+                 * zero. Make an adjustment.
+                 */
+                adjust(weightMap, percentStock / (percentStock + ratio -
+                        percentStock * ratio) - percentStock);
+            }
         }
     }
 
@@ -486,15 +460,15 @@ abstract class AccountRebalancer extends Rebalancer {
     /**
      * Creates a weight map for an account.
      *
-     * @param account   The account for which to create a weight map
-     * @param procedure The overlay procedure for the map
-     * @param adjust    True if the map should be adjusted for relative market
-     *                  valuation; false otherwise
+     * @param account      The account for which to create a weight map
+     * @param procedure    The overlay procedure for the map
+     * @param adjustVsHigh True if the map should be adjusted for relative
+     *                     market valuation; false otherwise
      * @return A weight map for the account
      */
     private static @NotNull Map<WeightType, Double> getWeights(
             @NotNull Account account, @NotNull OverlayProcedure procedure,
-            boolean adjust) {
+            boolean adjustVsHigh) {
 
         // Declare an empty weight map.
         final Map<WeightType, Double> weightMap =
@@ -502,31 +476,25 @@ abstract class AccountRebalancer extends Rebalancer {
 
         /*
          * Initialize the weight map. Perform the given overlay procedure with
-         * the initialized weight map and the account.
+         * the initialized weight map and the account. Adjust the weight map
+         * for the market valuation today versus last close.
          */
         initializeMap(weightMap);
         procedure.overlay(weightMap, account);
+        adjustVsClose(weightMap);
 
         /*
-         * Get the current stock weight from the weight map. Is the current
-         * stock weight greater than zero?
+         * Should the weight map be adjusted again for the valuation today
+         * versus market high?
          */
-        final double stock = weightMap.get(WeightType.STOCK);
-        if (0. < stock) {
+        if (adjustVsHigh) {
 
             /*
-             * The current stock weight is greater than zero. Adjust the weight
-             * map for the market valuation today versus last close.
+             * The weight map should be adjusted again for the valuation today
+             * versus market high. Do it.
              */
-            adjustVsClose(weightMap, stock);
-        }
-
-        /*
-         * Adjust the weight map for the market valuation at the last close
-         * versus the market valuation at the high (if so indicated).
-         */
-        if (adjust) {
-            adjustVsHigh(weightMap, procedure);
+            adjust(weightMap,
+                    procedure.adjustEquity(manager.getFractionHigh()));
         }
 
         // Return the weight map.
