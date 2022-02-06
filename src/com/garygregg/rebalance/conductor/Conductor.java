@@ -349,7 +349,7 @@ public class Conductor implements Dispatch<CommandLineId> {
 
             @Override
             protected void onPut() {
-                preferenceManager.setChangeBoth();
+                preferenceManager.signalChangeClose();
             }
         });
 
@@ -370,7 +370,7 @@ public class Conductor implements Dispatch<CommandLineId> {
 
             @Override
             protected void onPut() {
-                preferenceManager.setChangeLastClose();
+                preferenceManager.signalChangeHigh();
             }
         });
 
@@ -398,7 +398,7 @@ public class Conductor implements Dispatch<CommandLineId> {
 
             @Override
             protected void onPut() {
-                preferenceManager.setChangeToday();
+                preferenceManager.signalChangeToday();
             }
         });
 
