@@ -1,12 +1,6 @@
 Things to do:
 
-1. Take another look at whether the "--u" option is as useful as it can be.
-
-2. Clear data files in IntelliJ project and put data directory under version
-   control in preparation for adding sample data files without sensitive
-   personal information.
-
-3. Create git repository documentation including sample data files without
+1. Create git repository documentation including sample data files without
    sensitive personal information; project complete for now! Goal is to call
    project completion by end of February 2022.
 
