@@ -229,27 +229,56 @@ abstract class AccountRebalancer extends Rebalancer {
             Double> weightMap) {
 
         /*
-         * Get the ratio of the S&P 500 today versus S&P 500 last close. Is the
-         * ratio something other than one?
+         * Declare the weight type with which we are working. Get the ratio of
+         * the S&P 500 today versus S&P 500 last close. Is the ratio infinite
+         * (meaning: The value of equities at the last close was zero)?
          */
+        final WeightType equities = WeightType.STOCK;
         final double ratio = manager.getRatioVersusClose();
-        if (1. != ratio) {
+        if (Double.isInfinite(ratio)) {
 
             /*
-             * The ratio of the S&P 500 today versus S&P 500 last close is
-             * something other than one. Calculate the existing percentage of
-             * equities. Is the percentage something other than zero?
+             * The value of equities at the last close was zero. Set the weight
+             * of equities to zero in the weight map.
              */
-            final double percentStock = weightMap.get(WeightType.STOCK) /
-                    sumWeights(weightMap);
-            if (0. != percentStock) {
+            weightMap.put(equities, 0.);
+        }
+
+        /*
+         * The ratio is not infinite. Is it something other than one (meaning,
+         * the S&P 500 today is different from the S&P 500 at the last close)?
+         */
+        else if (1. != ratio) {
+
+            /*
+             * The S&P 500 today is different from what it was at the last
+             * close. Declare and initialize the do-nothing constant. Sum the
+             * level one weights. Is the level one weight sum different from
+             * the do-nothing constant?
+             */
+            final double doNothingConstant = 0.;
+            final double weightSum = sumWeights(weightMap);
+            if (doNothingConstant != weightSum) {
 
                 /*
-                 * The existing percentage of equities is something other than
-                 * zero. Make an adjustment.
+                 * The level one weight sum is different from the do-nothing
+                 * constant. Calculate the percent of equities in the weight
+                 * sum. Is the percent equities different from the do-nothing
+                 * constant?
                  */
-                adjust(weightMap, percentStock / (percentStock + ratio -
-                        percentStock * ratio) - percentStock);
+                final double percentEquities = weightMap.get(equities) /
+                        weightSum;
+                if (doNothingConstant != percentEquities) {
+
+                    /*
+                     * The percent of equities is different from the do-nothing
+                     * constant. Adjust the percent of equities based on their
+                     * current weight and the ratio the S&P 500 today versus
+                     * last close.
+                     */
+                    adjust(weightMap, percentEquities / (percentEquities +
+                            ratio - percentEquities * ratio) - percentEquities);
+                }
             }
         }
     }
@@ -476,25 +505,44 @@ abstract class AccountRebalancer extends Rebalancer {
 
         /*
          * Initialize the weight map. Perform the given overlay procedure with
-         * the initialized weight map and the account. Adjust the weight map
-         * for the market valuation today versus last close.
+         * the initialized weight map and the account.
          */
         initializeMap(weightMap);
         procedure.overlay(weightMap, account);
-        adjustVsClose(weightMap);
 
         /*
-         * Should the weight map be adjusted again for the valuation today
-         * versus market high?
+         * Adjust the weight map for the market valuation today versus its last
+         * close. Should the weight map be adjusted again for its valuation
+         * today versus market high?
          */
+        adjustVsClose(weightMap);
         if (adjustVsHigh) {
 
             /*
-             * The weight map should be adjusted again for the valuation today
-             * versus market high. Do it.
+             * The weight map should be adjusted again for its valuation today
+             * versus market high. Get the fraction of the market today versus
+             * high. Is the fraction infinite (meaning: The value of equities
+             * at market high was zero)?
              */
-            adjust(weightMap,
-                    procedure.adjustEquity(manager.getFractionHigh()));
+            final double fraction = manager.getFractionHigh();
+            if (Double.isInfinite(fraction)) {
+
+                /*
+                 * The value of equities at market high was zero. Set the
+                 * weight of equities to zero in the weight map.
+                 */
+                weightMap.put(WeightType.STOCK, 0.);
+            }
+
+            /*
+             * The value of equities at market high was not zero. If there is a
+             * difference between the value of equities today versus the value
+             * of equities at market high, do the following: Call the equity
+             * adjustment procedure, and apply its results to the weight map.
+             */
+            else if (0. != fraction) {
+                adjust(weightMap, procedure.adjustEquity(fraction));
+            }
         }
 
         // Return the weight map.

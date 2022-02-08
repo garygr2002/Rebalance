@@ -54,10 +54,11 @@ public class PreferenceManager {
      * Calculates a fraction from a ratio.
      *
      * @param ratio The ratio
-     * @return A fraction calculated from the ratio
+     * @return A fraction calculated from the ratio if the ratio is not
+     * infinite. Otherwise, the ratio itself
      */
     private static double calculateFraction(double ratio) {
-        return 1. - ratio;
+        return Double.isInfinite(ratio) ? ratio : 1. - ratio;
     }
 
     /**
@@ -101,7 +102,11 @@ public class PreferenceManager {
      * Calculates a ratio.
      *
      * @param denominator The denominator of the ratio
-     * @return The ratio of the S&P 500 today divided the denominator
+     * @return A default of one if either the denominator or the current value
+     * of the S&P 500 is null. Otherwise, the value of the S&P 500 today
+     * divided by the denominator if the denominator is not zero. If the
+     * denominator is zero the result will be positive or negative infinity
+     * depending on the sign of the S&P 500 today
      */
     private double calculateRatio(Double denominator) {
 
@@ -110,28 +115,27 @@ public class PreferenceManager {
         if (null != denominator) {
 
             /*
-             * The denominator is not null. Reinitialize the result to a
-             * maximum double if the denominator is zero.
+             * The denominator is not null. Get the value for the S&P 500
+             * today. Is the S&P 500 today not null?
              */
-            if (0. == denominator) {
-                result = Double.MAX_VALUE;
-            }
-
-            // The denominator is neither null nor zero.
-            else {
+            final Double today = getToday();
+            if (null != today) {
 
                 /*
-                 * Get the value for the S&P 500 today. Is the S&P 500 today
-                 * not null?
+                 * The S&P 500 today is not null. Reset the result to either
+                 * positive or negative infinity (depending on the sign of
+                 * 'today') if the denominator is zero.
                  */
-                final Double today = getToday();
-                if (null != today) {
+                if (0. == denominator) {
+                    result = (0. < today) ? Double.POSITIVE_INFINITY :
+                            Double.NEGATIVE_INFINITY;
+                }
 
-                    /*
-                     * The S&P 500 today is not null. Reinitialize the result
-                     * to the ratio of the ratio of the S&P 500 today and the
-                     * denominator.
-                     */
+                /*
+                 * The denominator is not zero. Reset the result to the ratio
+                 * of the S&P 500 today divided by the denominator.
+                 */
+                else {
                     result = today / denominator;
                 }
             }
@@ -191,7 +195,9 @@ public class PreferenceManager {
      * divided by the S&P 500 last close.
      *
      * @return The difference between the S&P 500 last close and the S&P 500
-     * today divided by the S&P 500 last close
+     * today, this divided by the S&P 500 last close if the S&P 500 last close
+     * is not zero. Otherwise, positive or negative infinity depending on the
+     * sign of the S&P 500 today
      */
     @SuppressWarnings("unused")
     public double getFractionClose() {
@@ -202,8 +208,10 @@ public class PreferenceManager {
      * Gets the difference between the S&P 500 high and the S&P 500 today
      * divided by the S&P 500 high.
      *
-     * @return The difference between the S&P 500 high and the S&P 500 today
-     * divided by the S&P 500 high
+     * @return The difference between the S&P 500 high and the S&P 500 today,
+     * this divided by the S&P 500 high if the S&P 500 high is not zero.
+     * Otherwise, positive or negative infinity depending on the sign of the
+     * S&P 500 today
      */
     public double getFractionHigh() {
         return fractionTodayOfHigh;
@@ -304,6 +312,8 @@ public class PreferenceManager {
      * Gets the ratio of the S&P 500 today divided by the S&P 500 last close
      *
      * @return The ratio of the S&P 500 today divided by the S&P 500 last close
+     * if the S&P 500 last close is not zero. Otherwise, positive or negative
+     * infinity depending on the sign of the S&P 500 today.
      */
     public double getRatioVersusClose() {
         return ratioTodayToClose;
@@ -312,7 +322,9 @@ public class PreferenceManager {
     /**
      * Gets the ratio of the S&P 500 today divided by the S&P 500 high
      *
-     * @return The ratio of the S&P 500 today divided by the S&P 500 high
+     * @return The ratio of the S&P 500 today divided by the S&P 500 high if
+     * the S&P 500 high is not zero. Otherwise, positive or negative infinity
+     * depending on the sign of the S&P 500 today.
      */
     @SuppressWarnings("unused")
     public double getRatioVersusHigh() {
