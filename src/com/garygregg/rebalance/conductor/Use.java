@@ -4,7 +4,9 @@ import com.garygregg.rebalance.cla.CLAException;
 import com.garygregg.rebalance.cla.PreferenceDispatch;
 import com.garygregg.rebalance.toolkit.CommandLineId;
 import com.garygregg.rebalance.toolkit.PreferenceManager;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -26,6 +28,27 @@ class Use extends PreferenceDispatch<CommandLineId> {
         super(CommandLineId.USE, preferences, stream);
     }
 
+    /**
+     * Processes elements from a data source path.
+     *
+     * @param elements The elements from a data source path
+     * @return Processed elements from the data source path
+     */
+    @Contract(value = "_ -> param1", pure = true)
+    private static @NotNull String @NotNull @Unmodifiable [] processSource(
+            @NotNull String @NotNull [] elements) {
+
+        /*
+         * Isolate the last element. Return the last element as a single-
+         * element array if any element exists. Return an empty string if no
+         * element exists. Note: Formerly this class operated by using all the
+         * elements, i.e., simply returning the argument to this method.
+         */
+        final int elementsLength = elements.length;
+        return new String[]{(0 < elementsLength) ?
+                elements[elementsLength - 1] : ""};
+    }
+
     @Override
     public void dispatch(String argument) throws CLAException {
 
@@ -41,20 +64,21 @@ class Use extends PreferenceDispatch<CommandLineId> {
 
                 /*
                  * The source is not null. Create a list to build destination
-                 * path elements. Add 'home', the user's name, and the
-                 * argument.
+                 * path elements, and add 'home'.
                  */
                 final List<String> destinationElementList = new ArrayList<>();
                 destinationElementList.add("home");
+
+                // Add the user's name, and the argument.
                 destinationElementList.add(System.getProperty("user.name"));
                 destinationElementList.add(argument);
 
                 /*
                  * Get the source elements by splitting on the file separator.
-                 * Cycle for each source element.
+                 * Process the elements, and cycle for each source element.
                  */
                 final String[] sourceElements =
-                        source.toString().split(File.separator);
+                        processSource(source.toString().split(File.separator));
                 for (String sourceElement : sourceElements) {
 
                     /*
