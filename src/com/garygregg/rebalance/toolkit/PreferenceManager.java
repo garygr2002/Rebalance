@@ -55,10 +55,36 @@ public class PreferenceManager {
      *
      * @param ratio The ratio
      * @return A fraction calculated from the ratio if the ratio is not
-     * infinite. Otherwise, the ratio itself
+     * infinite; otherwise, an appropriately signed infinity
      */
     private static double calculateFraction(double ratio) {
-        return Double.isInfinite(ratio) ? ratio : 1. - ratio;
+
+        // Declare the result. Is the ratio positive infinity?
+        double result;
+        if (Double.POSITIVE_INFINITY == ratio) {
+
+            /*
+             * The ratio is positive infinity. Set the result to negative
+             * infinity.
+             */
+            result = Double.NEGATIVE_INFINITY;
+        }
+
+        /*
+         * Set the result to positive infinity if the ratio is negative
+         * infinity.
+         */
+        else if (Double.NEGATIVE_INFINITY == ratio) {
+            result = Double.POSITIVE_INFINITY;
+        }
+
+        // The ratio is not infinity. Calculate the result appropriately.
+        else {
+            result = 1. - ratio;
+        }
+
+        // Return the result.
+        return result;
     }
 
     /**
