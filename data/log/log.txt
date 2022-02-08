@@ -1,0 +1,4 @@
+This directory will contain log files in the format log_yyyymmdd.txt for a run
+of the rebalancer on that day. Warning: The log file will be overwritten for a
+subsequent run of the rebalancer on the same day, although the output in the
+log file should not vary if the input files have not changed.

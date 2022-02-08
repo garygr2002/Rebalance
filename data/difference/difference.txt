@@ -1,0 +1,12 @@
+This directory will contain subdirectories for all investors named in the
+portfolio file. For each investor, there will be files of the form
+difference_yyyymmdd.txt that contain the holdings in the same format as the
+holdings file of the same date. The trailing numeric columns for each row
+will give the post-rebalance value for the corresponding holding, its pre-
+rebalance value, and the difference between the two. Each holding row
+corresponds to a portfolio, institution, account or ticker in a nested
+hierarchy. It is intended that the difference for the holding row for
+portfolios, institutions or accounts never be anything but zero. The
+differences for tickers may be non-zero so long as they have a zero difference
+in the account where they reside. This file is suitable to be parsed as a
+comma-separated value file.

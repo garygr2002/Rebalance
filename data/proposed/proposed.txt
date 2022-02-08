@@ -1,0 +1,7 @@
+This directory will contain subdirectories for all investors named in the
+portfolio file. For each investor, there will be files of the form
+proposed_yyyymmdd.txt that contain readable, post-rebalance reports about the
+portfolio of each investor. The report balances should be identical to those
+contained in corresponding 'report' files (pre-rebalance), although the
+distribution of assets among investment classes may (probably will) be
+different.

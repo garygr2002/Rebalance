@@ -1,0 +1,41 @@
+Things to do:
+
+1. Take another look at whether the "--u" option is as useful as it can be.
+
+2. Clear data files in IntelliJ project and put data directory under version
+   control in preparation for adding sample data files without sensitive
+   personal information.
+
+3. Create git repository documentation including sample data files without
+   sensitive personal information; project complete for now! Goal is to call
+   project completion by end of February 2022.
+
+For your information:
+
+   Account: Does not use optional field processors; builds type percentages
+   directly.
+
+   Code: Uses specific field processors for mnemonic and description, and an
+   array of field processors for the four subcode fields, indexed zero through
+   last index.
+
+   Detailed: Does not use optional field processors; builds type percentages
+   directly.
+
+   HoldingType: Specific field processors for name, shares, price and value.
+
+   Portfolio: Uses an array of field processors for percentages, indexed zero
+   through last index.
+
+   Ticker: Uses a single field processor for each of the four possible fund
+   subtypes.
+
+Notes on capital gains tax on real-estate sale:
+
+Wrong way - Formula for capital gains tax: Sale price average of $998,950.50
+minus mortgage value of $218,598.38 minus price paid $396,300.00 minus
+exclusion of $250.000.00. From this, take 15%. Total is $20,107.82.
+
+Right way - Formula for capital gains tax: Sale price average of $998,950.50
+minus price paid $396,300.00 minus exclusion of $250.000.00. From this, take
+15%. Total is $52,897.58.

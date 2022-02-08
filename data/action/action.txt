@@ -1,0 +1,5 @@
+This directory will contain subdirectories for all investors named in the
+portfolio file. For each investor, there will be files of the form
+action_yyyymmdd.txt that contain the specific buy, sell, or buy-to-sell
+actions required to rebalance the portfolio of the given investor for the
+holding file of the same date.
