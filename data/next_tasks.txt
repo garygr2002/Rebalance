@@ -1,8 +1,26 @@
 Things to do:
 
-1. Create git repository documentation including sample data files without
-   sensitive personal information; project complete for now! Goal is to call
-   project completion by end of February 2022.
+1. Add T. Rowe Price and Vanguard ETFs to sample ticker file.
+
+2. Add Fidelity mutual funds and ETFs to sample ticker file.
+
+3. Add sample checking and savings account "funds" for some well-known
+   institutions to sample ticker file.
+
+4. Add sample account file with accounts for both sample investors.
+
+5. Add sample detailed file for a few of the accounts in the sample account
+   file.
+
+6. Create a holding file referencing sample investors, institutions, and
+   accounts.
+
+7. Make sure rebalancer runs and produces sane output for the sample data
+   files.
+
+8. Create git repository documentation, including instructions for project
+   download, build and run. Goal is to call project completion by end of
+   February 2022.
 
 For your information:
 
