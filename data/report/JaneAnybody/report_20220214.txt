@@ -1,0 +1,49 @@
+Portfolio summary for: Jane Alice Anybody
+
+The date of the hierarchy is:         2022-02-14.
+The date of the holding library is:   2022-02-14.
+The date of the basis library is:     2022-02-14.
+The date of the code library is:      2022-01-14.
+The date of the portfolio library is: 2022-02-14.
+The date of the account library is:   2022-02-14.
+The date of the detailed library is:  2022-02-14.
+The date of the ticker library is:    2022-02-14.
+
+Investor birthday is:                 1993-08-15.
+Investor projected mortality date is: 2079-02-14.
+CPI adjusted monthly income is:       0.00.
+Non-CPI adjusted monthly income is:   0.00.
+Social Security monthly income is:    1,370.00.
+Taxable annual income is:             63,200.00.
+
+Expected annual rate of inflation is: 3.220%.
+S&P 500 high is:                      4818.62.
+S&P 500 last close is:                4326.51.
+S&P 500 today is:                     4431.85.
+
+Holdings that can be rebalanced:
+
+Institution     Taxable         Tax Deferred    Tax Paid        Total          
+--------------- --------------- --------------- --------------- ---------------
+TRowePrice             6,950.96       93,039.76            0.00       99,990.72
+XYZ Cr Union           1,042.80            0.00            0.00        1,042.80
+--------------- --------------- --------------- --------------- ---------------
+JaneAnybody            7,993.76       93,039.76            0.00      101,033.52
+
+The 'Total' column may not equal the sum of the numeric columns preceding it.
+
+Stock general:        39,579.40         39.175%
+Bond general:         44,436.74         43.982%
+Cash general:         17,017.38         16.843%
+Real-estate:               0.00          0.000%
+
+Holdings that cannot be rebalanced:
+
+Holding Name                                                    Value          
+--------------------------------------------------------------- ---------------
+Social Security Jane Alice Anybody                                   384,970.00
+Rewards Mastercard                                                    -1,324.57
+--------------------------------------------------------------- ---------------
+JaneAnybody                                                          383,645.43
+
+Total portfolio value for Jane Alice Anybody is: 484,678.95.

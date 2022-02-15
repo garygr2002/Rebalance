@@ -1,0 +1,6 @@
+JaneAnybody, 0000000000000001,00000000,Social Security Jane Alice Anybody,        Pension,       Percent,         0.00,  0.00,100.00,  0.00,Social_Security
+TRowePrice,  0000000833570510,00000004,Brokerage,                                 Taxable,       Redistribute,   50.00,  0.00, 50.00,  0.00
+TRowePrice,  0000000741830296,00000005,IRA,                                       Non_roth_ira,  Redistribute,   70.00, 25.00, 10.00,  5.00
+XYZ Cr Union,0000006231592710,00000001,Checking,                                  Taxable,       Percent,         0.00,  0.00,100.00,  0.00
+XYZ Cr Union,0000001638472938,00000002,Savings,                                   Taxable,       Percent,         0.00,  0.00,100.00,  0.00
+BofA,        5137434439329760,00000003,Rewards Mastercard,                        Credit,        Percent,         0.00,  0.00,100.00,  0.00
