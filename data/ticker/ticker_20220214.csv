@@ -1,3 +1,4 @@
+J,BOFAM,9760,Rewards Mastercard,                          -10000.00,        ,C,D,_,_
 F,OTCFX,0048,Small-Cap Stock,                               2500.00,        ,S,D,W,G
 F,RPMGX,0047,Mid-Cap Growth,                                2500.00,        ,S,D,M,G
 F,PEXMX,0099,Extended Equity Market Index,                  2500.00,        ,S,D,M,G
@@ -43,3 +44,5 @@ F,VTIAX,0569,Total International Stock Index Admiral,       3000.00,        ,S,O
 F,VVIAX,0506,Value Index Admiral,                           3000.00,        ,S,D,L,V
 F,VWEHX,0029,High-Yield Corporate Investor,                 3000.00,        ,B,D,T,Y
 F,VWILX,0581,International Growth Admiral,                 50000.00,        ,S,O,L,G
+F,XYZ1, 1000,Checking,                                         0.00,        ,C,D,_,_
+F,XYZ2, 1001,Savings,                                          0.00,        ,C,D,_,_
