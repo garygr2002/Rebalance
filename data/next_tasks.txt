@@ -1,19 +1,11 @@
 Things to do:
 
-1. Add Vanguard ETFs to sample ticker file for investor John Thomas Doe.
+1. Try to figure out how to a create command line build file for the project.
 
-2. Add account, basis, detailed and holding file entries for sample investor
-   John Thomas Doe.
-
-3. Make sure rebalancer runs and produces sane output for the sample investors
-   Jane Alice Anybody and John Thomas Doe.
-
-4. Try to figure out how to create command line build file for the project.
-
-5. Create build instructions for project for Linux and MacOS (Windows
+2. Create build instructions for project for Linux and MacOS (Windows
    build instructions will require PC rental).
 
-6. Create git repository documentation, including instructions for project
+3. Create git repository documentation, including instructions for project
    download, build and run. Goal is to call project completion by end of
    February 2022.
 

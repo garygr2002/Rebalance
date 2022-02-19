@@ -1,0 +1,158 @@
+[2022-02-18 16:34:35] [Conductor: INFO]
+I am building libraries...
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'holding' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the holding library/libraries is/are: 2022-02-18.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'basis' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the basis library/libraries is/are: 2022-02-14.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'code' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the code library/libraries is/are: 2022-01-14.
+[2022-02-18 16:34:35] [IncomeHeadTaxesBuilder: INFO]
+The standard deduction for the 'income_head' income tax library has been set to 18,800.00 at line 1.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'income_head' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the income_head library/libraries is/are: 2022-01-14.
+[2022-02-18 16:34:35] [IncomeJointTaxesBuilder: INFO]
+The standard deduction for the 'income_joint' income tax library has been set to 25,100.00 at line 1.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'income_joint' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the income_joint library/libraries is/are: 2022-01-14.
+[2022-02-18 16:34:35] [IncomeSeparateTaxesBuilder: INFO]
+The standard deduction for the 'income_separate' income tax library has been set to 12,550.00 at line 1.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'income_separate' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the income_separate library/libraries is/are: 2022-01-14.
+[2022-02-18 16:34:35] [IncomeSingleTaxesBuilder: INFO]
+The standard deduction for the 'income_single' income tax library has been set to 12,550.00 at line 1.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'income_single' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the income_single library/libraries is/are: 2022-01-14.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'gains_head' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the gains_head library/libraries is/are: 2022-01-14.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'gains_joint' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the gains_joint library/libraries is/are: 2022-01-14.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'gains_separate' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the gains_separate library/libraries is/are: 2022-01-14.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'gains_single' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the gains_single library/libraries is/are: 2022-01-14.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'portfolio' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the portfolio library/libraries is/are: 2022-02-14.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'account' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the account library/libraries is/are: 2022-02-14.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'detailed' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the detailed library/libraries is/are: 2022-02-14.
+[2022-02-18 16:34:35] [TickersBuilder: INFO]
+Checks of the fund types in the ticker library indicated no inconsistencies. 
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'ticker' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the ticker library/libraries is/are: 2022-02-14.
+[2022-02-18 16:34:35] [ElementReader: INFO]
+Element reader of type 'distinguished' is exiting with no error(s).
+[2022-02-18 16:34:35] [Conductor: INFO]
+The date of the distinguished library/libraries is/are: 2022-02-14.
+[2022-02-18 16:34:35] [Conductor: INFO]
+I am building the valuation hierarchy and synthesizing required accounts...
+[2022-02-18 16:34:35] [Conductor: INFO]
+I am building the basis hierarchy and synthesizing required accounts...
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <JaneAnybody><0000000000000001>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <JaneAnybody><0000000000000001> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <XYZ Cr Union><0000006231592710>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <XYZ Cr Union><0000006231592710> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <XYZ Cr Union><0000001638472938>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <XYZ Cr Union><0000001638472938> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <BofA><5137434439329760>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <BofA><5137434439329760> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <TRowePrice><0000000833570510>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <TRowePrice><0000000833570510> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <TRowePrice><0000000741830296>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <TRowePrice><0000000741830296> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <JohnDoe><0000000000000002>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <JohnDoe><0000000000000002> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <JohnDoe><0000000000000003>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <JohnDoe><0000000000000003> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <JohnDoe><0000000000000004>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <JohnDoe><0000000000000004> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <JohnDoe><0000000000000005>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <JohnDoe><0000000000000005> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <JohnDoe><0000000000000006>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <JohnDoe><0000000000000006> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <JPMorgan><0000002162530900>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <JPMorgan><0000002162530900> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <JPMorgan><0000008430471042>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <JPMorgan><0000008430471042> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <JPMorgan><4532471323807307>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <JPMorgan><4532471323807307> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <Citigroup><5350910556857113>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <Citigroup><5350910556857113> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <Vanguard><0000000034186200>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <Vanguard><0000000034186200> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <Vanguard><0000000047459213>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <Vanguard><0000000047459213> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <Fidelity><0000000000039596>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <Fidelity><0000000000039596> with no error.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has commenced for account: <Vanguard><0000000093033252>.
+[2022-02-18 16:34:35] [AccountRebalancer: INFO]
+Rebalancing has completed for account: <Vanguard><0000000093033252> with no error.
+[2022-02-18 16:34:35] [Conductor: INFO]
+Congratulations; it seems I have completed my work correctly!

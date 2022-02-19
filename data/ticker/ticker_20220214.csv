@@ -1,4 +1,29 @@
+J,A0000,3000,Property Purchase 1996,                           0.00,        ,C,D,_,_
+J,A0001,3001,Hot Tub 2003,                                     0.00,        ,C,D,_,_
+J,A0002,3002,Rain Gutters 2004,                                0.00,        ,C,D,_,_
+J,A0003,3003,Hardwood Floors 2004,                             0.00,        ,C,D,_,_
+J,A0004,3004,Exterior Paint 2005,                              0.00,        ,C,D,_,_
+J,A0005,3005,Upstairs Windows 2005,                            0.00,        ,C,D,_,_
+J,A0006,3006,Bird Mesh 2006,                                   0.00,        ,C,D,_,_
+J,A0007,3007,Property Fence 2007,                              0.00,        ,C,D,_,_
+J,A0008,3008,Hot Tub Cover 2010,                               0.00,        ,C,D,_,_
+J,A0009,3009,Interior Paint 2013,                              0.00,        ,C,D,_,_
+J,A0010,3010,Hot Tub Pump 2018,                                0.00,        ,C,D,_,_
+J,A0011,3011,New Roof 2019,                                    0.00,        ,C,D,_,_
+J,A0012,3012,Upstairs Window Treatments 2020,                  0.00,        ,C,D,_,_
+J,A0013,3013,Smoke Detectors 2020,                             0.00,        ,C,D,_,_
+X,BND  ,2000,Total Bond Market,                                0.00, 5.00000,B,D,_,_
 J,BOFAM,9760,Rewards Mastercard,                          -10000.00,        ,C,D,_,_
+X,BSV  ,2001,Short Term Bond,                                  0.00, 5.00000,B,D,Z,_
+J,CITMC,4033,Citigroup Mastercard,                         -5000.00,        ,C,D,_,_
+F,FCPEX,1200,Sm Cap ENH Index,                                 0.00,        ,S,D,W,K
+F,FMEIX,1201,Mid Cap ENH Index,                                0.00,        ,S,D,M,K
+F,FSPSX,1202,International Index,                              0.00,        ,S,O,L,K
+F,FXAIX,1203,500 Index,                                        0.00,        ,S,D,L,K
+J,HCGT ,1803,Capital Gains Tax on Sale,                        0.00,        ,C,D,_,_
+F,JPCHK,1100,Checking,                                         0.00,        ,C,D,_,_
+F,JPSVG,1101,Savings,                                          0.00,        ,C,D,_,_
+J,JPVSA,0989,JPMorgan Visa Card,                          -12000.00,        ,C,D,_,_
 F,OTCFX,0048,Small-Cap Stock,                               2500.00,        ,S,D,W,G
 F,RPMGX,0047,Mid-Cap Growth,                                2500.00,        ,S,D,M,G
 F,PEXMX,0099,Extended Equity Market Index,                  2500.00,        ,S,D,M,G
@@ -18,7 +43,9 @@ F,PRSVX,0040,Small-Cap Value,                               2500.00,        ,S,D
 F,PRTIX,0028,U.S. Treasury Intermediate Index,              2500.00,        ,B,D,U,Z
 F,PRTXX,0012,U.S. Treasury Money,                           2500.00,        ,C,D,U,_
 F,PRWBX,0022,Short-Term Bond,                               2500.00,        ,B,D,Z,_
+J,RDFN ,1808,Redfin Estimate,                                  0.00,        ,R,D,_,_
 F,RPIEX,0156,Dynamic Global Bond,                           2500.00,        ,B,O,_,_
+F,SPAXX,1204,Govt Mmkt,                                        0.00,        ,C,D,U,_
 F,TRBUX,0135,Ultra Short-Term Bond,                         2500.00,        ,B,D,Z,_
 F,TREMX,0100,Emerging Europe,                               2500.00,        ,S,O,L,K
 F,TRGOX,0732,Large-Cap Growth,                              2500.00,        ,S,D,L,G
@@ -26,23 +53,31 @@ F,TRIGX,0016,International Value Equity,                    2500.00,        ,S,O
 F,TRLUX,0733,Large-Cap Value,                               2500.00,        ,S,D,L,V
 F,TRMCX,0077,Mid-Cap Value,                                 2500.00,        ,S,D,M,V
 F,VBTLX,0584,Total Bond Market Index Admiral,               3000.00,        ,B,D,_,_
+X,VCIT ,2002,Intermediate Term Corp Bond,                      0.00, 5.00000,B,D,T,_
 F,VEMAX,5533,Emerging Markets Stock Index Admiral,          3000.00,        ,S,O,L,K
 F,VFIAX,0540,500 Index Admiral,                             3000.00,        ,S,D,L,K
 F,VGSLX,5123,Real Estate Index Admiral,                     3000.00,        ,R,D,_,_
 F,VIGAX,0509,Growth Index Admiral,                          3000.00,        ,S,D,L,G
 F,VIMAX,5859,Mid-Cap Index Fund Admiral,                    3000.00,        ,S,D,M,K
+X,VMBS ,2003,Mortgage Backed Securities,                       0.00, 5.00000,B,D,E,_
 F,VMFXX,0033,Federal Money Market,                           500.00,        ,C,D,U,_
 F,VMGMX,5832,Mid-Cap Growth Index Admiral,                  3000.00,        ,S,D,M,G
 F,VMRXX,0066,Cash Reserves Federal Money Market Admiral,    3000.00,        ,C,D,U,_
 F,VMVAX,5835,Mid-Cap Value Index Admiral,                   3000.00,        ,S,D,M,V
+X,VOO  ,2004,S&P 500 Index,                                    0.00, 5.00000,S,D,L,K
 F,VSGAX,5861,Small-Cap Growth Index Admiral,                3000.00,        ,S,D,W,G
 F,VSGDX,0549,Short-Term Federal Admiral,                   50000.00,        ,B,D,U,Z
 F,VSIAX,5860,Small-Cap Value Index Admiral,                 3000.00,        ,S,D,W,V
 F,VSMAX,0548,Small-Cap Index Admiral,                       3000.00,        ,S,D,W,K
+X,VSS  ,2005,FTSE All World EX US Small Cap,                   0.00, 5.00000,S,O,W,G
 F,VTABX,0511,Total International Bond Index Admiral,        3000.00,        ,B,O,_,_
 F,VTIAX,0569,Total International Stock Index Admiral,       3000.00,        ,S,O,L,K
+X,VTIP ,2006,Short Term Inflation Protected Securities,        0.00, 5.00000,B,D,H,Z
 F,VVIAX,0506,Value Index Admiral,                           3000.00,        ,S,D,L,V
 F,VWEHX,0029,High-Yield Corporate Investor,                 3000.00,        ,B,D,T,Y
 F,VWILX,0581,International Growth Admiral,                 50000.00,        ,S,O,L,G
+X,VXF  ,2007,Extended Market,                                  0.00, 5.00000,S,D,N,K
+X,VXUS ,2008,Total Intl Stock Index,                           0.00, 5.00000,S,O,L,K
 F,XYZ1, 1000,Checking,                                         0.00,        ,C,D,_,_
 F,XYZ2, 1001,Savings,                                          0.00,        ,C,D,_,_
+J,ZLLW ,1812,Zillow Estimate,                                  0.00,        ,R,D,_,_

@@ -1,0 +1,54 @@
+Portfolio summary for: John Thomas Doe
+
+The date of the hierarchy is:         2022-02-18.
+The date of the holding library is:   2022-02-18.
+The date of the basis library is:     2022-02-14.
+The date of the code library is:      2022-01-14.
+The date of the portfolio library is: 2022-02-14.
+The date of the account library is:   2022-02-14.
+The date of the detailed library is:  2022-02-14.
+The date of the ticker library is:    2022-02-14.
+
+Investor birthday is:                 1958-09-10.
+Investor projected mortality date is: 2042-05-24.
+CPI adjusted monthly income is:       616.42.
+Non-CPI adjusted monthly income is:   0.00.
+Social Security monthly income is:    1,510.00.
+Taxable annual income is:             40,300.00.
+
+Expected annual rate of inflation is: 3.220%.
+S&P 500 high is:                      4818.62.
+S&P 500 last close is:                4348.87.
+S&P 500 today is:                     4348.87.
+
+Holdings that can be rebalanced:
+
+Institution     Taxable         Tax Deferred    Tax Paid        Total          
+--------------- --------------- --------------- --------------- ---------------
+Vanguard                 500.76      144,097.05      994,238.87    1,138,836.68
+Fidelity                   0.00       35,419.98            0.00       35,419.98
+JPMorgan               1,956.18            0.00            0.00        1,956.18
+--------------- --------------- --------------- --------------- ---------------
+JohnDoe                2,456.94      179,517.03      994,238.87    1,176,212.84
+
+The 'Total' column may not equal the sum of the numeric columns preceding it.
+
+Stock general:       501,298.31         42.620%
+Bond general:        571,877.66         48.620%
+Cash general:          6,634.81          0.564%
+Real-estate:          96,402.06          8.196%
+
+Holdings that cannot be rebalanced:
+
+Holding Name                                                    Value          
+--------------------------------------------------------------- ---------------
+Redfin Estimate                                                      375,000.00
+Zillow Estimate                                                      374,800.00
+Social Security John Thomas Doe                                      365,420.00
+Citigroup Mastercard                                                    -376.32
+JPMorgan Visa Card                                                      -622.17
+Home John Doe Estimate Averaging                                    -374,900.00
+--------------------------------------------------------------- ---------------
+JohnDoe                                                              739,321.51
+
+Total portfolio value for John Thomas Doe is: 1,915,534.35.

@@ -4,3 +4,16 @@ TRowePrice,  0000000741830296,00000005,IRA,                                     
 XYZ Cr Union,0000006231592710,00000001,Checking,                                  Taxable,       Percent,         0.00,  0.00,100.00,  0.00
 XYZ Cr Union,0000001638472938,00000002,Savings,                                   Taxable,       Percent,         0.00,  0.00,100.00,  0.00
 BofA,        5137434439329760,00000003,Rewards Mastercard,                        Credit,        Percent,         0.00,  0.00,100.00,  0.00
+JohnDoe,     0000000000000002,00000006,Home John Doe Redfin,                      Real_Estate,   Percent,         0.00,  0.00,  0.00,100.00
+JohnDoe,     0000000000000003,00000007,Home John Doe Zillow,                      Real_Estate,   Percent,         0.00,  0.00,  0.00,100.00
+JohnDoe,     0000000000000004,00000008,Home John Doe Estimate Averaging,          Real_Estate,   Percent,         0.00,  0.00,  0.00,100.00,Negation,6,7
+JohnDoe,     0000000000000005,00000009,Capital Gains Tax on Sale,                 Real_Estate,   Percent,         0.00,  0.00,100.00,  0.00,US_Capital_Gains,1,2,3
+JohnDoe,     0000000000000006,00000010,Social Security John Thomas Doe,           Pension,       Percent,         0.00,  0.00, 10.00,  0.00,Social_Security
+Citigroup,   5350910556857113,00000014,Citigroup Mastercard,                      Credit,        Percent,         0.00,  0.00,100.00,  0.00
+Fidelity,    0000000000039596,00000017,Contract Employer Contributory IRA,        Non_Roth_401k, Percent,        60.00, 30.00, 10.00,  0.00
+JPMorgan,    0000002162530900,00000011,Checking,                                  Taxable,       Percent,         0.00,  0.00,100.00,  0.00
+JPMorgan,    0000008430471042,00000012,Savings,                                   Taxable,       Percent,         0.00,  0.00,100.00,  0.00
+JPMorgan,    4532471323807307,00000013,JPMorgan Visa Card,                        Credit,        Percent,         0.00,  0.00,100.00,  0.00
+Vanguard,    0000000034186200,00000015,Brokerage,                                 Taxable,       Redistribute,   60.00, 30.00, 10.00,  0.00
+Vanguard,    0000000047459213,00000016,FT Employer Contributory IRA,              Non_Roth_401k, Redistribute,   60.00, 30.00, 10.00,  0.00
+Vanguard,    0000000093033252,00000017,Contributory & Mature Roth IRA,            Roth_IRA,      Redistribute,   60.00, 30.00, 10.00,  0.00

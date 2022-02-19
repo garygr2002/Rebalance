@@ -1,0 +1,93 @@
+P,JaneAnybody,     Jane Alice Anybody,                                          ,                  ,         484092.23
+I,JaneAnybody,     Jane Alice Anybody,                                          ,                  ,         384970.00
+A,0000000000000001,Social Security Jane Alice Anybody,                          ,                  ,
+I,TRowePrice,      T. Rowe Price,                                               ,                  ,          99404.00
+A,0000000833570510,Brokerage,                                                   ,                  ,           6892.41
+F,PRTXX,           U.S. Treasury Money,                               3102.75000,          1.000000,
+F,PREIX,           Equity Index 500,                                    33.08300,        114.550000,
+A,0000000741830296,IRA,                                                         ,                  ,          92511.59
+F,OTCFX,           Small-Cap Stock,                                    102.67900,         61.650000,
+F,RPMGX,           Mid-Cap Growth,                                      47.03100,        101.400000,
+F,PREMX,           Emerging Markets Bond,                              616.89500,         10.210000,
+F,PRGFX,           Growth Stock,                                        21.78100,         88.300000,
+F,PRGMX,           GNMA,                                               757.65800,          8.960000,
+F,PRHYX,           High Yield,                                        1042.85400,          6.340000,
+F,RPIBX,           International Bond,                                 633.41000,          8.820000,
+F,PRIPX,           Inflation Protected Bond,                           249.88200,         12.660000,
+F,PRITX,           International Stock,                                120.73600,         18.830000,
+F,PRPIX,           Corporate Income,                                   444.72600,          9.080000,
+F,PRRXX,           Government Money Market,                           3316.26000,          1.000000,
+F,PRSVX,           Small-Cap Value,                                    134.62500,         56.660000,
+F,PRTIX,           U.S. Treasury Intermediate Index,                  1160.74400,          5.790000,
+F,PRTXX,           U.S. Treasury Money,                               9555.57000,          1.000000,
+F,PRWBX,           Short-Term Bond,                                   1087.71000,          4.720000,
+F,TRGOX,           Large-Cap Growth,                                   110.89900,         61.830000,
+F,TRLUX,           Large-Cap Value,                                    106.72800,         27.610000,
+F,TRMCX,           Mid-Cap Value,                                       76.48400,         33.610000,
+I,XYZ Cr Union,    XYZ Credit Union,                                            ,                  ,           1042.80
+A,0000006231592710,Checking,                                                    ,                  ,            518.67
+F,XYZ1,            Checking,                                           518.67000,          1.000000,
+A,0000001638472938,Savings,                                                     ,                  ,            524.13
+F,XYZ2,            Savings,                                            524.13000,          1.000000,
+I,BofA,            Bank of America,                                             ,                  ,          -1324.57
+A,5137434439329760,Rewards Mastercard,                                          ,                  ,          -1324.57
+J,BOFAM,           Rewards Mastercard,                                1324.57000,         -1.000000,
+P,JohnDoe,         John Thomas Doe,                                             ,                  ,        1915534.35
+I,JohnDoe,         John Thomas Doe,                                             ,                  ,         740320.00
+A,0000000000000002,Home John Doe Redfin,                                        ,                  ,         375000.00
+J,RDFN ,           Redfin Estimate,                                 375000.00000,          1.000000,
+A,0000000000000003,Home John Doe Zillow,                                        ,                  ,         374800.00
+J,ZLLW ,           Zillow Estimate,                                 374800.00000,          1.000000,
+A,0000000000000004,Home John Doe Estimate Averaging,                            ,                  ,        -374900.00
+A,0000000000000005,Capital Gains Tax on Sale,                                   ,                  ,              0.00
+J,HCGT ,           Capital Gains Tax on Sale,                            0.00000,         -1.000000,
+A,0000000000000006,Social Security John Thomas Doe,                             ,                  ,
+I,Citigroup,       Citigroup,                                                   ,                  ,           -376.32
+A,5350910556857113,Citigroup Mastercard,                                        ,                  ,           -376.32
+J,CITMC,           Citigroup Mastercard,                               376.32000,         -1.000000,
+I,Fidelity,        Fidelity Investments,                                        ,                  ,          35419.98
+A,0000000000039596,Contract Employer Contributory IRA,                          ,                  ,          35419.98
+F,FCPEX,           Sm Cap ENH Index,                                            ,         13.740000,           3829.12
+F,FMEIX,           Mid Cap ENH Index,                                           ,         17.220000,           4178.19
+F,FSPSX,           International Index,                                         ,         47.120000,          13919.75
+F,FXAIX,           500 Index,                                                   ,        151.150000,          13492.92
+F,VBTLX,           Total Bond Market Index Admiral,                             ,         10.750000,              0.00
+F,SPAXX,           Govt Mmkt,                                                   ,          1.000000,              0.00
+I,JPMorgan,        JPMorgan Chase,                                              ,                  ,           1334.01
+A,0000002162530900,Checking,                                                    ,                  ,            633.27
+F,JPCHK,           Checking,                                           633.27000,          1.000000,
+A,0000008430471042,Savings,                                                     ,                  ,           1322.91
+F,JPSVG,           Savings,                                           1322.91000,          1.000000,
+A,4532471323807307,JPMorgan Visa Card,                                          ,                  ,           -622.17
+J,JPVSA,           JPMorgan Visa Card,                                 622.17000,         -1.000000,
+I,Vanguard,        The Vanguard Group,                                          ,                  ,        1138836.68
+A,0000000034186200,Brokerage,                                                   ,                  ,            500.76
+F,VMFXX,           Federal Money Market,                               500.76000,          1.000000,
+F,VMRXX,           Cash Reserves Federal Money Market Admiral,           0.00000,          1.000000,                  ,0.000
+A,0000000047459213,FT Employer Contributory IRA,                                ,                  ,         144097.05
+F,VFIAX,           500 Index Admiral,                                   96.39400,        402.110000,
+F,VIMAX,           Mid-Cap Index Fund Admiral,                          43.21900,        284.710000,
+F,VMFXX,           Federal Money Market,                              1020.19000,          1.000000,
+F,VSMAX,           Small-Cap Index Admiral,                            116.58600,         99.060000,
+F,VTIAX,           Total International Stock Index Admiral,           1196.53200,         33.080000,
+X,BSV  ,           Short Term Bond,                                    515.00000,         79.380000,
+A,0000000093033252,Contributory & Mature Roth IRA,                              ,                  ,         994238.87
+F,VBTLX,           Total Bond Market Index Admiral,                   4918.34300,         10.750000,
+F,VEMAX,           Emerging Markets Stock Index Admiral,               243.10000,         41.170000,
+F,VGSLX,           Real Estate Index Admiral,                          666.72700,        144.590000,
+F,VIGAX,           Growth Index Admiral,                               319.73900,        141.150000,
+F,VMFXX,           Federal Money Market,                             3157.680000,          1.000000,
+F,VMGMX,           Mid-Cap Growth Index Admiral,                       153.39600,         92.140000,
+F,VMVAX,           Mid-Cap Value Index Admiral,                        424.83400,         75.330000,
+F,VSGDX,           Short-Term Federal Admiral,                       24888.58900,         10.630000,
+F,VSGAX,           Small-Cap Growth Index Admiral,                     152.24300,         83.870000,
+F,VSIAX,           Small-Cap Value Index Admiral,                      412.21100,         74.000000,
+F,VTABX,           Total International Bond Index Admiral,            3414.94500,         21.400000,
+F,VTIAX,           Total International Stock Index Admiral,            983.23400,         33.080000,
+F,VVIAX,           Value Index Admiral,                               1739.19900,         55.990000,
+F,VWEHX,           High-Yield Corporate Investor,                     5793.66000,          5.670000,
+F,VWILX,           International Growth Admiral,                       298.87300,        119.290000,
+X,VCIT ,           Intermediate Term Corp Bond,                        580.00000,         88.540000,
+X,VMBS ,           Mortgage Backed Securities,                         660.00000,         51.260000,
+X,VSS  ,           FTSE All World EX US Small Cap,                     430.00000,        124.600000,
+X,VTIP ,           Short Term Inflation Protected Securities,          440.00000,         51.010000,
