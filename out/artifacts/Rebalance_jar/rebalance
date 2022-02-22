@@ -1,0 +1,1 @@
+java -jar -Dprogram.name=rebalance $HOME/IdeaProjects/Rebalance/out/artifacts/Rebalance_jar/Rebalance.jar $*
