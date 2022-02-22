@@ -1,13 +1,21 @@
 Things to do:
 
-1. Try to figure out how to a create command line build file for the project.
+1. Try to clone git repository on old Linux notebook, and the MacBook. Ensure
+   proper Java version is present on each, acquire the annotations jar for
+   each, modify the build properties file and try to build the project on each.
+   Make notes as you go.
 
 2. Create build instructions for project for Linux and MacOS (Windows
-   build instructions will require PC rental).
+   build instructions will require PC rental) based on notes from step 1.
 
-3. Create git repository documentation, including instructions for project
+3. See if the executable jar that was checked in actually runs on the Linux
+   notebook, and the MacBook.
+
+4. Try to replicate steps 1 through 3 on a rental PC with Windows installed.
+
+5. Create git repository documentation, including instructions for project
    download, build and run. Goal is to call project completion by end of
-   February 2022.
+   March 2022.
 
 For your information:
 
