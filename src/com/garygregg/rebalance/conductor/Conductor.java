@@ -407,16 +407,31 @@ public class Conductor implements Dispatch<CommandLineId> {
                 preferences, outputStream, false));
 
         /*
-         * Add a preference dispatch for use expected prefix and suffix for
-         * data directory backup and minimum settings.
+         * Add preference dispatches for: 1) backup; 2) set minimum settings,
+         * and; 3) preferences.
          */
-        dispatchList.add(new Use(preferences, outputStream));
-        dispatchList.add(new Minimum(outputStream));
-
-        // Add dispatches for reset, backup and preferences.
-        dispatchList.add(new Reset(outputStream));
         dispatchList.add(new Backup(outputStream));
+        dispatchList.add(new Minimum(outputStream));
         dispatchList.add(new Preference(outputStream));
+
+        /*
+         * Add preferences for: 4) reset; 5) use expected prefix and suffix,
+         * and; 6) assistance.
+         */
+        dispatchList.add(new Reset(outputStream));
+        dispatchList.add(new Use(preferences, outputStream));
+        dispatchList.add(new Dispatch<>() {
+
+            @Override
+            public void dispatch(String argument) {
+                displayUsage();
+            }
+
+            @Override
+            public @NotNull CommandLineId getKey() {
+                return CommandLineId.ASSISTANCE;
+            }
+        });
 
         /*
          * Create a command line arguments object with an instance of the
@@ -424,7 +439,6 @@ public class Conductor implements Dispatch<CommandLineId> {
          */
         final CommandLineArguments<CommandLineId> cla =
                 new CommandLineArguments<>(dispatchList, getInstance());
-        //noinspection SpellCheckingInspection
         try {
 
             // Try to process the command line arguments, if any.
@@ -438,27 +452,11 @@ public class Conductor implements Dispatch<CommandLineId> {
         catch (@NotNull CLAException exception) {
 
             /*
-             * Stream the message of the exception as a severe error. Get the
-             * program name system property. Note: To set this property on the
-             * command line, use:
-             *
-             * -Dprogram.name = <name>
-             *
-             * In IntelliJ, select 'Add VM options' under 'Modify options'. Use
-             * the same syntax as above. A properly configured alias for
-             * starting the conductor should be able to added to a user login
-             * file.
+             * Stream the message of the exception as a severe error. Display
+             * the program usage with a property-dependent program name.
              */
             MessageLogger.stream(Level.SEVERE, exception.getMessage());
-            final String programName = System.getProperty(defaultProgramName);
-
-            /*
-             * Use the program name system property to display a usage message
-             * if the program name property is not null. Otherwise, use a
-             * default program name.
-             */
-            displayUsage((null == programName) ? getDefaultProgramName() :
-                    programName);
+            displayUsage();
         }
     }
 
@@ -498,6 +496,27 @@ public class Conductor implements Dispatch<CommandLineId> {
 
         // Return the result.
         return result;
+    }
+
+    /**
+     * Displays a usage line with a property-dependent program name.
+     */
+    @SuppressWarnings("SpellCheckingInspection")
+    private static void displayUsage() {
+
+        /*
+         * Get the program name system property. Note: To set this property on
+         * the command line, use:
+         *
+         * -Dprogram.name = <name>
+         *
+         * In IntelliJ, select 'Add VM options' under 'Modify options'. Use the
+         * same syntax as above. A properly configured alias for starting the
+         * conductor should be able to added to a user login file.
+         */
+        final String programName = System.getProperty(defaultProgramName);
+        displayUsage((null == programName) ? getDefaultProgramName() :
+                programName);
     }
 
     /**
