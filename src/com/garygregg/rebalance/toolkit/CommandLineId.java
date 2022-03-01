@@ -55,7 +55,7 @@ public enum CommandLineId {
 
     // The limit of allowed receiver delegates
     @SuppressWarnings("SpellCheckingInspection")
-    X("rebalance limit of funds per account", "ncnt", true),
+    X("rebalance limit of same fund type per account", "ncnt", true),
 
     // Source data directory (string path)
     @SuppressWarnings("SpellCheckingInspection")
@@ -73,6 +73,9 @@ public enum CommandLineId {
     @SuppressWarnings("SpellCheckingInspection")
     BACKUP("perform backup now; dpth if no bpth specified (see above)", "bpth",
             false),
+
+    // The assistance command
+    ASSISTANCE("assistance with this command (i.e., usage)", null, false),
 
     // Presumed to be an option argument (string)
     OTHER("other command argument", null, false);
