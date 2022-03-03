@@ -1,19 +1,12 @@
 Things to do:
 
-1. Try to clone git repository on old Linux notebook, and the MacBook. Ensure
-   proper Java version is present on each, acquire the annotations jar for
-   each, modify the build properties file and try to build the project on each.
-   Make notes as you go.
+1. Make sure there is a Java 11 installation on the MacBook, download the
+   executable jar, and try running the software.
 
-2. Create build instructions for project for Linux and MacOS (Windows
-   build instructions will require PC rental) based on notes from step 1.
+2. Rent a Windows laptop. Make sure there is a Java 11 installation on the
+   Windows laptop. Download the executable jar, and try running the software.
 
-3. See if the executable jar that was checked in actually runs on the Linux
-   notebook, and the MacBook.
-
-4. Try to replicate steps 1 through 3 on a rental PC with Windows installed.
-
-5. Create git repository documentation, including instructions for project
+3. Create git repository documentation, including instructions for project
    download, build and run. Goal is to call project completion by end of
    March 2022.
 
