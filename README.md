@@ -8,18 +8,18 @@ Output from the tool is a series of text files for each investor:
 
 1. A report of the current state of the portfolio
 2. A report of the state of the portfolio after proposed changes
-3. A file that shows currency differences between current and proposed holdings
+3. A file that shows currency differences between proposed and current holdings
 4. A file that describes the reallocation actions required to effect the proposed changes   
 
 ### Motivation
 
-I have been interested in investing and investments for many years, and have sought throughout my professional career to save and invest diligently. During that time, I have periodically undertaken the task of rebalancing my personal investments using spreadsheets and a calculator. I found this to be an imprecise, tedious, and error-prone task. 
+I have been interested in investing and investments for many years, and have sought throughout my professional career to save and invest diligently. During that time, I have periodically undertaken the task of rebalancing my personal investments by hand using spreadsheets and a calculator. I found this to be an imprecise, tedious, and error-prone task. 
 
 ### Why this Project?
 
-Beginning at the end of calendar year 2020, I changed my career focus from full-time employment and contract assignments to a long term status as a freelance software developer and data scientist. In my capacity in this role, I undertook this project for two reasons. First, I desired a mostly automated tool to undertake the chore of rebalancing my investments. Second, I desired to showcase a large, publicly accessible software project that was conceived, designed, coded and documented solely by myself.
+Beginning at the end of calendar year 2020, I changed my career focus from full-time employment, and contract assignments to a long term status as a freelance software developer and data scientist. In my capacity in this role, I undertook this project for two reasons. First, I desired a mostly automated tool to undertake the chore of rebalancing my investments. Second, I desired to showcase a large, publicly accessible software project that was conceived, designed, coded and documented solely by myself.
 
-In service of both goals, I decided to produce my own custom tool for the task rather than research utilities that might be commercially available, or open-source software. Reputable commercial software might have been a trustworthy choice for the task. I rejected this option for two reasons: 1) first, the expense, and; 2) the feeling that it might not be precisely what I needed. Open-source software from other developers might have been available. I also rejected this option for two reasons: 1) the legwork required to research the options, and; 2) less trust in the work of others. 
+In service of both goals, I decided to produce my own custom tool for the task. Another option might have been to use existing commercial software, or an existing open-source project. I rejected a commercial software solution for two reasons, the first being the one-time, or ongoing expense. I also felt commercial software might not be exactly what I needed. I rejected open-source solutions for two reasons, the first being a lack of complete trust in any solution I might discover. The second reason was that I felt my time would be better spent professionally in developing my own software rather than in researching open-source solutions. After all, at the end of the day I could demonstrate a unique professionally accomplishment when developing my own tool.
 
 ### Input
 
@@ -41,48 +41,74 @@ As well as sample data files, the reader will also find in each data subdirector
 
 I have left as an enhancement the possibility that input to the tool may be changed to SQL tables indexed by a combination of date, and existing keys in the CSV files. An additional enhancement would be a graphical user interface by which the SQL tables may be edited. The current tool does not have these features.
 
-### License
-
-License of this project and the resulting tool is covered by the GNU General Public License v3.0. 
-
 ### State of the Project
 
-After approximately 13 months of work, I have deemed the design, code and deployment activities of the project to be complete. I have allocated one man-month to fully document the project for professional showcase. My intention is to complete this work by the conclusion of March 2022. An observer will note progressive activity and growth in this markdown file and related documents during this time. Below you will find the portions of the markdown template that remain unedited. Stop by often for updates!
+After approximately 13 months of work, I have deemed the design, code and deployment activities of the project to be complete. I have allocated one man-month to fully document the project for professional showcase. My intention is to complete this work by the conclusion of March 2022. An observer will note progressive activity and growth in this markdown file and related documents during this time. Below you will find some portions of the markdown template that remain unedited. Stop by often for updates!
 
-## Table of Contents (Optional)
-
-If your README is long, add a table of contents to make it easy for users to find what they need.
+## Table of Contents
 
 - [Installation](#installation)
 - [Usage](#usage)
 - [Credits](#credits)
+- [Warranty](#warranty)
 - [License](#license)
 
 ## Installation
 
-What are the steps required to install your project? Provide a step-by-step description of how to get the development environment running.
+This project was designed and coded in an Ubuntu Linux environment using the IntelliJ IDE and Java version 11. It should be possible to install and run, or even build the software in a Windows, or MacOS environment. At this time I have decided against investigating the steps required for installing the product in non-Linux environments. You will need the Java 11 jre to run the software.
+
+Among the releases for this product, you will find the following files:
+
+1. An executable jar containing the software
+2. An executable file with a command to start the software
+3. The source code as a zip file
+4. The source code as a tar file
+
+Download at least the executable jar, and the executable file. Ensure that the executable file has the executable permission set for at least the user of the file. To do this, use a terminal and change directory to the directory containing your download. Then use the command: <pre>chmod u+x rebalance</pre> to set the executable permission. Return to your user home directory, and edit the .bash_alias file to include a line similar to the following:<pre>export PATH={path to your download}:$PATH</pre> and save the file. You will now need to close your terminal, and reopen a new terminal to make the rebalance command available.  
+
+Alternatively, you may build the software locally. You will need a Java jdk of at least version 11. In the directory containing this markdown file, you will find <i>build.xml</i> and <i>build.properties</i> files suitable for building the software using ant. These files were automatically generated using the Ant Build Generation plugin from Jetbrains, version 203.4. I desired to edit these files minimally to create an external build using ant. As such, you will only need to edit the <i>build.properties</i> file locally. See below. 
+
+Clone the repository for this project using a Linux terminal. On the command line, type: <pre>git clone https://github.com/garygr2002/Rebalance.git </pre>
+
+If ant is not installed in your Linux environment, you may install it using the following command: <pre>sudo apt install ant</pre>
+
+The software also uses the jetbrains annotations jar, version 20.1.0. To build the software, you will need to acquire the annotations jar from an IntelliJ installation, or directly from the Internet. Only the jar is required, but it must be available from a relative path of <i>...org/jetbrains/annotations/20.1.0/</i> from where you install it. Call this installation directory '<i>x</i>'. Edit the <i>build.properties</i> file in this directory, and follow the instructions therein to set the <i>path.variable.maven_repository</i> variable with the location of your annotations jar, '<i>x</i>'. Set the <i>jdk.home.11</i> variable with the path to your Java 11+ jdk. You should now be ready to build the software using the ant command from a terminal in the directory containing this markdown file.
 
 ## Usage
 
-Provide instructions and examples for use. Include screenshots as needed.
+The software uses Java preferences to maintain persistent settings. Currently, settings are not user-specific. If preferences have not been previously set, you will see something similar to the following terminal when running the software with the 'p' option: 
 
-To add a screenshot, create an `assets/images` folder in your repository and upload your screenshot to it. Then, using the relative filepath, add it to your README using the following syntax:
+![alt text](assets/images/preferences_reset.png)
 
-    ```md
-    ![alt text](assets/images/screenshot.png)
-    ```
+Minimum runtime settings are achieved by using the 'm' option, which will set the logging levels and thresholds to sane values. The option will also set the known, long-term inflation percentage, and the rebalance limit for same fund-types. Finally, this option sets a default as the source for the data files. You will see something similar to the following terminal when running the software after the 'm' and 'p' options: 
+
+![alt text](assets/images/minimum_preferences.png)
+
+You may reset the source directory for the data file using the 's' option. You will see something similar to the following terminal when running the software after the 's' and 'p' options:
+
+![alt text](assets/images/data_set.png)
+
+You may set the critical component of the destination directory for backup using the 'u' option. For this option, the same prefix for the data source directory is assumed. You will see something similar to the following terminal when running the software after the 'u' and 'p' options:
+
+![alt text](assets/images/use_set.png)
+
+You may set current and historical valuations for the Standard and Poor 500 using the 'c', 'h' and 't' options. These options stand for 'close (last)', 'high' and 'today' respectively. The software uses these settings to automatically adjust investor-specific equity weights given in the portfolio csv file. The software will always make adjustments for today's valuation of the S&P 500 versus last close, but an equity adjustment of today's setting versus historical high is a per-investor preference. Read further in this document, or explore the description of the csv files for more information. Please note that it is not required to set valuations for the S&P 500 in order for the software to run correctly. When one or more of these preferences are not set, the software will skip the adjustment. You will see something similar to the following terminal when running the software after the 'c', 'h', 't' and 'p' options: 
+
+![alt text](assets/images/SandP500_set.png)
+
+A screen snap is omitted here for the 'b' option, which backs up the current source directory to the current destination directory. As well, a screen snap is omitted here for running the software with no option, which causes the software to rebalance investor portfolios given the current csv input files.
 
 ## Credits
 
-List your collaborators, if any, with links to their GitHub profiles.
+I selfishly credit only myself with the design, coding and documentation of this project.
 
-If you used any third-party assets that require attribution, list the creators with links to their primary web presence in this section.
+### Warranty
 
-If you followed tutorials, include links to those here as well.
+No warranty, or guarantee of the correctness or suitability of this product for any purpose is given, either explicitly or implicitly. I have used the software for my own purposes, but it has not been exhaustively tested. Use at your own risk. Feedback and bug reports are welcome!
 
-## License
+### License
 
-The last section of a high-quality README file is the license. This lets other developers know what they can and cannot do with your project. If you need help choosing a license, refer to [https://choosealicense.com/](https://choosealicense.com/).
+License of this project and the resulting tool is covered by the GNU General Public License v3.0.
 
 ---
 
