@@ -64,13 +64,10 @@ class Use extends PreferenceDispatch<CommandLineId> {
 
                 /*
                  * The source is not null. Create a list to build destination
-                 * path elements, and add 'home'.
+                 * path elements, and add 'user.home'.
                  */
                 final List<String> destinationElementList = new ArrayList<>();
-                destinationElementList.add("home");
-
-                // Add the user's name, and the argument.
-                destinationElementList.add(System.getProperty("user.name"));
+                destinationElementList.add(System.getProperty("user.home"));
                 destinationElementList.add(argument);
 
                 /*
