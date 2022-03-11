@@ -50,6 +50,7 @@ After approximately 13 months of work, I have deemed the design, code and deploy
 - [Installation](#installation)
 - [Usage](#usage)
 - [Command Line Options](#command-line-options)
+- [Account File](#account-file)
 - [Credits](#credits)
 - [Warranty](#warranty)
 - [License](#license)
@@ -172,6 +173,62 @@ Backs up the files in the source path. The <i>bpth</i> argument is optional. If 
 ### -assistance
 
 Displays the command line usage text.
+
+## Account File
+
+The account is one of sixteen csv files that act as input to the software. Files in this format are located in a subdirectory named "account" located in the directory identified in the source preference. Files of this type have the prefix "account_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the account file that has the latest date that is not later than the date of the latest holding file. The account file contains information that is required to identify, characterize, and rebalance accounts. The key for the rows in the file is a concatenation of an institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of an account file row. 
+
+### Institution
+
+The institution mnemonic begins in column 1, and may be up to 12 characters long. Its content is not constrained as long as it is not blank. The institution mnemonic identifies the institution where the account is held.
+
+### Number
+
+The account number begins in column 14, and may be up to 16 characters long. Its content is constrained to a positive integer. The account number uniquely identifies an account within an institution. 
+
+### Rebalance Order
+
+The rebalance order begins at column 31, and may be up to 8 characters long. Its content is constrained to a non-negative integer. The rebalance order is the order in which the software will rebalance the account within a portfolio. I suggest that the rebalance order be a unique integer, but this is not required. If the specified rebalance order is not unique, then the software will rebalance same-portfolio accounts in the order in which they are specified in this file.  
+
+### Name
+
+The name begins at column 40, and may be up to 42 characters long. Its content is not constrained. The account name is for visual identification purposes, and I suggest it be unique. However, uniqueness is not required. The account name should match the corresponding field in the holding file. The holding file is where the account receives its value.
+
+### Tax Type
+
+The tax type begins at column 83, and may be up to 14 characters long. Its content is constrained to one of the following strings: "Credit", "HSA", "Inherited_IRA", "Non_Roth_401k", "Non_Roth_Annuity", "Non_Roth_IRA", "Pension", "Real_Estate", "Roth_401k", "Roth_Annuity", "Roth_IRA", or "Taxable". Case is not important. The tax type categorizes the tax status of the account. 
+
+### Rebalance Procedure
+
+The rebalance procedure begins at column 98, and may be up to 14 characters long. Its content is constrained to one of the following strings: "Percent" or "Redistribute". Case is not important. The rebalance procedure is used to report what actions to take to rebalance the account. For percent accounts, the software will report percent allocations to funds. For redistribute accounts, the software will report specific currency amounts to shift between funds.
+
+### Weight Equities
+
+The weight equities begins at column 113, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to equity (or stock) investments. If this field, and that for bonds, cash and real estate sum to 100, then the specified weight is actually a percent assigned to equities.
+
+### Weight Bonds
+
+The weight bonds begins at column 120, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to bond investments. If this field, and that for equities, cash and real estate sum to 100, then the specified weight is actually a percent assigned to bonds.
+
+### Weight Cash
+
+The weight cash begins at column 127, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to cash investments (e.g. checking or savings accounts, or CDs). If this field, and that for equities, bonds and real estate sum to 100, then the specified weight is actually a percent assigned to cash.
+
+### Weight Real Estate
+
+The weight cash begins at column 134, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real estate investments (e.g. real property or shares in a trust). If this field, and that for equities, bonds and cash sum to 100, then the specified weight is actually a percent assigned to real estate.
+
+### Synthesizer Type
+
+The synthesizer type begins at column 141, and may be up to 16 characters long. The field is typically not specified for accounts where the value does not need to be synthesized. Accounts whose value may need to be synthesized include annuities, social security, or pensions. If specified, the content is constrained to one of the following strings: "Averaging", "CPI_Annuity", "Negation", "No_CPI_Annuity", or "Social_Security". Case is not important.
+
+Monthly annuitized payments for CPI-adjusted, No-CPI-adjusted and Social Security are given per-investor in the portfolio file. If the value of the account is not explicitly specified in the holding file, then the software will attempt to synthesize the value of the account using the indicated synthesizer. It will do this based on the monthly payment, the life expectancy of the investor (also given in the portfolio file), and the expected rate of inflation (for no-CPI adjusted annuities).
+
+For accounts that estimate valuations of real estate, the user may create a synthesized account that is the negated sum of the estimates, plus their average. The sum of the synthesized account and all the estimates will produce a single, positive average. This valuation of this type of account is the work of an averaging synthesizer. See the Referenced Accounts field.  
+
+### Referenced Accounts
+
+Referenced accounts begin at column 158, and maybe up to 16 characters long per referenced account. Their content is constrained to positive integers. The referenced accounts may be used by the indicated synthesizer. For example, an averaging synthesizer will need to reference the accounts it is expected to average.  
 
 ## Credits
 
