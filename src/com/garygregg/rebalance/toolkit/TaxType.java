@@ -37,11 +37,11 @@ public enum TaxType {
     // A real estate holding
     REAL_ESTATE(CategoryType.TAX_DEFERRED),
 
-    // A Roth annuity
-    ROTH_ANNUITY(CategoryType.TAX_PAID),
-
     // A Roth 401k
     ROTH_401K(CategoryType.TAX_PAID),
+
+    // A Roth annuity
+    ROTH_ANNUITY(CategoryType.TAX_PAID),
 
     // A Roth contributory IRA
     ROTH_IRA(CategoryType.TAX_PAID),
