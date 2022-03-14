@@ -52,6 +52,7 @@ After approximately 13 months of work, I have deemed the design, code and deploy
 - [Command Line Options](#command-line-options)
 - [Account File](#account-file)
 - [Portfolio File](#portfolio-file)
+- [Ticker File](#ticker-file)
 - [Credits](#credits)
 - [Warranty](#warranty)
 - [License](#license)
@@ -233,7 +234,7 @@ Referenced accounts begin at column 158, and maybe up to 16 characters long per 
 
 ## Portfolio File
 
-The portfolio file is one of sixteen csv files that act at input to the software. Files in this format are located in a directory named "portfolio" located in the directory identified in the source preference. Files of this type have the prefix "portfolio_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the portfolio file that has the latest date that is not later than the date of the latest holding file. The portfolio contains information that is required to identify, valuate and rebalance portfolios. The key for the rows in the file is a mnemonic that should uniquely identify the investor associated with the portfolio. The following are the fields of a portfolio file row.
+The portfolio file is one of sixteen csv files that act as input to the software. Files in this format are located in a directory named "portfolio" located in the directory identified in the source preference. Files of this type have the prefix "portfolio_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the portfolio file that has the latest date that is not later than the date of the latest holding file. The portfolio contains information that is required to identify, valuate and rebalance portfolios. The key for the rows in the file is a mnemonic that should uniquely identify the investor associated with the portfolio. The following are the fields of a portfolio file row.
 
 ### Mnemonic
 
@@ -290,6 +291,76 @@ The weight cash begins at column 129, and may be up to 6 characters long. Its co
 ### Adjust from High
 
 The adjust-from-high flag begins at column 136, and may be up to 6 characters long. Its content is constrained to one of the following strings: "False", or "True". Case is not important. The adjust-from-high flag indicates to the software whether it should make an upward-revision of the preferred equity weight of the portfolio based on a ratio of today's value of the S&P 500 versus the high of the index. We assume by definition that the value of the S&P 500 today cannot be higher than its high. While the software will always make an equity weight adjustment for the ratio of the S&P 500 today versus its last close (assuming these preferences are both set), it will skip an additional today-versus-high adjustment on a per-portfolio basis if this flag is not set. Note that the user may skip all equity adjustments by simply not setting the preference for S&P 500 today. See the command line option -t.   
+
+## Ticker File
+
+The ticker file is one of sixteen csv files that act as input to the software. Files in this format are located in a directory named "ticker" located in the directory identified in the source preference. Files of this type have the prefix "ticker_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the ticker file that has the latest date that is not later than the date of the latest holding file. The ticker contains information that is required to identify and categorize investments by type. "Tickers" is a catch-all name for open-end mutual funds, exchange-traded funds, individual stocks, individual bonds, or any sub-grouping of holding that occurs within an account. The key for the rows in the file is a mnemonic that should uniquely identify the investment in the institution where the ticker exists, or on the exchanges where it trades. It can also be a unique mnemonic that has meaning only to the investor who owns the account. Tickers may appear in one or more accounts in the holding file with valuations that are not the same. The following are the fields of a ticker file row.  
+
+### Code
+
+The ticker code begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'F' (a fund that is available for rebalance), 'J' (a fund that is not available for rebalance), 'Q' (a single stock or bond), or 'X' (an exchange traded fund). I hope the use of the code is self-explanatory. The software assumes single stocks or bonds are not to be available for rebalance, but it assumes exchange-traded funds (ETFs) <b><i>are</i></b> available for rebalance.
+
+### Ticker
+
+The ticker symbol begins in column 3, and may be up to 5 characters long. The symbol uniquely identifies the ticker in the institution where it exists, or on an exchange where it trades. It can also be a unique mnemonic that has meaning only to the investor that holds it. Securities can be sub-grouped and categorized within an account using ticker symbols.
+
+### Number
+
+The ticker number begins in column 9, and may be up to 4 characters long. Its value is constrained to a non-negative integer. This number may uniquely identify the ticker within some institutions, but its existence and meaning is not assumed to be universal at all institutions. Assuming a ticker number does not exist, I recommend the user make up a unique ticker number to pair with the symbol. The software only uses the ticker number to help identify tickers in rebalance reports.   
+
+### Name
+
+The ticker name begins in column 14, and may be up to 42 characters long. Its value is not constrained. The ticker name helps identify the ticker in rebalance reports. I recommend that the name be unique, and describe the ticker in an identifiable way.
+
+### Minimum
+
+The minimum investment begins in column 58, and is up to 10 characters long. Its value is constrained to a number, possibly with a decimal point. The ticker minimum is a currency-denominated minimum investment in the ticker. In its effort to rebalance an account, the software will place either no value in any ticker, or not less than this minimum. Non-balanceable debts may be specified with a negative minimum, which we assume to be a credit limit. Although some institutions place limitations only on initial investments in a fund, the software currently assumes that minimums are applicable to all future transfers into, or out of a fund. An investor may also arbitrarily opt for a self-imposed minimum in any fund. Use this field to do that. 
+
+### Preferred Rounding
+
+The preferred rounding begins in column 69, and is up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The preferred rounding is the round number of shares the software will choose for any ticker. Some institutions will require that ETFs be purchased or sold in whole shares, for example. As well, I myself typically like to trade ETFs or stocks in lots of 5 shares. Use this field to make a specification for preferred, or required rounding of shares in the ticker. 
+
+### Subcode 1
+
+The first subcode field begins in column 78, and is one character. Its content is constrained to one of the following characters indicating fund type characteristic:
+
+1. '_' (placeholder for no entry)
+2. 'B' (all bonds)
+3. 'C' (all cash, e.g. bank accounts, CDs, or money-market funds)
+4. 'D' (domestic securities)
+5. 'E' (mortgage-baked securities)
+6. 'G' (growth stocks)
+7. 'H' (inflation protected securities)
+8. 'K' (both growth and value stocks)
+9. 'L' (large-cap stocks)
+10. 'M' (medium-cap stocks)
+11. 'N' (medium and small-cap stocks)
+12. 'O' (foreign securities)
+13. 'P' (investor-specific non-balanceable investment project)
+14. 'R' (all real estate)
+15. 'S' (all stocks)
+16. 'T' (corporate bonds)
+17. 'U' (treasury securities)
+18. 'V' (value stocks)
+19. 'W' (small-cap stocks)
+20. 'Y' (high-yield bonds)
+21. 'Z' (short-term bonds)
+
+The first subcode, in conjunction with the subcodes two, three and four determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.  
+
+A use of subcodes one through four may be demonstrated as follows: A large-cap growth fund - holding domestic securities - may be specified with the subcodes 'S', 'D', 'L' and 'G'. Currently, the software requires no more than four subcodes to completely characterize a ticker for its rebalancing effort.
+
+### Subcode 2
+
+The second subcode begins in column 80, and is one character. Its content is constrained to one of the characters described in the first subcode. The second subcode, in conjunction with subcodes one, three and four determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.
+
+### Subcode 3
+
+The third subcode begins in column 82, and is one character. Its content is constrained to one of the characters described in the first subcode. The third subcode, in conjunction with subcodes one, two and four determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.
+
+### Subcode 4
+
+The fourth subcode begins in column 84, and is one character. Its content is constrained to one of the characters described in the first subcode. The fourth subcode, in conjunction with subcodes one, two and three determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.
 
 ## Credits
 
