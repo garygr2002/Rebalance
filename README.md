@@ -31,8 +31,8 @@ These sixteen input files are:
 3. Code: A description of single-character alphabetic codes used internally by the tool
 4. Detailed: Fine-grained weight preferences specific to account
 5. Distinguished: Key-value pairs that map programmatically accessible keys to sensitive portfolio keys, institution names, and account numbers
-6. Holdings: The most important file, a hierarchy of holding valuations organized by portfolios, institutions, accounts, and securities
-7. Capital Gains Tax Rates (4 files): Current capital gains tax rates, one file for each of head-of-household, joint, separate and single filers
+6. Gains Tax Rates (4 files): Current capital gains tax rates, one file for each of head-of-household, joint, separate and single filers
+7. Holding: The most important file, a hierarchy of holding valuations organized by portfolios, institutions, accounts, and securities 
 8. Income Tax Rates (4 files): Current income tax rates, one file for each of head-of-household, joint, separate and single filers
 9. Portfolio: A description of portfolios unique by a key
 10. Ticker: A description of tickers unique by key (funds, ETFs or individual security) that describe the type of securities held (e.g., stock, bond, cash or real estate)
@@ -51,6 +51,13 @@ After approximately 13 months of work, I have deemed the design, code and deploy
 - [Usage](#usage)
 - [Command Line Options](#command-line-options)
 - [Account File](#account-file)
+- [Basis File](#basis-file)
+- [Code File](#code-file)
+- [Detailed File](#detailed-file)
+- [Distinguished File](#distinguished-file)
+- [Gains Files](#gains-files)
+- [Holding File](#holding-file)
+- [Income Files](#income-files)
 - [Portfolio File](#portfolio-file)
 - [Ticker File](#ticker-file)
 - [Credits](#credits)
@@ -231,6 +238,34 @@ For accounts that estimate valuations of real estate, the user may create a synt
 ### Referenced Accounts
 
 Referenced accounts begin at column 158, and maybe up to 16 characters long per referenced account. Their content is constrained to positive integers. The referenced accounts may be used by the indicated synthesizer. For example, an averaging synthesizer will need to reference the accounts it is expected to average.  
+
+## Basis File
+
+-> Enter description for the basis file here (hint: it is the same format as the holding file).
+
+## Code File
+
+-> Enter description for the code file here.
+
+## Detailed File
+
+-> Enter description for the detailed file here.
+
+## Distinguished File
+
+-> Enter description for the distinguished file here.
+
+## Gains Files
+
+-> Enter description for the capital gains tax rate files here.
+
+## Holding File
+
+-> Enter description for the holding file here.
+
+## Income Files
+
+-> Enter description for the income tax rate files here.
 
 ## Portfolio File
 
