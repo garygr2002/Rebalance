@@ -80,7 +80,7 @@ public class Purse {
 
         // Return the countable.
         return countable;
-    }    // The reset for shares
+    }
 
     private final Reset forShares = new Reset() {
 
@@ -226,7 +226,6 @@ public class Purse {
      *
      * @param newValue The new value to set
      */
-    @SuppressWarnings("unused")
     public void setValueAdjustShares(double newValue) {
         setValue(newValue, forShares);
     }
