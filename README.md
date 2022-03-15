@@ -437,7 +437,7 @@ The ticker code begins in column 1, and is 1 character. Its content is constrain
 
 ### Ticker
 
-The ticker symbol begins in column 3, and may be up to 5 characters long. The symbol uniquely identifies the ticker in the institution where it exists, or on an exchange where it trades. It can also be a unique mnemonic that has meaning only to the investor that holds it. Securities can be sub-grouped and categorized within an account using ticker symbols.
+The ticker symbol begins in column 3, and may be up to 5 characters long. Its content is unconstrained as long as it is not blank. The symbol uniquely identifies the ticker in the institution where it exists, or on an exchange where it trades. It can also be a unique mnemonic that has meaning only to the investor that holds it. Securities can be sub-grouped and categorized within an account using ticker symbols.
 
 ### Number
 
