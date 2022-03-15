@@ -2,7 +2,9 @@
 
 A Java Project to Rebalance Investment Portfolios
 
-The Rebalance Project is one that I undertook beginning in February 2022. It is a Java-based, command-line software tool that rebalances the investment holdings of one or more investors. The tool is currently driven by a series of comma-separated files (csv's). The tool will rebalance the portfolio holdings of each investor across institutions, accounts, mutual funds, ETFs and individual securities based on declared weight preferences.
+The Rebalance Project is one that I undertook beginning in February 2022. It is a Java-based, command-line software tool that rebalances the investment holdings of one or more investors. While doing so, it also categorizes and sums the assets of each investor. The tool will produce reports that give a complete breakdown of the holdings of the investor, and their net worth. It will also produce instructions for each investor for rebalancing his or her portfolio. 
+
+The tool is currently driven by a series of comma-separated files (csv's). The tool will rebalance the portfolio holdings of each investor across institutions, accounts, mutual funds, ETFs and individual securities based on declared weight preferences.
 
 Output from the tool is a series of text files for each investor:
 
@@ -43,7 +45,7 @@ I have left as an enhancement the possibility that input to the tool may be chan
 
 ### State of the Project
 
-After approximately 13 months of work, I have deemed the design, code and deployment activities of the project to be complete. I have allocated one man-month to fully document the project for professional showcase. My intention is to complete this work by the conclusion of March 2022. An observer will note progressive activity and growth in this markdown file and related documents during this time. Below you will find some portions of the markdown template that remain unedited. Stop by often for updates!
+After 13 months of work - to the end of February 2022 - I deemed the design, code and deployment activities of the project to be complete. I allocated one man-month to fully document the project for professional showcase. My intention is to complete this work by the conclusion of March 2022. An observer will note progressive activity and growth in this markdown file and related documents during this time. Below you will find some portions of the markdown template that remain unedited. Stop by often for updates!
 
 ## Table of Contents
 
@@ -91,7 +93,7 @@ The software uses Java preferences to maintain persistent settings. Currently, s
 
 ![alt text](assets/images/preferences_reset.png)
 
-Minimum runtime settings are achieved by using the 'm' option, which will set the logging levels and thresholds to sane values. The option will also set the known, long-term inflation percentage, and the rebalance limit for same fund-types. Finally, this option sets a default as the source for the data files. You will see something similar to the following terminal window when running the software after the 'm' and 'p' options: 
+Minimum runtime settings are achieved by using the 'm' option, which will set the logging levels and thresholds to sane values. The option will also set the known, long-term inflation percentage, and the rebalance limit for same fund types. Finally, this option sets a default as the source for the data files. You will see something similar to the following terminal window when running the software after the 'm' and 'p' options: 
 
 ![alt text](assets/images/minimum_preferences.png)
 
@@ -277,7 +279,7 @@ The portfolio mnemonic begins in column 1, and may be 16 characters long. Its co
 
 ### Name
 
-The investor name begins in column 18, and may be 20 characters long. Its content is not constrained. The software uses the investor name (rather than the investor mnemonic) in portfolio report files to make those files more readable.
+The investor name begins in column 18, and may be 20 characters long. Its content is not constrained. The software uses the investor name (rather than the investor mnemonic) in portfolio report files to make those files more readable. The investor name should match the corresponding field in the holding file. The holding file is where the portfolio receives its value.
 
 ### Birthdate
 
@@ -289,7 +291,7 @@ The investor mortality date begins in column 50, and is 10 characters long. Its 
 
 ### Filing Status
 
-The filing status begins in column 61, and is 8 characters long. Its content is constrained to one of the following strings: "Head", "Joint", "Separate", or "Single". Case is not important. The filing status characterizes the income tax filing status of the investor. The possible values mean, respectively, head-of-household, married-filing-jointly, married-filing-separately, or single. The software uses the filing status to determine income tax and capital gains tax, as necessary. 
+The filing status begins in column 61, and is 8 characters long. Its content is constrained to one of the following strings: "Head", "Joint", "Separate", or "Single". Case is not important. The filing status characterizes the income tax filing status of the investor. The possible values mean, respectively: head-of-household, married-filing-jointly, married-filing-separately, or single. The software uses the filing status to determine income tax and capital gains tax, as necessary. 
 
 ### Social Security
 
@@ -333,7 +335,7 @@ The ticker file is one of sixteen csv files that act as input to the software. F
 
 ### Code
 
-The ticker code begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'F' (a fund that is available for rebalance), 'J' (a fund that is not available for rebalance), 'Q' (a single stock or bond), or 'X' (an exchange traded fund). I hope the use of the code is self-explanatory. The software assumes single stocks or bonds are not to be available for rebalance, but it assumes exchange-traded funds (ETFs) <b><i>are</i></b> available for rebalance.
+The ticker code begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'F' (a fund that is available for rebalance), 'J' (a fund that is not available for rebalance), 'Q' (a single stock or bond), or 'X' (an exchange traded fund). I hope the use of the code is self-explanatory. The software assumes single stocks or bonds are not available for rebalance, but it assumes exchange-traded funds (ETFs) <b><i>are</i></b> available for rebalance.
 
 ### Ticker
 
@@ -345,7 +347,7 @@ The ticker number begins in column 9, and may be up to 4 characters long. Its va
 
 ### Name
 
-The ticker name begins in column 14, and may be up to 42 characters long. Its value is not constrained. The ticker name helps identify the ticker in rebalance reports. I recommend that the name be unique, and describe the ticker in an identifiable way.
+The ticker name begins in column 14, and may be up to 42 characters long. Its value is not constrained. The ticker name helps identify the ticker in rebalance reports. I recommend that the name be unique, and describe the ticker in an identifiable way. The ticker name should match the corresponding field in the holding file. The holding file is where the ticker receives its value.
 
 ### Minimum
 
@@ -383,7 +385,9 @@ The first subcode field begins in column 78, and is one character. Its content i
 
 The first subcode, in conjunction with the subcodes two, three and four determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.  
 
-A use of subcodes one through four may be demonstrated as follows: A large-cap growth fund - holding domestic securities - may be specified with the subcodes 'S', 'D', 'L' and 'G'. Currently, the software requires no more than four subcodes to completely characterize a ticker for its rebalancing effort.
+Currently, the software does not accept blended, or multi-asset funds for rebalance. The user may specify these types of tickers with a code of 'J' (unbalanceable) so that software will take them into account when valuing an account or portfolio. However, it will not attempt to rebalance such a ticker within its account. The software would report an inconsistency if a stock and bond blended fund - or ETF - were designated as balanceable with both the 'B' and 'S' subcodes. 
+
+A use of subcodes one through four may be demonstrated as follows: A large-cap growth fund - holding domestic securities - may be specified with the subcodes 'S', 'D', 'L' and 'G'. This completely specifies the balanceable characteristics of the ticker in a way that is possible, and consistent. Currently, the software requires no more than four subcodes to completely characterize a ticker for its rebalancing effort.
 
 ### Subcode 2
 
