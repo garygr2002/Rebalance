@@ -243,7 +243,56 @@ Referenced accounts begin at column 158, and maybe up to 16 characters long per 
 
 ## Basis File
 
--> Enter description for the basis file here (hint: it is the same format as the holding file).
+Note: The rows, fields, and consistency rules stated below are applicable to both the basis file, and the holding file. The basis file contains prices paid for tickers, and the sums of prices paid for all tickers in accounts, institutions and portfolios. The software may use the basis file for calculating capital gains tax. See [Holding File](#holding-file) for a discussion of the holding file.
+
+The basis file is one of sixteen csv files that act as input to the software. Files in this format are located in a subdirectory named "basis_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the basis file that has the latest date that is not later than the date of the latest holding file. The basis file contains a hierarchy of investment bases. At the highest level are portfolios, followed by institutions, followed by accounts, followed by tickers. Each row of the basis file corresponds to one of these, and is coded to indicated its type. The software assumes:
+
+1. All ticker rows are a part of the most recently listed account row
+2. All account rows are a part of the most recently listed institution row
+3. All institution rows are a part of the most recently listed portfolio row
+
+The software assumes that "orphaned" rows (tickers, accounts or institutions with no parent) are errors, and reports these as such. If the value field of an account is specified, it should match the sum of the ticker rows of the account. If the value field of an institution is specified, it should match the sum of the account rows of the institution. If the value field of a portfolio is specified, it should match the sum of the institution rows of the portfolio. The software will consider it an error if the value field in any row - if provided - does not match the sum of its children.
+
+The key of a basis file entry is the unique concatenation of the key of a parent row and the key of its child. For portfolios, the key would be a distinguished value concatenated with the portfolio mnemonic. For institutions, the key would be the portfolio mnemonic concatenated with an institution mnemonic. For accounts, the key would be the institution mnemonic concatenated with the account number. For tickers, the key would be the account key (institution mnemonic/account number combination) concatenated with the ticker symbol.
+
+The portfolio mnemonic specified in a basis row must match a portfolio file row. The institution mnemonic/account number combination must match an account file row. The ticker symbol must match a ticker file row. The following are the fields of a basis file row.
+
+### Line Type
+
+The line type begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'A' (an account row), 'F' (a row for a fund available for rebalance), 'I' (an institution row), 'J' (a row for a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio row), 'Q', (a row for a single bond or stock), 'X' (a row for an exchange-trade fund). I hope the use of the line type is self-explanatory.
+
+### Key
+
+The basis key begins in column 3, and may be 16 characters long. Its content is unconstrained as long as it references:
+
+1. A portfolio mnemonic (see [Portfolio File](#portfolio-file)) for rows with a 'P' line type
+2. An institution mnemonic (see [Account File](#account-file)) for rows with an 'I' line type
+3. An account number (see [Account File](#account-file)) for rows with an 'A' line type
+4. A ticker symbol (see [Ticker File](#ticker-file)) for rows with an 'F', 'J', 'Q' or 'X' line type
+
+### Name
+
+The basis name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the portfolio name for rows with a 'P' line type, an account name for rows with an 'A' line type, or the ticker name for rows with an 'F, 'J', 'Q', or 'X' line type. Institution names (rows with an 'I' line type) are specified in this file, and nowhere else. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the holding file. The software only uses this field for readable in its reports.
+
+### Shares
+
+The basis shares begins in column 63, and may be 18 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. If left blank, the software will attempt to infer the basis shares by dividing the basis value by the basis price, but only if both are specified and the basis price is not zero. The basis shares only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the basis shares to calculate a basis value that was left blank, but for no other purpose.
+
+### Price
+
+The basis price begins in column 82, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the basis price by dividing the basis value by the basis shares, but only if both are specified and the basis shares is not zero. The basis price only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the basis price to calculate a basis value that was left blank, but for no other purpose.
+
+### Value
+
+The basis value begins in column 101, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the basis value by multiplying the basis shares by the basis price, but only if both are specified. If specified, the basis value must:
+
+1. For 'A' rows, match the sum of all 'F', 'J', 'Q' and 'X' rows given as children
+2. For 'I' rows, match the sum of all 'A' rows given as children
+3. For 'P' rows, match the sum of all 'I' rows given as children
+
+### Weight
+
+The basis weight begins in column 120, and may be 8 characters if specified. Its content is a non-negative number, possibly with a decimal point. For consistency with the similarly-formatted holding file, the software reads the basis weight. However, it currently uses the holding weight for no purpose.
 
 ## Code File
 
@@ -263,6 +312,8 @@ Referenced accounts begin at column 158, and maybe up to 16 characters long per 
 
 ## Holding File
 
+Note: The rows, fields, and consistency rules stated below are applicable to both the basis file, and the holding file. The holding file contains valuations of accounts and tickers as of the date of the file. See [Basis File](#basis-file) for a discussion of the basis file.  
+
 The holding file is one of sixteen csv files that act as input to the software. Files in this format are located in a subdirectory named "holding_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the holding file that has the latest date. The holding file contains a hierarchy of investment valuations. At the highest level are portfolios, followed by institutions, followed by accounts, followed by tickers. Each row of the holding file corresponds to one of these, and is coded to indicated its type. The software assumes:
 
 1. All ticker rows are a part of the most recently listed account row
@@ -277,31 +328,40 @@ The portfolio mnemonic specified in a holding row must match a portfolio file ro
 
 ### Line Type
 
--> Enter line type description here
+The line type begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'A' (an account row), 'F' (a row for a fund available for rebalance), 'I' (an institution row), 'J' (a row for a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio row), 'Q', (a row for a single bond or stock), 'X' (a row for an exchange-trade fund). I hope the use of the line type is self-explanatory.
 
 ### Key
 
--> Enter key description here
+The holding key begins in column 3, and may be 16 characters long. Its content is unconstrained as long as it references:
+
+1. A portfolio mnemonic (see [Portfolio File](#portfolio-file)) for rows with a 'P' line type
+2. An institution mnemonic (see [Account File](#account-file)) for rows with an 'I' line type
+3. An account number (see [Account File](#account-file)) for rows with an 'A' line type
+4. A ticker symbol (see [Ticker File](#ticker-file)) for rows with an 'F', 'J', 'Q' or 'X' line type
 
 ### Name
 
--> Enter name description here
+The holding name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the portfolio name for rows with a 'P' line type, an account name for rows with an 'A' line type, or the ticker name for rows with an 'F, 'J', 'Q', or 'X' line type. Institution names (rows with an 'I' line type) are specified in this file, and nowhere else. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the basis file. The software only uses this field for readable in its reports. 
 
 ### Shares
 
--> Enter shares description here
+The holding shares begins in column 63, and may be 18 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. If left blank, the software will attempt to infer the holding shares by dividing the holding value by the holding price, but only if both are specified and the holding price is not zero. The holding shares only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the holding shares to calculate a holding value that was left blank, but for no other purpose. 
 
 ### Price
 
--> Enter price description here
+The holding price begins in column 82, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the holding price by dividing the holding value by the holding shares, but only if both are specified and the holding shares is not zero. The holding price only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the holding price to calculate a holding value that was left blank, but for no other purpose.
 
 ### Value
 
--> Enter value description here
+The holding value begins in column 101, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the holding value by multiplying the holding shares by the holding price, but only if both are specified. If specified, the holding value must:
+
+1. For 'A' rows, match the sum of all 'F', 'J', 'Q' and 'X' rows given as children
+2. For 'I' rows, match the sum of all 'A' rows given as children
+3. For 'P' rows, match the sum of all 'I' rows given as children
 
 ### Weight
 
--> Enter weight description here
+The holding weight begins in column 120, and may be 8 characters if specified. Its content is a non-negative number, possibly with a decimal point. The holding weight is the value the software will use when rebalancing the holding identified by the current row with other holdings of exactly the same type in the same account. The software assumes a default weight of one, meaning the software will equally distribute value to same-type holdings in the same account if the weight is not explicitly specified for any. A convenient way to withhold value from any holding during rebalance is to set the content of its holding weight to zero. 
 
 ## Income Files
 
@@ -381,15 +441,15 @@ The ticker symbol begins in column 3, and may be up to 5 characters long. The sy
 
 ### Number
 
-The ticker number begins in column 9, and may be up to 4 characters long. Its value is constrained to a non-negative integer. This number may uniquely identify the ticker within some institutions, but its existence and meaning is not assumed to be universal at all institutions. Assuming a ticker number does not exist, I recommend the user make up a unique ticker number to pair with the symbol. The software only uses the ticker number to help identify tickers in rebalance reports.   
+The ticker number begins in column 9, and may be up to 4 characters long. Its content is constrained to a non-negative integer. This number may uniquely identify the ticker within some institutions, but its existence and meaning is not assumed to be universal at all institutions. Assuming a ticker number does not exist, I recommend the user make up a unique ticker number to pair with the symbol. The software only uses the ticker number to help identify tickers in rebalance reports.   
 
 ### Name
 
-The ticker name begins in column 14, and may be up to 42 characters long. Its value is not constrained. The ticker name helps identify the ticker in rebalance reports. I recommend that the name be unique, and describe the ticker in an identifiable way. The ticker name should match the corresponding field in the holding file. The holding file is where the ticker receives its value.
+The ticker name begins in column 14, and may be up to 42 characters long. Its content is not constrained. The ticker name helps identify the ticker in rebalance reports. I recommend that the name be unique, and describe the ticker in an identifiable way. The ticker name should match the corresponding field in the holding file. The holding file is where the ticker receives its value.
 
 ### Minimum
 
-The minimum investment begins in column 58, and is up to 10 characters long. Its value is constrained to a number, possibly with a decimal point. The ticker minimum is a currency-denominated minimum investment in the ticker. In its effort to rebalance an account, the software will place either no value in any ticker, or not less than this minimum. Non-balanceable debts may be specified with a negative minimum, which we assume to be a credit limit. Although some institutions place limitations only on initial investments in a fund, the software currently assumes that minimums are applicable to all future transfers into, or out of a fund. An investor may also arbitrarily opt for a self-imposed minimum in any fund. Use this field to do that. 
+The minimum investment begins in column 58, and is up to 10 characters long. Its content is constrained to a number, possibly with a decimal point. The ticker minimum is a currency-denominated minimum investment in the ticker. In its effort to rebalance an account, the software will place either no value in any ticker, or not less than this minimum. Non-balanceable debts may be specified with a negative minimum, which we assume to be a credit limit. Although some institutions place limitations only on initial investments in a fund, the software currently assumes that minimums are applicable to all future transfers into, or out of a fund. An investor may also arbitrarily opt for a self-imposed minimum in any fund. Use this field to do that. 
 
 ### Preferred Rounding
 
