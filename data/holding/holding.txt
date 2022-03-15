@@ -64,7 +64,7 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
     The value of the holding; the product of shares times price (column
     alignment ends here)
 
- 7. Weight: length - 8, position - ?; type - three-precision floating
+ 7. Weight: length - 8, position - 120; type - three-precision floating
 
     The explicit weight to be used for the holding when rebalancing it against
     others of the same type; if not specified the default weight is one
