@@ -263,7 +263,45 @@ Referenced accounts begin at column 158, and maybe up to 16 characters long per 
 
 ## Holding File
 
--> Enter description for the holding file here.
+The holding file is one of sixteen csv files that act as input to the software. Files in this format are located in a subdirectory named "holding_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the holding file that has the latest date. The holding file contains a hierarchy of investment valuations. At the highest level are portfolios, followed by institutions, followed by accounts, followed by tickers. Each row of the holding file corresponds to one of these, and is coded to indicated its type. The software assumes:
+
+1. All ticker rows are a part of the most recently listed account row
+2. All account rows are a part of the most recently listed institution row
+3. All institution rows are a part of the most recently listed portfolio row
+
+The software assumes that "orphaned" rows (tickers, accounts or institutions with no parent) are errors, and reports these as such. If the value field of an account is specified, it should match the sum of the ticker rows of the account. If the value field of an institution is specified, it should match the sum of the account rows of the institution. If the value field of a portfolio is specified, it should match the sum of the institution rows of the portfolio. The software will consider it an error if the value field in any row - if provided - does not match the sum of its children. 
+
+The key of a holding file entry is the unique concatenation of the key of a parent row and the key of its child. For portfolios, the key would be a distinguished value concatenated with the portfolio mnemonic. For institutions, the key would be the portfolio mnemonic concatenated with an institution mnemonic. For accounts, the key would be the institution mnemonic concatenated with the account number. For tickers, the key would be the account key (institution mnemonic/account number combination) concatenated with the ticker symbol. 
+
+The portfolio mnemonic specified in a holding row must match a portfolio file row. The institution mnemonic/account number combination must match an account file row. The ticker symbol must match a ticker file row. The following are the fields of a holding file row. 
+
+### Line Type
+
+-> Enter line type description here
+
+### Key
+
+-> Enter key description here
+
+### Name
+
+-> Enter name description here
+
+### Shares
+
+-> Enter shares description here
+
+### Price
+
+-> Enter price description here
+
+### Value
+
+-> Enter value description here
+
+### Weight
+
+-> Enter weight description here
 
 ## Income Files
 
