@@ -502,6 +502,8 @@ The fourth subcode begins in column 84, and is one character. Its content is con
 
 ## How Does Rebalancing Work?
 
+This is a stub for the How Does Rebalancing Work section. Here I will discuss levels of investment category, from least specific (lower), to most specific (higher). I will also discuss how the software treats individual holdings the same as investment categories when reallocating value.
+
 ## Credits
 
 I selfishly credit only myself with the design, coding and documentation of this project.
