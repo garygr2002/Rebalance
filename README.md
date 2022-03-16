@@ -162,7 +162,7 @@ The <i>ncnt</i> argument must be a non-negative integer, and is required. It is 
 
 Why would an allocation not be able to exactly match the specified weights? At the level of individual funds in the account, there are two reasons. First, the fund may have a minimum investment which may not be met with a certain weight allocation. Second, for an ETF or stock, an investment may have a requirement, or preference for some whole or round number of shares that may not be met with a certain weight allocation.
 
-The thing is, checking all the subsets of an investment category in an account requires a runtime that is two to the power of the number of investments in the category. This is prohibitively expensive for even a modest number of investments. A situation where this would come into play would be when an account contains, for example, twenty small-cap value stock ETFs, all with a preferred round number of shares. You can see that it will take no small amount of runtime to examine two to the twentieth power of investment subsets. If the number of investments of a certain type exceed this preference, the software will not even try to rebalance them. The alternative is a program that appears to hang indefinitely when run. Note that the software applies this same limit as it works up the tree of same-type investments. At the coarsest level - level one - the software needs a minimum of four in this setting to rebalance equities, bonds, cash and real-estate.
+The thing is, checking all the subsets of an investment category in an account requires a runtime that is two to the power of the number of investments in the category. This is prohibitively expensive for even a modest number of investments. A situation where this would come into play would be when an account contains, for example, twenty small cap value stock ETFs, all with a preferred round number of shares. You can see that it will take no small amount of runtime to examine two to the twentieth power of investment subsets. If the number of investments of a certain type exceed this preference, the software will not even try to rebalance them. The alternative is a program that appears to hang indefinitely when run. Note that the software applies this same limit as it works up the tree of same-type investments. At the coarsest level - level one - the software needs a minimum of four in this setting to rebalance equities, bonds, cash and real-estate.
 
 There is a dynamic programming algorithm that can find a best-fit for investments subsets as discussed here. This is faster than exhaustively searching all subsets as is currently done by the software. I will move on to discuss hierarchies of investments types, and the weights assigned to subtypes further in this discussion. In the meantime, you may wish to leave this preference to its reasonable default.
 
@@ -204,7 +204,7 @@ The rebalance order begins at column 31, and may be up to 8 characters long. Its
 
 ### Name
 
-The name begins at column 40, and may be up to 42 characters long. Its content is not constrained. The account name is for visual identification purposes, and I suggest it be unique. However, uniqueness is not required. The account name should match the corresponding field in the holding file. The holding file is where the account receives its value.
+The account name begins at column 40, and may be up to 42 characters long. Its content is not constrained. The account name is for visual identification purposes, and I suggest it be unique. However, uniqueness is not required. The account name should match the corresponding field in the holding file. The holding file is where the account receives its value.
 
 ### Tax Type
 
@@ -301,7 +301,115 @@ The basis weight begins in column 120, and may be 8 characters if specified. Its
 
 ## Detailed File
 
--> Enter description for the detailed file here.
+-> Enter overall file description here.
+
+### Institution
+
+The institution mnemonic begins in column 1, and may be up to 12 characters long. Its content is not constrained as long as it is not blank. The institution mnemonic identifies the institution where the account is held.
+
+### Number
+
+The account number begins in column 14, and may be up to 16 characters long. Its content is constrained to a positive integer. The account number uniquely identifies an account within an institution.
+
+### Name
+
+The account name begins at column 31, and may be up to 42 characters long. Its content is not constrained. The account name is for visual identification purposes, and should match the corresponding field in the account file.
+
+### Weight Stock
+
+The stock weight begins in column 74, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to stocks (equities). If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to stocks. The stock weight is a level 1 weight category under all investments.
+
+### Weight Stock Domestic
+
+The domestic stock weight begins in column 81, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to domestic stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to domestic stocks. The domestic stock weight is a level 2 weight category under stock investments.
+
+### Weight Stock Foreign
+
+The foreign stock weight begins in column 88, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to foreign stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to foreign stocks. The foreign stock weight is a level 2 weight category under stock investments.
+
+### Weight Stock Large
+
+The large stock weight begins in column 95, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to large cap stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to large cap stocks. The large stock weight is a level 3 weight category under: 1) domestic stock investments, and; 2) foreign stock investments.
+
+### Weight Stock Not Large
+
+The not-large stock weight begins in column 102, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to medium cap, or small cap stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to not-large (medium and small cap) stocks. The not-large stock weight is a level 3 weight category under: 1) domestic stock investments, and; 2) foreign stock investments.
+
+### Weight Stock Medium
+
+The medium stock weight begins in column 109, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to medium cap stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to medium cap stocks. The medium stock weight is a level 4 weight category under not-large (medium and small cap) stock investments.
+
+### Weight Stock Small
+
+The small stock weight begins in column 116, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to small cap stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to small cap stocks. The small stock weight is a level 4 weight category under not-large (medium and small cap) stock investments.
+
+### Weight Stock Growth and Value
+
+The growth-and-value stock weight begins in column 123, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to growth-and-value stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to growth-and-value stocks. The growth-and-value stock weight is a level 4 weight category under: 1) large cap stock investments, and; 2) not-large cap stock investments. Alternatively, it is a level 5 weight category under: 1) medium cap stock investments, and; 2) small cap stock investments.
+
+### Weight Stock Growth or Value
+
+The growth-or-value stock weight begins in column 130, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to growth-or-value (one or the other <i>only</i>) stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to growth-or-value stocks. The growth-or-value stock weight is a level 4 weight category under: 1) large cap stock investments, and; 2) not-large cap stock investments. Alternatively, it is a level 5 weight category under: 1) medium cap stock investments, and; 2) small cap stock investments.
+
+### Weight Stock Growth
+
+The growth stock weight begins in column 137, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to growth stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to growth stocks. The growth stock weight is a level 5 or 6 weight category under growth-or-value stocks depending on the category of that parent.
+
+### Weight Stock Value
+
+The value stock weight begins in column 144, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to value stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to value stocks. The value stock weight is a level 5 or 6 weight category under growth-or-value stocks depending on the category of that parent.
+
+### Weight Bond
+
+The bond weight begins in column 151, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to bonds. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to bonds. The bond weight is a level 1 weight category under all investments.
+
+### Weight Bond Corporate
+
+The corporate bond weight begins in column 158, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to corporate bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to corporate bonds. The corporate bond weight is a level 2 weight category under bond investments.
+
+### Weight Bond Foreign
+
+The foreign bond weight begins in column 165, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to foreign bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to foreign bonds. The foreign bond weight is a level 2 weight category under bond investments.
+
+### Weight Bond Government
+
+The government bond weight begins in column 172, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to government bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to government bonds. The government bond weight is a level 2 weight category under bond investments.
+
+### Weight Bond High Yield
+
+The high-yield bond weight begins in column 179, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to high-yield bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to high-yield bonds. The high-yield bond weight is a level 2 weight category under bond investments.
+
+### Weight Bond Inflation Protected
+
+The inflation-protected bond weight begins in column 186, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to inflation-protected bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to inflation-protected bonds. The inflation-protected bond weight is a level 2 weight category under bond investments.
+
+### Weight Bond Mortgage
+
+The mortgage-backed bond weight begins in column 193, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to mortgage-backed bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to mortgage-backed bonds. The mortgage-backed bond weight is a level 2 weight category under bond investments.
+
+### Weight Bond Short
+
+The short-term bond weight begins in column 200, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to short-term bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to short-term bonds. The short-term bond weight is a level 2 weight category under bond investments.
+
+### Weight Bond Uncategorized
+
+The uncategorized bond weight begins in column 207, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to uncategorized (mixed type) bonds. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to uncategorized bonds. The uncategorized bond weight is a level 2 weight category under bond investments.
+
+### Weight Cash
+
+The cash weight begins in column 214, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to cash. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to cash. The cash weight is a level 1 weight category under all investments.
+
+### Weight Cash Government
+
+The government cash weight begins in column 221, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to government-issued cash only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to government cash. The government cash weight is a level 2 weight category under cash investments. 
+
+### Weight Cash Uncategorized
+
+The uncategorized cash weight begins in column 228, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to uncategorized (mixed type) cash. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to uncategorized cash. The uncategorized cash weight is a level 2 weight category under cash investments.
+
+### Weight Real Estate
+
+The real-estate weight begins in column 235, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real-estate. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to real-estate. The real-estate weight is a level 1 weight category under all investments.
 
 ## Distinguished File
 
@@ -468,9 +576,9 @@ The first subcode field begins in column 78, and is one character. Its content i
 6. 'G' (growth stocks)
 7. 'H' (inflation protected securities)
 8. 'K' (both growth and value stocks)
-9. 'L' (large-cap stocks)
-10. 'M' (medium-cap stocks)
-11. 'N' (medium and small-cap stocks)
+9. 'L' (large cap stocks)
+10. 'M' (medium cap stocks)
+11. 'N' (medium and small cap stocks)
 12. 'O' (foreign securities)
 13. 'P' (investor-specific non-balanceable investment project)
 14. 'R' (all real estate)
@@ -478,7 +586,7 @@ The first subcode field begins in column 78, and is one character. Its content i
 16. 'T' (corporate bonds)
 17. 'U' (treasury securities)
 18. 'V' (value stocks)
-19. 'W' (small-cap stocks)
+19. 'W' (small cap stocks)
 20. 'Y' (high-yield bonds)
 21. 'Z' (short-term bonds)
 
@@ -486,7 +594,7 @@ The first subcode, in conjunction with the subcodes two, three and four determin
 
 Currently, the software does not accept blended, or multi-asset funds for rebalance. The user may specify these types of tickers with a code of 'J' (unbalanceable) so that software will take them into account when valuing an account or portfolio. However, it will not attempt to rebalance such a ticker within its account. The software would report an inconsistency if a stock and bond blended fund - or ETF - were designated as balanceable with both the 'B' and 'S' subcodes. 
 
-A use of subcodes one through four may be demonstrated as follows: A large-cap growth fund - holding domestic securities - may be specified with the subcodes 'S', 'D', 'L' and 'G'. This completely specifies the balanceable characteristics of the ticker in a way that is possible, and consistent. Currently, the software requires no more than four subcodes to completely characterize a ticker for its rebalancing effort.
+A use of subcodes one through four may be demonstrated as follows: A large cap growth fund - holding domestic securities - may be specified with the subcodes 'S', 'D', 'L' and 'G'. This completely specifies the balanceable characteristics of the ticker in a way that is possible, and consistent. Currently, the software requires no more than four subcodes to completely characterize a ticker for its rebalancing effort.
 
 ### Subcode 2
 
