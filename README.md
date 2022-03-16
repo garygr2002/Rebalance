@@ -62,6 +62,7 @@ After 13 months of work - to the end of February 2022 - I deemed the design, cod
 - [Income Files](#income-files)
 - [Portfolio File](#portfolio-file)
 - [Ticker File](#ticker-file)
+- [How Does Rebalancing Work?](#how-does-rebalancing-work)
 - [Credits](#credits)
 - [Warranty](#warranty)
 - [License](#license)
@@ -499,36 +500,16 @@ The third subcode begins in column 82, and is one character. Its content is cons
 
 The fourth subcode begins in column 84, and is one character. Its content is constrained to one of the characters described in the first subcode. The fourth subcode, in conjunction with subcodes one, two and three determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.
 
+## How Does Rebalancing Work?
+
 ## Credits
 
 I selfishly credit only myself with the design, coding and documentation of this project.
 
-### Warranty
+## Warranty
 
 No warranty, or guarantee of the correctness or suitability of this product for any purpose is given, either explicitly or implicitly. I have used the software for my own purposes, but it has not been exhaustively tested. Use at your own risk. Feedback and bug reports are welcome!
 
-### License
+## License
 
 License of this project and the resulting tool is covered by the GNU General Public License v3.0.
-
----
-
-🏆 The previous sections are the bare minimum, and your project will ultimately determine the content of this document. You might also want to consider adding the following sections.
-
-## Badges
-
-![badmath](https://img.shields.io/github/languages/top/lernantino/badmath)
-
-Badges aren't necessary, per se, but they demonstrate street cred. Badges let other developers know that you know what you're doing. Check out the badges hosted by [shields.io](https://shields.io/). You may not understand what they all represent now, but you will in time.
-
-## Features
-
-If your project has a lot of features, list them here.
-
-## How to Contribute
-
-If you created an application or package and would like other developers to contribute it, you can include guidelines for how to do so. The [Contributor Covenant](https://www.contributor-covenant.org/) is an industry standard, but you can always write your own if you'd prefer.
-
-## Tests
-
-Go the extra mile and write tests for your application. Then provide examples on how to run them here.
