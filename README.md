@@ -422,7 +422,7 @@ The distinguished file is one of sixteen CSV files that act as input to the soft
 1. All account rows are a part of the most recently listed institution row
 2. All institution rows are a part of the most recently listed portfolio row
 
-The software assumes that "orphaned" rows (tickers, accounts or institutions with no parent) are errors, and reports these as such. Before referencing the programmatically accessible mnemonics in the distinguished file, the programmer/user will need to modify the software thusly:
+The software assumes that "orphaned" rows (accounts or institutions with no parent) are errors, and reports these as such. Before referencing the programmatically accessible mnemonics in the distinguished file, the programmer/user will need to modify the software thusly:
 
 1. For account references, modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedAccount.java</b>, and add the needed mnemonic
 2. For institution references,  modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedInstitution.java</b>, and add the needed mnemonic
