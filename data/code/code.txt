@@ -16,7 +16,7 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
 
     The unique code
 
- 2. Name: length - 22, position - 2; type - unconstrained
+ 2. Name: length - 21, position - 3; type - unconstrained
 
     The name of the code
 
