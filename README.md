@@ -475,7 +475,7 @@ The line type begins in column 1, and is 1 character. Its content is constrained
 
 ### Distinguished Key
 
-The distinguished key begins in column 3, and is up to 24 characters long. Its content is constrained to one of the case-insensitive mnemonics in the <b>DistinguishedAccount</b>, <b>DistinguishedInstitution</b>, or <b>DistinguishedPortfolio</b> classes, as discussed above. The universal of acceptable strings in this field is governed by the line type. 
+The distinguished key begins in column 3, and is up to 24 characters long. Its content is constrained to one of the case-insensitive mnemonics in the <b>DistinguishedAccount</b>, <b>DistinguishedInstitution</b>, or <b>DistinguishedPortfolio</b> classes, as discussed above. The line type governs the class used for the set of acceptable strings. 
 
 ### Distinguished Value
 
