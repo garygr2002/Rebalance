@@ -297,7 +297,46 @@ The basis weight begins in column 120, and may be 8 characters if specified. Its
 
 ## Code File
 
--> Enter description for the code file here.
+Unless they intend to programmatically modify the software, the code file and the [Distinguished File](#distinguished-file) are two files that a casual user will not need to edit. If you do not need to edit the code file, borrow the empty example.
+
+The code file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "code" located in the directory identified in the source preference. Files of this type have the prefix "code_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the code file that has the latest date that is not later than the date of the latest holding file. The code file contains descriptive information about the character code used by the software. The character codes fall into one of two categories:
+
+1. Codes that describe the holding hierarchy, namely 'A' (an account), 'F' (a fund available for rebalance), 'I' (an institution), 'J' (a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio), 'Q', (a single bond or stock), 'X' (an exchange-trade fund).
+2. Codes that describe fund types, e.g., 'B' for bond, 'C' for cash, 'R' for real-estate, and 'S' for stock.
+
+Currently, the needed number of codes is almost exactly equal to the number of characters in the Latin alphabet. Therefore, the software only uses uppercase Latin letters for codes. The software uses the code library for no programmatic purpose, however, it remains available for a purpose such as report output. The software overloads the meaning of the character 'P' to specify the holding hierarchy type "portfolio," and also to code a portfolio-specific investment project for funds, ETFs, bonds or stocks. The following are the fields of a code file row. 
+
+### Code
+
+The code begins in column 1, and is 1 character. Its content is unconstrained, but the existing codes are currently all uppercase Latin characters.
+
+### Name
+
+The name begin in column 3, and may be up to 21 characters long. Its content is unconstrained. The name is a readable mnemonic for the code, giving it an easily understandable meaning.
+
+### Subcode 1
+
+The first subcode begins in column 25, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+
+### Subcode 2
+
+The second subcode begins in column 27, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+
+### Subcode 3
+
+The third subcode begins in column 29, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+
+### Subcode 4
+
+The fourth subcode begins in column 31, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+
+### Subcode 5
+
+The fifth subcode begins in column 33, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+
+### Description
+
+The description begins column 35, and may be 80 characters long. Its content is unconstrained except that it may not contain a comma, ',' (this is, after all, a CSV file). I recommend using semicolons in place of commas in the description. Actual semicolons have little use here, and they may be programmatically replaced with commas. The description contains more information about the meaning of the code than is given in its name.  
 
 ## Detailed File
 

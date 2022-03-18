@@ -4,11 +4,9 @@ Things to do:
 
 2. Add description for the Income files in the README.md.
 
-3. Add description for the Code file in the README.md.
+3. Add a section on how rebalancing works in the README.md.
 
-4. Add a section on how rebalancing works in the README.md.
-
-5. Add other sections to the README.md as needed.
+4. Add other sections to the README.md as needed.
 
 For your information:
 
