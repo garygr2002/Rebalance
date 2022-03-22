@@ -93,6 +93,10 @@ class RebalanceNode implements CurrencyReceiver {
     private final ConsiderationSetterAction considerationSetterAction =
             new ConsiderationSetterAction();
 
+    // The leaves in the node
+    private final Collection<Ticker> leaves =
+            new TreeSet<>(Comparator.comparing(ticker -> ticker.getKey()));
+
     // A map of snapshot keys to the value of the snapshot
     private final Map<SnapshotKey, Currency> snapshotMap = new HashMap<>();
 
@@ -410,10 +414,20 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
+     * Adds a leaf to the node.
+     *
+     * @return True if the node did not already contain the specified leaf
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public boolean addLeaf(@NotNull Ticker ticker) {
+        return leaves.add(ticker);
+    }
+
+    /**
      * Adds a ticker to the node.
      *
      * @param ticker The ticker to add to the node
-     * @return True if the group did not already contain the specified ticker
+     * @return True if the node did not already contain the specified ticker
      */
     @SuppressWarnings("UnusedReturnValue")
     public boolean addTicker(@NotNull Ticker ticker) {
@@ -473,8 +487,9 @@ class RebalanceNode implements CurrencyReceiver {
      */
     public void clear() {
 
-        // Clear both the children and the tickers.
+        // Clear all the children, the leaves, and the tickers.
         children.clear();
+        leaves.clear();
         tickers.clear();
     }
 
