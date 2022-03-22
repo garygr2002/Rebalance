@@ -174,6 +174,17 @@ class WeightRebalancer extends AccountRebalancer
     }
 
     @Override
+    public void receive(@NotNull Ticker ticker) {
+
+        /*
+         * TODO:
+         *
+         * Let the current node know that we are at a leaf of the weight tree
+         * for the current ticker.
+         */
+    }
+
+    @Override
     public void receive(@NotNull WeightType type) {
 
         /*
