@@ -23,7 +23,7 @@ class TickerDelegate extends ReceiverDelegate<Ticker> {
      * @param ticker The ticker from whom we are delegated
      */
     public TickerDelegate(@NotNull Ticker ticker) {
-        super(ticker, 0.);
+        this(ticker, 0.);
     }
 
     @Override
