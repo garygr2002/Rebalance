@@ -7,23 +7,23 @@ import org.jetbrains.annotations.NotNull;
 class TickerDelegate extends ReceiverDelegate<Ticker> {
 
     /**
-     * Constructs the ticker delegate with an explicit divisor.
+     * Constructs the ticker delegate with an explicit multiplier.
      *
-     * @param ticker  The ticker from whom we are delegated
-     * @param divisor The divisor
+     * @param ticker     The ticker from whom we are delegated
+     * @param multiplier The multiplier
      */
-    public TickerDelegate(@NotNull Ticker ticker, double divisor) {
-        super(ticker, (0. == divisor) ? ticker.getWeight() :
-                ticker.getWeight() / Math.abs(divisor));
+    public TickerDelegate(@NotNull Ticker ticker, double multiplier) {
+        super(ticker, (0. == multiplier) ? ticker.getWeight() :
+                ticker.getWeight() * Math.abs(multiplier));
     }
 
     /**
-     * Constructs the ticker delegate with an implicit divisor.
+     * Constructs the ticker delegate with a default multiplier.
      *
      * @param ticker The ticker from whom we are delegated
      */
     public TickerDelegate(@NotNull Ticker ticker) {
-        this(ticker, 0.);
+        this(ticker, 1.);
     }
 
     @Override
