@@ -424,6 +424,56 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
+     * If there are existing children: 1) creates a new node of the same
+     * weight type as this node; 2) add leaves as tickers of the new node, and;
+     * 3) adds the new node as a child of this node.
+     */
+    private void addLeaves() {
+
+        /*
+         * Get the leaf count. Are there leaves, and do the existing children
+         * have any weight?
+         */
+        final int leafCount = leaves.size();
+        if ((0 < leafCount) && hasAnyWeight(childValues)) {
+
+            /*
+             * There are leaves, and existing children have weight. Create a
+             * weight list using all existing children.
+             */
+            final List<Double> weightList = createWeightList(childValues,
+                    Integer.MAX_VALUE);
+
+            /*
+             * Create a new child node of the same weight type as this node.
+             * For the weight of the new child, use the sum of the weight of
+             * the existing children, multiplied by the number of leaves, and
+             * divided by the number of existing children. The weight sum,
+             * number of leaves, and number of existing children will all be
+             * positive, or we would not be here performing this calculation.
+             * Because of this, it is not necessary to check if the number of
+             * existing children is zero before using that number as a divisor.
+             */
+            final RebalanceNode newChild = new RebalanceNode(getType(),
+                    new Reallocator(weightList).getWeightSum() * leafCount /
+                            weightList.size());
+
+            // Add each leaf as a ticker of the new child node.
+            for (Ticker leaf : leaves) {
+                newChild.addTicker(leaf);
+            }
+
+            /*
+             * Clear the leaves. This will prevent the logic in this block from
+             * being duplicated unless new leaves are added. Add the new child
+             * to this node.
+             */
+            leaves.clear();
+            addChild(newChild);
+        }
+    }
+
+    /**
      * Adds a ticker to the node.
      *
      * @param ticker The ticker to add to the node
@@ -446,7 +496,7 @@ class RebalanceNode implements CurrencyReceiver {
                 Integer.MAX_VALUE);
 
         /*
-         * Create an allocator with the weight list. Is the sum of the weights
+         * Create a reallocator with the weight list. Is the sum of the weights
          * greater than zero?
          */
         final Reallocator reallocator = new Reallocator(weightList);
@@ -972,10 +1022,16 @@ class RebalanceNode implements CurrencyReceiver {
                                          boolean isRelative) {
 
         /*
-         * Declare and initialize the residual. Clear the maps in the value
-         * setter action. Does any child have positive weight?
+         * Declare and initialize the residual, which is the return value of
+         * this method. Add any leaves of this node.
          */
         Currency residual = currency;
+        addLeaves();
+
+        /*
+         * Clear the maps in the value setter action. Does any child have
+         * positive weight?
+         */
         valueSetterAction.clearMaps();
         if (hasAnyWeight(childValues)) {
 
