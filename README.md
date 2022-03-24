@@ -312,31 +312,31 @@ The code begins in column 1, and is 1 character. Its content is unconstrained, b
 
 ### Name
 
-The name begin in column 3, and may be up to 21 characters long. Its content is unconstrained. The name is a readable mnemonic for the code, giving it an easily understandable meaning.
+The name begin in column 3, and may be up to 22 characters long. Its content is unconstrained. The name is a readable mnemonic for the code, giving it an easily understandable meaning.
 
 ### Subcode 1
 
-The first subcode begins in column 25, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+The first subcode begins in column 26, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
 
 ### Subcode 2
 
-The second subcode begins in column 27, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+The second subcode begins in column 28, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
 
 ### Subcode 3
 
-The third subcode begins in column 29, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+The third subcode begins in column 30, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
 
 ### Subcode 4
 
-The fourth subcode begins in column 31, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+The fourth subcode begins in column 32, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
 
 ### Subcode 5
 
-The fifth subcode begins in column 33, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+The fifth subcode begins in column 34, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
 
 ### Description
 
-The description begins column 35, and may be 80 characters long. Its content is unconstrained except that it may not contain a comma, ',' (this is, after all, a CSV file). I recommend using semicolons in place of commas in the description. Actual semicolons have little use here, and they may be programmatically replaced with commas. The description contains more information about the meaning of the code than is given in its name.  
+The description begins column 36, and may be 80 characters long. Its content is unconstrained except that it may not contain a comma, ',' (this is, after all, a CSV file). I recommend using semicolons in place of commas in the description. Actual semicolons have little use here, and they may be programmatically replaced with commas. The description contains more information about the meaning of the code than is given in its name.  
 
 ## Detailed File
 

@@ -16,31 +16,31 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
 
     The unique code
 
- 2. Name: length - 21, position - 3; type - unconstrained
+ 2. Name: length - 22, position - 3; type - unconstrained
 
     The name of the code
 
- 3. Subcode 1: length - 1, position - 25; type - character
+ 3. Subcode 1: length - 1, position - 26; type - character
 
     Associated subcode 1
 
- 4. Subcode 2: length - 1, position - 27; type - character
+ 4. Subcode 2: length - 1, position - 28; type - character
 
     Associated subcode 2
 
- 5. Subcode 3: length - 1, position - 29; type - character
+ 5. Subcode 3: length - 1, position - 30; type - character
 
     Associated subcode 3
 
- 6. Subcode 4: length - 1, position - 31; type - character
+ 6. Subcode 4: length - 1, position - 32; type - character
 
     Associated subcode 4
 
- 7. Subcode 5: length - 1, position - 33; type - character
+ 7. Subcode 5: length - 1, position - 34; type - character
 
     Associated subcode 5
 
- 8. Description: length - 80, position - 35; type - unconstrained (column
+ 8. Description: length - 80, position - 36; type - unconstrained (column
     alignment ends here)
 
     A description of the code based on related codes
