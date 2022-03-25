@@ -21,11 +21,19 @@ I have been interested in investing and investments for many years, and have sou
 
 Beginning at the end of calendar year 2020, I changed my career focus from full-time employment, and contract assignments to a long term status as a freelance software developer and data scientist. In my capacity in this role, I undertook this project for two reasons. First, I desired a mostly automated tool to undertake the chore of rebalancing my investments. Second, I desired to showcase a large, publicly accessible software project that was conceived, designed, coded and documented solely by myself.
 
-In service of both goals, I decided to produce my own custom tool for the task. Another option might have been to use existing commercial software, or an existing open-source project. I rejected a commercial software solution for two reasons, the first being the one-time, or ongoing expense. I also felt commercial software might not be exactly what I needed. I rejected open-source solutions for two reasons, the first being a lack of complete trust in any solution I might discover. The second reason was that I felt my time would be better spent professionally in developing my own software rather than in researching open-source solutions. After all, at the end of the day I could demonstrate a unique, professional accomplishment when developing my own tool.
+In service of both goals, I decided to produce my own custom tool for the task of rebalancing my investments. Another option might have been to use existing commercial software, or an existing open-source project. I rejected a commercial software solution for two reasons:
+
+1. The one-time, or ongoing expense for commercial software (I am a cheapskate)
+2. I felt that commercial software might not be exactly what I needed, or wated
+
+I rejected existing open-source solutions, also for two reasons:
+
+1. Lack of complete trust in any solution I might discover (I do not blindly trust free software, sorry)
+2. I felt my time would be better spent professionally in developing my own software rather than in researching open-source solutions. After all, at the end of the day I could demonstrate a unique, professional accomplishment by developing my own tool.
 
 ### Input
 
-The input to the tool is a series of sixteen CSV files that are coded by date as a suffix in their names (format: yyyymmdd). Sample files are located in the data directory of this project. There you will find a series of subdirectories. Some subdirectories contain one or more input files of the same type, differing by date, or one or more output files differing by date.
+The input to the software is a series of sixteen CSV files that are coded by date as a suffix in their names (format: yyyymmdd). Sample files are located in the data directory of this project. There you will find a series of subdirectories. Some subdirectories contain one or more input files of the same type, differing by date, or one or more output files differing by date.
 These sixteen input files are:
 
 1. Account: A description of accounts unique by institution and account number
@@ -37,15 +45,15 @@ These sixteen input files are:
 7. Holding: The most important file, a hierarchy of holding valuations organized by portfolios, institutions, accounts, and securities 
 8. Income Tax Rates (4 files): Current income tax rates, one file for each of head-of-household, joint, separate and single filers
 9. Portfolio: A description of portfolios unique by a key
-10. Ticker: A description of tickers unique by key (funds, ETFs or individual security) that describe the type of securities held (e.g., stock, bond, cash or real estate)
+10. Ticker: A description of tickers unique by key (funds, ETFs or individual securities) that describe the type of securities held (e.g., stock, bond, cash or real estate)
 
-As well as sample data files, the reader will also find in each data subdirectory a text file describing in column order the fields in the CSV files of that type. Each row in the CSV files of the given type is assumed to have a unique key. The key field(s) are so indicated in the description file. 
+As well as sample data files, the reader will also find in each data subdirectory a text file describing in column order the fields in the CSV files of that type. The column descriptions are also contained in this markdown file. Each row in the CSV files of the given type is assumed to have a unique key. The key field(s) are so indicated in the description file, and also in this markdown file. 
 
 I have left as an enhancement the possibility that input to the tool may be changed to SQL tables indexed by a combination of date, and existing keys in the CSV files. An additional enhancement would be a graphical user interface by which the SQL tables may be edited. The current tool does not have these features.
 
 ### State of the Project
 
-After 13 months of work - to the end of February 2022 - I deemed the design, code and deployment activities of the project to be complete. I allocated one man-month to fully document the project for professional showcase. My intention is to complete this work by the conclusion of March 2022. An observer will note progressive activity and growth in this markdown file and related documents during this time. Below you will find some portions of the markdown template that remain unedited. Stop by often for updates!
+After 13 months of work - to the end of February 2022 - I deemed the design, code and deployment activities of the project to be complete. I have allocated one man-month to fully document the project for professional showcase. My intention is to complete this work by the conclusion of March 2022. An observer will note progressive activity and growth in this markdown file and related documents during this time. Below you will find some portions of the markdown template that remain unedited. Stop by often for updates!
 
 ## Table of Contents
 
@@ -70,7 +78,7 @@ After 13 months of work - to the end of February 2022 - I deemed the design, cod
 
 ## Installation
 
-This project was designed and coded in an Ubuntu Linux environment using the IntelliJ IDE and Java version 11. It should be possible to install and run, or even build the software in a Windows, or MacOS environment. At this time I have decided against investigating the steps required for installing the product in non-Linux environments. You will need the Java 11 JRE to run the software.
+This project was designed and coded in an Ubuntu Linux environment using the IntelliJ IDE and Java version 11. It should be possible to install and run, or even build the software in a Windows, or macOS environment. At this time I have decided against investigating the steps required for installing the product in non-Linux environments. You will need the Java 11 JRE to run the software.
 
 Among the releases for this product, you will find the following files:
 
@@ -123,7 +131,7 @@ Resets all preferences to defaults. The default is null when null has a meaning 
 
 ### -minimum
 
-Sets all preferences required for the software to run in some fashion. This assumes a default for the source directory for the data files. The default is not assumed to be a directory that exists. The action of this option is different from the 's' command line option, where the explicitly identified argument must be an absolute, or relative directory path that <b>must</b> exist.
+Sets all preferences required for the software to run in some fashion. This assumes a default for the source directory of the data files. The default is not assumed to be a directory that exists. The action of this option is different from the 's' command line option, where the explicitly identified argument must be an absolute, or relative directory path that <b>must</b> exist.
 
 ### -preference
 
@@ -163,9 +171,9 @@ The <i>ncnt</i> argument must be a non-negative integer, and is required. It is 
 
 Why would an allocation not be able to exactly match the specified weights? At the level of individual funds in the account, there are two reasons. First, the fund may have a minimum investment which may not be met with a certain weight allocation. Second, for an ETF or stock, an investment may have a requirement, or preference for some whole or round number of shares that may not be met with a certain weight allocation.
 
-The thing is, checking all the subsets of an investment category in an account requires a runtime that is two to the power of the number of investments in the category. This is prohibitively expensive for even a modest number of investments. A situation where this would come into play would be when an account contains, for example, twenty small cap value stock ETFs, all with a preferred round number of shares. You can see that it will take no small amount of runtime to examine two to the twentieth power of investment subsets. If the number of investments of a certain type exceed this preference, the software will not even try to rebalance them. The alternative is a program that appears to hang indefinitely when run. Note that the software applies this same limit as it works up the tree of same-type investments. At the coarsest level - level one - the software needs a minimum of four in this setting to rebalance equities, bonds, cash and real-estate.
+The thing is, checking all the subsets of an investment category in an account requires a runtime that is two to the power of the number of investments in the category. This is prohibitively expensive for even a modest number of investments. A situation where this would come into play would be when an account contains, for example, twenty small cap value stock ETFs, all with a different preferred round number of shares. You can see that it will take no small amount of runtime to examine two to the twentieth power of investment subsets. If the number of investments of a certain type exceed this preference, the software will not even try to rebalance them. The alternative is a program that appears to hang indefinitely when run. Note that the software applies this same limit as it works up the tree of same-type investments. At the coarsest level - level one - the software needs a minimum of four in this setting to rebalance equities, bonds, cash and real-estate.
 
-There is a dynamic programming algorithm that can find a best-fit for investments subsets as discussed here. This is faster than exhaustively searching all subsets as is currently done by the software. I will move on to discuss hierarchies of investments types, and the weights assigned to subtypes further in this discussion. In the meantime, you may wish to leave this preference to its reasonable default.
+There is a dynamic programming algorithm that can find a best-fit for investments subsets as discussed here. This is faster than exhaustively searching all subsets as is currently done by the software. I will move on to discuss hierarchies of investments types, and the weights assigned to subtypes further in this document (see [How Does Rebalancing Work](#how-does-rebalancing-work)). In the meantime, you may wish to leave this preference to its reasonable default.
 
 ### -source spth
 
@@ -189,13 +197,13 @@ Displays the command line usage text.
 
 ## Account File
 
-The account file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "account" located in the directory identified in the source preference. Files of this type have the prefix "account_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the account file that has the latest date that is not later than the date of the latest holding file. The account file contains information that is required to identify, characterize, and rebalance accounts. The key for the rows in the file is a concatenation of an institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of an account file row. 
+The account file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "account" located in the directory identified in the source preference. Files of this type have the prefix "account_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the account file that has the latest date that is not later than the date of the latest holding file. The account file contains information that is required to identify, characterize, and rebalance accounts. The key for rows in the file is a concatenation of institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of an account file row. 
 
-### Institution
+### Institution Mnemonic
 
 The institution mnemonic begins in column 1, and may be up to 12 characters long. Its content is not constrained as long as it is not blank. The institution mnemonic identifies the institution where the account is held.
 
-### Number
+### Account Number
 
 The account number begins in column 14, and may be up to 16 characters long. Its content is constrained to a positive integer. The account number uniquely identifies an account within an institution. 
 
@@ -255,17 +263,17 @@ The basis file is one of sixteen CSV files that act as input to the software. Fi
 
 The software assumes that "orphaned" rows (tickers, accounts or institutions with no parent) are errors, and reports these as such. If the value field of an account is specified, it should match the sum of the ticker rows of the account. If the value field of an institution is specified, it should match the sum of the account rows of the institution. If the value field of a portfolio is specified, it should match the sum of the institution rows of the portfolio. The software will consider it an error if the value field in any row - if provided - does not match the sum of its children.
 
-The key of a basis file entry is the unique concatenation of the key of a parent row and the key of its child. For portfolios, the key would be a distinguished value concatenated with the portfolio mnemonic. For institutions, the key would be the portfolio mnemonic concatenated with an institution mnemonic. For accounts, the key would be the institution mnemonic concatenated with the account number. For tickers, the key would be the account key (institution mnemonic/account number combination) concatenated with the ticker symbol.
+The concatenation of the foreign key of a parent row, and the foreign key of a child row in the basis file should be unique. For portfolios, the unique combination would be a distinguished value concatenated with the portfolio mnemonic. For institutions, the unique combination would be the portfolio mnemonic concatenated with an institution mnemonic. For accounts, the unique combination would be the institution mnemonic concatenated with the account number. For tickers, the unique combination would be the account key (institution mnemonic/account number combination) concatenated with the ticker symbol.
 
-The portfolio mnemonic specified in a basis row must match a portfolio file row. The institution mnemonic/account number combination must match an account file row. The ticker symbol must match a ticker file row. The following are the fields of a basis file row.
+The portfolio mnemonic specified in a basis row must match a portfolio file row. The institution mnemonic/account number combination must match an account file row. The ticker symbol must match a ticker file row. The primary key for rows in the file is the ordinal number of the row. The following are the fields of a basis file row.
 
 ### Line Type
 
 The line type begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'A' (an account row), 'F' (a row for a fund available for rebalance), 'I' (an institution row), 'J' (a row for a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio row), 'Q', (a row for a single bond or stock), 'X' (a row for an exchange-trade fund). I hope the use of the line type is self-explanatory.
 
-### Key
+### Foreign Key
 
-The basis key begins in column 3, and may be 16 characters long. Its content is unconstrained as long as it references:
+The foreign key begins in column 3, and may be 16 characters long. Its content is unconstrained as long as it references:
 
 1. A portfolio mnemonic (see [Portfolio File](#portfolio-file)) for rows with a 'P' line type
 2. An institution mnemonic (see [Account File](#account-file)) for rows with an 'I' line type
@@ -305,7 +313,7 @@ The code file is one of sixteen CSV files that act as input to the software. Fil
 1. Codes that describe the holding hierarchy, namely 'A' (an account), 'F' (a fund available for rebalance), 'I' (an institution), 'J' (a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio), 'Q', (a single bond or stock), 'X' (an exchange-trade fund).
 2. Codes that describe fund types, e.g., 'B' for bond, 'C' for cash, 'R' for real-estate, and 'S' for stock.
 
-Currently, the needed number of codes is almost exactly equal to the number of characters in the Latin alphabet. Therefore, the software only uses uppercase Latin letters for codes. The software uses the code library for no programmatic purpose, however, it remains available for a purpose such as report output. The software overloads the meaning of the character 'P' to specify the holding hierarchy type "portfolio," and also to code a portfolio-specific investment project for funds, ETFs, bonds or stocks. The following are the fields of a code file row. 
+Currently, the needed number of codes is almost exactly equal to the number of characters in the Latin alphabet. Therefore, the software only uses uppercase Latin letters for codes. The software uses the code library for no programmatic purpose, however, it remains available for a purpose such as report output. The software overloads the meaning of the character 'P' to specify the holding hierarchy type "portfolio," and also to code a portfolio-specific investment project for funds, ETFs, bonds or stocks. The key for the rows in the file is the code itself, and it should be unique. The following are the fields of a code file row. 
 
 ### Code
 
@@ -341,15 +349,15 @@ The description begins column 36, and may be 80 characters long. Its content is 
 
 ## Detailed File
 
-The detailed file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "detailed" located in the directory identified in the source preference. Files of this type have the prefix "detailed_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the detailed file that has the latest date that is not later than the date of the latest holding file. The detailed file contains fine-grained investment category weights for rebalancing accounts. The key for the rows in the file is a concatenation of an institution mnemonic and account number. The combination of the two should be unique, and match a row in the account file. The account name should match that in the account file, but this is not required. The account name is a field in this file only for fast visual identification of the account. It is not used by the software for any purpose.
+The detailed file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "detailed" located in the directory identified in the source preference. Files of this type have the prefix "detailed_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the detailed file that has the latest date that is not later than the date of the latest holding file. The detailed file contains fine-grained investment category weights for rebalancing accounts. The combination institution mnemonic and account number should match a row in the account file. The account name should match that in the account file, but this is not required. The account name is a field in this file only for fast visual identification of the account. It is not used by the software for any purpose.
 
-The level 1 category weights specified in the detailed file - stock, bond, cash, and real-estate - replace these course-grained weights specified in the account file. The user of the software may override these course-grained weights for any number of accounts, and at the same time specify finer-grained category weights levels 2 through 6 using a row in the detailed file. The user may override the weights for any number of rows: no rows, one row, or all the account rows. Rows in the detailed file that match no row in the account file are read, but ignored. If the software seems to be ignoring course-grained weight settings in the account file, the user might first check whether there exists an overriding row in the detailed file. If the software seems to be ignoring fine-grained weight settings in the detailed file, the user might first check whether the institution mnemonic and account number precisely match the target account in the account file. The following are the fields of a detailed file row.
+The level 1 category weights specified in the detailed file - stock, bond, cash, and real-estate - replace these course-grained weights specified in the account file. The user of the software may override these course-grained weights for any number of accounts, and at the same time specify finer-grained category weights levels 2 through 6 using a row in the detailed file. The user may override the weights for any number of rows: no rows, one row, or all the account rows. Rows in the detailed file that match no row in the account file are read, but ignored. If the software seems to be ignoring course-grained weight settings in the account file, the user might first check whether there exists an overriding row in the detailed file. If the software seems to be ignoring fine-grained weight settings in the detailed file, the user might first check whether the institution mnemonic and account number precisely match the target account in the account file. The key for rows in the file is a concatenation of institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of a detailed file row.
 
-### Institution
+### Institution Mnemonic
 
 The institution mnemonic begins in column 1, and may be up to 12 characters long. Its content is not constrained as long as it is not blank. The institution mnemonic identifies the institution where the account is held.
 
-### Number
+### Account Number
 
 The account number begins in column 14, and may be up to 16 characters long. Its content is constrained to a positive integer. The account number uniquely identifies an account within an institution.
 
@@ -459,6 +467,8 @@ Unless they intend to programmatically modify the software, the [Code File](#cod
 
 The distinguished file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "distinguished" located in the directory identified in the source preference. Files of this type have the prefix "distinguished_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the distinguished file that has the latest date that is not later than the date of the latest holding file. The distinguished file maps well-known, non-sensitive mnemonics for portfolios, institutions and accounts to sensitive keys. The programmer/user will then be able to add code that references these mnemonics to a publicly accessible code base without concern that personally sensitive information will be compromised. The distinguished file is a hierarchy. At the highest level are portfolios, followed by institutions, followed by accounts. Each row of the distinguished file corresponds to one of these, and is coded to indicate its type. The software assumes: 
 
+The level 1 category weights specified in the detailed file - stock, bond, cash, and real-estate - replace these course-grained weights specified in the account file. The user of the software may override these course-grained weights for any number of accounts, and at the same time specify finer-grained category weights levels 2 through 6 using a row in the detailed file. The user may override the weights for any number of rows: no rows, one row, or all the account rows. Rows in the detailed file that match no row in the account file are read, but ignored. If the software seems to be ignoring course-grained weight settings in the account file, the user might first check whether there exists an overriding row in the detailed file. If the software seems to be ignoring fine-grained weight settings in the detailed file, the user might first check whether the institution mnemonic and account number precisely match the target account in the account file. The key for the rows in the file is a concatenation of an institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of a detailed file row.
+
 1. All account rows are a part of the most recently listed institution row
 2. All institution rows are a part of the most recently listed portfolio row
 
@@ -468,7 +478,7 @@ The software assumes that "orphaned" rows (accounts or institutions with no pare
 2. For institution references,  modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedInstitution.java</b>, and add the needed mnemonic
 3. For portfolio references,  modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedPortfolio.java</b>, and add the needed mnemonic
 
-Once the programmer/user accomplishes this, the added mnemonic may then be referenced using the <b>Distinguished Key</b> field in a row in the distinguished file. The values for the keys will then be programmatically accessible from the <b>DistinguishedAccountLibrary</b>, <b>DistinguishedInstitutionLibrary</b>, or the <b>DistinguishedPortfolioLibrary</b>, depending on the type of distinguished key identified by the line type. The following are the fields of a distinguished file row.
+Once the programmer/user accomplishes this, the added mnemonic may then be referenced using the <b>Distinguished Key</b> field in a row in the distinguished file. The values for the keys will then be programmatically accessible from the <b>DistinguishedAccountLibrary</b>, <b>DistinguishedInstitutionLibrary</b>, or the <b>DistinguishedPortfolioLibrary</b>, depending on the type of distinguished key identified by the line type. The key for rows in the file is a concatenation of the line type and distinguished key, and the combination of the two should be unique. The following are the fields of a distinguished file row.
 
 ### Line Type
 
@@ -493,7 +503,7 @@ The gains files are four of sixteen CSV files that act as input to the software.
 3. "gains_separate", for married-filing-separately filers
 4. "gains_single", for single filers
 
-Files of this type have the prefix "gains_head_", "gains_joint_", "gains_separate_", or "gains_single_", depending on the subdirectory where they are located. The name is followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the gains files that have the latest dates that are not later than the date of the latest holding file. The gains files contain capital gains tax brackets for taxpayers in the various filing statuses. The following are the fields of a gains file row.
+Files of this type have the prefix "gains_head_", "gains_joint_", "gains_separate_", or "gains_single_", depending on the subdirectory where they are located. The name is followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the gains files that have the latest dates that are not later than the date of the latest holding file. The gains files contain capital gains tax brackets for taxpayers in the various filing statuses. The key for rows in the file is the income threshold, and it should be unique. The following are the fields of a gains file row.
 
 ### Income Threshold
 
@@ -515,17 +525,17 @@ The holding file is one of sixteen CSV files that act as input to the software. 
 
 The software assumes that "orphaned" rows (tickers, accounts or institutions with no parent) are errors, and reports these as such. If the value field of an account is specified, it should match the sum of the ticker rows of the account. If the value field of an institution is specified, it should match the sum of the account rows of the institution. If the value field of a portfolio is specified, it should match the sum of the institution rows of the portfolio. The software will consider it an error if the value field in any row - if provided - does not match the sum of its children. 
 
-The key of a holding file entry is the unique concatenation of the key of a parent row and the key of its child. For portfolios, the key would be a distinguished value concatenated with the portfolio mnemonic. For institutions, the key would be the portfolio mnemonic concatenated with an institution mnemonic. For accounts, the key would be the institution mnemonic concatenated with the account number. For tickers, the key would be the account key (institution mnemonic/account number combination) concatenated with the ticker symbol. 
+The concatenation of the foreign key of a parent row, and the foreign key of a child row in the holding file should be unique. For portfolios, the unique combination would be a distinguished value concatenated with the portfolio mnemonic. For institutions, the unique combination would be the portfolio mnemonic concatenated with an institution mnemonic. For accounts, the unique combination would be the institution mnemonic concatenated with the account number. For tickers, the unique combination would be the account key (institution mnemonic/account number combination) concatenated with the ticker symbol.
 
-The portfolio mnemonic specified in a holding row must match a portfolio file row. The institution mnemonic/account number combination must match an account file row. The ticker symbol must match a ticker file row. The following are the fields of a holding file row. 
+The portfolio mnemonic specified in a holding row must match a portfolio file row. The institution mnemonic/account number combination must match an account file row. The ticker symbol must match a ticker file row. The primary key for rows in the file is the ordinal number of the row. The following are the fields of a holding file row.
 
 ### Line Type
 
 The line type begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'A' (an account row), 'F' (a row for a fund available for rebalance), 'I' (an institution row), 'J' (a row for a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio row), 'Q', (a row for a single bond or stock), 'X' (a row for an exchange-trade fund). I hope the use of the line type is self-explanatory.
 
-### Key
+### Foreign Key
 
-The holding key begins in column 3, and may be 16 characters long. Its content is unconstrained as long as it references:
+The foreign key begins in column 3, and may be 16 characters long. Its content is unconstrained as long as it references:
 
 1. A portfolio mnemonic (see [Portfolio File](#portfolio-file)) for rows with a 'P' line type
 2. An institution mnemonic (see [Account File](#account-file)) for rows with an 'I' line type
@@ -567,7 +577,7 @@ The income files are four of sixteen CSV files that act as input to the software
 3. "income_separate", for married-filing-separately filers
 4. "income_single", for single filers
 
-Files of this type have the prefix "income_head_", "income_joint_", "income_separate_", or "income_single_", depending on the subdirectory where they are located. The name is followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the income files that have the latest dates that are not later than the date of the latest holding file. The income files contain standard deduction, and income tax brackets for taxpayers in the various filing statuses. The following are the fields of an income file row.
+Files of this type have the prefix "income_head_", "income_joint_", "income_separate_", or "income_single_", depending on the subdirectory where they are located. The name is followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the income files that have the latest dates that are not later than the date of the latest holding file. The income files contain standard deduction, and income tax brackets for taxpayers in the various filing statuses. The key for rows in the file is the income threshold, and it should be unique unless the row is a distinguished standard deduction row. The following are the fields of an income file row.
 
 ### Income Threshold
 
@@ -579,13 +589,13 @@ The tax rate begins in column 18, and may be 8 characters long. Its content is c
 
 ## Portfolio File
 
-The portfolio file is one of sixteen CSV files that act as input to the software. Files in this format are located in a directory named "portfolio" located in the directory identified in the source preference. Files of this type have the prefix "portfolio_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the portfolio file that has the latest date that is not later than the date of the latest holding file. The portfolio contains information that is required to identify, valuate and rebalance portfolios. The key for the rows in the file is a mnemonic that should uniquely identify the investor associated with the portfolio. The following are the fields of a portfolio file row.
+The portfolio file is one of sixteen CSV files that act as input to the software. Files in this format are located in a directory named "portfolio" located in the directory identified in the source preference. Files of this type have the prefix "portfolio_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the portfolio file that has the latest date that is not later than the date of the latest holding file. The portfolio contains information that is required to identify, valuate and rebalance portfolios. The key for rows in the file is the portfolio mnemonic, and it should uniquely identify the investor associated with the portfolio. The following are the fields of a portfolio file row.
 
-### Mnemonic
+### Portfolio Mnemonic
 
 The portfolio mnemonic begins in column 1, and may be 16 characters long. Its content is not constrained as long as it is not blank. The portfolio mnemonic uniquely identifies the investor associated with the portfolio. 
 
-### Name
+### Investor Name
 
 The investor name begins in column 18, and may be 20 characters long. Its content is not constrained. The software uses the investor name (rather than the investor mnemonic) in portfolio report files to make those files more readable. The investor name should match the corresponding field in the holding file. The holding file is where the portfolio receives its value.
 
@@ -639,7 +649,7 @@ The adjust-from-high flag begins at column 136, and may be up to 6 characters lo
 
 ## Ticker File
 
-The ticker file is one of sixteen CSV files that act as input to the software. Files in this format are located in a directory named "ticker" located in the directory identified in the source preference. Files of this type have the prefix "ticker_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the ticker file that has the latest date that is not later than the date of the latest holding file. The ticker contains information that is required to identify and categorize investments by type. "Tickers" is a catch-all name for open-end mutual funds, exchange-traded funds, individual stocks, individual bonds, or any sub-grouping of holding that occurs within an account. The key for the rows in the file is a mnemonic that should uniquely identify the investment in the institution where the ticker exists, or on the exchanges where it trades. It can also be a unique mnemonic that has meaning only to the investor who owns the account. Tickers may appear in one or more accounts in the holding file with valuations that are not the same. The following are the fields of a ticker file row.  
+The ticker file is one of sixteen CSV files that act as input to the software. Files in this format are located in a directory named "ticker" located in the directory identified in the source preference. Files of this type have the prefix "ticker_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the ticker file that has the latest date that is not later than the date of the latest holding file. The ticker contains information that is required to identify and categorize investments by type. "Tickers" is a catch-all name for open-end mutual funds, exchange-traded funds, individual stocks, individual bonds, or any sub-grouping of holding that occurs within an account. The key for the rows in the file is a mnemonic that should uniquely identify the investment in the institution where the ticker exists, or on the exchanges where it trades. It can also be a unique mnemonic that has meaning only to the investor who owns the account. Tickers may appear in one or more accounts in the holding file with valuations that are not the same. The key for rows in the file is the ticker, and it should be unique. The following are the fields of a ticker file row.  
 
 ### Code
 
