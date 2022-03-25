@@ -487,12 +487,12 @@ Note: The rows, fields and consistency rules stated below are applicable to all 
 
 The gains files are four of sixteen CSV files that act as input to the software. Files in this format are located in the following subdirectories in the directory identified in the source preference:
 
-1. "gains_head_", for head-of-house hold filers
+1. "gains_head", for head-of-house hold filers
 2. "gains_joint", for married-filing-jointly filers
 3. "gains_separate", for married-filing-separately filers
 4. "gains_single", for single filers
 
-Files of this type have the prefix "gains_head_", "gains_joint_", "gains_separate_", or "gains_single_", depending on the subdirectory where they are located. The name is followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the gains files that have the latest dates that are not later than the date of the latest holding file. The gains files contain capital gains tax brackets for taxpayers in the various filing statuses. The following are the fields of an gains file row.
+Files of this type have the prefix "gains_head_", "gains_joint_", "gains_separate_", or "gains_single_", depending on the subdirectory where they are located. The name is followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the gains files that have the latest dates that are not later than the date of the latest holding file. The gains files contain capital gains tax brackets for taxpayers in the various filing statuses. The following are the fields of a gains file row.
 
 ### Income Threshold
 
@@ -561,7 +561,7 @@ Note: The rows, fields and consistency rules stated below are applicable to all 
 
 The income files are four of sixteen CSV files that act as input to the software. Files in this format are located in the following subdirectories in the directory identified in the source preference:
 
-1. "income_head_", for head-of-house hold filers
+1. "income_head", for head-of-house hold filers
 2. "income_joint", for married-filing-jointly filers
 3. "income_separate", for married-filing-separately filers
 4. "income_single", for single filers
