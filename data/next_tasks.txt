@@ -6,7 +6,11 @@ Things to do:
 
 3. Add a section on how rebalancing works in the README.md.
 
-4. Add other sections to the README.md as needed.
+4. Add a boolean field to the Account file specifying that rebalance should be
+   governed by ticker weights in the Holding file, bypassing category weights
+   in the Account and Detailed files.
+
+5. Add other sections to the README.md as needed.
 
 For your information:
 
