@@ -174,11 +174,6 @@ class WeightRebalancer extends AccountRebalancer
     }
 
     @Override
-    public void receive(@NotNull Ticker ticker) {
-        currentNode.addLeaf(ticker);
-    }
-
-    @Override
     public void receive(@NotNull WeightType type) {
 
         /*
@@ -206,7 +201,6 @@ class WeightRebalancer extends AccountRebalancer
 
     @Override
     public void stop() {
-
-        // Currently, there is nothing to do here.
+        currentNode.addLeaf(currentTicker);
     }
 }

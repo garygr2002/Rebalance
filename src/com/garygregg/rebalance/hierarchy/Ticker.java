@@ -866,13 +866,6 @@ public class Ticker extends
     public interface WeightEnumerator {
 
         /**
-         * Receives a ticker.
-         *
-         * @param ticker A ticker
-         */
-        void receive(@NotNull Ticker ticker);
-
-        /**
          * Receives a weight type.
          *
          * @param type A weight type
@@ -977,15 +970,6 @@ public class Ticker extends
                  * for the non-null child weight type.
                  */
                 Ticker.this.enumerate(child, enumerator);
-            }
-
-            /*
-             * The child weight type is null. This means we are at a leaf of
-             * the weight tree. Let the weight enumerator receive this ticker
-             * as an indication of the condition.
-             */
-            else {
-                enumerator.receive(Ticker.this);
             }
         }
 
