@@ -24,7 +24,7 @@ Beginning at the end of calendar year 2020, I changed my career focus from full-
 In service of both goals, I decided to produce my own custom tool for the task of rebalancing my investments. Another option might have been to use existing commercial software, or an existing open-source project. I rejected a commercial software solution for two reasons:
 
 1. The one-time, or ongoing expense for commercial software (I am a cheapskate)
-2. I felt that commercial software might not be exactly what I needed, or wated
+2. I felt that commercial software might not be exactly what I needed, or wanted
 
 I rejected existing open-source solutions, also for two reasons:
 
