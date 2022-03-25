@@ -28,8 +28,8 @@ In service of both goals, I decided to produce my own custom tool for the task o
 
 I rejected existing open-source solutions, also for two reasons:
 
-1. Lack of complete trust in any solution I might discover (I do not blindly trust free software, sorry)
-2. I felt my time would be better spent professionally in developing my own software rather than in researching open-source solutions. After all, at the end of the day I could demonstrate a unique, professional accomplishment by developing my own tool.
+1. Lack of complete trust in any solution I might discover (I do not blindly trust free software; sorry)
+2. I felt my time would be better spent professionally in developing my own software rather than in researching open-source solutions. After all, at the end of the day I could demonstrate a unique, professional accomplishment by developing my own tool
 
 ### Input
 
