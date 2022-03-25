@@ -483,7 +483,24 @@ The distinguished value begins in column 28, and is up to 52 characters long. It
 
 ## Gains Files
 
--> Enter description for the capital gains tax rate files here.
+Note: The rows, fields and consistency rules stated below are applicable to all four gains files, and the [Income Files](#income-files).
+
+The gains files are four of sixteen CSV files that act as input to the software. Files in this format are located in the following subdirectories in the directory identified in the source preference:
+
+1. "gains_head_", for head-of-house hold filers
+2. "gains_joint", for married-filing-jointly filers
+3. "gains_separate", for married-filing-separately filers
+4. "gains_single", for single filers
+
+Files of this type have the prefix "gains_head_", "gains_joint_", "gains_separate_", or "gains_single_", depending on the subdirectory where they are located. The name is followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the gains files that have the latest dates that are not later than the date of the latest holding file. The gains files contain capital gains tax brackets for taxpayers in the various filing statuses. The following are the fields of an gains file row.
+
+### Income Threshold
+
+The income threshold begins in column 1, and may be 16 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The income threshold is the minimum income where the capital gains tax rate takes effect.
+
+### Tax Rate
+
+The tax rate begins in column 18, and may be 8 characters long. Its content is constrained to a non-negative number no greater than 100, possibly with a decimal point. The rate applies to capital gains beginning at the associated income threshold.
 
 ## Holding File
 
@@ -540,7 +557,24 @@ The holding weight begins in column 120, and may be 8 characters if specified. I
 
 ## Income Files
 
--> Enter description for the income tax rate files here.
+Note: The rows, fields and consistency rules stated below are applicable to all four income files, and the [Gains Files](#gains-files).  
+
+The income files are four of sixteen CSV files that act as input to the software. Files in this format are located in the following subdirectories in the directory identified in the source preference:
+
+1. "income_head_", for head-of-house hold filers
+2. "income_joint", for married-filing-jointly filers
+3. "income_separate", for married-filing-separately filers
+4. "income_single", for single filers
+
+Files of this type have the prefix "income_head_", "income_joint_", "income_separate_", or "income_single_", depending on the subdirectory where they are located. The name is followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the income files that have the latest dates that are not later than the date of the latest holding file. The income files contain standard deduction, and income tax brackets for taxpayers in the various filing statuses. The following are the fields of an income file row.
+
+### Income Threshold
+
+The income threshold begins in column 1, and may be 16 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. For associated tax rates that are positive, the income threshold is the minimum income where the income tax rate takes effect. For associated tax rate of zero, the software interprets that income threshold as the standard deduction for a taxpayer with the indicated filing status.
+
+### Tax Rate
+
+The tax rate begins in column 18, and may be 8 characters long. Its content is constrained to a non-negative number no greater than 100, possibly with a decimal point. The software interprets a tax rate of zero to mean that the indicated income threshold is actually the standard deduction for a taxpayer in the indicated filing status. A non-zero tax rate applies to income beginning at the associated income threshold. 
 
 ## Portfolio File
 
