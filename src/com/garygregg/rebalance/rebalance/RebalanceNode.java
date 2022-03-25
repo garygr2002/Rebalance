@@ -463,14 +463,18 @@ class RebalanceNode implements CurrencyReceiver {
                 newChild.addTicker(leaf);
             }
 
-            /*
-             * Clear the leaves. This will prevent the logic in this block from
-             * being duplicated unless new leaves are added. Add the new child
-             * to this node.
-             */
-            leaves.clear();
+            // Add the new child to this node.
             addChild(newChild);
         }
+
+        /*
+         * Clear the leaves. This will prevent the block, above, from being
+         * duplicated unless new leaves are added. For nodes that had existing
+         * children, the block above has added them as tickers of a new child.
+         * For nodes that had no existing children, all the leaves were already
+         * present in the 'tickers' collection. Nothing has been lost.
+         */
+        leaves.clear();
     }
 
     /**
