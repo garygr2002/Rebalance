@@ -8,10 +8,10 @@ The tool is currently driven by a series of comma-separated files (CSV's). The t
 
 Output from the tool is a series of text files for each investor:
 
-1. A report of the current state of the portfolio
-2. A report of the state of the portfolio after proposed changes
-3. A file that shows currency differences between proposed and current holdings
-4. A file that describes the reallocation actions required to effect the proposed changes   
+1. A report of the current state of the portfolio, see [Report File](#report-file)
+2. A report of the state of the portfolio after proposed changes, see [Proposed File](#proposed-file)
+3. A file that shows currency differences between proposed and current holdings, see [Difference File](#difference-file)
+4. A file that describes the reallocation actions required to effect the proposed changes, see [Action File](#action-file)
 
 ### Motivation
 
@@ -62,6 +62,7 @@ After 13 months of work - to the end of February 2022 - I deemed the design, cod
 - [Income Files](#income-files)
 - [Portfolio File](#portfolio-file)
 - [Ticker File](#ticker-file)
+- [Output Files](#output-files)
 - [How Does Rebalancing Work?](#how-does-rebalancing-work)
 - [Credits](#credits)
 - [Warranty](#warranty)
@@ -707,6 +708,26 @@ The third subcode begins in column 82, and is one character. Its content is cons
 ### Subcode 4
 
 The fourth subcode begins in column 84, and is one character. Its content is constrained to one of the characters described in the first subcode. The fourth subcode, in conjunction with subcodes one, two and three determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.
+
+## Output Files
+
+The output files are written in type-specific subdirectories in the directory identified in the source preference. The output files are described below. In each type-specific subdirectory, the user will find nested subdirectories specific to the portfolio mnemonics specified in the [Portfolio File](#portfolio-file), and referenced in the [Holding File](#holding-file). Put succinctly, this means that the software organizes the reports by specific investor using the directory hierarchy. The output files are as follows:  
+
+### Action File
+
+Describe the Action file here.
+
+### Difference File
+
+Describe the Difference file here.
+
+### Proposed File
+
+Describe the Proposed file here.
+
+### Report File
+
+Describe the Report file here.
 
 ## How Does Rebalancing Work?
 
