@@ -40,22 +40,32 @@ class ClosureRebalancer extends WeightRebalancer {
                                double considered) {
 
         /*
-         * Sum the existing level one weights in the weight map. Declare a
-         * variable to receive a weight from the map.
+         * Sum the existing level one weights in the weight map. Calculate the
+         * level zero weight (sum of all investments). If the sum of the level
+         * one weights is non-zero, then the level zero weight receives the
+         * considered value of the portfolio divided by the level one weight
+         * sum. Otherwise, the level zero weight receives zero. Checking the
+         * sum of the level one weights against zero prevents the level zero
+         * weight from receiving a NaN caused by divide-by-zero.
          */
         final double sum = sum(weightMap);
+        final double levelZeroWeight = (0. < sum) ? (considered / sum) : 0.;
+
+        /*
+         * Declare a variable to receive a weight from the map. Cycle for each
+         * level one type.
+         */
         Double weight;
         for (WeightType type : getLevelOne()) {
 
             /*
              * Get the existing weight for the first/next level one type.
              * Replace (or add, if necessary) the mapping for the type by
-             * multiplying the existing weight by the considered value of the
-             * portfolio, and dividing by the calculated weight sum.
+             * multiplying the existing weight by the level zero weight.
              */
             weight = weightMap.get(type);
             weightMap.put(type, ((null == weight) ? 0. : weight) *
-                    considered / sum);
+                    levelZeroWeight);
         }
     }
 
