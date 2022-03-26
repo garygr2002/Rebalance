@@ -175,8 +175,9 @@ abstract class AccountRebalancer extends Rebalancer {
                                        weightMap, double ratio) {
 
         /*
-         * Declare and initialize a sum for all the level zero weight types.
-         * Declare and initialize a variable to receive a weight type.
+         * Declare and initialize a sum for all the level one weight types.
+         * Declare and initialize a variable to receive a weight type, and
+         * initialize it to stock.
          */
         final double all = sumWeights(weightMap);
         WeightType type = WeightType.STOCK;
@@ -187,8 +188,8 @@ abstract class AccountRebalancer extends Rebalancer {
          * greater than all the weight.
          */
         final double oldStock = weightMap.get(type);
-        final double newStock = Math.max(0., Math.min((oldStock / all + ratio)
-                * all, all));
+        final double newStock = (0. < all) ? Math.max(0.,
+                Math.min((oldStock / all + ratio) * all, all)) : 0.;
 
         /*
          * Put the new stock weight in the weight map. Calculate the old
