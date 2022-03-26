@@ -562,9 +562,21 @@ The holding value begins in column 101, and may be 18 characters long. Its conte
 2. For 'I' rows, match the sum of all 'A' rows given as children
 3. For 'P' rows, match the sum of all 'I' rows given as children
 
-### Weight
+### Holding Weight
 
-The holding weight begins in column 120, and may be 8 characters if specified. Its content is a non-negative number, possibly with a decimal point. The holding weight is the value the software will use when rebalancing the holding identified by the current row with other holdings of exactly the same type in the same account. The software assumes a default weight of one, meaning the software will equally distribute value to same-type holdings in the same account if the weight is not explicitly specified for any. A convenient way to withhold value from any holding during rebalance is to set the content of its holding weight to zero. 
+The holding weight begins in column 120, and may be 8 characters if specified. Its content is a non-negative number, possibly with a decimal point. The holding weight is the value that the software will use when rebalancing the holding identified by the current row with other holdings of exactly the same type in the same account. The software assumes a default weight of one, meaning the software will equally distribute value to same-type holdings in the same account if the weight is not explicitly specified for any. A convenient way to withhold value from any holding during rebalance is to set the content of its holding weight to zero.
+
+It is possible to bypass investment-type weight rebalancing, and rely on the [Holding Weight](#holding-weight) alone. How?
+
+* For all but the last rebalanced account in a portfolio (see [Rebalance Order](#rebalance-order)), set to zero all weights for the account in the [Account File](#acccount-file), assuming there is no row for the account in the [Detailed File](#detailed-file). If there is a row for the account in the [Detailed File](#detailed-file), set to zero the level-one weights in that row (only stocks, bonds, cash, and real-estate need to be set)
+* For the last rebalanced account in a portfolio, set to zero all weights for the portfolio in the [Portfolio File](#portfolio-file)
+
+If the user wishes to rebalance in this way, he/she must take care to ensure two things:
+
+1. That the [-x](#-x-ncnt) preference is one greater than the number of tickers in the account
+2. That the [Holding Weight](#holding-weight) for at least one ticker in the account is something other than zero
+
+When rebalancing by [Holding Weight](#holding-weight), the software may take considerable time to rebalance an account if the account has a considerable number of tickers, and it cannot precisely allocate value due to ticker investment minimums and/or preferred share rounding. See the discussion of the [-x](#-x-ncnt) preference.
 
 ## Income Files
 
