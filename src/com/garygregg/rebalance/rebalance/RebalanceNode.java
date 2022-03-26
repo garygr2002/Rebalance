@@ -630,7 +630,7 @@ class RebalanceNode implements CurrencyReceiver {
      */
     private @NotNull Collection<? extends ReceiverDelegate<?>>
     getCollection() {
-        return childValues.isEmpty() ? tickers : childValues;
+        return hasAnyWeight(childValues) ? childValues : tickers;
     }
 
     @Override
@@ -1027,31 +1027,23 @@ class RebalanceNode implements CurrencyReceiver {
 
         /*
          * Declare and initialize the residual, which is the return value of
-         * this method. Add any leaves of this node.
+         * this method. Add any leaves of this node. Clear the maps in the
+         * value setter action.
          */
         Currency residual = currency;
         addLeaves();
-
-        /*
-         * Clear the maps in the value setter action. Does any child have
-         * positive weight?
-         */
         valueSetterAction.clearMaps();
-        if (hasAnyWeight(childValues)) {
-
-            /*
-             * One or more children have positive weight. Rebalance using
-             * the child values, and reset the residual.
-             */
-            residual = rebalance(childValues, currency, isRelative);
-        }
 
         /*
-         * No child has positive weight. Rebalance using the tickers if any has
-         * weight.
+         * Get the relevant collection of receiver delegates. Do the delegates
+         * have any weight?
          */
-        else if (hasAnyWeight(tickers)) {
-            residual = rebalance(tickers, currency, isRelative);
+        final Collection<? extends ReceiverDelegate<?>> delegates =
+                getCollection();
+        if (hasAnyWeight(delegates)) {
+
+            // The delegates have weight. Rebalance them.
+            residual = rebalance(delegates, currency, isRelative);
         }
 
         // Return the residual.
