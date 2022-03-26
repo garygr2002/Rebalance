@@ -1,14 +1,20 @@
 Things to do:
 
-1. Add a boolean field to the Account file specifying that rebalance should be
-   governed by ticker weights in the Holding file, bypassing category weights
-   in the Account and Detailed files.
+1. In README.md, Ensure that each field in all CSV files has a unique name, and
+   make sure these are consistent with what is in the corresponding text
+   description file.
 
-2. Add a section on how rebalancing works in the README.md.
+2. In README.md, create links for all CSV files no matter they are mentioned in
+   the text.
 
-3. Do code metrics, and report in the README.md.
+3. In README.md, create links for all CSV file fields (they are unique now; see
+   item 1) no matter where they are mentioned in the text.
 
-4. Add other sections to the README.md as needed.
+4. Add a section on how rebalancing works in the README.md.
+
+5. Do code metrics, and report in the README.md.
+
+6. Create section for tools used in README.md.
 
 For your information:
 
