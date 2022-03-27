@@ -29,7 +29,7 @@ blanks, as noted. Unconstrained types, enumerated types, and floating point
 types are padded neither left nor right. Integral and floating point fields are
 aligned-right. Unconstrained and enumerated types are left-aligned.
 
- 1. Line type: length - 1, position - 1; type - character
+ 1. Basis Type: length - 1, position - 1; type - character
 
     The holding type (see code description file - 'P' is a portfolio; 'I' is an
     institution; 'A' is an account; 'F', 'J', 'Q' and 'X' are respectively:
@@ -37,29 +37,29 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
     sub-accounts that cannot be considered for rebalance, individual stocks,
     and exchange-traded funds
 
- 2. Key: length - 16, position - 3; type - unconstrained, but account numbers
-    should be zero-padded long integers
+ 2. Basis Foreign: length - 16, position - 3; type - unconstrained, but account
+    numbers should be zero-padded long integers
 
-    The key of the holding; in order for important information to be considered
-    when rebalancing, the key should match the same name in the account,
-    portfolio or ticker data files (institutions currently have no information
-    outside this holding file)
+    The foreign key of the holding; in order for important information to be
+    considered when rebalancing, the key should match the same name in the
+    account, portfolio or ticker data files (institutions currently have no
+    information outside this holding file)
 
- 3. Name: length - 42, position - 20; type - unconstrained
+ 3. Basis Name: length - 42, position - 20; type - unconstrained
 
     The name of the holding; should match the same in the account, portfolio or
     ticker data files - this field is for eye-identification only; there will
     be a log warning if the name does not match
 
- 4. Shares: length - 18, position - 63; type - five-precision floating
+ 4. Basis Shares: length - 18, position - 63; type - five-precision floating
 
     The number of shares in the holding
 
- 5. Price: length - 18, position - 82; type - six-precision floating
+ 5. Basis Price: length - 18, position - 82; type - six-precision floating
 
     The price of one share of the holding
 
- 6. Value: length - 18, position - 101; type - two-precision floating
+ 6. Basis Value: length - 18, position - 101; type - two-precision floating
 
     The value of the holding; the product of shares times price (column
     alignment ends here)

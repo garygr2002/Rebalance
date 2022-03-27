@@ -10,55 +10,56 @@ blanks, as noted. Unconstrained types, enumerated types, and floating point
 types are padded neither left nor right. Integral and floating point fields are
 aligned-right. Unconstrained and enumerated types are left-aligned.
 
- 1. Code: length - 1, position - 1; type - character
+ 1. Ticker Character: length - 1, position - 1; type - character
 
-    The code of the ticker (see code file description - 'F' is a mutual fund,
+    The type of the ticker (see code file description - 'F' is a mutual fund,
     or sub-account that can be considered for rebalance; 'J' is a sub-account
     that cannot be considered for rebalance; 'Q' is a single stock; 'X' is an
     exchange-traded fund)
 
- 2. Ticker: length - 5, position - 3; type - unconstrained (tickers on the
-    exchanges are alphabetic and case-insensitive, but that is not required
+ 2. Ticker Symbol: length - 5, position - 3; type - unconstrained (tickers on
+    the exchanges are alphabetic and case-insensitive, but that is not required
     here)
 
-    The unique ticker ID
+    The unique ticker symbol, used to trade shares on an exchange
 
- 3. Number: length - 4, position - 9; type - integer, zero-padding
+ 3. Ticker Number: length - 4, position - 9; type - integer, zero-padding
 
     The number of the ticker
 
- 4. Name: length - 42, position - 14; type - unconstrained
+ 4. Ticker Name: length - 42, position - 14; type - unconstrained
 
     The name of the ticker (should match the name in the holding file)
 
- 5. Minimum: length - 10, position - 58; type - two-precision floating
+ 5. Minimum Investment: length - 10, position - 58; type - two-precision
+    floating
 
     The minimum investment in the ticker
 
- 6. Preferred rounding: length - 8, position - 69; type - five-precision
+ 6. Preferred Rounding: length - 8, position - 69; type - five-precision
     floating
 
     The preferred round number of shares to hold (e.g., 1, 5, 10, etc.; may be
     missing to use the default of minimum granularity of shares, i.e., 0.00001)
 
- 7. Subcode 1: length - 1, position - 78; type - character
+ 7. Ticker Subcode 1: length - 1, position - 78; type - character
 
     Subcode for contained securities - level 1: code for stocks, bonds, cash,
     or real estate
 
- 8. Subcode 2: length - 1, position - 80; type - character
+ 8. Ticker Subcode 2: length - 1, position - 80; type - character
 
     Subcode for contained securities - level 2: code for subtypes of subcode 1;
     can be domestic or foreign for stocks, cash or real estate; bond subtype
     for bonds
 
- 9. Subcode 3: length - 1, position - 82; type - character
+ 9. Ticker Subcode 3: length - 1, position - 82; type - character
 
     Subcode for contained securities - level 3: code for market capitalization
     as a stock subtype; large, not-large, medium specifically, or small
     specifically
 
-10. Subcode 4: length - 1, position - 84; type - character
+10. Ticker Subcode 4: length - 1, position - 84; type - character
 
     Subcode for contained securities - level 4: as a stock subtype, code for
     relative valuation based on earnings, i.e., growth-and-value (mixed),

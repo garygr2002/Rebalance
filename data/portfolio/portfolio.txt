@@ -9,75 +9,75 @@ blanks, as noted. Unconstrained types, enumerated types, and floating point
 types are padded neither left nor right. Integral and floating point fields are
 aligned-right. Unconstrained and enumerated types are left-aligned.
 
- 1. Mnemonic: length - 16, position - 1; type - unconstrained
+ 1. Portfolio Mnemonic: length - 16, position - 1; type - unconstrained
 
     The mnemonic of the portfolio, unique to the identified portfolio
 
- 2. Name: length - 20, position - 18; type - unconstrained
+ 2. Investor Name: length - 20, position - 18; type - unconstrained
 
-    The name of the portfolio (should match the name in the holding file)
+    The name of the investor (should match the name in the holding file)
 
- 3. Birthdate: length - 10, position - 39; type - date in yyyy-mm-dd format
-    (decimal digits for year, month, and day; month and day are one-based)
-
-    The birthdate of the portfolio owner
-
- 4. Mortality date: length - 10, position - 50; type - date in yyyy-mm-dd
+ 3. Investor Birthdate: length - 10, position - 39; type - date in yyyy-mm-dd
     format (decimal digits for year, month, and day; month and day are
     one-based)
 
+    The birthdate of the portfolio owner
+
+ 4. Investor Mortality date: length - 10, position - 50; type - date in
+    yyyy-mm-dd format (decimal digits for year, month, and day; month and day
+    are one-based)
+
     The projected mortality date of the portfolio owner
 
- 5. Filing status: length - 8, position - 61; type - filing status enumerator
+ 5. Filing Status: length - 8, position - 61; type - filing status enumerator
 
     The taxpayer filing status
 
- 6. Social security monthly: length - 8, position - 70; type - two-precision
-    floating
+ 6. Social Security: length - 8, position - 70; type - two-precision floating
 
     Projected Social Security monthly income starting from the current month if
     the portfolio owner has passed their 62nd birthday, or starting from the
     month of their 62nd birthday
 
- 7. Other CPI adjusted monthly income: length - 8, position - 79; type -
-    two-precision floating
+ 7. CPI Adjusted: length - 8, position - 79; type - two-precision floating
 
     Other monthly income that is CPI adjusted
 
- 8. Other non-CPI adjusted monthly income: length - 8, position - 88; type -
-    two-precision floating
+ 8. Non-CPI Adjusted: length - 8, position - 88; type - two-precision floating
 
     Other monthly income that is not CPI adjusted
 
- 9. Taxable annual income: length - 10, position - 97; type - two-precision
-    floating
+ 9. Taxable Income: length - 10, position - 97; type - two-precision floating
 
     The projected taxable annual income
 
-10. Weight equities: length - 6, position - 108; type - two-precision floating
+10. Portfolio Weight Stock: length - 6, position - 108; type - two-precision
+    floating
 
     Desired weight of stocks (equities) in the portfolio (can be a percentage
     if sum of all weights is 100)
 
-11. Weight bond: length - 6, position - 115; type - two-precision floating
+11. Portfolio Weight Bond: length - 6, position - 115; type - two-precision
+    floating
 
     Desired weight of bonds in the portfolio (can be a percentage if sum of all
     weights is 100)
 
-12. Weight cash: length - 6, position - 122; type - two-precision floating
+12. Portfolio Weight Cash: length - 6, position - 122; type - two-precision
+    floating
 
     Desired weight of cash in the portfolio (i.e., checking or savings
     accounts, money market funds, or savings bonds...can be a percentage if sum
     of all weights is 100)
 
-13. Weight real estate: length - 6, position - 129; type - two-precision
-    floating
+13. Portfolio Weight Real-Estate: length - 6, position - 129; type -
+    two-precision floating
 
     Desired weight of real estate (i.e., REITs...can be a percentage if sum of
     all weights is 100)
 
-14. Adjust for S&P 500 current value: length - 6, position - 136; type - a
-    boolean value of 'false' or 'true' (case-insensitive)
+14. Adjust from High: length - 6, position - 136; type - a boolean value of
+    'false' or 'true' (case-insensitive)
 
     Adjust desired equity percentage for relative market valuation, true/false;
     for "relative market valuation," we mean the current value of the S&P 500

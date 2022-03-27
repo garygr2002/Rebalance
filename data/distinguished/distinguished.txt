@@ -16,18 +16,18 @@ blanks, as noted. Unconstrained types, enumerated types, and floating point
 types are padded neither left nor right. Integral and floating point fields are
 aligned-right. Unconstrained and enumerated types are left-aligned.
 
- 1. Line type: length - 1, position - 1; type - character
+ 1. Distinguished Type: length - 1, position - 1; type - character
 
-    The holding type: a character code identifying distinguished portfolio,
-    distinguished institution, or distinguished account
+    The distinguished type: a character code identifying distinguished
+    portfolio, distinguished institution, or distinguished account
 
- 2. Key: length - 24, position - 3; type - unconstrained
+ 2. Distinguished Key: length - 24, position - 3; type - unconstrained
 
-    The key of the holding: The unique, programmatically usable value
+    The key of the holding: The unique, programmatically usable key
 
- 3. Value: length - 52, position - 28; type - unconstrained for portfolios and
-    institutions; long, zero-padding to 16 characters for accounts (column
-    alignment ends here)
+ 3. Distinguished Foreign: length - 52, position - 28; type - unconstrained for
+    portfolios and institutions; long, zero-padding to 16 characters for accounts
+    (column alignment ends here)
 
-    The name of the holding: The actual, presumably sensitive portfolio key,
-    institution name, or account number
+    The foreign key of the holding: The actual, presumably sensitive portfolio
+    key, an institution name, or an account number
