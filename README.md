@@ -4,7 +4,7 @@ A Java Project to Rebalance Investment Portfolios
 
 The Rebalance Project is one that I undertook beginning in February 2021. It is a Java-based, command-line software tool that rebalances the investment holdings of one or more investors. While doing so, it also categorizes and sums the assets of each investor. The tool will produce reports that give a complete breakdown of the holdings of the investor, and their net worth. It will also produce instructions for each investor for rebalancing his or her portfolio. 
 
-The tool is currently driven by a series of comma-separated files (CSV's). The tool will rebalance the portfolio holdings of each investor across institutions, accounts, mutual funds, ETFs and individual securities based on declared weight preferences.
+The tool is currently driven by a series of comma-separated (CSV) files. The tool will rebalance the portfolio holdings of each investor across institutions, accounts, mutual funds, ETFs and individual securities based on declared weight preferences.
 
 Output from the tool is a series of text files for each investor:
 
@@ -36,16 +36,16 @@ I rejected existing open-source solutions, also for two reasons:
 The input to the software is a series of sixteen CSV files that are coded by date as a suffix in their names (format: yyyymmdd). Sample files are located in the data directory of this project. There you will find a series of subdirectories. Some subdirectories contain one or more input files of the same type, differing by date, or one or more output files differing by date.
 These sixteen input files are:
 
-1. Account: A description of accounts unique by institution and account number
-2. Basis: A hierarchy of expenses used for calculating capital gains tax
-3. Code: A description of single-character alphabetic codes used internally by the tool
-4. Detailed: Fine-grained weight preferences specific to account
-5. Distinguished: Key-value pairs that map programmatically accessible keys to sensitive portfolio keys, institution names, and account numbers
-6. Gains Tax Rates (4 files): Current capital gains tax rates, one file for each of head-of-household, joint, separate and single filers
-7. Holding: The most important file, a hierarchy of holding valuations organized by portfolios, institutions, accounts, and securities 
-8. Income Tax Rates (4 files): Current income tax rates, one file for each of head-of-household, joint, separate and single filers
-9. Portfolio: A description of portfolios unique by a key
-10. Ticker: A description of tickers unique by key (funds, ETFs or individual securities) that describe the type of securities held (e.g., stock, bond, cash or real estate)
+1. [Account File](#account-file): A description of accounts unique by institution and account number
+2. [Basis File](#basis-file): A hierarchy of expenses used for calculating capital gains tax
+3. [Code File](#code-file): A description of single-character alphabetic codes used internally by the tool
+4. [Detailed File](#detailed-file): Fine-grained weight preferences specific to account
+5. [Distinguished File](#distinguished-file): Key-value pairs that map programmatically accessible keys to sensitive portfolio keys, institution names, and account numbers
+6. [Gains File](#gains-files) (4 files): Current capital gains tax rates, one file for each of head-of-household, joint, separate and single filers
+7. [Holding File](#holding-file): The most important file, a hierarchy of holding valuations organized by portfolios, institutions, accounts, and securities 
+8. [Income Files](#income-files) (4 files): Current income tax rates, one file for each of head-of-household, joint, separate and single filers
+9. [Portfolio File](#portfolio-file): A description of portfolios unique by a key
+10. [Ticker File](#ticker-file): A description of tickers unique by exchange-traded symbols (funds, ETFs or individual securities) that describe the type of securities held (e.g., stock, bond, cash or real estate)
 
 As well as sample data files, the reader will also find in each data subdirectory a text file describing in column order the fields in the CSV files of that type. The column descriptions are also contained in this markdown file. Each row in the CSV files of the given type is assumed to have a unique key. The key field(s) are so indicated in the description file, and also in this markdown file. 
 
@@ -95,7 +95,7 @@ Clone the repository for this project using a Linux terminal. On the command lin
 
 If ant is not installed in your Linux environment, you may install it using the following command: <pre>sudo apt install ant</pre>
 
-The software also uses the jetbrains annotations jar, version 20.1.0. To build the software, you will need to acquire the annotations jar from an IntelliJ installation, or directly from the Internet. Only the jar is required, but it must be available from a relative path of <i>...org/jetbrains/annotations/20.1.0/</i> from where you install it. Call this installation directory '<i>x</i>'. Edit the <i>build.properties</i> file in this directory, and follow the instructions therein to set the <i>path.variable.maven_repository</i> variable with path to your annotations jar, '<i>x</i>'. Set the <i>JDK.home.11</i> variable with the path to your Java 11+ JDK. You should now be ready to build the software using the ant command from a terminal in the directory containing this markdown file in your cloned repository.
+The software also uses the jetbrains annotations jar, version 20.1.0. To build the software, you will need to acquire the annotations jar from an IntelliJ installation, or directly from the Internet. Only the jar is required, but it must be available from a relative path of <i>...org/jetbrains/annotations/20.1.0/</i> from where you install it. Call this installation directory '<i>x</i>'. Edit the <i>build.properties</i> file in this directory, and follow the instructions therein to set the <i>path.variable.maven_repository</i> variable with the path to your annotations jar, '<i>x</i>'. Set the <i>JDK.home.11</i> variable with the path to your Java 11+ JDK. You should now be ready to build the software using the ant command from a terminal in the directory containing this markdown file in your cloned repository.
 
 ## Usage
 
@@ -103,21 +103,31 @@ The software uses Java preferences to maintain persistent settings. Currently, s
 
 ![alt text](assets/images/preferences_reset.png)
 
+<sub><sup>Above: software preferences when newly installed</sup></sub>
+
 Minimum runtime settings are achieved by using the 'm' option, which will set the logging levels and thresholds to sane values. The option will also set the known, long-term inflation percentage, and the rebalance limit for same fund types. Finally, this option sets a default as the source for the data files. You will see something similar to the following terminal window when running the software after the 'm' and 'p' options: 
 
 ![alt text](assets/images/minimum_preferences.png)
+
+<sub><sup>Above: software preferences after setting minimums for runtime</sup></sub>
 
 You may reset the source directory for the data file using the 's' option. The argument to the 's' option must be a valid absolute path, or valid path relative to the current directory. You will see something similar to the following terminal window when running the software after the 's' and 'p' options:
 
 ![alt text](assets/images/data_set.png)
 
+<sub><sup>Above: software preferences after setting source directory</sup></sub>
+
 You may set the critical component of the destination directory for backup using the 'u' option. For this option, the home directory of the user is assumed as a prefix, and the final element of the data source directory is assumed as a suffix. You will see something similar to the following terminal window when running the software after the 'u' and 'p' options:
 
 ![alt text](assets/images/use_set.png)
 
+<sub><sup>Above: software preferences after setting default destination directory for backup with assumed name and default location</sup></sub>
+
 You may set current and historical valuations for the Standard and Poor 500 using the 'c', 'h' and 't' options. These options stand for 'close (last)', 'high' and 'today' respectively. The software uses these settings to automatically adjust investor-specific equity weights given in the portfolio CSV file. The software will make the adjustment for today's valuation of the S&P 500 versus last close for every portfolio. However, an equity adjustment of today's setting versus historical high is a per-portfolio preference. Read further in this document, or explore the description of the CSV files for more information. Please note that it is not required to set valuations for the S&P 500 in order for the software to run correctly. When one or more of these preferences are not set, the software will skip the adjustments. You will see something similar to the following terminal window when running the software after the 'c', 'h', 't' and 'p' options: 
 
 ![alt text](assets/images/SandP500_set.png)
+
+<sub><sup>Above: software preferences after setting explicit values for Standard and Poor 500 last close, high, and value today</sup></sub>
 
 A screen snap is omitted here for the 'b' option, which backs up the current source directory to the current destination directory. As well, a screen snap is omitted here for running the software with no option, which causes the software to rebalance investor portfolios given the current CSV input files.
 
@@ -171,7 +181,7 @@ The <i>ncnt</i> argument must be a non-negative integer, and is required. It is 
 
 Why would an allocation not be able to exactly match the specified weights? At the level of individual funds in the account, there are two reasons. First, the fund may have a minimum investment which may not be met with a certain weight allocation. Second, for an ETF or stock, an investment may have a requirement, or preference for some whole or round number of shares that may not be met with a certain weight allocation.
 
-The thing is, checking all the subsets of an investment category in an account requires a runtime that is two to the power of the number of investments in the category. This is prohibitively expensive for even a modest number of investments. A situation where this would come into play would be when an account contains, for example, twenty small cap value stock ETFs, all with a different preferred round number of shares. You can see that it will take no small amount of runtime to examine two to the twentieth power of investment subsets. If the number of investments of a certain type exceed this preference, the software will not even try to rebalance them. The alternative is a program that appears to hang indefinitely when run. Note that the software applies this same limit as it works up the tree of same-type investments. At the coarsest level - level one - the software needs a minimum of four in this setting to rebalance equities, bonds, cash and real-estate.
+The thing is, checking all the subsets of an investment category in an account requires a runtime that is two to the power of the number of investments in the category. This is prohibitively expensive for even a modest number of investments. A situation where this would come into play would be when an account contains, for example, twenty small cap value stock ETFs, all with a different preferred round number of shares. You can see that it will take no small amount of runtime to examine two to the twentieth power of investment subsets. If the number of investments of a certain type exceed this preference, the software will not even try to rebalance them. The alternative is a program that appears to hang indefinitely when run. Note that the software applies this same limit as it works up the tree of same-type investments. At the coarsest level - level one - the software needs a minimum of four in this setting to rebalance stocks, bonds, cash and real-estate.
 
 There is a dynamic programming algorithm that can find a best-fit for investments subsets as discussed here. This is faster than exhaustively searching all subsets as is currently done by the software. I will move on to discuss hierarchies of investments types, and the weights assigned to subtypes further in this document (see [How Does Rebalancing Work](#how-does-rebalancing-work)). In the meantime, you may wish to leave this preference to its reasonable default.
 
@@ -197,7 +207,7 @@ Displays the command line usage text.
 
 ## Account File
 
-The account file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "account" located in the directory identified in the source preference. Files of this type have the prefix "account_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the account file that has the latest date that is not later than the date of the latest holding file. The account file contains information that is required to identify, characterize, and rebalance accounts. The key for rows in the file is a concatenation of institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of an account file row. 
+The account file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "account" located in the directory identified in the source preference. Files of this type have the prefix "account_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the account file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The account file contains information that is required to identify, characterize, and rebalance accounts. The key for rows in the file is a concatenation of institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of an account file row. 
 
 ### Account Institution
 
@@ -213,7 +223,7 @@ The rebalance order begins at column 31, and may be up to 8 characters long. Its
 
 ### Account Name
 
-The account name begins at column 40, and may be up to 42 characters long. Its content is not constrained. The account name is for visual identification purposes, and I suggest it be unique. However, uniqueness is not required. The account name should match the corresponding field in the holding file. The holding file is where the account receives its value.
+The account name begins at column 40, and may be up to 42 characters long. Its content is not constrained. The account name is for visual identification purposes, and I suggest it be unique. However, uniqueness is not required. The account name should match the corresponding field in the [Holding File](#holding-file). The [Holding File](#holding-file) is where the account receives its value.
 
 ### Tax Type
 
@@ -225,27 +235,27 @@ The rebalance procedure begins at column 98, and may be up to 14 characters long
 
 ### Account Weight Stock
 
-The weight stock begins at column 113, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to equity (or stock) investments. If this field, and that for bonds, cash and real estate sum to 100, then the specified weight is actually a percent assigned to equities.
+The weight stock begins at column 113, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to equity (or stock) investments. If this field, and that for bonds, cash and real estate sum to 100, then the specified weight is actually a percent assigned to stocks.
 
 ### Account Weight Bond
 
-The weight bond begins at column 120, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to bond investments. If this field, and that for equities, cash and real estate sum to 100, then the specified weight is actually a percent assigned to bonds.
+The weight bond begins at column 120, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to bond investments. If this field, and that for stocks, cash and real estate sum to 100, then the specified weight is actually a percent assigned to bonds.
 
 ### Account Weight Cash
 
-The weight cash begins at column 127, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to cash investments (e.g. checking or savings accounts, or CDs). If this field, and that for equities, bonds and real estate sum to 100, then the specified weight is actually a percent assigned to cash.
+The weight cash begins at column 127, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to cash investments (e.g. checking or savings accounts, or CDs). If this field, and that for stocks, bonds and real estate sum to 100, then the specified weight is actually a percent assigned to cash.
 
 ### Account Weight Real-Estate
 
-The weight real-estate begins at column 134, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real estate investments (e.g. real property or shares in a trust). If this field, and that for equities, bonds and cash sum to 100, then the specified weight is actually a percent assigned to real estate.
+The weight real-estate begins at column 134, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real estate investments (e.g. real property or shares in a trust). If this field, and that for stocks, bonds and cash sum to 100, then the specified weight is actually a percent assigned to real estate.
 
 ### Synthesizer Type
 
 The synthesizer type begins at column 141, and may be up to 16 characters long. The field is typically not specified for accounts where the value does not need to be synthesized. Accounts whose value may need to be synthesized include annuities, social security, or pensions. If specified, the content is constrained to one of the following strings: "Averaging", "CPI_Annuity", "Negation", "No_CPI_Annuity", or "Social_Security". Case is not important.
 
-Monthly annuitized payments for CPI-adjusted, No-CPI-adjusted and Social Security are given per-investor in the portfolio file. If the value of the account is not explicitly specified in the holding file, then the software will attempt to synthesize the value of the account using the indicated synthesizer. It will do this based on the monthly payment, the life expectancy of the investor (also given in the portfolio file), and the expected rate of inflation (for no-CPI adjusted annuities).
+Monthly annuitized payments for CPI-adjusted, Non-CPI-adjusted and Social Security are given per-investor in the portfolio file. If the value of the account is not explicitly specified in the holding file, then the software will attempt to synthesize the value of the account using the indicated synthesizer. It will do this based on the monthly payment, the life expectancy of the investor (also given in the portfolio file), and the expected rate of inflation (for non-CPI adjusted annuities).
 
-For accounts that estimate valuations of real estate, the user may create a synthesized account that is the negated sum of the estimates, plus their average. The sum of the synthesized account and all the estimates will produce a single, positive average. This valuation of this type of account is the work of an averaging synthesizer. See the Referenced Accounts field.  
+For accounts that estimate valuations of real estate, the user may create a synthesized account that is the negated sum of the estimates, plus their average. The sum of the synthesized account and all the estimates will produce a single, positive average. This valuation of this type of account is the work of an averaging synthesizer. See the [Referenced Accounts](#referenced-accounts) field.  
 
 ### Referenced Accounts
 
@@ -253,7 +263,7 @@ Referenced accounts begin at column 158, and maybe up to 16 characters long per 
 
 ## Basis File
 
-Note: The rows, fields, and consistency rules stated below are applicable to both the basis file, and the holding file. The basis file contains prices paid for tickers, and the sums of prices paid for all tickers in accounts, institutions and portfolios. The software may use the basis file for calculating capital gains tax. See [Holding File](#holding-file) for a discussion of the holding file.
+Note: The rows, fields, and consistency rules stated below are applicable to both the basis file, and the [Holding File](#holding-file). The basis file contains prices paid for tickers, and the sums of prices paid for all tickers in accounts, institutions and portfolios. The software may use the basis file for calculating capital gains tax. See [Holding File](#holding-file) for a discussion of the holding file.
 
 The basis file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "basis_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the basis file that has the latest date that is not later than the date of the latest holding file. The basis file contains a hierarchy of investment bases. At the highest level are portfolios, followed by institutions, followed by accounts, followed by tickers. Each row of the basis file corresponds to one of these, and is coded to indicate its type. The software assumes:
 
@@ -282,7 +292,7 @@ The foreign key begins in column 3, and may be 16 characters long. Its content i
 
 ### Basis Name
 
-The basis name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the portfolio name for rows with a 'P' line type, an account name for rows with an 'A' line type, or the ticker name for rows with an 'F, 'J', 'Q', or 'X' line type. Institution names (rows with an 'I' line type) are specified in this file, and nowhere else. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the holding file. The software only uses this field for readable in its reports.
+The basis name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the portfolio name for rows with a 'P' line type, an account name for rows with an 'A' line type, or the ticker symbol for rows with an 'F, 'J', 'Q', or 'X' line type. Institution names (rows with an 'I' line type) are specified in this file, and nowhere else. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the [Holding File](#holding-file). The software only uses this field for readability in its reports.
 
 ### Basis Shares
 
@@ -302,13 +312,13 @@ The basis value begins in column 101, and may be 18 characters long. Its content
 
 ### Basis Weight
 
-The basis weight begins in column 120, and may be 8 characters if specified. Its content is a non-negative number, possibly with a decimal point. For consistency with the similarly-formatted holding file, the software reads the basis weight. However, it currently uses the basis weight for no purpose.
+The basis weight begins in column 120, and may be 8 characters if specified. Its content is a non-negative number, possibly with a decimal point. For consistency with the similarly-formatted [Holding File](#holding-file), the software reads the basis weight. However, it currently uses the basis weight for no purpose.
 
 ## Code File
 
 Unless they intend to programmatically modify the software, the code file and the [Distinguished File](#distinguished-file) are two files that a casual user will not need to edit. If you do not need to edit the code file, borrow the empty example.
 
-The code file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "code" located in the directory identified in the source preference. Files of this type have the prefix "code_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the code file that has the latest date that is not later than the date of the latest holding file. The code file contains descriptive information about the character codes used by the software. The character codes fall into one of two categories:
+The code file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "code" located in the directory identified in the source preference. Files of this type have the prefix "code_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the code file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The code file contains descriptive information about the character codes used by the software. The character codes fall into one of two categories:
 
 1. Codes that describe the holding hierarchy, namely 'A' (an account), 'F' (a fund available for rebalance), 'I' (an institution), 'J' (a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio), 'Q', (a single bond or stock), 'X' (an exchange-trade fund).
 2. Codes that describe fund types, e.g., 'B' for bond, 'C' for cash, 'R' for real-estate, and 'S' for stock.
@@ -349,9 +359,9 @@ The code description begins column 36, and may be 80 characters long. Its conten
 
 ## Detailed File
 
-The detailed file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "detailed" located in the directory identified in the source preference. Files of this type have the prefix "detailed_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the detailed file that has the latest date that is not later than the date of the latest holding file. The detailed file contains fine-grained investment category weights for rebalancing accounts. The combination institution mnemonic and account number should match a row in the account file. The account name should match that in the account file, but this is not required. The account name is a field in this file only for fast visual identification of the account. It is not used by the software for any purpose.
+The detailed file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "detailed" located in the directory identified in the source preference. Files of this type have the prefix "detailed_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the detailed file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The detailed file contains fine-grained investment category weights for rebalancing accounts. The of combination institution mnemonic and account number should match a row in the account file. The account name should match that in the account file, but this is not required. The account name is a field in this file only for fast visual identification of the account. It is not used by the software for any purpose.
 
-The level 1 category weights specified in the detailed file - stock, bond, cash, and real-estate - replace these course-grained weights specified in the account file. The user of the software may override these course-grained weights for any number of accounts, and at the same time specify finer-grained category weights levels 2 through 6 using a row in the detailed file. The user may override the weights for any number of rows: no rows, one row, or all the account rows. Rows in the detailed file that match no row in the account file are read, but ignored. If the software seems to be ignoring course-grained weight settings in the account file, the user might first check whether there exists an overriding row in the detailed file. If the software seems to be ignoring fine-grained weight settings in the detailed file, the user might first check whether the institution mnemonic and account number precisely match the target account in the account file. The key for rows in the file is a concatenation of institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of a detailed file row.
+The level 1 category weights specified in the detailed file - stock, bond, cash, and real-estate - replace these course-grained weights specified in the [Account File](#account-file). The user of the software may override these course-grained weights for any number of accounts, and at the same time specify finer-grained category weights levels 2 through 6 using a row in the detailed file (see [How Does Rebalancing Work](#how-does-rebalancing-work)). The user may override the weights for any number of rows: no rows, one row, or all the account rows. Rows in the detailed file that match no row in the [Account File](#account-file) are read, but ignored. If the software seems to be ignoring course-grained weight settings in the [Account File](#account-file), the user might first check whether there exists an overriding row in the detailed file. If the software seems to be ignoring fine-grained weight settings in the detailed file, the user might first check whether the institution mnemonic and account number precisely match the target account in the [Account File](#account-file). The key for rows in the file is a concatenation of institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of a detailed file row.
 
 ### Detailed Institution
 
@@ -465,9 +475,7 @@ The real-estate weight begins in column 235, and may be 6 characters long. Its c
 
 Unless they intend to programmatically modify the software, the [Code File](#code-file) and the distinguished file are two files that a casual user will not need to edit. If you do not need to edit the distinguished file, create an empty file, or borrow the empty example.
 
-The distinguished file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "distinguished" located in the directory identified in the source preference. Files of this type have the prefix "distinguished_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the distinguished file that has the latest date that is not later than the date of the latest holding file. The distinguished file maps well-known, non-sensitive mnemonics for portfolios, institutions and accounts to sensitive keys. The programmer/user will then be able to add code that references these mnemonics to a publicly accessible code base without concern that personally sensitive information will be compromised. The distinguished file is a hierarchy. At the highest level are portfolios, followed by institutions, followed by accounts. Each row of the distinguished file corresponds to one of these, and is coded to indicate its type. The software assumes: 
-
-The level 1 category weights specified in the detailed file - stock, bond, cash, and real-estate - replace these course-grained weights specified in the account file. The user of the software may override these course-grained weights for any number of accounts, and at the same time specify finer-grained category weights levels 2 through 6 using a row in the detailed file. The user may override the weights for any number of rows: no rows, one row, or all the account rows. Rows in the detailed file that match no row in the account file are read, but ignored. If the software seems to be ignoring course-grained weight settings in the account file, the user might first check whether there exists an overriding row in the detailed file. If the software seems to be ignoring fine-grained weight settings in the detailed file, the user might first check whether the institution mnemonic and account number precisely match the target account in the account file. The key for the rows in the file is a concatenation of an institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of a detailed file row.
+The distinguished file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "distinguished" located in the directory identified in the source preference. Files of this type have the prefix "distinguished_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the distinguished file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The distinguished file maps well-known, non-sensitive mnemonics for portfolios, institutions and accounts to sensitive keys. The programmer/user will then be able to add code that references these mnemonics to a publicly accessible code base without concern that personally sensitive information will be compromised. The distinguished file is a hierarchy. At the highest level are portfolios, followed by institutions, followed by accounts. Each row of the distinguished file corresponds to one of these, and is coded to indicate its type. The software assumes: 
 
 1. All account rows are a part of the most recently listed institution row
 2. All institution rows are a part of the most recently listed portfolio row
@@ -478,7 +486,7 @@ The software assumes that "orphaned" rows (accounts or institutions with no pare
 2. For institution references,  modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedInstitution.java</b>, and add the needed mnemonic
 3. For portfolio references,  modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedPortfolio.java</b>, and add the needed mnemonic
 
-Once the programmer/user accomplishes this, the added mnemonic may then be referenced using the <b>Distinguished Key</b> field in a row in the distinguished file. The values for the keys will then be programmatically accessible from the <b>DistinguishedAccountLibrary</b>, <b>DistinguishedInstitutionLibrary</b>, or the <b>DistinguishedPortfolioLibrary</b>, depending on the type of distinguished key identified by the line type. The key for rows in the file is a concatenation of the line type and distinguished key, and the combination of the two should be unique. The following are the fields of a distinguished file row.
+Once the programmer/user accomplishes this, the added mnemonic may then be referenced using the <b>Distinguished Key</b> field in a row in the distinguished file. The values for the keys will then be programmatically accessible from the <b>DistinguishedAccountLibrary</b>, <b>DistinguishedInstitutionLibrary</b>, or the <b>DistinguishedPortfolioLibrary</b>, depending on the type of distinguished key identified by the distinguished type. The key for rows in the file is a concatenation of the distinguished type and distinguished key, and the combination of the two should be unique. The following are the fields of a distinguished file row.
 
 ### Distinguished Type
 
@@ -486,7 +494,7 @@ The distinguished type begins in column 1, and is 1 character. Its content is co
 
 ### Distinguished Key
 
-The distinguished key begins in column 3, and is up to 24 characters long. Its content is constrained to one of the case-insensitive mnemonics in the <b>DistinguishedAccount</b>, <b>DistinguishedInstitution</b>, or <b>DistinguishedPortfolio</b> classes, as discussed above. The line type governs the class used for the set of acceptable strings. 
+The distinguished key begins in column 3, and is up to 24 characters long. Its content is constrained to one of the case-insensitive mnemonics in the <b>DistinguishedAccount</b>, <b>DistinguishedInstitution</b>, or <b>DistinguishedPortfolio</b> classes, as discussed above. The line type governs the class used for the set of acceptable strings, and case is not important. 
 
 ### Distinguished Foreign
 
@@ -503,7 +511,7 @@ The gains files are four of sixteen CSV files that act as input to the software.
 3. "gains_separate", for married-filing-separately filers
 4. "gains_single", for single filers
 
-Files of this type have the prefix "gains_head_", "gains_joint_", "gains_separate_", or "gains_single_", depending on the subdirectory where they are located. The name is followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the gains files that have the latest dates that are not later than the date of the latest holding file. The gains files contain capital gains tax brackets for taxpayers in the various filing statuses. The key for rows in the file is the income threshold, and it should be unique. The following are the fields of a gains file row.
+Files of this type have the prefix "gains_head_", "gains_joint_", "gains_separate_", or "gains_single_", depending on the subdirectory where they are located. The name is followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the gains files that have the latest dates that are not later than the date of the latest [Holding File](#holding-file). The gains files contain capital gains tax brackets for taxpayers in the various filing statuses. The key for rows in the file is the income threshold, and it should be unique. The following are the fields of a gains file row.
 
 ### Gains Threshold
 
@@ -544,7 +552,7 @@ The foreign key begins in column 3, and may be 16 characters long. Its content i
 
 ### Holding Name
 
-The holding name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the portfolio name for rows with a 'P' line type, an account name for rows with an 'A' line type, or the ticker name for rows with an 'F, 'J', 'Q', or 'X' line type. Institution names (rows with an 'I' line type) are specified in this file, and nowhere else. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the basis file. The software only uses this field for readable in its reports. 
+The holding name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the portfolio name for rows with a 'P' line type, an account name for rows with an 'A' line type, or the ticker symbol for rows with an 'F, 'J', 'Q', or 'X' line type. Institution names (rows with an 'I' line type) are specified in this file, and nowhere else. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the basis file. The software only uses this field for readability in its reports. 
 
 ### Holding Shares
 
@@ -564,19 +572,19 @@ The holding value begins in column 101, and may be 18 characters long. Its conte
 
 ### Holding Weight
 
-The holding weight begins in column 120, and may be 8 characters if specified. Its content is a non-negative number, possibly with a decimal point. The holding weight is the value that the software will use when rebalancing the holding identified by the current row with other holdings of exactly the same type in the same account. The software assumes a default weight of one, meaning the software will equally distribute value to same-type holdings in the same account if the weight is not explicitly specified for any. A convenient way to withhold value from any holding during rebalance is to set the content of its holding weight to zero.
+The holding weight begins in column 120, and may be 8 characters if specified. Its content is a non-negative number, possibly with a decimal point. The holding weight is the value that the software will use when rebalancing the holding identified by the current row with other holdings of exactly the same type in the same account. The software assumes a default weight of one, meaning the software will equally distribute value to same-type holdings in the same account if the weight is not explicitly specified for any. A convenient way to withhold value from any holding during rebalance is to here set its weight to zero.
 
 It is possible to bypass investment-type weight rebalancing, and rely on the [Holding Weight](#holding-weight) alone. How?
 
-* For all but the last rebalanced account in a portfolio (see [Rebalance Order](#rebalance-order)), set to zero all weights for the account in the [Account File](#acccount-file), assuming there is no row for the account in the [Detailed File](#detailed-file). If there is a row for the account in the [Detailed File](#detailed-file), set to zero the level-one weights in that row (only stocks, bonds, cash, and real-estate need to be set)
+* For all but the last rebalanced account in a portfolio (see [Rebalance Order](#rebalance-order)), set to zero all weights for the account in the [Account File](#account-file), assuming there is no row for the account in the [Detailed File](#detailed-file). If there is a row for the account in the [Detailed File](#detailed-file), set to zero the level-one weights in that row (only [Detailed Weight Stock](#detailed-weight-stock), [Detailed Weight Bonds](#detailed-weight-bond), [Detailed Weight Cash](#detailed-weight-cash), and [Detailed Weight Real-Estate](#detailed-weight-real-estate) need to be set)
 * For the last rebalanced account in a portfolio, set to zero all weights for the portfolio in the [Portfolio File](#portfolio-file)
 
 If the user wishes to rebalance in this way, he/she must take care to ensure two things:
 
 1. That the [-x](#-x-ncnt) preference is one greater than the number of tickers in the account
-2. That the [Holding Weight](#holding-weight) for at least one ticker in the account is something other than zero
+2. That the holding weight for at least one ticker in the account is something other than zero, otherwise the software will not be able to assign the account value to any ticker
 
-When rebalancing by [Holding Weight](#holding-weight), the software may take considerable time to rebalance an account if the account has a considerable number of tickers, and it cannot precisely allocate value due to ticker investment minimums and/or preferred share rounding. See the discussion of the [-x](#-x-ncnt) preference.
+When rebalancing by holding weight, the software may take considerable time to rebalance an account if the account has many tickers, and it cannot precisely allocate value due to ticker investment minimums and/or preferred share rounding. See the discussion of the [-x](#-x-ncnt) preference and [How Does Rebalancing Work](#how-does-rebalancing-work).
 
 ## Income Files
 
@@ -589,7 +597,7 @@ The income files are four of sixteen CSV files that act as input to the software
 3. "income_separate", for married-filing-separately filers
 4. "income_single", for single filers
 
-Files of this type have the prefix "income_head_", "income_joint_", "income_separate_", or "income_single_", depending on the subdirectory where they are located. The name is followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the income files that have the latest dates that are not later than the date of the latest holding file. The income files contain standard deduction, and income tax brackets for taxpayers in the various filing statuses. The key for rows in the file is the income threshold, and it should be unique unless the row is a distinguished standard deduction row. The following are the fields of an income file row.
+Files of this type have the prefix "income_head_", "income_joint_", "income_separate_", or "income_single_", depending on the subdirectory where they are located. The name is followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the income files that have the latest dates that are not later than the date of the latest [Holding File](#holding-file). The income files contain standard deduction, and income tax brackets for taxpayers in the various filing statuses. The key for rows in the file is the income threshold, and it should be unique unless the row is a distinguished standard deduction row ([Income Rate](#income-rate) equal to zero). The following are the fields of an income file row.
 
 ### Income Threshold
 
@@ -601,7 +609,7 @@ The tax rate begins in column 18, and may be 8 characters long. Its content is c
 
 ## Portfolio File
 
-The portfolio file is one of sixteen CSV files that act as input to the software. Files in this format are located in a directory named "portfolio" located in the directory identified in the source preference. Files of this type have the prefix "portfolio_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the portfolio file that has the latest date that is not later than the date of the latest holding file. The portfolio contains information that is required to identify, valuate and rebalance portfolios. The key for rows in the file is the portfolio mnemonic, and it should uniquely identify the investor associated with the portfolio. The following are the fields of a portfolio file row.
+The portfolio file is one of sixteen CSV files that act as input to the software. Files in this format are located in a directory named "portfolio" located in the directory identified in the source preference. Files of this type have the prefix "portfolio_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the portfolio file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The portfolio contains information that is required to identify, valuate and rebalance portfolios. The key for rows in the file is the portfolio mnemonic, and it should uniquely identify the investor associated with the portfolio. The following are the fields of a portfolio file row.
 
 ### Portfolio Mnemonic
 
@@ -609,7 +617,7 @@ The portfolio mnemonic begins in column 1, and may be 16 characters long. Its co
 
 ### Investor Name
 
-The investor name begins in column 18, and may be 20 characters long. Its content is not constrained. The software uses the investor name (rather than the investor mnemonic) in portfolio report files to make those files more readable. The investor name should match the corresponding field in the holding file. The holding file is where the portfolio receives its value.
+The investor name begins in column 18, and may be 20 characters long. Its content is not constrained. The software uses the investor name (rather than the investor mnemonic) in portfolio report files to make those files more readable. The investor name should match the corresponding field in the [Holding File](#holding-file). The [Holding File](#holding-file) is where the portfolio receives its value.
 
 ### Investor Birthdate
 
@@ -625,15 +633,15 @@ The filing status begins in column 61, and is 8 characters long. Its content is 
 
 ### Social Security
 
-The monthly Social Security income begins in column 70, and may be up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The monthly Social Security income is either: 1) the anticipated Social Security benefit beginning at investor age 62, or; 2) the known benefit as of the current date. The software will use the latter of the two dates, as necessary. If the holding file does not specify an explicit valuation for a Social Security account, the software will synthesize the total value of Social Security using this amount, as well as the birthdate and expected mortality date of the investor. 
+The monthly Social Security income begins in column 70, and may be up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The monthly Social Security income is either: 1) the anticipated Social Security benefit beginning at investor age 62, or; 2) the known benefit as of the current date. The software will use the latter of the two dates, as necessary. If the [Holding File](#holding-file) does not specify an explicit valuation for a Social Security account, the software will synthesize the total value of Social Security using this amount, as well as the birthdate and expected mortality date of the investor. 
 
 ### CPI Adjusted
 
-The monthly CPI adjusted income begins in column 79, and may be up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The monthly CPI adjusted income is the total CPI adjusted annuity and/or pension income of the investor. The software assumes the income is current, and will continue through the lifetime of the investor. If the holding file does not specify an explicit valuation for a CPI adjusted account, the software will synthesize the total value of the annuity/pension income using this amount and the expected mortality date of the investor.
+The monthly CPI adjusted income begins in column 79, and may be up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The monthly CPI adjusted income is the total CPI adjusted annuity and/or pension income of the investor. The software assumes the income is current, and will continue through the lifetime of the investor. If the [Holding File](#holding-file) does not specify an explicit valuation for a CPI adjusted account, the software will synthesize the total value of the annuity/pension income using this amount and the expected mortality date of the investor.
 
 ### Non-CPI Adjusted
 
-The monthly non-CPI adjusted income begins in column 88, and may be up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The monthly non-CPI adjusted income is the total non-CPI adjusted annuity and/or pension income of the investor. The software assumes the income is current, and will continue through the lifetime of the investor. If the holding file does not specify an explicit valuation for a non-CPI adjusted account, the software will synthesize the total value of the annuity/pension income using this amount and the expected mortality date of the investor. It will also use the expected annual rate of inflation to reduce the real purchasing value of the monthly benefit over time.      
+The monthly non-CPI adjusted income begins in column 88, and may be up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The monthly non-CPI adjusted income is the total non-CPI adjusted annuity and/or pension income of the investor. The software assumes the income is current, and will continue through the lifetime of the investor. If the [Holding File](#holding-file) does not specify an explicit valuation for a non-CPI adjusted account, the software will synthesize the total value of the annuity/pension income using this amount and the expected mortality date of the investor. It will also use the expected annual rate of inflation to reduce the real purchasing value of the monthly benefit over time. See the [-i fltn](#-inflation-fltn) command line option.      
 
 ### Taxable Income
 
@@ -641,27 +649,27 @@ The annual taxable income begins in column 97, and may be up to 10 characters lo
 
 ### Portfolio Weight Stock
 
-The weight stock begins at column 108, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to equity (or stock) investments. If this field, and that for bonds, cash and real estate sum to 100, then the specified weight is actually a percent assigned to equities.
+The weight stock begins at column 108, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to equity (or stock) investments. If this field, and that for bonds, cash and real estate sum to 100, then the specified weight is actually a percent assigned to stocks.
 
 ### Portfolio Weight Bond
 
-The weight bond begins at column 115, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to bond investments. If this field, and that for equities, cash and real estate sum to 100, then the specified weight is actually a percent assigned to bonds.
+The weight bond begins at column 115, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to bond investments. If this field, and that for stocks, cash and real estate sum to 100, then the specified weight is actually a percent assigned to bonds.
 
 ### Portfolio Weight Cash
 
-The weight cash begins at column 122, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to cash investments (e.g. checking or savings accounts, or CDs). If this field, and that for equities, bonds and real estate sum to 100, then the specified weight is actually a percent assigned to cash.
+The weight cash begins at column 122, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to cash investments (e.g. checking or savings accounts, or CDs). If this field, and that for stocks, bonds and real estate sum to 100, then the specified weight is actually a percent assigned to cash.
 
 ### Portfolio Weight Real-Estate
 
-The weight real-estate begins at column 129, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real estate investments (e.g. real property or shares in a trust). If this field, and that for equities, bonds and cash sum to 100, then the specified weight is actually a percent assigned to real estate.
+The weight real-estate begins at column 129, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real estate investments (e.g. real property or shares in a trust). If this field, and that for stocks, bonds and cash sum to 100, then the specified weight is actually a percent assigned to real estate.
 
 ### Adjust from High
 
-The adjust-from-high flag begins at column 136, and may be up to 6 characters long. Its content is constrained to one of the following strings: "False", or "True". Case is not important. The adjust-from-high flag indicates to the software whether it should make an upward-revision of the preferred equity weight of the portfolio based on a ratio of today's value of the S&P 500 versus the high of the index. We assume by definition that the value of the S&P 500 today cannot be higher than its high. While the software will always make an equity weight adjustment for the ratio of the S&P 500 today versus its last close (assuming these preferences are both set), it will skip an additional today-versus-high adjustment on a per-portfolio basis if this flag is not set. Note that the user may skip all equity adjustments by simply not setting the preference for S&P 500 today. See the command line option -t.   
+The adjust-from-high flag begins at column 136, and may be up to 6 characters long. Its content is constrained to one of the following strings: "False", or "True". Case is not important. The adjust-from-high flag indicates to the software whether it should make an upward-revision of the preferred equity weight of the portfolio based on a ratio of today's value of the S&P 500 versus the high of the index. We assume by definition that the value of the S&P 500 today cannot be higher than its high. While the software will always make an equity weight adjustment for the ratio of the S&P 500 today versus its last close (assuming these preferences are both set), it will skip an additional today-versus-high adjustment on a per-portfolio basis if this flag is not set. Note that the user may skip all equity adjustments by simply not setting the preference for S&P 500 today. See the [-t sptd](#-today-sptd) command line option.   
 
 ## Ticker File
 
-The ticker file is one of sixteen CSV files that act as input to the software. Files in this format are located in a directory named "ticker" located in the directory identified in the source preference. Files of this type have the prefix "ticker_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the ticker file that has the latest date that is not later than the date of the latest holding file. The ticker contains information that is required to identify and categorize investments by type. "Tickers" is a catch-all name for open-end mutual funds, exchange-traded funds, individual stocks, individual bonds, or any sub-grouping of holding that occurs within an account. The key for the rows in the file is a mnemonic that should uniquely identify the investment in the institution where the ticker exists, or on the exchanges where it trades. It can also be a unique mnemonic that has meaning only to the investor who owns the account. Tickers may appear in one or more accounts in the holding file with valuations that are not the same. The key for rows in the file is the ticker, and it should be unique. The following are the fields of a ticker file row.  
+The ticker file is one of sixteen CSV files that act as input to the software. Files in this format are located in a directory named "ticker" located in the directory identified in the source preference. Files of this type have the prefix "ticker_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the ticker file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The ticker contains information that is required to identify and categorize investments by type. "Tickers" is a catch-all name for open-end mutual funds, exchange-traded funds, individual stocks, individual bonds, or any sub-grouping of holding that occurs within an account. The key for the rows in the file is a symbol that should uniquely identify the investment in the institution where the ticker exists, or on the exchanges where it trades. It can also be a unique mnemonic that has meaning only to the investor who owns the account. Tickers may appear in one or more accounts in the [Holding File](#holding-file) with valuations that are not the same. This would indicate different holdings in different accounts within the same, or different portfolio. To summarize, the key for rows in the file is the ticker symbol, and it should be unique. The following are the fields of a ticker file row.  
 
 ### Ticker Character
 
@@ -677,7 +685,7 @@ The ticker number begins in column 9, and may be up to 4 characters long. Its co
 
 ### Ticker Name
 
-The ticker name begins in column 14, and may be up to 42 characters long. Its content is not constrained. The ticker name helps identify the ticker in rebalance reports. I recommend that the name be unique, and describe the ticker in an identifiable way. The ticker name should match the corresponding field in the holding file. The holding file is where the ticker receives its value.
+The ticker name begins in column 14, and may be up to 42 characters long. Its content is not constrained. The ticker name helps identify the ticker in rebalance reports. I recommend that the name be unique, and describe the ticker in an identifiable way. The ticker name should match the corresponding field in the [Holding File](#holding-file). The [Holding File](#holding-file) is where the ticker receives its value.
 
 ### Minimum Investment
 
@@ -713,23 +721,23 @@ The first subcode field begins in column 78, and is one character. Its content i
 20. 'Y' (high-yield bonds)
 21. 'Z' (short-term bonds)
 
-The first subcode, in conjunction with the subcodes two, three and four determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.  
+The first subcode, in conjunction with the subcodes two, three and four determine the characteristics of the security holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds. The use of the 'S' and 'T' codes together is therefore not consistent, and the software will tell the user as much if these codes are used for the same ticker.  
 
-Currently, the software does not accept blended, or multi-asset funds for rebalance. The user may specify these types of tickers with a code of 'J' (unbalanceable) so that software will take them into account when valuing an account or portfolio. However, it will not attempt to rebalance such a ticker within its account. The software would report an inconsistency if a stock and bond blended fund - or ETF - were designated as balanceable with both the 'B' and 'S' subcodes. 
+Currently, the software does not have the capability to specify blended, or multi-assets funds. If a ticker falls in this category, it is possible to give the ticker no entries in any subcode field ('_' for all five subcodes). The software would then assign to the ticker a value apportionment equal to 1 / n, where 'n' is the number of tickers in the account.  
 
 A use of subcodes one through four may be demonstrated as follows: A large cap growth fund - holding domestic securities - may be specified with the subcodes 'S', 'D', 'L' and 'G'. This completely specifies the balanceable characteristics of the ticker in a way that is possible, and consistent. Currently, the software requires no more than four subcodes to completely characterize a ticker for its rebalancing effort.
 
 ### Ticker Subcode 2
 
-The second subcode begins in column 80, and is one character. Its content is constrained to one of the characters described in the first subcode. The second subcode, in conjunction with subcodes one, three and four determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.
+The second subcode begins in column 80, and is one character. Its content is constrained to one of the characters described in [Ticker Subcode 1](#ticker-subcode-1). The second subcode, in conjunction with subcodes [Ticker Subcode 1](#ticker-subcode-1), [Ticker Subcode 3](#ticker-subcode-3), and [Ticker Subcode 4](#ticker-subcode-4) determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.
 
 ### Ticker Subcode 3
 
-The third subcode begins in column 82, and is one character. Its content is constrained to one of the characters described in the first subcode. The third subcode, in conjunction with subcodes one, two and four determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.
+The third subcode begins in column 82, and is one character. Its content is constrained to one of the characters described in [Ticker Subcode 1](#ticker-subcode-1). The third subcode, in conjunction with subcodes [Ticker Subcode 1](#ticker-subcode-1), [Ticker Subcode 2](#ticker-subcode-2), and [Ticker Subcode 4](#ticker-subcode-4) determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.
 
 ### Ticker Subcode 4
 
-The fourth subcode begins in column 84, and is one character. Its content is constrained to one of the characters described in the first subcode. The fourth subcode, in conjunction with subcodes one, two and three determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.
+The fourth subcode begins in column 84, and is one character. Its content is constrained to one of the characters described in [Ticker Subcode 1](#ticker-subcode-1). The fourth subcode, in conjunction with subcodes [Ticker Subcode 1](#ticker-subcode-1), [Ticker Subcode 2](#ticker-subcode-2), and [Ticker Subcode 3](#ticker-subcode-3) determine the characteristics of the securities holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds, etc.
 
 ## Output Files
 
