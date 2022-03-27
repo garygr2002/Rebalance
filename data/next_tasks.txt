@@ -1,20 +1,10 @@
 Things to do:
 
-1. In README.md, Ensure that each field in all CSV files has a unique name, and
-   make sure these are consistent with what is in the corresponding text
-   description file.
+1. Add a section on how rebalancing works in the README.md.
 
-2. In README.md, create links for all CSV files no matter they are mentioned in
-   the text.
+2. Do code metrics, and report in the README.md.
 
-3. In README.md, create links for all CSV file fields (they are unique now; see
-   item 1) no matter where they are mentioned in the text.
-
-4. Add a section on how rebalancing works in the README.md.
-
-5. Do code metrics, and report in the README.md.
-
-6. Create section for tools used in README.md.
+3. Create section for tools used in README.md.
 
 For your information:
 
