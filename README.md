@@ -123,11 +123,11 @@ You may set the critical component of the destination directory for backup using
 
 <sub><sup>Above: software preferences after setting default destination directory for backup with assumed name and default location</sup></sub>
 
-You may set current and historical valuations for the Standard and Poor 500 using the 'c', 'h' and 't' options. These options stand for 'close (last)', 'high' and 'today' respectively. The software uses these settings to automatically adjust investor-specific equity weights given in the portfolio CSV file. The software will make the adjustment for today's valuation of the S&P 500 versus last close for every portfolio. However, an equity adjustment of today's setting versus historical high is a per-portfolio preference. Read further in this document, or explore the description of the CSV files for more information. Please note that it is not required to set valuations for the S&P 500 in order for the software to run correctly. When one or more of these preferences are not set, the software will skip the adjustments. You will see something similar to the following terminal window when running the software after the 'c', 'h', 't' and 'p' options: 
+You may set current and historical valuations for the Standard and Poor 500 (S&P 500) using the 'c', 'h' and 't' options. These options stand for 'close (last)', 'high' and 'today' respectively. The software uses these settings to automatically adjust investor-specific equity weights given in the portfolio CSV file. The software will make the adjustment for today's valuation of the S&P 500 versus last close for every portfolio. However, an equity adjustment of today's setting versus historical high is a per-portfolio preference. Read further in this document, or explore the description of the CSV files for more information. Please note that it is not required to set valuations for the S&P 500 in order for the software to run correctly. When one or more of these preferences are not set, the software will skip the adjustments. You will see something similar to the following terminal window when running the software after the 'c', 'h', 't' and 'p' options: 
 
 ![alt text](assets/images/SandP500_set.png)
 
-<sub><sup>Above: software preferences after setting explicit values for Standard and Poor 500 last close, high, and value today</sup></sub>
+<sub><sup>Above: software preferences after setting explicit values for S&P 500 last close, high, and value today</sup></sub>
 
 A screen snap is omitted here for the 'b' option, which backs up the current source directory to the current destination directory. As well, a screen snap is omitted here for running the software with no option, which causes the software to rebalance investor portfolios given the current CSV input files.
 
@@ -165,15 +165,15 @@ The annual expected rate of inflation, expressed as a percentage. The <i>fltn</i
 
 ### -high sphg
 
-The record high of the Standard & Poor 500. The <i>sphg</i> argument must be a non-negative number, possibly with a decimal point, and is required. The software will use this value, if set, and the value of the Standard & Poor 500 today (see option, below) to upward-adjust the percentage of a portfolio allocated to equity investments. It will only do this for portfolios that so specify in the portfolio CSV file.
+The record high of the S&P 500. The <i>sphg</i> argument must be a non-negative number, possibly with a decimal point, and is required. The software will use this value, if set, and the value of the S&P 500 today (see option, below) to upward-adjust the percentage of a portfolio allocated to equity investments. It will only do this for portfolios that so specify in the portfolio CSV file.
 
 ### -close spcl
 
-The last close of the Standard & Poor 500. The <i>spcl</i> argument must be a non-negative number, possibly with a decimal point, and is required. The software will use this value, if set, and the value of the Standard and Poor 500 today (see option, below) to adjust the percentage of equity investment allocations in all portfolios. To skip this adjustment, the user may leave this preference unset.
+The last close of the S&P 500. The <i>spcl</i> argument must be a non-negative number, possibly with a decimal point, and is required. The software will use this value, if set, and the value of the S&P 500 today (see option, below) to adjust the percentage of equity investment allocations in all portfolios. To skip this adjustment, the user may leave this preference unset.
 
 ### -today sptd
 
-The value of the Standard & Poor 500 on the day the software is run. The <i>sptd</i> argument must be a non-negative number, possibly with a decimal point, and is required. The software will use this value, if set, to perform adjustments to the equity investment allocations in all portfolios. It does this in conjunction with the S&P 500 high, and S&P 500 last close preferences previously discussed. Note that if this preference is not set, the software will rely  on per-portfolio specifications for equity weight, and will perform no adjustments. 
+The value of the S&P 500 on the day the software is run. The <i>sptd</i> argument must be a non-negative number, possibly with a decimal point, and is required. The software will use this value, if set, to perform adjustments to the equity investment allocations in all portfolios. It does this in conjunction with the S&P 500 high, and S&P 500 last close preferences previously discussed. Note that if this preference is not set, the software will rely  on per-portfolio specifications for equity weight, and will perform no adjustments. 
 
 ### -x ncnt
 
@@ -665,7 +665,28 @@ The weight real-estate begins at column 129, and may be up to 6 characters long.
 
 ### Adjust from High
 
-The adjust-from-high flag begins at column 136, and may be up to 6 characters long. Its content is constrained to one of the following strings: "False", or "True". Case is not important. The adjust-from-high flag indicates to the software whether it should make an upward-revision of the preferred equity weight of the portfolio based on a ratio of today's value of the S&P 500 versus the high of the index. We assume by definition that the value of the S&P 500 today cannot be higher than its high. While the software will always make an equity weight adjustment for the ratio of the S&P 500 today versus its last close (assuming these preferences are both set), it will skip an additional today-versus-high adjustment on a per-portfolio basis if this flag is not set. Note that the user may skip all equity adjustments by simply not setting the preference for S&P 500 today. See the [-t sptd](#-today-sptd) command line option.   
+The adjust-from-high flag begins at column 136, and may be up to 6 characters long. Its content is constrained to one of the following strings: "False", or "True". Case is not important. The adjust-from-high flag indicates to the software whether it should make an upward-revision of the preferred equity weight of the portfolio based on a ratio of today's value of the S&P 500 versus the high for the index. We assume by definition that the value of the S&P 500 today cannot be higher than its high. While the software will always make an equity weight adjustment for the ratio of the S&P 500 today versus its last close (assuming these preferences are both set), it will skip an additional today-versus-high adjustment on a per-portfolio basis if the S&P 500 high is not set (see the [-h sphg](#-high-sphg) command line option), or this flag is not set. Note that the user may skip all equity adjustments by simply not setting the preference for S&P 500 today. See the [-t sptd](#-today-sptd) command line option.   
+
+The formula by which the software adjusts equity weight for S&P 500 today versus S&P 500 high is not currently variable. For individual accounts, there is no adjustment at all. The adjustment comes into play only when the software rebalances the last account in a portfolio, and attempts to match portfolio equity preferences as specified in the [Portfolio File](#portfolio-file).
+
+The current adjustment formula is: <b>(5 * ((sphg - sptd) / sphg) / 8) + ew</b>, where:
+
+* <b>ew</b> is the existing declared weight of equities in the [Portfolio File](#portfolio-file)
+* <b>sphg</b> is the preference set for the S&P 500 high
+* <b>sptd</b> is the preference set for the S&P 500 today
+
+Note that in this equation, the level 1 category weight for stocks has been converted from a weight to a percentage, and this necessitates that the software also modify the other level 1 category weights (bonds, cash, and real estate) to convert these to percentages as well. It does this in proportion to the original weight preferences that the user had set for these categories.
+
+The equity adjustment that the software makes with regard to the S&P 500 today versus last close is a different beast. The software will make this adjustment for all portfolios, and the adjustment is not affected by the setting of the adjust-from-high flag for any portfolio. The software assumes that the user has declared valuations of all accounts and portfolios in the [Holding File](#holding-file) as of S&P 500 last close. It therefore assumes - perhaps in a naive way - that the stated valuations will decrease, or increase in proportion to the change reflected in the S&P 500 today. The way the user turns off this adjustment is not to set the value of the S&P 500 last close or S&P 500 today. If the user wants to preserve the ability to adjust the portfolio versus last high, however, the only option is not to set the S&P 500 last close. Let us summarize what can be done in a table by clearing or setting the proper preference:
+
+| User Wants            | S&P 500 Today     | S&P 500 Last Close       | S&P 500 High             |
+|-----------------------|-------------------|--------------------------|--------------------------|
+| No Adjustment         | Clear <b>sptd</b> | Clear or set <b>spcl</b> | Clear or set <b>sphg</b> |
+| Only Today vs Close   | Set <b>sptd</b>   | Set <b>spcl</b>          | Clear <b>sphg</b>        |
+| Only Today vs High    | Set <b>sptd</b>   | Clear <b>spcl</b>        | Set <b>sphg</b>          |
+| Both Adjustments      | Set <b>sptd</b>   | Set <b>spcl</b>          | Set <b>sphg</b>          |
+
+If the user desires both adjustments, he should know that the software performs the today-vs-close adjustment before the today-vs-high adjustment.
 
 ## Ticker File
 
