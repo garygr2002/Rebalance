@@ -667,13 +667,13 @@ The weight real-estate begins at column 129, and may be up to 6 characters long.
 
 The adjust-from-high flag begins at column 136, and may be up to 6 characters long. Its content is constrained to one of the following strings: "False", or "True". Case is not important. The adjust-from-high flag indicates to the software whether it should make an upward-revision of the preferred equity weight of the portfolio based on a ratio of today's value of the S&P 500 versus the high for the index. We assume by definition that the value of the S&P 500 today cannot be higher than its high. While the software will always make an equity weight adjustment for the ratio of the S&P 500 today versus its last close (assuming these preferences are both set), it will skip an additional today-versus-high adjustment on a per-portfolio basis if the S&P 500 high is not set (see the [-h sphg](#-high-sphg) command line option), or this flag is not set. Note that the user may skip all equity adjustments by simply not setting the preference for S&P 500 today. See the [-t sptd](#-today-sptd) command line option.   
 
-The formula by which the software adjusts equity weight for S&P 500 today versus S&P 500 high is not currently variable. For individual accounts, there is no adjustment at all. The adjustment comes into play only when the software rebalances the last account in a portfolio, and attempts to match portfolio equity preferences as specified in the [Portfolio File](#portfolio-file).
+The formula by which the software adjusts equity weight for S&P 500 today versus S&P 500 high is not currently variable. For individual accounts, there is no adjustment at all. The adjustment comes into play only when the software rebalances the last account in a portfolio, and attempts to match portfolio equity preferences as specified in this file.
 
 The current adjustment formula is: <b>(5 * ((sphg - sptd) / sphg) / 8) + ew</b>, where:
 
-* <b>ew</b> is the existing declared weight of equities in the [Portfolio File](#portfolio-file)
-* <b>sphg</b> is the preference set for the S&P 500 high
-* <b>sptd</b> is the preference set for the S&P 500 today
+* <b>ew</b> is the existing declared weight of equities in this file
+* <b>sphg</b> is the preference set for the S&P 500 high ([-h sphg](#-high-sphg) option)
+* <b>sptd</b> is the preference set for the S&P 500 today ([-t sptd](#-today-sptd) option)
 
 Note that in this equation, the level 1 category weight for stocks has been converted from a weight to a percentage, and this necessitates that the software also modify the other level 1 category weights (bonds, cash, and real estate) to convert these to percentages as well. It does this in proportion to the original weight preferences that the user had set for these categories.
 
