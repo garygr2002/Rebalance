@@ -51,6 +51,22 @@ As well as sample data files, the reader will also find in each data subdirector
 
 I have left as an enhancement the possibility that input to the tool may be changed to SQL tables indexed by a combination of date, and existing keys in the CSV files. An additional enhancement would be a graphical user interface by which the SQL tables may be edited. The current tool does not have these features.
 
+### Tool Set
+
+Describe here hardware and software used to complete this project.  Software includes:
+
+* Ubuntu Linux (declare version)
+* Java JDK version 11 (declare details)
+* Ant Build Generation Plugin from Jetbrains (declare details)
+* IntelliJ IDE (declare details)
+* GitHub
+* Code Metrics Tool (investigate details)
+* Graph Drawing Tool (investigate details)
+
+### Code Metrics
+
+Do code metrics, and put results here.
+
 ### State of the Project
 
 After 13 months of work - to the end of February 2022 - I deemed the design, code and deployment activities of the project to be complete. I have allocated one man-month to fully document the project for professional showcase. My intention is to complete this work by the conclusion of March 2022. An observer will note progressive activity and growth in this markdown file and related documents during this time. Below you will find some portions of the markdown template that remain unedited. Stop by often for updates!
@@ -783,6 +799,10 @@ Describe the Report file here.
 ## How Does Rebalancing Work?
 
 This is a stub for the How Does Rebalancing Work section. Here I will discuss levels of investment category, from least specific (lower), to most specific (higher). I will also discuss how the software treats individual holdings the same as investment categories when reallocating value.
+
+## What Do I Do with Debts?
+
+Fill in here a description of how the software handles negative ticker and account balances.
 
 ## Credits
 
