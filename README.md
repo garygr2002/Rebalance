@@ -56,11 +56,11 @@ As well as sample data files, the reader will also find in each data subdirector
 
 I used the following hardware in this project:
 
-* Dell XPS 13 9300 laptop (256GB memory) with factory installed Ubuntu Linux version 18.04 at delivery
-* Dell Thunderbolt docking station WD19TB
-* Dell UltraSharp 38 curved monitor U3818DW
-* Kinesis Freestyle2 ergonomic keyboard for PC
-* Anker 2.4G wireless vertical ergonomic optical mouse
+* [Dell](https://www.dell.com/en-us) XPS 13 9300 laptop (256GB memory) with factory installed Ubuntu Linux version 18.04 at delivery
+* [Dell](https://www.dell.com/en-us) Thunderbolt docking station WD19TB
+* [Dell](https://www.dell.com/en-us) UltraSharp 38 curved monitor U3818DW
+* [Kinesis](https://kinesis-ergo.com/) Freestyle2 ergonomic keyboard for PC
+* [Anker](https://us.anker.com/) 2.4G wireless vertical ergonomic optical mouse
 
 And I used the following software. All software versions here specified were those installed at the declaration of project complete, 31 March 2022:
 
@@ -106,6 +106,7 @@ After 13 months of work - to the end of February 2022 - I deemed the design, cod
 - [Ticker File](#ticker-file)
 - [Output Files](#output-files)
 - [How Does Rebalancing Work?](#how-does-rebalancing-work)
+- [What Do I Do with Debts?](#what-do-i-do-with-debts)
 - [Room for Enhancement](#room-for-enhancement)
 - [Credits](#credits)
 - [Warranty](#warranty)
@@ -857,7 +858,7 @@ The report file is formatted exactly the same as a proposed file, but with level
 
 This software is not meant to rebalance debts. Do you want to know how to rebalance your debts? Investigate the interest rate you pay on your various debts, then move as much debt as you can to the lowest rate account. Repeat with the next lowest rate account until all your debts are reallocated. This procedure assumes that debt can be moved from one account to another, and that is admittedly sometimes difficult for credit card balances. Additionally, moving debt to a mortgage involves refinancing a loan...an expensive proposition. 
 
-All that is beside the point. Although this software does not rebalance debts, it can be used to track them, and take them into account when calculating the whole value of a portfolio. When attempting to reallocate rebalance-able assets in accounts, the software does not really care if the total value of the account is positive, or negative. It just takes the whole value of the account, and reallocates it using desired weights to the tickers that can be rebalanced. These two statements are axiomatic: 1) <i>If the value of an account is positive, no balanceable ticker will have negative value after rebalance</i>, and; 2) <i>If the value an account is negative, no balanceable ticker will have positive value after rebalance.</i> Make sense?     
+All that is beside the point. Although this software does not rebalance debts, it can be used to track them, and take them into account when calculating the whole value of a portfolio. When attempting to reallocate rebalance-able assets in accounts, the software does not really care if the total value of the account is positive, or negative. It just takes the whole value of the account, and reallocates it using desired weights to the tickers that can be rebalanced. These three statements are axiomatic: 1) <i>If the value of an account is positive, no balanceable ticker will have negative value after rebalance</i>; 2) <i>If the value an account is negative, no balanceable ticker will have positive value after rebalance</i>, and; 3) <i>If the value of the account is zero, no balanceable ticker will have a non-zero value after rebalance</i>. Make sense?     
 
 So how do you track your debts? Firstly - if the user tracks the debt as a ticker - the ticker cannot be balanceable. It should have a 'J' (a fund that is not available for rebalance) code in the [Holding Type](#holding-type) of the [Holding File](#holding-file), and the same in the [Ticker Character](#ticker-character) of the [Ticker File](#ticker-file). Secondly, the [Holding Value](#holding-value) needs a negative value in the [Holding File](#holding-file). In my own holdings, I have accomplished this by leaving the [Holding Value](#holding-value) blank, then giving the [Holding Price](#holding-price) a value of -1.00, and the [Holding Shares](#holding-shares) a value equal to the absolute value of the debt. The software then calculates the [Holding Value](#holding-value) as a negative number equal to the debt. For whatever it may mean to the user, any product of [Holding Shares](#holding-shares) and [Holding Price](#holding-price) whose product equals the debt is fine. Obviously the shares and price have to have different signs to produce a negative [Holding Value](#holding-value). Another way to do this is give the [Holding Value](#holding-value) an explicit, negative entry. Breaking a debt account (like a credit card balance) into non-balanceable tickers is a convenient way to subdivide the debt for accounting purposes. Keep in mind that a [Ticker Symbol](#ticker-symbol) need not necessarily be a well-known mnemonic on a trading exchange. It can be something that the user makes up.
 
