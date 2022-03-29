@@ -1,10 +1,17 @@
 Things to do:
 
-1. Add a section on how rebalancing works in the README.md.
+1. Fill in What Do I Do with Debts section in README.md.
 
-2. Do code metrics, and report in the README.md.
+2. Install Cloc and Dia onto development laptop.
 
-3. Create section for tools used in README.md.
+3. Create graphics for How Does Rebalancing Work section in README.md using
+   Dia.
+
+4. Fill in How Does Rebalancing Work section in README.md.
+
+5. Do code metrics using Cloc, and report in README.md.
+
+6. Do one final proofread.
 
 For your information:
 

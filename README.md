@@ -13,6 +13,8 @@ Output from the tool is a series of text files for each investor:
 3. A file that shows currency differences between proposed and current holdings, see [Difference File](#difference-file)
 4. A file that describes the reallocation actions required to effect the proposed changes, see [Action File](#action-file)
 
+The software does not affix a currency indicator to any value written to an output file. The user will find no '$', '£', or '€' symbols in the output files, for example. There are three reasons for this: 1) the software assumes the currency type is uniform, specific to each investor, and that the investor knows what it is; 2) currency type is irrelevant to how this software works; 3) currency indicators tend to clutter the output files.
+
 ### Motivation
 
 I have been interested in investing and investments for many years, and have sought throughout my professional career to save and invest diligently. During that time, I have periodically undertaken the task of rebalancing my personal investments by hand using spreadsheets and a calculator. I found this to be an imprecise, tedious, and error-prone task. 
@@ -33,7 +35,8 @@ I rejected existing open-source solutions, also for two reasons:
 
 ### Input
 
-The input to the software is a series of sixteen CSV files that are coded by date as a suffix in their names (format: yyyymmdd). Sample files are located in the data directory of this project. There you will find a series of subdirectories. Some subdirectories contain one or more input files of the same type, differing by date, or one or more output files differing by date.
+The input to the software is a series of sixteen CSV files that are coded by date as a suffix in their names (format: yyyymmdd). Sample files are located in the data directory of this project. There you will find a series of subdirectories. Some subdirectories contain one or more input files of the same type, differing by date, or one or more output files differing by date. The [Basis File](#basis-file), [Gains Files](#gains-files), [Holding File](#holding-file), [Income Files](#income-files), [Portfolio File](#portfolio-file), and the [Ticker File](#ticker-file) all contain currency fields that are assumed to be of the same type, but are nowhere assumed specific. For example, the holdings of the any investor may be in U.S. dollars, British pounds, euros or any other currency, but the currency is assumed to be uniform throughout. Currency fields are so indicated in the descriptions of fields in the input files.  
+
 These sixteen input files are:
 
 1. [Account File](#account-file): A description of accounts unique by institution and account number
@@ -53,7 +56,7 @@ I have left as an enhancement the possibility that input to the tool may be chan
 
 ### Tool Set
 
-I used the following hardware:
+I used the following hardware in this project:
 
 * Dell XPS 13 9300 laptop (256GB memory) with factory installed Ubuntu Linux version 18.04 at delivery
 * Dell Thunderbolt docking station WD19TB
@@ -73,7 +76,7 @@ And I used the following software. All software versions here specified were tho
 
 ### Code Metrics
 
-Insert code metrics here to be gathered using [Cloc](http://cloc.sourceforge.net/). 
+<b>TODO</b>: Insert code metrics here to be gathered using [Cloc](http://cloc.sourceforge.net/). 
 
 ### State of the Project
 
@@ -324,11 +327,11 @@ The basis shares begins in column 63, and may be 18 characters long. Its content
 
 ### Basis Price
 
-The basis price begins in column 82, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the basis price by dividing the basis value by the basis shares, but only if both are specified and the basis shares is not zero. The basis price only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the basis price to calculate a basis value that was left blank, but for no other purpose.
+The basis price begins in column 82, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the basis price by dividing the basis value by the basis shares, but only if both are specified and the basis shares is not zero. The basis price only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the basis price to calculate a basis value that was left blank, but for no other purpose. <i>Basis price is a currency field with no currency indicator.</i>
 
 ### Basis Value
 
-The basis value begins in column 101, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the basis value by multiplying the basis shares by the basis price, but only if both are specified. If specified, the basis value must:
+The basis value begins in column 101, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the basis value by multiplying the basis shares by the basis price, but only if both are specified. <i>Basis value is a currency field with no currency indicator.</i> If specified, the basis value must:
 
 1. For 'A' rows, match the sum of all 'F', 'J', 'Q' and 'X' rows given as children
 2. For 'I' rows, match the sum of all 'A' rows given as children
@@ -539,7 +542,7 @@ Files of this type have the prefix "gains_head_", "gains_joint_", "gains_separat
 
 ### Gains Threshold
 
-The income threshold begins in column 1, and may be 16 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The income threshold is the minimum income where the capital gains tax rate takes effect.
+The income threshold begins in column 1, and may be 16 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The income threshold is the minimum income where the capital gains tax rate takes effect. <i>Gains threshold is a currency field with no currency indicator.</i>
 
 ### Gains Rate
 
@@ -584,11 +587,11 @@ The holding shares begins in column 63, and may be 18 characters long. Its conte
 
 ### Holding Price
 
-The holding price begins in column 82, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the holding price by dividing the holding value by the holding shares, but only if both are specified and the holding shares is not zero. The holding price only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the holding price to calculate a holding value that was left blank, but for no other purpose.
+The holding price begins in column 82, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the holding price by dividing the holding value by the holding shares, but only if both are specified and the holding shares is not zero. The holding price only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the holding price to calculate a holding value that was left blank, but for no other purpose. <i>Holding price is a currency field with no currency indicator.</i>
 
 ### Holding Value
 
-The holding value begins in column 101, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the holding value by multiplying the holding shares by the holding price, but only if both are specified. If specified, the holding value must:
+The holding value begins in column 101, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the holding value by multiplying the holding shares by the holding price, but only if both are specified. <i>Holding value is a currency field with no currency indicator.</i> If specified, the holding value must:
 
 1. For 'A' rows, match the sum of all 'F', 'J', 'Q' and 'X' rows given as children
 2. For 'I' rows, match the sum of all 'A' rows given as children
@@ -625,7 +628,7 @@ Files of this type have the prefix "income_head_", "income_joint_", "income_sepa
 
 ### Income Threshold
 
-The income threshold begins in column 1, and may be 16 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. For associated tax rates that are positive, the income threshold is the minimum income where the income tax rate takes effect. For associated tax rate of zero, the software interprets that income threshold as the standard deduction for a taxpayer with the indicated filing status.
+The income threshold begins in column 1, and may be 16 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. For associated tax rates that are positive, the income threshold is the minimum income where the income tax rate takes effect. For associated tax rate of zero, the software interprets that income threshold as the standard deduction for a taxpayer with the indicated filing status. <i>Income threshold is a currency field with no currency indicator.</i>
 
 ### Income Rate
 
@@ -657,19 +660,19 @@ The filing status begins in column 61, and is 8 characters long. Its content is 
 
 ### Social Security
 
-The monthly Social Security income begins in column 70, and may be up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The monthly Social Security income is either: 1) the anticipated Social Security benefit beginning at investor age 62, or; 2) the known benefit as of the current date. The software will use the latter of the two dates, as necessary. If the [Holding File](#holding-file) does not specify an explicit valuation for a Social Security account, the software will synthesize the total value of Social Security using this amount, as well as the birthdate and expected mortality date of the investor. 
+The monthly Social Security income begins in column 70, and may be up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The monthly Social Security income is either: 1) the anticipated Social Security benefit beginning at investor age 62, or; 2) the known benefit as of the current date. The software will use the latter of the two dates, as necessary. If the [Holding File](#holding-file) does not specify an explicit valuation for a Social Security account, the software will synthesize the total value of Social Security using this amount, as well as the birthdate and expected mortality date of the investor. <i>Social Security is a currency field with no currency indicator.</i>
 
 ### CPI Adjusted
 
-The monthly CPI adjusted income begins in column 79, and may be up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The monthly CPI adjusted income is the total CPI adjusted annuity and/or pension income of the investor. The software assumes the income is current, and will continue through the lifetime of the investor. If the [Holding File](#holding-file) does not specify an explicit valuation for a CPI adjusted account, the software will synthesize the total value of the annuity/pension income using this amount and the expected mortality date of the investor.
+The monthly CPI adjusted income begins in column 79, and may be up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The monthly CPI adjusted income is the total CPI adjusted annuity and/or pension income of the investor. The software assumes the income is current, and will continue through the lifetime of the investor. If the [Holding File](#holding-file) does not specify an explicit valuation for a CPI adjusted account, the software will synthesize the total value of the annuity/pension income using this amount and the expected mortality date of the investor. <i>CPI adjusted is a currency field with no currency indicator.</i>
 
 ### Non-CPI Adjusted
 
-The monthly non-CPI adjusted income begins in column 88, and may be up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The monthly non-CPI adjusted income is the total non-CPI adjusted annuity and/or pension income of the investor. The software assumes the income is current, and will continue through the lifetime of the investor. If the [Holding File](#holding-file) does not specify an explicit valuation for a non-CPI adjusted account, the software will synthesize the total value of the annuity/pension income using this amount and the expected mortality date of the investor. It will also use the expected annual rate of inflation to reduce the real purchasing value of the monthly benefit over time. See the [-i fltn](#-inflation-fltn) command line option.      
+The monthly non-CPI adjusted income begins in column 88, and may be up to 8 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The monthly non-CPI adjusted income is the total non-CPI adjusted annuity and/or pension income of the investor. The software assumes the income is current, and will continue through the lifetime of the investor. If the [Holding File](#holding-file) does not specify an explicit valuation for a non-CPI adjusted account, the software will synthesize the total value of the annuity/pension income using this amount and the expected mortality date of the investor. It will also use the expected annual rate of inflation to reduce the real purchasing value of the monthly benefit over time. See the [-i fltn](#-inflation-fltn) command line option. <i>Non-CPI adjusted is a currency field with no currency indicator.</i>
 
 ### Taxable Income
 
-The annual taxable income begins in column 97, and may be up to 10 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The software uses the annual taxable income for calculating income and capital gains tax, where necessary, and in portfolio reports.
+The annual taxable income begins in column 97, and may be up to 10 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The software uses the annual taxable income for calculating income and capital gains tax, where necessary, and in portfolio reports. <i>Taxable income is a currency field with no currency indicator.</i>
 
 ### Portfolio Weight Stock
 
@@ -710,7 +713,7 @@ The equity adjustment that the software makes with regard to the S&P 500 today v
 | Only Today vs High    | Set <b>sptd</b>   | Clear <b>spcl</b>        | Set <b>sphg</b>          |
 | Both Adjustments      | Set <b>sptd</b>   | Set <b>spcl</b>          | Set <b>sphg</b>          |
 
-If the user desires both adjustments, he should know that the software performs the today-vs-close adjustment before the today-vs-high adjustment.
+The software comes with all S&P 500 valuation preferences clear. Currently, once the user sets any of the S&P 500 preferences, it is not possible to clear that same setting. What the user can do, however, is set the value equal to one of the other preferences. For example, setting <b>spcl</b> equal <b>sptd</b> has the effect of preventing an adjustment for the current day's market action. If the user desires both equity adjustments, he should know that the software performs the today-vs-close adjustment before the today-vs-high adjustment.
 
 ## Ticker File
 
@@ -734,7 +737,7 @@ The ticker name begins in column 14, and may be up to 42 characters long. Its co
 
 ### Minimum Investment
 
-The minimum investment begins in column 58, and is up to 10 characters long. Its content is constrained to a number, possibly with a decimal point. The ticker minimum is a currency-denominated minimum investment in the ticker. In its effort to rebalance an account, the software will place either no value in any ticker, or not less than this minimum. Non-balanceable debts may be specified with a negative minimum, which we assume to be a credit limit. Although some institutions place limitations only on initial investments in a fund, the software currently assumes that minimums are applicable to all future transfers into, or out of a fund. An investor may also arbitrarily opt for a self-imposed minimum in any fund. Use this field to do that. 
+The minimum investment begins in column 58, and is up to 10 characters long. Its content is constrained to a number, possibly with a decimal point. The ticker minimum is a currency-denominated minimum investment in the ticker. In its effort to rebalance an account, the software will place either no value in any ticker, or not less than this minimum. Non-balanceable debts may be specified with a negative minimum, which we assume to be a credit limit. Although some institutions place limitations only on initial investments in a fund, the software currently assumes that minimums are applicable to all future transfers into, or out of a fund. An investor may also arbitrarily opt for a self-imposed minimum in any fund. Use this field to do that. <i>Minimum investment is a currency field with no currency indicator.</i>
 
 ### Preferred Rounding
 
@@ -790,27 +793,61 @@ The output files are written in type-specific subdirectories in the directory id
 
 ### Action File
 
-Describe the Action file here.
+The action file is one of four text files that are output by the software. Files in this format are located in a directory named "action" in the directory identified in the source preference. Files of this type have the prefix "action_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write an action file for each investor that has holdings in the [Holding File](#holding-file). The date of the action files will match that from the source [Holding File](#holding-file).
+
+The action file contains user-readable instructions for rebalancing a portfolio. The file is broken down into sections first by institution, then by account. For each account, the software will first report the number of shares of individual stocks, bonds, or ETFs that the user will need to buy or sell in order to realize the rebalance.
+
+For accounts that have a [Rebalance Procedure](#rebalance-procedure) of "percent", the software will then report the reallocation percentages per ticker needed to rebalance the account. For accounts that have a [Rebalance Procedure](#rebalance-procedure) of "redistribute", the software will report mutual fund transfers organized by the fund from which assets are coming, and then in order of decreasing value. If there are stock, bond or ETF purchases or sales in the same account, the software may report either purchases or sales of mutual funds using these assets. Assets coming from stock/bond/ETF purchases or sales would not be indicated as transferred from any other mutual fund. 
 
 ### Difference File
 
-Describe the Difference file here.
+The difference file is one of four text files that are output by the software. Files in this format are located in a directory named "difference" in the directory identified in the source preference. Files of this type have the prefix "difference_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write a difference file for each investor that has holdings in the [Holding File](#holding-file). The date of the difference files will match that from the source [Holding File](#holding-file).
+
+The difference file is organized just the same as the [Holding File](#holding-file), a hierarchy of institutions, account, and tickers owned by the investor. In fact - although it is a text file - it is also a perfectly usable CSV file in its own right. In the [Holding File](#holding-file) the three numeric values at the end of holding rows are shares, price and value, respectively. In the difference file, these numbers are, in column order:
+
+* Proposed (rebalanced) value of the holding
+* Current value of the holding
+* The difference between the first two columns
+
+If the software was able to successfully do its job, the difference value for institution and account rows will always be zero. For ticker holdings, however, the difference - plus or minus - is the proposed value to be transferred into, or out of the ticker.
 
 ### Proposed File
 
-Describe the Proposed file here.
+The proposed file is one of four text files that are output by the software. Files in this format are located in a directory named "proposed" in the directory identified in the source preference. Files of this type have the prefix "proposed_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write a proposed file for each investor that has holdings in the [Holding File](#holding-file). The date of the proposed files will match that from the source [Holding File](#holding-file).
+
+The proposed file is a readable report of the state of the portfolio of the investor. It has several sections:
+
+* A report of the date of each source CSV file used
+* Investor specific information from the [Portfolio File](#portfolio-file), including investor birthdate, projected mortality date, CPI adjusted monthly income, non-CPI adjusted monthly income, Social Security income, and annual taxable income
+* Non-investor specific information to include expected rate of inflation, S&P 500 high, S&P 500 last close, and S&P 500 today (if these are specified)
+* A table of balanceable assets, broken down by institutions in rows, and tax-types in columns
+* A summary of level 1 investment percentages <b>after</b> rebalance, i.e., stock, bond, cash, and real-estate percentages
+* A summary of non-balanceable assets reported by account and value
+
+The proposed file is formatted exactly the same as a report file, but with level 1 investment percentages reported <i>after</i> rebalance. 
 
 ### Report File
 
-Describe the Report file here.
+The report file is one of four text files that are output by the software. Files in this format are located in a directory named "report" in the directory identified in the source preference. Files of this type have the prefix "report_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write a report file for each investor that has holdings in the [Holding File](#holding-file). The date of the report files will match that from the source [Holding File](#holding-file).
+
+The report file is a readable report of the state of the portfolio of the investor. It has several sections:
+
+* A report of the date of each source CSV file used
+* Investor specific information from the [Portfolio File](#portfolio-file), including investor birthdate, projected mortality date, CPI adjusted monthly income, non-CPI adjusted monthly income, Social Security income, and annual taxable income
+* Non-investor specific information to include expected rate of inflation, S&P 500 high, S&P 500 last close, and S&P 500 today (if these are specified)
+* A table of balanceable assets, broken down by institutions in rows, and tax-types in columns
+* A summary of level 1 investment percentages <b>before</b> rebalance, i.e., stock, bond, cash, and real-estate percentages
+* A summary of non-balanceable assets reported by account and value
+
+The report file is formatted exactly the same as a proposed file, but with level 1 investment percentages reported <i>before</i> rebalance.
 
 ## How Does Rebalancing Work?
 
-This is a stub for the How Does Rebalancing Work section. Here I will discuss levels of investment category, from least specific (lower), to most specific (higher). I will also discuss how the software treats individual holdings the same as investment categories when reallocating value.
+<b>TODO</b>: This is a stub for the How Does Rebalancing Work section. Here I will discuss levels of investment category, from least specific (lower), to most specific (higher). I will also discuss how the software treats individual holdings the same as investment categories when reallocating value.
 
 ## What Do I Do with Debts?
 
-Fill in here a description of how the software handles negative ticker and account balances.
+<b>TODO</b>: Fill in here a description of how the software handles negative ticker and account balances.
 
 ## Credits
 
