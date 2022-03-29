@@ -52,8 +52,6 @@ These sixteen input files are:
 
 As well as sample data files, the reader will also find in each data subdirectory a text file describing in column order the fields in the CSV files of that type. The column descriptions are also contained in this markdown file. Each row in the CSV files of the given type is assumed to have a unique key. The key field(s) are so indicated in the description file, and also in this markdown file. 
 
-I have left as an enhancement the possibility that input to the tool may be changed to SQL tables indexed by a combination of date, and existing keys in the CSV files. An additional enhancement would be a graphical user interface by which the SQL tables may be edited. The current tool does not have these features.
-
 ### Tool Set
 
 I used the following hardware in this project:
@@ -99,6 +97,7 @@ After 13 months of work - to the end of February 2022 - I deemed the design, cod
 - [Ticker File](#ticker-file)
 - [Output Files](#output-files)
 - [How Does Rebalancing Work?](#how-does-rebalancing-work)
+- [Room for Enhancement](#room-for-enhancement)
 - [Credits](#credits)
 - [Warranty](#warranty)
 - [License](#license)
