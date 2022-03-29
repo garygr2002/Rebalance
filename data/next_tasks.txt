@@ -1,13 +1,11 @@
 Things to do:
 
-1. Complete Room for Enhancement section in README.md. (Tuesday)
+1. Fill in How Does Rebalancing Work section in README.md. (Tuesday)
 
-2. Fill in How Does Rebalancing Work section in README.md. (Tuesday)
-
-3. Create graphics for How Does Rebalancing Work section in README.md using
+2. Create graphics for How Does Rebalancing Work section in README.md using
    Dia. (Wednesday)
 
-4. Do one final proofread. (Thursday)
+3. Do one final proofread. (Thursday)
 
 For your information:
 
