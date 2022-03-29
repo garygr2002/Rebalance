@@ -53,19 +53,27 @@ I have left as an enhancement the possibility that input to the tool may be chan
 
 ### Tool Set
 
-Describe here hardware and software used to complete this project.  Software includes:
+I used the following hardware:
 
-* Ubuntu Linux (declare version)
-* Java JDK version 11 (declare details)
-* Ant Build Generation Plugin from Jetbrains (declare details)
-* IntelliJ IDE (declare details)
-* GitHub
-* Code Metrics Tool (investigate details)
-* Graph Drawing Tool (investigate details)
+* Dell XPS 13 9300 laptop (256GB memory) with factory installed Ubuntu Linux version 18.04 at delivery
+* Dell Thunderbolt docking station WD19TB
+* Dell UltraSharp 38 curved monitor U3818DW
+* Kinesis Freestyle2 ergonomic keyboard for PC
+* Anker 2.4G wireless vertical ergonomic optical mouse
+
+And I used the following software. All software versions here specified were those installed at the declaration of project complete, 31 March 2022:
+
+* [Ubuntu Linux](https://ubuntu.com/) (version 21.10)
+* [Java JDK](https://www.java.com/en/) (version 11.0.14)
+* [IntelliJ IDEA Community Edition](https://www.jetbrains.com/idea/) (version 2021.3.3)
+* [Ant Build Generation Plugin](https://plugins.jetbrains.com/plugin/14169-ant-build-generation) (version 203.4)
+* [GitHub](https://github.com/)
+* [Cloc](http://cloc.sourceforge.net/) (version 1.82)
+* [Dia](https://wiki.gnome.org/Apps/Dia/) (version 0.97.2)
 
 ### Code Metrics
 
-Do code metrics, and put results here.
+Insert code metrics here to be gathered using [Cloc](http://cloc.sourceforge.net/). 
 
 ### State of the Project
 
