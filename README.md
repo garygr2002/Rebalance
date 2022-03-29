@@ -74,7 +74,16 @@ And I used the following software. All software versions here specified were tho
 
 ### Code Metrics
 
-<b>TODO</b>: Insert code metrics here to be gathered using [Cloc](http://cloc.sourceforge.net/). 
+As of version v1.1.2 (26 March, 2022), the software consists of the following:
+
+* 208 Java code files organized into 16 packages
+* 4,973 blank lines inserted for code readability
+* 12,315 comment lines written for code understandability (take a look and tell me if I succeeded)
+* 13,422 Java code lines
+
+The blank, comment and code line counts are brought to you courtesy of [Cloc](http://cloc.sourceforge.net/). I arrived at the package count by hand using the Project View in the [IntelliJ IDEA Community Edition](https://www.jetbrains.com/idea/).   
+
+There is currently only one Java entry point (main method).  You will find it in <b>com.garygregg.rebalance.conductor.Conductor.java</b>.
 
 ### State of the Project
 
