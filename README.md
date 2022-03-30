@@ -801,13 +801,19 @@ The fourth subcode begins in column 84, and is one character. Its content is con
 
 ## Output Files
 
-The software writes all output files except its log file in type-specific subdirectories in the directory identified in the source preference. These output files are described below. In each type-specific subdirectory, the user will find nested subdirectories specific to the portfolio mnemonics specified in the [Portfolio File](#portfolio-file), and referenced in the [Holding File](#holding-file). Put succinctly, this means that the software organizes the reports by specific investor using the directory hierarchy. The output files are as follows:  
+The software writes all output files except its log file in type-specific subdirectories in the directory identified in the source preference. The output files are described below. In each type-specific subdirectory, the user will find nested subdirectories specific to the [Portfolio Mnemonics](#portfolio-mnemonic) specified in the [Portfolio File](#portfolio-file), and referenced in the [Holding File](#holding-file). Put succinctly, this means that the software organizes the reports by specific investor using the directory hierarchy. The output files are as follows:  
+
+### Log File
+
+The log file is not investor specific. Files in this format are located in a directory named "log" in the directory identified in the source preference. Files of this type have the prefix "log_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". Unlike other output files that the software generates, the software keys the date of the log to the day the user ran the software, not the date of the [Holding File](#holding-file) that it read.
+
+The log file contains log entries made by the software that are at or above the log level preference (see [-l lglv](#-level-lglv)). These can include errors, warnings or information that occurred in the most recent run of the software. Subsequent runs of the software on the same day overwrite the log file.
 
 ### Action File
 
 The action file is one of four investor-specific text files that are output by the software. Files in this format are located in a directory named "action" in the directory identified in the source preference. Files of this type have the prefix "action_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write an action file for each investor that has holdings in the [Holding File](#holding-file). The date of the action files will match that from the source [Holding File](#holding-file).
 
-The action file contains user-readable instructions for rebalancing a portfolio. The file is broken down into sections first by institution, then by account. For each account, the software will first report the number of shares of individual stocks, bonds, or ETFs that the user will need to buy or sell in order to realize the rebalance.
+The action file contains user-readable instructions for rebalancing a portfolio. The software breaks down the file into sections first by institution, then by account. For each account, the software will first report the number of shares of individual stocks, bonds, or ETFs that the user will need to buy or sell in order to realize the rebalance.
 
 For accounts that have a [Rebalance Procedure](#rebalance-procedure) of "percent", the software will then report the reallocation percentages per ticker needed to rebalance the account. For accounts that have a [Rebalance Procedure](#rebalance-procedure) of "redistribute", the software will report mutual fund transfers organized by the fund from which assets are coming, and then in order of decreasing value. If there are stock, bond or ETF purchases or sales in the same account, the software may report either purchases or sales of mutual funds using these assets. Assets coming from stock/bond/ETF purchases or sales would not be indicated as transferred from any other mutual fund. 
 
@@ -830,13 +836,13 @@ The proposed file is one of four investor-specific text files that are output by
 The proposed file is a readable report of the state of the portfolio of the investor. It has several sections:
 
 * A report of the date of each source CSV file used
-* Investor specific information from the [Portfolio File](#portfolio-file), including investor birthdate, projected mortality date, CPI adjusted monthly income, non-CPI adjusted monthly income, Social Security income, and annual taxable income
+* Investor specific information from the [Portfolio File](#portfolio-file), including [Investor Birthdate](#investor-birthdate), [Investor Mortality Date](#investor-mortality-date), monthly [CPI Adjusted](#cpi-adjusted) income, monthly [Non-CPI Adjusted](#non-cpi-adjusted) income, monthly [Social Security](#social-security) income, and annual [Taxable Income](#taxable-income)
 * Non-investor specific information to include expected rate of inflation, S&P 500 high, S&P 500 last close, and S&P 500 today (if these are specified)
 * A table of balanceable assets, broken down by institutions in rows, and tax-types in columns
-* A summary of level 1 investment percentages <b>after</b> rebalance, i.e., stock, bond, cash, and real-estate percentages
+* A summary of <b>Level 1</b> investment percentages <b>after</b> rebalance, i.e., stock, bond, cash, and real-estate percentages
 * A summary of non-balanceable assets reported by account or ticker, and value
 
-The proposed file is formatted exactly the same as a report file, but with level 1 investment percentages reported <i>after</i> rebalance. 
+The proposed file is formatted exactly the same as a [Report File](#report-file), but with <b>Level 1</b> investment percentages reported <i>after</i> rebalance. 
 
 ### Report File
 
@@ -845,23 +851,17 @@ The report file is one of four investor-specific text files that are output by t
 The report file is a readable report of the state of the portfolio of the investor. It has several sections:
 
 * A report of the date of each source CSV file used
-* Investor specific information from the [Portfolio File](#portfolio-file), including investor birthdate, projected mortality date, CPI adjusted monthly income, non-CPI adjusted monthly income, Social Security income, and annual taxable income
+* Investor specific information from the [Portfolio File](#portfolio-file), including [Investor Birthdate](#investor-birthdate), [Investor Mortality Date](#investor-mortality-date), monthly [CPI Adjusted](#cpi-adjusted) income, monthly [Non-CPI Adjusted](#non-cpi-adjusted) income, monthly [Social Security](#social-security) income, and annual [Taxable Income](#taxable-income)
 * Non-investor specific information to include expected rate of inflation, S&P 500 high, S&P 500 last close, and S&P 500 today (if these are specified)
 * A table of balanceable assets, broken down by institutions in rows, and tax-types in columns
-* A summary of level 1 investment percentages <b>before</b> rebalance, i.e., stock, bond, cash, and real-estate percentages
+* A summary of <b>Level 1</b> investment percentages <b>before</b> rebalance, i.e., stock, bond, cash, and real-estate percentages
 * A summary of non-balanceable assets reported by account or ticker, and value
 
-The report file is formatted exactly the same as a proposed file, but with level 1 investment percentages reported <i>before</i> rebalance.
-
-### Log File
-
-The log file is not investor specific. Files in this format are located in a directory named "log" in the directory identified in the source preference. Files of this type have the prefix "log_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". Unlike other output files that the software generates, the software keys the date of the log to the day the user ran the software, not the date of the [Holding File](#holding-file) that it read.
-
-The log file contains log entries made by the software that are at or above the log level preference (see [-l lglv](#-level-lglv)). These can include errors, warnings or information that occurred in the most recent run of the software. Subsequent runs of the software on the same day overwrite the log file.
+The report file is formatted exactly the same as a [Proposed File](#proposed-file), but with <b>Level 1</b> investment percentages reported <i>before</i> rebalance.
 
 ## How Does Rebalancing Work?
 
-The software rebalances holdings on a per-account basis. The user specifies the order in which the software rebalances accounts using the [Rebalance Order](#rebalance-order) field of the [Account File](#account-file). I have recommended that the [Rebalance Order](#rebalance-order) of an account be a unique integer, but in the event that it is not, the software will break ties by rebalancing accounts as they are declared in the [Account File](#account-file). The declaration of accounts in the [Account File](#account-file) does not specify to which portfolio the account belongs. However, the [Rebalance Order](#rebalance-order) always forms a total rebalance order in whichever portfolio accounts may appear.  
+The software rebalances holdings on a per-account basis. The user specifies the order in which the software rebalances accounts using the [Rebalance Order](#rebalance-order) field of the [Account File](#account-file). I have recommended that the [Rebalance Order](#rebalance-order) of an account be a unique integer, but in the event that it is not, the software will break ties by rebalancing accounts as they are declared in the [Account File](#account-file). The declaration of accounts in the [Account File](#account-file) does not specify to which portfolio the account belongs. However, the [Rebalance Order](#rebalance-order) always forms a total rebalance order in whichever portfolio the accounts may appear.  
 
 Currently, the [Rebalance Order](#rebalance-order) of an account is meaningless unless the account is the last rebalanced account in a portfolio. For all but the last rebalanced account in a portfolio, the software will use a [Weight Rebalancer](#weight-rebalancer) to accomplish its work. For the last balanced account in a portfolio, the software will use a specialized [Weight Rebalancer](#weight-rebalancer) called a [Closure Rebalancer](#closure-rebalancer).
 
