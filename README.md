@@ -75,7 +75,7 @@ And I used the following software. All software versions here specified were tho
 
 ### Code Metrics
 
-As of version v1.1.2 (26 March, 2022), the software consists of the following:
+As of version v1.1.3 (30 March, 2022), the software consists of the following:
 
 * 208 Java code files organized into 16 packages
 * 4,973 blank lines inserted for code readability
@@ -892,9 +892,9 @@ The weight rebalancer begins with a table whose elements correspond in meaning t
 | Stock Growth and Value    | 4 or 5       | 50.0          |
 | Stock Growth or Value     | 4 or 5       | 50.0          |
 | Stock Large               | 3            | 60.0          |
-| Stock Medium              | 4            | 20.0          |
+| Stock Medium              | 4            | 50.0          |
 | Stock Not Large           | 3            | 40.0          |
-| Stock Small               | 4            | 20.0          |
+| Stock Small               | 4            | 50.0          |
 | Stock Value               | 5 or 6       | 60.0          |
 
 <sub><sup>Table 2: Weight Rebalancer weight table with weight-type levels and initial values</sup></sub>
