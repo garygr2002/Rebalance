@@ -606,9 +606,9 @@ abstract class AccountRebalancer extends Rebalancer {
         weightMap.put(WeightType.STOCK_GROWTH_AND_VALUE, 50.);
         weightMap.put(WeightType.STOCK_GROWTH_OR_VALUE, 50.);
         weightMap.put(WeightType.STOCK_LARGE, 60.);
-        weightMap.put(WeightType.STOCK_MEDIUM, 20.);
+        weightMap.put(WeightType.STOCK_MEDIUM, 50.);
         weightMap.put(WeightType.STOCK_NOT_LARGE, 40.);
-        weightMap.put(WeightType.STOCK_SMALL, 20.);
+        weightMap.put(WeightType.STOCK_SMALL, 50.);
         weightMap.put(WeightType.STOCK_VALUE, 60.);
     }
 
