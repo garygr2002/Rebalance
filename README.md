@@ -244,7 +244,7 @@ Displays the command line usage text.
 
 ## Account File
 
-The account file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "account" located in the directory identified in the source preference. Files of this type have the prefix "account_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the account file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The account file contains information that is required to identify, characterize, and rebalance accounts. The key for rows in the file is a concatenation of institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of an account file row. 
+The account file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "account" located in the directory identified in the source preference. Files of this type have the prefix "account_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the account file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The account file contains information that is required to identify, characterize, and rebalance accounts. The key for rows in the file is a concatenation of [Account Institution](#account-institution) and [Account Number](#account-number), and the combination of the two should be unique. The following are the fields of an account file row. 
 
 ### Account Institution
 
@@ -256,11 +256,11 @@ The account number begins in column 14, and may be up to 16 characters long. Its
 
 ### Rebalance Order
 
-The rebalance order begins at column 31, and may be up to 8 characters long. Its content is constrained to a non-negative integer. The rebalance order is the order in which the software will rebalance the account within a portfolio. I suggest that the rebalance order be a unique integer, but this is not required. If the specified rebalance order is not unique, then the software will rebalance same-portfolio accounts in the order in which they are specified in this file.  
+The rebalance order begins at column 31, and may be up to 8 characters long. Its content is constrained to a non-negative integer. The rebalance order is the order in which the software will rebalance the account within a portfolio. I suggest that the rebalance order be a unique integer, but this is not required. If the specified rebalance order is not unique, then the software will rebalance same-portfolio accounts in the order in which they are specified in the [Account File](#account-file).  
 
 ### Account Name
 
-The account name begins at column 40, and may be up to 42 characters long. Its content is not constrained. The account name is for visual identification purposes, and I suggest it be unique. However, uniqueness is not required. The account name should match the corresponding field in the [Holding File](#holding-file). The [Holding File](#holding-file) is where the account receives its value.
+The account name begins at column 40, and may be up to 42 characters long. Its content is not constrained. The account name is for visual identification purposes, and I suggest it be unique. However, uniqueness is not required. The account name should match the [Holding Name](#holding-name) in the [Holding File](#holding-file) for rows that reference it. The [Holding File](#holding-file) is where the account receives its value.
 
 ### Tax Type
 
@@ -284,64 +284,64 @@ The weight cash begins at column 127, and may be up to 6 characters long. Its co
 
 ### Account Weight Real-Estate
 
-The weight real-estate begins at column 134, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real estate investments (e.g. real property or shares in a trust). If this field, and that for stocks, bonds and cash sum to 100, then the specified weight is actually a percent assigned to real estate.
+The weight real estate begins at column 134, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real estate investments (e.g. real property or shares in a trust). If this field, and that for stocks, bonds and cash sum to 100, then the specified weight is actually a percent assigned to real estate.
 
 ### Synthesizer Type
 
 The synthesizer type begins at column 141, and may be up to 16 characters long. The field is typically not specified for accounts where the value does not need to be synthesized. Accounts whose value may need to be synthesized include annuities, social security, or pensions. If specified, the content is constrained to one of the following strings: "Averaging", "CPI_Annuity", "Negation", "No_CPI_Annuity", or "Social_Security". Case is not important.
 
-Monthly annuitized payments for CPI-adjusted, Non-CPI-adjusted and Social Security are given per-investor in the portfolio file. If the value of the account is not explicitly specified in the holding file, then the software will attempt to synthesize the value of the account using the indicated synthesizer. It will do this based on the monthly payment, the life expectancy of the investor (also given in the portfolio file), and the expected rate of inflation (for non-CPI adjusted annuities).
+Monthly annuitized payments for CPI-adjusted, Non-CPI-adjusted and Social Security are given per-investor in the [Portfolio File](#portfolio-file). If the value of the account is not explicitly specified in the [Holding File](#holding-file), then the software will attempt to synthesize the value of the account using the indicated synthesizer. It will do this based on the monthly payment, the life expectancy of the investor (also given in the [Portfolio File](#portfolio-file), and the expected rate of inflation (for non-CPI adjusted annuities).
 
 For accounts that estimate valuations of real estate, the user may create a synthesized account that is the negated sum of the estimates, plus their average. The sum of the synthesized account and all the estimates will produce a single, positive average. This valuation of this type of account is the work of an averaging synthesizer. See the [Referenced Accounts](#referenced-accounts) field.  
 
 ### Referenced Accounts
 
-Referenced accounts begin at column 158, and maybe up to 16 characters long per referenced account. Their content is constrained to positive integers. The referenced accounts may be used by the indicated synthesizer. For example, an averaging synthesizer will need to reference the accounts it is expected to average.  
+Referenced accounts begin at column 158, and maybe up to 16 characters long per referenced account. Their content is constrained to positive integers. The referenced accounts may be used by the synthesizer indicated in the [Synthesizer Type](#synthesizer-type). For example, an averaging synthesizer will need to reference the accounts it is expected to average.  
 
 ## Basis File
 
 Note: The rows, fields, and consistency rules stated below are applicable to both the basis file, and the [Holding File](#holding-file). The basis file contains prices paid for tickers, and the sums of prices paid for all tickers in accounts, institutions and portfolios. The software may use the basis file for calculating capital gains tax. See [Holding File](#holding-file) for a discussion of the holding file.
 
-The basis file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "basis_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the basis file that has the latest date that is not later than the date of the latest holding file. The basis file contains a hierarchy of investment bases. At the highest level are portfolios, followed by institutions, followed by accounts, followed by tickers. Each row of the basis file corresponds to one of these, and is coded to indicate its type. The software assumes:
+The basis file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "basis_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the basis file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The basis file contains a hierarchy of investment bases. At the highest level are portfolios, followed by institutions, followed by accounts, followed by tickers. Each row of the basis file corresponds to one of these, and is coded to indicate its type. The software assumes:
 
 1. All ticker rows are a part of the most recently listed account row
 2. All account rows are a part of the most recently listed institution row
 3. All institution rows are a part of the most recently listed portfolio row
 
-The software assumes that "orphaned" rows (tickers, accounts or institutions with no parent) are errors, and reports these as such. If the value field of an account is specified, it should match the sum of the ticker rows of the account. If the value field of an institution is specified, it should match the sum of the account rows of the institution. If the value field of a portfolio is specified, it should match the sum of the institution rows of the portfolio. The software will consider it an error if the value field in any row - if provided - does not match the sum of its children.
+The software assumes that "orphaned" rows (tickers, accounts or institutions with no parent) are errors, and reports these as such. If a user specifies the value field for an account, he should match the sum of the ticker rows of the account. If a user specifies the value field of an institution, he should match the sum of the account rows of the institution. If a user specifies the value field of a portfolio, he should match the sum of the institution rows of the portfolio. The software will consider it an error if the value field in any row - if provided - does not match the sum of its children.
 
 The concatenation of the foreign key of a parent row, and the foreign key of a child row in the basis file should be unique. For portfolios, the unique combination would be a distinguished value concatenated with the portfolio mnemonic. For institutions, the unique combination would be the portfolio mnemonic concatenated with an institution mnemonic. For accounts, the unique combination would be the institution mnemonic concatenated with the account number. For tickers, the unique combination would be the account key (institution mnemonic/account number combination) concatenated with the ticker symbol.
 
-The portfolio mnemonic specified in a basis row must match a portfolio file row. The institution mnemonic/account number combination must match an account file row. The ticker symbol must match a ticker file row. The primary key for rows in the file is the ordinal number of the row. The following are the fields of a basis file row.
+The portfolio mnemonic specified in a basis row must match a [Portfolio File](#portfolio-file) row. The institution mnemonic/account number combination must match an [Account File](#account-file) row. The ticker symbol must match a [Ticker File](#ticker-file) row. The primary key for rows in the file is the ordinal number of the row. The following are the fields of a basis file row.
 
 ### Basis Type
 
-The basis type begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'A' (an account row), 'F' (a row for a fund available for rebalance), 'I' (an institution row), 'J' (a row for a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio row), 'Q', (a row for a single bond or stock), 'X' (a row for an exchange-trade fund). I hope the use of the line type is self-explanatory.
+The basis type begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'A' (an account row), 'F' (a row for a fund available for rebalance), 'I' (an institution row), 'J' (a row for a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio row), 'Q', (a row for a single bond or stock), 'X' (a row for an exchange-trade fund). I hope the use of the [Basis Type](#basis-type) is self-explanatory.
 
 ### Basis Foreign
 
 The foreign key begins in column 3, and may be 16 characters long. Its content is unconstrained as long as it references:
 
-1. A portfolio mnemonic (see [Portfolio File](#portfolio-file)) for rows with a 'P' line type
-2. An institution mnemonic (see [Account File](#account-file)) for rows with an 'I' line type
-3. An account number (see [Account File](#account-file)) for rows with an 'A' line type
-4. A ticker symbol (see [Ticker File](#ticker-file)) for rows with an 'F', 'J', 'Q' or 'X' line type
+1. A portfolio mnemonic (see [Portfolio File](#portfolio-file)) for rows with a 'P' [Basis Type](#basis-type)
+2. An institution mnemonic (see [Account File](#account-file)) for rows with an 'I' [Basis Type](#basis-type)
+3. An account number (see [Account File](#account-file)) for rows with an 'A' [Basis Type](#basis-type)
+4. A ticker symbol (see [Ticker File](#ticker-file)) for rows with an 'F', 'J', 'Q' or 'X' [Basis Type](#basis-type)
 
 ### Basis Name
 
-The basis name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the portfolio name for rows with a 'P' line type, an account name for rows with an 'A' line type, or the ticker symbol for rows with an 'F, 'J', 'Q', or 'X' line type. Institution names (rows with an 'I' line type) are specified in this file, and nowhere else. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the [Holding File](#holding-file). The software only uses this field for readability in its reports.
+The basis name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the portfolio name for rows with a 'P' [Basis Type](#basis-type), an account name for rows with an 'A' [Basis Type](#basis-type), or the ticker symbol for rows with an 'F, 'J', 'Q', or 'X' [Basis Type](#basis-type). Institution names (rows with an 'I' [Basis Type](#basis-type)) are specified in this file, and nowhere else. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the [Holding File](#holding-file). The software only uses this field for readability in its reports.
 
 ### Basis Shares
 
-The basis shares begins in column 63, and may be 18 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. If left blank, the software will attempt to infer the basis shares by dividing the basis value by the basis price, but only if both are specified and the basis price is not zero. The basis shares only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the basis shares to calculate a basis value that was left blank, but for no other purpose.
+The basis shares begins in column 63, and may be 18 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. If left blank, the software will attempt to infer the basis shares by dividing the [Basis Value](#basis-value) by the [Basis Price](#basis-price), but only if both are specified and the [Basis Price](#basis-price) is not zero. The basis shares only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the basis shares to calculate a [Basis Value](#basis-value) that was left blank, but for no other purpose.
 
 ### Basis Price
 
-The basis price begins in column 82, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the basis price by dividing the basis value by the basis shares, but only if both are specified and the basis shares is not zero. The basis price only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the basis price to calculate a basis value that was left blank, but for no other purpose. <i>Basis price is a currency field with no currency indicator.</i>
+The basis price begins in column 82, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the basis price by dividing the [Basis Value](#basis-value) by the [Basis Shares](#basis-shares), but only if both are specified and the [Basis Shares](#basis-shares) is not zero. The basis price only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the basis price to calculate a [Basis Value](#basis-value) that was left blank, but for no other purpose. <i>Basis price is a currency field with no currency indicator.</i>
 
 ### Basis Value
 
-The basis value begins in column 101, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the basis value by multiplying the basis shares by the basis price, but only if both are specified. <i>Basis value is a currency field with no currency indicator.</i> If specified, the basis value must:
+The basis value begins in column 101, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the basis value by multiplying the [Basis Shares](#basis-shares) by the [Basis Price](#basis-price), but only if both are specified. <i>Basis value is a currency field with no currency indicator.</i> If specified, the basis value must:
 
 1. For 'A' rows, match the sum of all 'F', 'J', 'Q' and 'X' rows given as children
 2. For 'I' rows, match the sum of all 'A' rows given as children
@@ -396,9 +396,9 @@ The code description begins column 36, and may be 80 characters long. Its conten
 
 ## Detailed File
 
-The detailed file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "detailed" located in the directory identified in the source preference. Files of this type have the prefix "detailed_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the detailed file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The detailed file contains fine-grained investment category weights for rebalancing accounts. The of combination institution mnemonic and account number should match a row in the account file. The account name should match that in the account file, but this is not required. The account name is a field in this file only for fast visual identification of the account. It is not used by the software for any purpose.
+The detailed file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "detailed" located in the directory identified in the source preference. Files of this type have the prefix "detailed_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the detailed file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The detailed file contains fine-grained investment category weights for rebalancing accounts. The combination of institution mnemonic and account number should match a row in the account file. The account name should match that in the account file, but this is not required. The account name is a field in this file only for fast visual identification of the account. It is not used by the software for any purpose.
 
-The level 1 category weights specified in the detailed file - stock, bond, cash, and real-estate - replace these course-grained weights specified in the [Account File](#account-file). The user of the software may override these course-grained weights for any number of accounts, and at the same time specify finer-grained category weights levels 2 through 6 using a row in the detailed file (see [How Does Rebalancing Work](#how-does-rebalancing-work)). The user may override the weights for any number of rows: no rows, one row, or all the account rows. Rows in the detailed file that match no row in the [Account File](#account-file) are read, but ignored. If the software seems to be ignoring course-grained weight settings in the [Account File](#account-file), the user might first check whether there exists an overriding row in the detailed file. If the software seems to be ignoring fine-grained weight settings in the detailed file, the user might first check whether the institution mnemonic and account number precisely match the target account in the [Account File](#account-file). The key for rows in the file is a concatenation of institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of a detailed file row.
+The level 1 category weights specified in the detailed file - stock, bond, cash, and real-estate - replace these course-grained weights specified in the [Account File](#account-file). The user of the software may override these course-grained weights for any number of accounts, and at the same time specify finer-grained category <b>Levels 2 through 6</b> using a row in the detailed file (see [How Does Rebalancing Work](#how-does-rebalancing-work)). The user may override the weights for any number of rows: no rows, one row, or all the account rows. The software reads rows in the detailed file that match no row in the [Account File](#account-file), but ignores them. If the software seems to be ignoring course-grained weight settings in the [Account File](#account-file), the user might first check whether there exists an overriding row in the detailed file. If the software seems to be ignoring fine-grained weight settings in the detailed file, the user might first check whether the institution mnemonic and account number precisely match the target account in the [Account File](#account-file). The key for rows in the detailed file is a concatenation of institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of a detailed file row.
 
 ### Detailed Institution
 
@@ -414,99 +414,99 @@ The detailed account name begins at column 31, and may be up to 42 characters lo
 
 ### Detailed Weight Stock
 
-The stock weight begins in column 74, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to stocks (equities). If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to stocks. The stock weight is a level 1 weight category.
+The stock weight begins in column 74, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to stocks (equities). If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to stocks. The stock weight is a <b>Level 1</b> weight category.
 
 ### Weight Stock Domestic
 
-The domestic stock weight begins in column 81, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to domestic stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to domestic stocks. The domestic stock weight is a level 2 weight category under stock investments.
+The domestic stock weight begins in column 81, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to domestic stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to domestic stocks. The domestic stock weight is a <b>Level 2</b> weight category under stock investments.
 
 ### Weight Stock Foreign
 
-The foreign stock weight begins in column 88, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to foreign stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to foreign stocks. The foreign stock weight is a level 2 weight category under stock investments.
+The foreign stock weight begins in column 88, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to foreign stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to foreign stocks. The foreign stock weight is a <b>Level 2</b> weight category under stock investments.
 
 ### Weight Large
 
-The large stock weight begins in column 95, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to large cap stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to large cap stocks. The large stock weight is a level 3 weight category under: 1) domestic stock investments, and; 2) foreign stock investments.
+The large stock weight begins in column 95, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to large cap stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to large cap stocks. The large stock weight is a <b>Level 3</b> weight category under: 1) domestic stock investments, and; 2) foreign stock investments.
 
 ### Weight Not Large
 
-The not-large stock weight begins in column 102, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to medium cap and small cap stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to not-large (medium and small cap) stocks. The not-large stock weight is a level 3 weight category under: 1) domestic stock investments, and; 2) foreign stock investments.
+The not-large stock weight begins in column 102, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to medium cap and small cap stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to not-large (medium and small cap) stocks. The not-large stock weight is a <b>Level 3</b> weight category under: 1) domestic stock investments, and; 2) foreign stock investments.
 
 ### Weight Medium
 
-The medium stock weight begins in column 109, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to medium cap stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to medium cap stocks. The medium stock weight is a level 4 weight category under not-large (medium and small cap) stock investments.
+The medium stock weight begins in column 109, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to medium cap stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to medium cap stocks. The medium stock weight is a <b>Level 4</b> weight category under not-large (medium and small cap) stock investments.
 
 ### Weight Small
 
-The small stock weight begins in column 116, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to small cap stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to small cap stocks. The small stock weight is a level 4 weight category under not-large (medium and small cap) stock investments.
+The small stock weight begins in column 116, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to small cap stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to small cap stocks. The small stock weight is a <b>Level 4</b> weight category under not-large (medium and small cap) stock investments.
 
 ### Weight Growth and Value
 
-The growth-and-value stock weight begins in column 123, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to growth-and-value stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to growth-and-value stocks. The growth-and-value stock weight is a level 4 weight category under: 1) large cap stock investments, and; 2) not-large cap stock investments. Alternatively, it is a level 5 weight category under: 1) medium cap stock investments, and; 2) small cap stock investments.
+The growth-and-value stock weight begins in column 123, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to growth-and-value stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to growth-and-value stocks. The growth-and-value stock weight is a <b>Level 4</b> weight category under: 1) large cap stock investments, and; 2) not-large cap stock investments. Alternatively, it is a <b>Level 5</b> weight category under: 1) medium cap stock investments, and; 2) small cap stock investments.
 
 ### Weight Stock or Value
 
-The growth-or-value stock weight begins in column 130, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to growth-or-value (one or the other <i>only</i>) stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to growth-or-value stocks. The growth-or-value stock weight is a level 4 weight category under: 1) large cap stock investments, and; 2) not-large cap stock investments. Alternatively, it is a level 5 weight category under: 1) medium cap stock investments, and; 2) small cap stock investments.
+The growth-or-value stock weight begins in column 130, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to growth-or-value (one or the other <i>only</i>) stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to growth-or-value stocks. The growth-or-value stock weight is a <b>Level 4</b> weight category under: 1) large cap stock investments, and; 2) not-large cap stock investments. Alternatively, it is a <b>Level 5</b> weight category under: 1) medium cap stock investments, and; 2) small cap stock investments.
 
 ### Weight Growth
 
-The growth stock weight begins in column 137, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to growth stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to growth stocks. The growth stock weight is a level 5 or 6 weight category under growth-or-value stocks depending on the category of that parent.
+The growth stock weight begins in column 137, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to growth stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to growth stocks. The growth stock weight is a <b>Level 5 or 6</b> weight category under growth-or-value stocks depending on the category of that parent.
 
 ### Weight Value
 
-The value stock weight begins in column 144, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to value stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to value stocks. The value stock weight is a level 5 or 6 weight category under growth-or-value stocks depending on the category of that parent.
+The value stock weight begins in column 144, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to value stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to value stocks. The value stock weight is a <b>Level 5 or 6</b> weight category under growth-or-value stocks depending on the category of that parent.
 
 ### Detailed Weight Bond
 
-The bond weight begins in column 151, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to bonds. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to bonds. The bond weight is a level 1 weight category.
+The bond weight begins in column 151, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to bonds. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to bonds. The bond weight is a <b>Level 1</b> weight category.
 
 ### Weight Corporate
 
-The corporate bond weight begins in column 158, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to corporate bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to corporate bonds. The corporate bond weight is a level 2 weight category under bond investments.
+The corporate bond weight begins in column 158, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to corporate bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to corporate bonds. The corporate bond weight is a <b>Level 2</b> weight category under bond investments.
 
 ### Weight Bond Foreign
 
-The foreign bond weight begins in column 165, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to foreign bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to foreign bonds. The foreign bond weight is a level 2 weight category under bond investments.
+The foreign bond weight begins in column 165, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to foreign bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to foreign bonds. The foreign bond weight is a <b>Level 2</b> weight category under bond investments.
 
 ### Weight Bond Government
 
-The government bond weight begins in column 172, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to government bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to government bonds. The government bond weight is a level 2 weight category under bond investments.
+The government bond weight begins in column 172, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to government bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to government bonds. The government bond weight is a <b>Level 2</b> weight category under bond investments.
 
 ### Weight High Yield
 
-The high-yield bond weight begins in column 179, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to high-yield bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to high-yield bonds. The high-yield bond weight is a level 2 weight category under bond investments.
+The high-yield bond weight begins in column 179, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to high-yield bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to high-yield bonds. The high-yield bond weight is a <b>Level 2</b> weight category under bond investments.
 
 ### Weight Inflation Protected
 
-The inflation-protected bond weight begins in column 186, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to inflation-protected bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to inflation-protected bonds. The inflation-protected bond weight is a level 2 weight category under bond investments.
+The inflation-protected bond weight begins in column 186, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to inflation-protected bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to inflation-protected bonds. The inflation-protected bond weight is a <b>Level 2</b> weight category under bond investments.
 
 ### Weight Mortgage
 
-The mortgage-backed bond weight begins in column 193, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to mortgage-backed bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to mortgage-backed bonds. The mortgage-backed bond weight is a level 2 weight category under bond investments.
+The mortgage-backed bond weight begins in column 193, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to mortgage-backed bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to mortgage-backed bonds. The mortgage-backed bond weight is a <b>Level 2</b> weight category under bond investments.
 
 ### Weight Bond Short
 
-The short-term bond weight begins in column 200, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to short-term bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to short-term bonds. The short-term bond weight is a level 2 weight category under bond investments.
+The short-term bond weight begins in column 200, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to short-term bonds only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to short-term bonds. The short-term bond weight is a <b>Level 2</b> weight category under bond investments.
 
 ### Weight Bond Uncategorized
 
-The uncategorized bond weight begins in column 207, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to uncategorized (mixed type) bonds. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to uncategorized bonds. The uncategorized bond weight is a level 2 weight category under bond investments.
+The uncategorized bond weight begins in column 207, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to uncategorized (mixed type) bonds. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to uncategorized bonds. The uncategorized bond weight is a <b>Level 2</b> weight category under bond investments.
 
 ### Detailed Weight Cash
 
-The cash weight begins in column 214, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to cash. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to cash. The cash weight is a level 1 weight category.
+The cash weight begins in column 214, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to cash. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to cash. The cash weight is a <b>Level 1</b> weight category.
 
 ### Weight Cash Government
 
-The government cash weight begins in column 221, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to government-issued cash only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to government cash. The government cash weight is a level 2 weight category under cash investments. 
+The government cash weight begins in column 221, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to government-issued cash only. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to government cash. The government cash weight is a <b>Level 2</b> weight category under cash investments. 
 
 ### Weight Cash Uncategorized
 
-The uncategorized cash weight begins in column 228, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to uncategorized (mixed type) cash. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to uncategorized cash. The uncategorized cash weight is a level 2 weight category under cash investments.
+The uncategorized cash weight begins in column 228, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to uncategorized (mixed type) cash. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to uncategorized cash. The uncategorized cash weight is a <b>Level 2</b> weight category under cash investments.
 
 ### Detailed Weight Real-Estate
 
-The real-estate weight begins in column 235, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real-estate. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to real-estate. The real-estate weight is a level 1 weight category.
+The real estate weight begins in column 235, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real estate. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to real estate. The real estate weight is a <b>Level 1</b> weight category.
 
 ## Distinguished File
 
@@ -514,16 +514,16 @@ Unless they intend to programmatically modify the software, the [Code File](#cod
 
 The distinguished file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "distinguished" located in the directory identified in the source preference. Files of this type have the prefix "distinguished_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the distinguished file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The distinguished file maps well-known, non-sensitive mnemonics for portfolios, institutions and accounts to sensitive keys. The programmer/user will then be able to add code that references these mnemonics to a publicly accessible code base without concern that personally sensitive information will be compromised. The distinguished file is a hierarchy. At the highest level are portfolios, followed by institutions, followed by accounts. Each row of the distinguished file corresponds to one of these, and is coded to indicate its type. The software assumes: 
 
-1. All account rows are a part of the most recently listed institution row
-2. All institution rows are a part of the most recently listed portfolio row
+* All account rows are a part of the most recently listed institution row
+* All institution rows are a part of the most recently listed portfolio row
 
 The software assumes that "orphaned" rows (accounts or institutions with no parent) are errors, and reports these as such. Before referencing the programmatically accessible mnemonics in the distinguished file, the programmer/user will need to modify the software thusly:
 
-1. For account references, modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedAccount.java</b>, and add the needed mnemonic
-2. For institution references,  modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedInstitution.java</b>, and add the needed mnemonic
-3. For portfolio references,  modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedPortfolio.java</b>, and add the needed mnemonic
+* For account references, modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedAccount.java</b>, and add the needed mnemonic
+* For institution references,  modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedInstitution.java</b>, and add the needed mnemonic
+* For portfolio references,  modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedPortfolio.java</b>, and add the needed mnemonic
 
-Once the programmer/user accomplishes this, the added mnemonic may then be referenced using the <b>Distinguished Key</b> field in a row in the distinguished file. The values for the keys will then be programmatically accessible from the <b>DistinguishedAccountLibrary</b>, <b>DistinguishedInstitutionLibrary</b>, or the <b>DistinguishedPortfolioLibrary</b>, depending on the type of distinguished key identified by the distinguished type. The key for rows in the file is a concatenation of the distinguished type and distinguished key, and the combination of the two should be unique. The following are the fields of a distinguished file row.
+Once the programmer/user accomplishes this, he may then reference the added mnemonic programmatically using the <b>Distinguished Key</b> field in a row in the distinguished file. The values for the keys will then be programmatically accessible from the <b>DistinguishedAccountLibrary</b>, <b>DistinguishedInstitutionLibrary</b>, or the <b>DistinguishedPortfolioLibrary</b>, depending on the type of distinguished key identified by the distinguished type. The key for rows in the file is a concatenation of the distinguished type and distinguished key, and the combination of the two should be unique. The following are the fields of a distinguished file row.
 
 ### Distinguished Type
 
@@ -531,11 +531,11 @@ The distinguished type begins in column 1, and is 1 character. Its content is co
 
 ### Distinguished Key
 
-The distinguished key begins in column 3, and is up to 24 characters long. Its content is constrained to one of the case-insensitive mnemonics in the <b>DistinguishedAccount</b>, <b>DistinguishedInstitution</b>, or <b>DistinguishedPortfolio</b> classes, as discussed above. The line type governs the class used for the set of acceptable strings, and case is not important. 
+The distinguished key begins in column 3, and is up to 24 characters long. Its content is constrained to one of the case-insensitive mnemonics in the <b>DistinguishedAccount</b>, <b>DistinguishedInstitution</b>, or <b>DistinguishedPortfolio</b> classes, as discussed above. The [Distinguished Type](#distinguished-type) governs the class used for the set of acceptable strings, and case is not important. 
 
 ### Distinguished Foreign
 
-The foreign key begins in column 28, and is up to 52 characters long. Its content is constrained to the type of key required for accounts, institutions, or portfolios, depending on the line type. The foreign key is a sensitive value that will appear in the distinguished file and referenced in other CSV files, but need not appear in any publicly accessible code base.
+The foreign key begins in column 28, and is up to 52 characters long. Its content is constrained to the type of key required for accounts, institutions, or portfolios, depending on the [Distinguished Type](#distinguished-type). The foreign key is a sensitive value that will appear in the [Distinguished File](#distinguished-file) and referenced in other CSV files, but need not appear in any publicly accessible code base.
 
 ## Gains Files
 
@@ -560,7 +560,7 @@ The tax rate begins in column 18, and may be 8 characters long. Its content is c
 
 ## Holding File
 
-Note: The rows, fields, and consistency rules stated below are applicable to both the basis file, and the holding file. The holding file contains valuations of accounts and tickers as of the date of the file. See [Basis File](#basis-file) for a discussion of the basis file.  
+Note: The rows, fields, and consistency rules stated below are applicable to both the [Basis File](#basis-file), and the holding file. The holding file contains valuations of accounts and tickers as of the date of the file. See [Basis File](#basis-file) for a discussion of the basis file.  
 
 The holding file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "holding_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the holding file that has the latest date. The holding file contains a hierarchy of investment valuations. At the highest level are portfolios, followed by institutions, followed by accounts, followed by tickers. Each row of the holding file corresponds to one of these, and is coded to indicated its type. The software assumes:
 
@@ -568,40 +568,40 @@ The holding file is one of sixteen CSV files that act as input to the software. 
 2. All account rows are a part of the most recently listed institution row
 3. All institution rows are a part of the most recently listed portfolio row
 
-The software assumes that "orphaned" rows (tickers, accounts or institutions with no parent) are errors, and reports these as such. If the value field of an account is specified, it should match the sum of the ticker rows of the account. If the value field of an institution is specified, it should match the sum of the account rows of the institution. If the value field of a portfolio is specified, it should match the sum of the institution rows of the portfolio. The software will consider it an error if the value field in any row - if provided - does not match the sum of its children. 
+The software assumes that "orphaned" rows (tickers, accounts or institutions with no parent) are errors, and reports these as such. If a user specifies the value field for an account, he should match the sum of the ticker rows of the account. If a user specifies the value field of an institution, he should match the sum of the account rows of the institution. If a user specifies the value field of a portfolio, he should match the sum of the institution rows of the portfolio. The software will consider it an error if the value field in any row - if provided - does not match the sum of its children.
 
 The concatenation of the foreign key of a parent row, and the foreign key of a child row in the holding file should be unique. For portfolios, the unique combination would be a distinguished value concatenated with the portfolio mnemonic. For institutions, the unique combination would be the portfolio mnemonic concatenated with an institution mnemonic. For accounts, the unique combination would be the institution mnemonic concatenated with the account number. For tickers, the unique combination would be the account key (institution mnemonic/account number combination) concatenated with the ticker symbol.
 
-The portfolio mnemonic specified in a holding row must match a portfolio file row. The institution mnemonic/account number combination must match an account file row. The ticker symbol must match a ticker file row. The primary key for rows in the file is the ordinal number of the row. The following are the fields of a holding file row.
+The portfolio mnemonic specified in a holding row must match a [Portfolio File](#portfolio-file) row. The institution mnemonic/account number combination must match an [Account File](#account-file). The ticker symbol must match a [Ticker File](#ticker-file) row. The primary key for rows in the file is the ordinal number of the row. The following are the fields of a holding file row.
 
 ### Holding Type
 
-The holding type begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'A' (an account row), 'F' (a row for a fund available for rebalance), 'I' (an institution row), 'J' (a row for a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio row), 'Q', (a row for a single bond or stock), 'X' (a row for an exchange-trade fund). I hope the use of the line type is self-explanatory.
+The holding type begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'A' (an account row), 'F' (a row for a fund available for rebalance), 'I' (an institution row), 'J' (a row for a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio row), 'Q', (a row for a single bond or stock), 'X' (a row for an exchange-trade fund). I hope the use of the [Holding Type](#holding-type) is self-explanatory.
 
 ### Holding Foreign
 
 The foreign key begins in column 3, and may be 16 characters long. Its content is unconstrained as long as it references:
 
-1. A portfolio mnemonic (see [Portfolio File](#portfolio-file)) for rows with a 'P' line type
-2. An institution mnemonic (see [Account File](#account-file)) for rows with an 'I' line type
-3. An account number (see [Account File](#account-file)) for rows with an 'A' line type
-4. A ticker symbol (see [Ticker File](#ticker-file)) for rows with an 'F', 'J', 'Q' or 'X' line type
+1. A portfolio mnemonic (see [Portfolio File](#portfolio-file)) for rows with a 'P' [Holding Type](#holding-type)
+2. An institution mnemonic (see [Account File](#account-file)) for rows with an 'I' [Holding Type](#holding-type)
+3. An account number (see [Account File](#account-file)) for rows with an 'A' [Holding Type](#holding-type)
+4. A ticker symbol (see [Ticker File](#ticker-file)) for rows with an 'F', 'J', 'Q' or 'X' [Holding Type](#holding-type)
 
 ### Holding Name
 
-The holding name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the portfolio name for rows with a 'P' line type, an account name for rows with an 'A' line type, or the ticker symbol for rows with an 'F, 'J', 'Q', or 'X' line type. Institution names (rows with an 'I' line type) are specified in this file, and nowhere else. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the basis file. The software only uses this field for readability in its reports. 
+The holding name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the portfolio name for rows with a 'P' [Holding Type](#holding-type), an account name for rows with an 'A' [Holding Type](#holding-type), or the ticker symbol for rows with an 'F, 'J', 'Q', or 'X' [Holding Type](#holding-type). Institution names (rows with an 'I' [Holding Type](#holding-type)) are specified in this file, and nowhere else. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the [Basis File](#basis-file). The software only uses this field for readability in its reports. 
 
 ### Holding Shares
 
-The holding shares begins in column 63, and may be 18 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. If left blank, the software will attempt to infer the holding shares by dividing the holding value by the holding price, but only if both are specified and the holding price is not zero. The holding shares only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the holding shares to calculate a holding value that was left blank, but for no other purpose. 
+The holding shares begins in column 63, and may be 18 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. If left blank, the software will attempt to infer the holding shares by dividing the [Holding Value](#holding-value) by the [Holding Price](#holding-price), but only if both are specified and the [Holding Price](#holding-price) is not zero. The holding shares only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the holding shares to calculate a [Holding Value](#holding-value) that was left blank, but for no other purpose. 
 
 ### Holding Price
 
-The holding price begins in column 82, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the holding price by dividing the holding value by the holding shares, but only if both are specified and the holding shares is not zero. The holding price only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the holding price to calculate a holding value that was left blank, but for no other purpose. <i>Holding price is a currency field with no currency indicator.</i>
+The holding price begins in column 82, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the holding price by dividing the [Holding Value](#holding-value) by the [Holding Shares](#holding-shares), but only if both are specified and the [Holding Shares](#holding-shares) is not zero. The holding price only has meaning for rows of the 'F', 'J', 'Q' or 'X' types, and should be left blank for 'A', 'I' and 'P' rows. If not blank for 'A', 'I' or 'P' rows, the software may use the holding price to calculate a [Holding Value](#holding-value) that was left blank, but for no other purpose. <i>Holding price is a currency field with no currency indicator.</i>
 
 ### Holding Value
 
-The holding value begins in column 101, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the holding value by multiplying the holding shares by the holding price, but only if both are specified. <i>Holding value is a currency field with no currency indicator.</i> If specified, the holding value must:
+The holding value begins in column 101, and may be 18 characters long. Its content is constrained to a number, possibly with a decimal point. If left blank, the software will attempt to infer the holding value by multiplying the [Holding Shares](#holding-shares) by the [Holding Price](#holding-price), but only if both are specified. <i>Holding value is a currency field with no currency indicator.</i> If specified, the holding value must:
 
 1. For 'A' rows, match the sum of all 'F', 'J', 'Q' and 'X' rows given as children
 2. For 'I' rows, match the sum of all 'A' rows given as children
@@ -712,7 +712,7 @@ The current adjustment formula is: <b>(5 * ((sphg - sptd) / sphg) / 8) + ew</b>,
 * <b>sphg</b> is the preference set for the S&P 500 high ([-h sphg](#-high-sphg) option)
 * <b>sptd</b> is the preference set for the S&P 500 today ([-t sptd](#-today-sptd) option)
 
-Note that in this equation, the level 1 category weight for stocks has been converted from a weight to a percentage, and this necessitates that the software also modify the other level 1 category weights (bonds, cash, and real estate) to convert these to percentages as well. It does this in proportion to the original weight preferences that the user had set for these categories.
+Note that in this equation, the <b>Level 1</b> category weight for stocks has been converted from a weight to a percentage, and this necessitates that the software also modify the other <b>Level 1</b> category weights (bonds, cash, and real estate) to convert these to percentages as well. It does this in proportion to the original weight preferences that the user had set for these categories.
 
 The equity adjustment that the software makes with regard to the S&P 500 today versus last close is a different beast. The software will make this adjustment for all accounts in all portfolios, and the adjustment is not affected by the setting of the adjust-from-high flag for any portfolio. The software assumes that the user has declared valuations of all accounts and portfolios in the [Holding File](#holding-file) as of S&P 500 last close. It therefore assumes - perhaps in a naive way - that the stated valuations will decrease, or increase in proportion to the change reflected in the S&P 500 today. The way the user turns off this adjustment is not to set the value of the S&P 500 last close or S&P 500 today. If the user wants to preserve the ability to adjust the portfolio versus last high, however, the only option is not to set the S&P 500 last close. Let us summarize what can be done in a table by clearing or setting the proper preference:
 
@@ -729,7 +729,7 @@ The software comes with all S&P 500 valuation preferences clear. Currently, once
 
 ## Ticker File
 
-The ticker file is one of sixteen CSV files that act as input to the software. Files in this format are located in a directory named "ticker" located in the directory identified in the source preference. Files of this type have the prefix "ticker_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the ticker file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The ticker contains information that is required to identify and categorize investments by type. "Tickers" is a catch-all name for open-end mutual funds, exchange-traded funds, individual stocks, individual bonds, or any sub-grouping of holding that occurs within an account. The key for the rows in the file is a symbol that should uniquely identify the investment in the institution where the ticker exists, or on the exchanges where it trades. It can also be a unique mnemonic that has meaning only to the investor who owns the account. Tickers may appear in one or more accounts in the [Holding File](#holding-file) with valuations that are not the same. This would indicate different holdings in different accounts within the same, or different portfolio. To summarize, the key for rows in the file is the ticker symbol, and it should be unique. The following are the fields of a ticker file row.  
+The ticker file is one of sixteen CSV files that act as input to the software. Files in this format are located in a directory named "ticker" located in the directory identified in the source preference. Files of this type have the prefix "ticker_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the ticker file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The ticker contains information that is required to identify and categorize investments by type. "Tickers" is a catch-all name for open-end mutual funds, exchange-traded funds, individual stocks, individual bonds, or any sub-grouping of holding that occurs within an account. The key for the rows in the file is a symbol that should uniquely identify the investment in the institution where the ticker exists, or on the exchanges where it trades. It can also be a unique mnemonic that has meaning only to the investor who owns the account. Tickers may appear in one or more accounts in the [Holding File](#holding-file) with valuations that are not the same. This would indicate different holdings in different accounts within the same, or different portfolio. To summarize, the key for rows in the file is the [Ticker Symbol](#ticker-symbol), and it should be unique. The following are the fields of a ticker file row.  
 
 ### Ticker Character
 
@@ -763,7 +763,7 @@ The first subcode field begins in column 78, and is one character. Its content i
 2. 'B' (all bonds)
 3. 'C' (all cash, e.g. bank accounts, CDs, or money-market funds)
 4. 'D' (domestic securities)
-5. 'E' (mortgage-baked securities)
+5. 'E' (mortgage-backed securities)
 6. 'G' (growth stocks)
 7. 'H' (inflation protected securities)
 8. 'K' (both growth and value stocks)
