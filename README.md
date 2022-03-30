@@ -725,6 +725,8 @@ The equity adjustment that the software makes with regard to the S&P 500 today v
 | Only Today vs High    | Set <b>sptd</b>   | Clear <b>spcl</b>        | Set <b>sphg</b>          |
 | Both Adjustments      | Set <b>sptd</b>   | Set <b>spcl</b>          | Set <b>sphg</b>          |
 
+<sub><sup>Table 1: preference controls for equity weight adjustments</sup></sub>
+
 The software comes with all S&P 500 valuation preferences clear. Currently, once the user sets any of the S&P 500 preferences, it is not possible to clear that same setting. What the user can do, however, is set the value equal to one of the other preferences. For example, setting <b>spcl</b> equal <b>sptd</b> has the effect of preventing an adjustment for the current day's market action. If the user desires both equity adjustments, he should know that the software performs the today-vs-close adjustment before the today-vs-high adjustment.
 
 ## Ticker File
@@ -897,9 +899,11 @@ The weight rebalancer begins with a table whose elements correspond in meaning t
 | Stock Small               | 4            | 20.0          |
 | Stock Value               | 5 or 6       | 60.0          |
 
+<sub><sup>Table 2: Weight Rebalancer weight table with weight-type levels and initial values</sup></sub>
+
 What is a weight level? The software rebalances accounts by comparing weights of investment categories against each other. It does this in a tree of weight-type nodes. At the root of the tree is one node, the <b>Level 0</b> (zero) node, representing <b>all investments</b>. Children of the root are <b>Level 1</b> investments, the most-coarse grained characterization: stocks, bonds, cash or real estate. <b>Levels 2, 3, 4, 5 and 6</b> are increasingly fine-grained characterizations of these core investment groups:
 
-* Bonds are characterized at <b>Level 2</b> in various ways (see the table)
+* Bonds are characterized at <b>Level 2</b> in various ways (see the table 2)
 * Cash is characterized at <b>Level 2</b> as Government, or Uncategorized
 * Stocks are characterized at <b>Level 2</b> as Domestic, or Foreign
 * Domestic and Foreign Stocks are characterized at <b>Level 3</b> as Large, or Not-Large
