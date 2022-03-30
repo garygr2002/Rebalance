@@ -6,12 +6,13 @@ The Rebalance Project is one that I undertook beginning in February 2021. It is 
 
 The tool is currently driven by a series of comma-separated (CSV) files. The tool will rebalance the portfolio holdings of each investor across institutions, accounts, mutual funds, ETFs and individual securities based on declared weight preferences.
 
-Output from the tool is a series of text files for each investor:
+Output from the tool is a series of text files for each investor, and one log file:
 
 1. A report of the current state of the portfolio, see [Report File](#report-file)
 2. A report of the state of the portfolio after proposed changes, see [Proposed File](#proposed-file)
 3. A file that shows currency differences between proposed and current holdings, see [Difference File](#difference-file)
 4. A file that describes the reallocation actions required to effect the proposed changes, see [Action File](#action-file)
+5. A log file that describes errors, warnings, and information encountered by the software during its most recent run, see [Log File](#log-file)
 
 The software does not affix a currency indicator to any value written to an output file. The user will find no '$', '£', or '€' symbols in the output files, for example. There are three reasons for this: 1) the software assumes the currency type is uniform, specific to each investor, and that the investor knows what it is; 2) currency type is irrelevant to how this software works; 3) currency indicators tend to clutter the output files.
 
@@ -800,11 +801,11 @@ The fourth subcode begins in column 84, and is one character. Its content is con
 
 ## Output Files
 
-The output files are written in type-specific subdirectories in the directory identified in the source preference. The output files are described below. In each type-specific subdirectory, the user will find nested subdirectories specific to the portfolio mnemonics specified in the [Portfolio File](#portfolio-file), and referenced in the [Holding File](#holding-file). Put succinctly, this means that the software organizes the reports by specific investor using the directory hierarchy. The output files are as follows:  
+The software writes all output files except its log file in type-specific subdirectories in the directory identified in the source preference. These output files are described below. In each type-specific subdirectory, the user will find nested subdirectories specific to the portfolio mnemonics specified in the [Portfolio File](#portfolio-file), and referenced in the [Holding File](#holding-file). Put succinctly, this means that the software organizes the reports by specific investor using the directory hierarchy. The output files are as follows:  
 
 ### Action File
 
-The action file is one of four text files that are output by the software. Files in this format are located in a directory named "action" in the directory identified in the source preference. Files of this type have the prefix "action_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write an action file for each investor that has holdings in the [Holding File](#holding-file). The date of the action files will match that from the source [Holding File](#holding-file).
+The action file is one of four investor-specific text files that are output by the software. Files in this format are located in a directory named "action" in the directory identified in the source preference. Files of this type have the prefix "action_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write an action file for each investor that has holdings in the [Holding File](#holding-file). The date of the action files will match that from the source [Holding File](#holding-file).
 
 The action file contains user-readable instructions for rebalancing a portfolio. The file is broken down into sections first by institution, then by account. For each account, the software will first report the number of shares of individual stocks, bonds, or ETFs that the user will need to buy or sell in order to realize the rebalance.
 
@@ -812,7 +813,7 @@ For accounts that have a [Rebalance Procedure](#rebalance-procedure) of "percent
 
 ### Difference File
 
-The difference file is one of four text files that are output by the software. Files in this format are located in a directory named "difference" in the directory identified in the source preference. Files of this type have the prefix "difference_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write a difference file for each investor that has holdings in the [Holding File](#holding-file). The date of the difference files will match that from the source [Holding File](#holding-file).
+The difference file is one of four investor-specific text files that are output by the software. Files in this format are located in a directory named "difference" in the directory identified in the source preference. Files of this type have the prefix "difference_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write a difference file for each investor that has holdings in the [Holding File](#holding-file). The date of the difference files will match that from the source [Holding File](#holding-file).
 
 The difference file is organized just the same as the [Holding File](#holding-file), a hierarchy of institutions, account, and tickers owned by the investor. In fact - although it is a text file - it is also a perfectly usable CSV file in its own right. In the [Holding File](#holding-file) the three numeric values at the end of holding rows are shares, price and value, respectively. In the difference file, these numbers are, in column order:
 
@@ -824,7 +825,7 @@ If the software was able to successfully do its job, the difference value for in
 
 ### Proposed File
 
-The proposed file is one of four text files that are output by the software. Files in this format are located in a directory named "proposed" in the directory identified in the source preference. Files of this type have the prefix "proposed_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write a proposed file for each investor that has holdings in the [Holding File](#holding-file). The date of the proposed files will match that from the source [Holding File](#holding-file).
+The proposed file is one of four investor-specific text files that are output by the software. Files in this format are located in a directory named "proposed" in the directory identified in the source preference. Files of this type have the prefix "proposed_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write a proposed file for each investor that has holdings in the [Holding File](#holding-file). The date of the proposed files will match that from the source [Holding File](#holding-file).
 
 The proposed file is a readable report of the state of the portfolio of the investor. It has several sections:
 
@@ -839,7 +840,7 @@ The proposed file is formatted exactly the same as a report file, but with level
 
 ### Report File
 
-The report file is one of four text files that are output by the software. Files in this format are located in a directory named "report" in the directory identified in the source preference. Files of this type have the prefix "report_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write a report file for each investor that has holdings in the [Holding File](#holding-file). The date of the report files will match that from the source [Holding File](#holding-file).
+The report file is one of four investor-specific text files that are output by the software. Files in this format are located in a directory named "report" in the directory identified in the source preference. Files of this type have the prefix "report_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". When run with no command line options, the software will write a report file for each investor that has holdings in the [Holding File](#holding-file). The date of the report files will match that from the source [Holding File](#holding-file).
 
 The report file is a readable report of the state of the portfolio of the investor. It has several sections:
 
@@ -852,9 +853,81 @@ The report file is a readable report of the state of the portfolio of the invest
 
 The report file is formatted exactly the same as a proposed file, but with level 1 investment percentages reported <i>before</i> rebalance.
 
+### Log File
+
+The log file is not investor specific. Files in this format are located in a directory named "log" in the directory identified in the source preference. Files of this type have the prefix "log_" followed by the date designation in the format "yyyymmdd", and a file type of ".txt". Unlike other output files that the software generates, the software keys the date of the log to the day the user ran the software, not the date of the [Holding File](#holding-file) that it read.
+
+The log file contains log entries made by the software that are at or above the log level preference (see [-l lglv](#-level-lglv)). These can include errors, warnings or information that occurred in the most recent run of the software. Subsequent runs of the software on the same day overwrite the log file.
+
 ## How Does Rebalancing Work?
 
-<b>TODO</b>: This is a stub for the How Does Rebalancing Work section. Here I will discuss levels of investment category, from least specific (lower), to most specific (higher). I will also discuss how the software treats individual holdings the same as investment categories when reallocating value.
+The software rebalances holdings on a per-account basis. The user specifies the order in which the software rebalances accounts using the [Rebalance Order](#rebalance-order) field of the [Account File](#account-file). I have recommended that the [Rebalance Order](#rebalance-order) of an account be a unique integer, but in the event that it is not, the software will break ties by rebalancing accounts as they are declared in the [Account File](#account-file). The declaration of accounts in the [Account File](#account-file) does not specify to which portfolio the account belongs. However, the [Rebalance Order](#rebalance-order) always forms a total rebalance order in whichever portfolio accounts may appear.  
+
+Currently, the [Rebalance Order](#rebalance-order) of an account is meaningless unless the account is the last rebalanced account in a portfolio. For all but the last rebalanced account in a portfolio, the software will use a [Weight Rebalancer](#weight-rebalancer) to accomplish its work. For the last balanced account in a portfolio, the software will use a specialized [Weight Rebalancer](#weight-rebalancer) called a [Closure Rebalancer](#closure-rebalancer).
+
+### Weight Rebalancer
+
+The weight rebalancer begins with a table whose elements correspond in meaning to the weight values specified in the [Detailed File](#detailed-file). The table below contains these elements, the weight level of its investment category, and the initial weights:
+
+| Category                  | Weight Level | Initial Value |
+|---------------------------|--------------|---------------|
+| All Investments           | 0            | 100.0         |
+| Bond                      | 1            | 36.0          |
+| Bond Corporate            | 2            | 12.5          |
+| Both Foreign              | 2            | 7.0           |
+| Bond Government           | 2            | 0.0           |
+| Bond High Yield           | 2            | 5.0           |
+| Bond Inflation Protected  | 2            | 5.0           |
+| Bond Mortgage Instruments | 2            | 8.0           |
+| Bond Uncategorized        | 2            | 12.5          |
+| Bond Short                | 2            | 50.0          |
+| Cash                      | 1            | 10.0          |
+| Cash Government           | 2            | 50.0          |
+| Cash Uncategorized        | 2            | 50.0          |
+| Real Estate               | 1            | 4.0           |
+| Stock                     | 1            | 50.0          |
+| Stock Domestic            | 2            | 60.0          |
+| Stock Foreign             | 2            | 40.0          |
+| Stock Growth              | 5 or 6       | 40.0          |
+| Stock Growth and Value    | 4 or 5       | 50.0          |
+| Stock Growth or Value     | 4 or 5       | 50.0          |
+| Stock Large               | 3            | 60.0          |
+| Stock Medium              | 4            | 20.0          |
+| Stock Not Large           | 3            | 40.0          |
+| Stock Small               | 4            | 20.0          |
+| Stock Value               | 5 or 6       | 60.0          |
+
+What is a weight level? The software rebalances accounts by comparing weights of investment categories against each other. It does this in a tree of weight-type nodes. At the root of the tree is one node, the <b>Level 0</b> (zero) node, representing <b>all investments</b>. Children of the root are <b>Level 1</b> investments, the most-coarse grained characterization: stocks, bonds, cash or real estate. <b>Levels 2, 3, 4, 5 and 6</b> are increasingly fine-grained characterizations of these core investment groups:
+
+* Bonds are characterized at <b>Level 2</b> in various ways (see the table)
+* Cash is characterized at <b>Level 2</b> as Government, or Uncategorized
+* Stocks are characterized at <b>Level 2</b> as Domestic, or Foreign
+* Domestic and Foreign Stocks are characterized at <b>Level 3</b> as Large, or Not-Large
+* Large Stocks are characterized at <b>Level 4</b> as Growth and Value, or Growth or Value
+* Not-Large Stocks are characterized at <b>Level 4</b> as Medium, or Small
+* Not-Large Stocks are also characterized at <b>Level 4</b> as Growth and Value, or Growth or Value
+* Medium and Small Stocks are characterized at <b>Level 5</b> as Growth and Value, or Growth or Value
+* Growth or Value Stocks are characterized at <b>Level 5</b> or <b>Level 6</b> as Growth, or Value
+
+My decision to characterize growth or value stocks at a lower level than company size was somewhat arbitrary. However, I have not seen a mutual fund characterized as strictly growth, or value without the size of the companies in which it invests already specified. 
+
+When rebalancing any currency value passed to it, a weight-type node does the following for each of its children: It multiplies the received currency value by the weight assigned to the child, then divides the result by the weight sum of all its children. The node then pushes the result down to the child node. At the leaves of the tree a weight-type node will find no children, but it <i>will</i> find a collection of one or more tickers of that same investment type. Using the [Holding Weight](#holding-weight) assigned to the ticker, the weight-type node will perform exactly the same calculation: it multiplies the received currency value by the [Holding Weight](#holding-weight) of the ticker, and divides the result by the weight sum of all the tickers. In truth, a weight-type node does not differentiate between child weight-type nodes, and tickers when it pushes currency value down the tree. I have abstracted the two to look the same. 
+
+The weight assigned to the <b>Level 0</b> root weight-type node is arbitrary. I have assigned 100 (see the table) to be evocative of 100%. Since the software compares the weight of the root node against nothing else, it can be any positive value.
+
+The way a weight-type node determines if it has children is to ask if any child has weight. If the answer is no, it may mean there are no children, or it may mean existing children have no weight. In this way, a user can ask the software to disregard weight rebalancing in favor of the [Holding Weight](#holding-weight) of the tickers by setting all <b>Level 1</b> weights to zero. This forces the root node to allocate any received currency directly to its contained tickers, and not to any weight-type child node. See the discussion in [Holding Weight](#holding-weight). For a non-closure weight rebalancer, the user would zero all the weights in the [Account File](#account-file), or all <b>Level 1</b> weights in the [Detailed File](#detailed-file), but only if a detailed entry exists for the account.   
+
+Back to the table of weights in the weight rebalancer: Before rebalancing any account, the software overlays the <b>Level 1</b> weights in the table with the weights it read for the account in the [Account File](#account-file). If the account has an entry in the [Detailed File](#detailed-file), the software overlays the table weights a second time. This time, however, it overlays <i>all</i> of the weights in the table. It can do this since the [Detailed File](#detailed-file) contains an explicit entry for each. After both weight overlays, the software applies an equity (stock) weight adjustment using the S&P 500 today preference setting (see [-t sptd](#-today-sptd)) versus the S&P 500 last-close (see [-c spcl](#-close-spcl)) preference setting. Each weight-type node then references this table when it decides how to allocate currency to its children.  
+
+### Closure Rebalancer
+
+A closure rebalancer is a specialized [Weight Rebalancer](#weight-rebalancer), and the software uses it for the last rebalanced account in any portfolio. In the section under [Weight Rebalancer](#weight-rebalancer), I discussed how the rebalancer overlays its weight table twice, once for the <b>Level 1</b> weights in the [Account File](#account-file), and a second time for all the weights in the [Detailed File](#detailed-file). Before making equity (stock) weight adjustments based on the high, last close, and today's values of the S&P 500, a closure rebalancer overlays the <b>Level 1</b> weights a third time. It does this by summing the <b>Level 1</b> weights that the user specified in the [Portfolio File](#portfolio-file). It multiplies each <b>Level 1</b> weight by the total balanceable value of the portfolio, then divides by the sum of the weights. Finally, the closure rebalancer subtracts the existing balances that ordinary [Weight Rebalancers](#weight-rebalancer) have already assigned to previous investment <b>Level 1</b> investment categories. Non-negative values become the new weights for the corresponding category. Negative values mean that the software has already assigned too much value to the category. The software enters zero for the weight instead, and writes information about the condition to its log file. 
+
+After making the S&P 500 today versus S&P 500 last-close adjustment, the closure rebalancer performs the S&P 500 today versus S&P 500 high (see [-h spgh](#-high-spgh)) adjustment if the user has set the [Adjust from High](#adjust-from-high) flag in the corresponding row of the [Portfolio File](#portfolio-file).
+
+### An Example
+
+<b>TODO:</b> Fill in an example here, complete with graphics.
 
 ## What Do I Do with Debts?
 

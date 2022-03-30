@@ -1,9 +1,10 @@
 Things to do:
 
-1. Fill in How Does Rebalancing Work section in README.md. (Tuesday)
-
-2. Create graphics for How Does Rebalancing Work section in README.md using
+1. Create graphics for How Does Rebalancing Work section in README.md using
    Dia. (Wednesday)
+
+2. Fill out an example using the graphics created in step 1 for the section of
+   How Does Rebalancing Work in the README.md. (Wednesday)
 
 3. Do one final proofread. (Thursday)
 
