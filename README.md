@@ -88,10 +88,6 @@ There is currently only one Java entry point (main method).  You will find it in
 
 I can only approximate the amount of time I have spent on this project. I am guessing an average of 20 hours per week over 60 weeks for a total of 1,200 man-hours. This project is solely my own work.
 
-### State of the Project
-
-After 13 months of work - to the end of February 2022 - I deemed the design, code and deployment activities of the project to be complete. I have allocated one man-month to fully document the project for professional showcase. My intention is to complete this work by the conclusion of March 2022. An observer will note progressive activity and growth in this markdown file and related documents during this time. Below you may find some portions of the markdown template that remain unedited. Stop by often for updates!
-
 ## Table of Contents
 
 - [Installation](#installation)
@@ -290,7 +286,7 @@ The weight real estate begins at column 134, and may be up to 6 characters long.
 
 The synthesizer type begins at column 141, and may be up to 16 characters long. The field is typically not specified for accounts where the value does not need to be synthesized. Accounts whose value may need to be synthesized include annuities, social security, or pensions. If specified, the content is constrained to one of the following strings: "Averaging", "CPI_Annuity", "Negation", "No_CPI_Annuity", or "Social_Security". Case is not important.
 
-Monthly annuitized payments for CPI-adjusted, Non-CPI-adjusted and Social Security are given per-investor in the [Portfolio File](#portfolio-file). If the value of the account is not explicitly specified in the [Holding File](#holding-file), then the software will attempt to synthesize the value of the account using the indicated synthesizer. It will do this based on the relevant monthly payment, the life expectancy of the investor (also given in the [Portfolio File](#portfolio-file), and the expected rate of inflation (for non-CPI adjusted annuities).
+Monthly annuitized payments for CPI-adjusted, Non-CPI-adjusted and Social Security are given per-investor in the [Portfolio File](#portfolio-file). If the value of the account is not explicitly specified in the [Holding File](#holding-file), then the software will attempt to synthesize the value of the account using the indicated synthesizer. It will do this based on the relevant monthly payment, the life expectancy of the investor (also given in the [Portfolio File](#portfolio-file)), and the expected rate of inflation (for non-CPI adjusted annuities).
 
 For accounts that estimate valuations of real estate, the user may create a synthesized account that is the negated sum of the estimates, plus their average. The sum of the synthesized account and all the estimates will produce a single, positive average. This valuation of this type of account is the work of an averaging synthesizer. See the [Referenced Accounts](#referenced-accounts) field.  
 
@@ -523,7 +519,7 @@ The software assumes that "orphaned" rows (accounts or institutions with no pare
 * For institution references,  modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedInstitution.java</b>, and add the needed mnemonic
 * For portfolio references,  modify the code file: <b>com.garygregg.rebalance.distinguished.DistinguishedPortfolio.java</b>, and add the needed mnemonic
 
-Once the programmer/user accomplishes this, he may then reference the added mnemonic programmatically using the <b>Distinguished Key</b> field in a row in the distinguished file. The values for the keys will then be programmatically accessible from the <b>DistinguishedAccountLibrary</b>, <b>DistinguishedInstitutionLibrary</b>, or the <b>DistinguishedPortfolioLibrary</b>, depending on the type of distinguished key identified by the distinguished type. The key for rows in the distinguished file is a concatenation of the distinguished type and distinguished key, and the combination of the two should be unique. The following are the fields of a distinguished file row.
+Once the programmer/user accomplishes this, he may then reference the added mnemonic programmatically using the [Distinguished Key](#distinguished-key) field in a row in the distinguished file. The values for the keys will then be programmatically accessible from the <b>DistinguishedAccountLibrary</b>, <b>DistinguishedInstitutionLibrary</b>, or the <b>DistinguishedPortfolioLibrary</b>, depending on the type of [Distinguished Key](#distinguished-key) identified by the [Distinguished Type](#distinguished-type). The key for rows in the distinguished file is a concatenation of the [Distinguished Type](#distinguished-type) and [Distinguished Key](#distinguished-key), and the combination of the two should be unique. The following are the fields of a distinguished file row.
 
 ### Distinguished Type
 
@@ -552,11 +548,11 @@ Files of this type have the prefix "gains_head_", "gains_joint_", "gains_separat
 
 ### Gains Threshold
 
-The income threshold begins in column 1, and may be 16 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The income threshold is the minimum income where the capital gains tax rate takes effect. <i>Gains threshold is a currency field with no currency indicator.</i>
+The income threshold begins in column 1, and may be 16 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. The income threshold is the minimum income where the capital [Gains Rate](#gains-rate) takes effect. <i>Gains threshold is a currency field with no currency indicator.</i>
 
 ### Gains Rate
 
-The tax rate begins in column 18, and may be 8 characters long. Its content is constrained to a non-negative number no greater than 100, possibly with a decimal point. The rate applies to capital gains beginning at the associated income threshold.
+The tax rate begins in column 18, and may be 8 characters long. Its content is constrained to a non-negative number no greater than 100, possibly with a decimal point. The rate applies to capital gains beginning at the associated [Gains Threshold](#gains-threshold).
 
 ## Holding File
 
@@ -589,7 +585,7 @@ The foreign key begins in column 3, and may be 16 characters long. Its content i
 
 ### Holding Name
 
-The holding name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the [Portfolio Mnemonic](#portfolio-mnemonic) for rows with a 'P' [Holding Type](#holding-type), an [Account Name](#account-name) for rows with an 'A' [Holding Type](#holding-type), or the [Ticker Symbol](#ticker-symbol) for rows with an 'F, 'J', 'Q', or 'X' [Holding Type](#holding-type). Institution names (rows with an 'I' [Holding Type](#holding-type)) are specified in this file or the [Basis File](#basis-file) only. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the [Basis File](#basis-file). The software only uses this field for readability in its reports.
+The holding name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the [Investor Name](#investor-name) for rows with a 'P' [Holding Type](#holding-type), an [Account Name](#account-name) for rows with an 'A' [Holding Type](#holding-type), or the [Ticker Name](#ticker-name) for rows with an 'F, 'J', 'Q', or 'X' [Holding Type](#holding-type). Institution names (rows with an 'I' [Holding Type](#holding-type)) are specified in this file or the [Basis File](#basis-file) only. The software only uses this field for readability in its reports.
 
 ### Holding Shares
 
@@ -613,7 +609,7 @@ The holding weight begins in column 120, and may be 8 characters if specified. I
 
 It is possible to bypass investment-type weight rebalancing, and rely on the [Holding Weight](#holding-weight) alone. How?
 
-* For all but the last rebalanced account in a portfolio (see [Rebalance Order](#rebalance-order)), set to zero all weights for the account in the [Account File](#account-file), assuming there is no row for the account in the [Detailed File](#detailed-file). If there is a row for the account in the [Detailed File](#detailed-file), set to zero the level-one weights in that row (only [Detailed Weight Stock](#detailed-weight-stock), [Detailed Weight Bonds](#detailed-weight-bond), [Detailed Weight Cash](#detailed-weight-cash), and [Detailed Weight Real-Estate](#detailed-weight-real-estate) need to be set)
+* For all but the last rebalanced account in a portfolio (see [Rebalance Order](#rebalance-order)), set to zero all weights for the account in the [Account File](#account-file), assuming there is no row for the account in the [Detailed File](#detailed-file). If there is a row for the account in the [Detailed File](#detailed-file), set to zero the <b>Level 1</b> weights in that row (only [Detailed Weight Stock](#detailed-weight-stock), [Detailed Weight Bonds](#detailed-weight-bond), [Detailed Weight Cash](#detailed-weight-cash), and [Detailed Weight Real-Estate](#detailed-weight-real-estate) need to be set)
 * For the last rebalanced account in a portfolio, set to zero all weights for the portfolio in the [Portfolio File](#portfolio-file)
 
 If the user wishes to rebalance in this way, he/she must take care to ensure two things:
@@ -638,15 +634,15 @@ Files of this type have the prefix "income_head_", "income_joint_", "income_sepa
 
 ### Income Threshold
 
-The income threshold begins in column 1, and may be 16 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. For associated tax rates that are positive, the income threshold is the minimum income where the income tax rate takes effect. For associated tax rate of zero, the software interprets that income threshold as the standard deduction for a taxpayer with the indicated filing status. <i>Income threshold is a currency field with no currency indicator.</i>
+The income threshold begins in column 1, and may be 16 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. For associated [Income Rates](#income-rate) that are positive, the income threshold is the minimum income where the [Income Rate](#income-rate) takes effect. For associated [Income Rate](#income-rate) of zero, the software interprets that income threshold as the standard deduction for a taxpayer with the indicated filing status. <i>Income threshold is a currency field with no currency indicator.</i>
 
 ### Income Rate
 
-The tax rate begins in column 18, and may be 8 characters long. Its content is constrained to a non-negative number no greater than 100, possibly with a decimal point. The software interprets a tax rate of zero to mean that the indicated income threshold is actually the standard deduction for a taxpayer in the indicated filing status. A non-zero tax rate applies to income beginning at the associated income threshold. 
+The tax rate begins in column 18, and may be 8 characters long. Its content is constrained to a non-negative number no greater than 100, possibly with a decimal point. The software interprets a tax rate of zero to mean that the indicated [Income Threshold](#income-threshold) is actually the standard deduction for a taxpayer in the indicated filing status. A non-zero tax rate applies to income beginning at the associated [Income Threshold](#income-threshold). 
 
 ## Portfolio File
 
-The portfolio file is one of sixteen CSV files that act as input to the software. Files in this format are located in a directory named "portfolio" located in the directory identified in the source preference. Files of this type have the prefix "portfolio_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the portfolio file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The portfolio contains information that is required to identify, valuate and rebalance portfolios. The key for rows in the portfolio file is the [Portfolio Mnemonic](#portfolio mnemonic), and it should uniquely identify the investor associated with the portfolio. The following are the fields of a portfolio file row.
+The portfolio file is one of sixteen CSV files that act as input to the software. Files in this format are located in a directory named "portfolio" located in the directory identified in the source preference. Files of this type have the prefix "portfolio_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the portfolio file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The portfolio contains information that is required to identify, valuate and rebalance portfolios. The key for rows in the portfolio file is the [Portfolio Mnemonic](#portfolio-mnemonic), and it should uniquely identify the investor associated with the portfolio. The following are the fields of a portfolio file row.
 
 ### Portfolio Mnemonic
 
@@ -698,17 +694,17 @@ The weight cash begins at column 122, and may be up to 6 characters long. Its co
 
 ### Portfolio Weight Real-Estate
 
-The weight real-estate begins at column 129, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real estate investments (e.g. real property or shares in a trust). If this field, and that for stocks, bonds and cash sum to 100, then the specified weight is actually a percent assigned to real estate.
+The weight real estate begins at column 129, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real estate investments (e.g. real property or shares in a trust). If this field, and that for stocks, bonds and cash sum to 100, then the specified weight is actually a percent assigned to real estate.
 
 ### Adjust from High
 
 The adjust-from-high flag begins at column 136, and may be up to 6 characters long. Its content is constrained to one of the following strings: "False", or "True". Case is not important. The adjust-from-high flag indicates to the software whether it should make an upward-revision of the preferred equity weight of the portfolio based on a ratio of today's value of the S&P 500 versus the high for the index. We assume by definition that the value of the S&P 500 today cannot be higher than its high. While the software will always make an equity weight adjustment for the ratio of the S&P 500 today versus its last close (assuming these preferences are both set), it will skip an additional today-versus-high adjustment on a per-portfolio basis if the S&P 500 high is not set (see the [-h sphg](#-high-sphg) command line option), or this flag is not set. Note that the user may skip all equity adjustments by simply not setting the preference for S&P 500 today. See the [-t sptd](#-today-sptd) command line option.   
 
-The formula by which the software adjusts equity weight for S&P 500 today versus S&P 500 high is not currently variable. For individual accounts, there is no adjustment at all. The adjustment comes into play only when the software rebalances the last account in a portfolio, and attempts to match portfolio equity preferences as specified in this file.
+The formula by which the software adjusts equity weight for S&P 500 today versus S&P 500 high is not currently variable. For individual accounts, there is no adjustment at all. The adjustment comes into play only when the software rebalances the last account in a portfolio, and attempts to match portfolio equity preferences as specified in this file. See the difference between a [Weight Rebalancer](#weight-rebalancer) vs. [Closure Rebalancer](#closure-rebalancer).
 
 The current adjustment formula is: <b>(5 * ((sphg - sptd) / sphg) / 8) + ew</b>, where:
 
-* <b>ew</b> is the existing declared weight of equities in this file
+* <b>ew</b> is the existing, declared weight of equities in this file
 * <b>sphg</b> is the preference set for the S&P 500 high ([-h sphg](#-high-sphg) option)
 * <b>sptd</b> is the preference set for the S&P 500 today ([-t sptd](#-today-sptd) option)
 
@@ -917,7 +913,7 @@ When rebalancing any currency value passed to it, a weight-type node does the fo
 
 The weight assigned to the <b>Level 0</b> root weight-type node is arbitrary. I have assigned 100 (see the table) to be evocative of 100%. Since the software compares the weight of the root node against nothing else, it can be any positive value.
 
-The way a weight-type node determines if it has children is to ask if any child has weight. If the answer is no, it may mean there are no children, or it may mean existing children have no weight. In this way, a user can ask the software to disregard weight rebalancing in favor of the [Holding Weight](#holding-weight) of the tickers by setting all <b>Level 1</b> weights to zero. This forces the root node to allocate any received currency directly to its contained tickers, and not to any weight-type child node. See the discussion in [Holding Weight](#holding-weight). For a non-closure weight rebalancer, the user would zero all the weights in the [Account File](#account-file), or all <b>Level 1</b> weights in the [Detailed File](#detailed-file), but only if a detailed entry exists for the account.   
+The way a weight-type node determines if it has children is to ask if any child has weight. If the answer is no, it may mean there are no children, or it may mean existing children have no weight. In this way, a user can ask the software to disregard weight rebalancing in favor of the [Holding Weight](#holding-weight) of the tickers by setting all <b>Level 1</b> weights to zero. This forces the root node to allocate any received currency directly to its contained tickers, and not to any weight-type child node. See the discussion in [Holding Weight](#holding-weight). For a [Weight Rebalancer](#weight-rebalancer) that is not a [Closure Rebalancer](#closure-rebalancer), the user would zero all the weights in the [Account File](#account-file), or all <b>Level 1</b> weights in the [Detailed File](#detailed-file), but only if a detailed entry exists for the account.   
 
 Back to the table of weights in the weight rebalancer: Before rebalancing any account, the software overlays the <b>Level 1</b> weights in the table with the weights it read for the account in the [Account File](#account-file). If the account has an entry in the [Detailed File](#detailed-file), the software overlays the table weights a second time. This time, however, it overlays <i>all</i> of the weights in the table. It can do this since the [Detailed File](#detailed-file) contains an explicit entry for each. After both weight overlays, the software applies an equity (stock) weight adjustment using the S&P 500 today preference setting (see [-t sptd](#-today-sptd)) versus the S&P 500 last-close (see [-c spcl](#-close-spcl)) preference setting. Each weight-type node then references this table when it decides how to allocate currency to its children.  
 
@@ -929,7 +925,11 @@ After making the S&P 500 today versus S&P 500 last-close adjustment, the closure
 
 ### An Example
 
-<b>TODO:</b> Fill in an example here, complete with graphics.
+My intention with this section was to use [Dia](https://wiki.gnome.org/Apps/Dia/) to create one or more graphics that showed trees of the software's investment weight-type hierarchy. For example, picture a tree with a root node, <b>Level 0</b> (all investments), with four children for <b>Level 1</b>: stocks, bonds, cash, and real estate. Then I would have another graphic for the <b>Level 1</b> subtree for stocks showing branches for domestic and foreign stocks (<b>Level 2</b>) sub-nodes. And then for each of these sub-nodes there would be branches to <b>Level 3</b> sub-nodes: large, and not-large stocks, etc. You get the picture. Also picture another graphic for the bond subtree. And another subtree for cash. And yet another subtree for real estate.
+
+Furthermore, I wanted to show how each ticker in an account was pushed down the investment weight-type tree (using the fund characteristics specified in the [Ticker File](#ticker-file)) until the ticker reached a leaf with its most specific categorization. For example, a ticker only specified as stock would end at the appropriate <b>Level 1</b> node. However, a domestic, small-cap, value stock ticker would be pushed all the way down to <b>Level 6</b>, i.e.: stock (<b>Level 1</b>); domestic stock (<b>Level 2</b>); not-large stock (<b>Level 3</b>); small stock (<b>Level 4</b>); growth-or-value stock (<b>Level 5</b>); value stock (<b>Level 6</b>). And then what I had hoped to do is show how the software was subdividing some whole value of the account (say $10,000) as it went down the tree, finally using the [Holding Weight](#holding-weight) for one or more tickers in a leaf node to subdivide the value given to that weight type. With a default [Holding Weight](#holding-weight) of one for all holdings, the software would therefore equally divide value given to tickers of the same weight type. Does all that make sense?
+
+However, today is the last day of March 2022. I want to finish this project today, and I am running out of time, patience and stamina. I am therefore foregoing - at least for now - the construction of the visualizations I had hoped to create. Please contact me if you have questions about this software, and how it works.
 
 ## What Do I Do with Debts?
 
@@ -939,7 +939,7 @@ All that is beside the point. Although this software does not rebalance debts, i
 
 So how do you track your debts? Firstly - if the user tracks the debt as a ticker - the ticker cannot be balanceable. It should have a 'J' (a fund that is not available for rebalance) code in the [Holding Type](#holding-type) of the [Holding File](#holding-file), and the same in the [Ticker Character](#ticker-character) of the [Ticker File](#ticker-file). Secondly, the [Holding Value](#holding-value) needs a negative value in the [Holding File](#holding-file). In my own holdings, I have accomplished this by leaving the [Holding Value](#holding-value) blank, then giving the [Holding Price](#holding-price) a value of -1.00, and the [Holding Shares](#holding-shares) a value equal to the absolute value of the debt. The software then calculates the [Holding Value](#holding-value) as a negative number equal to the debt. For whatever it may mean to the user, any product of [Holding Shares](#holding-shares) and [Holding Price](#holding-price) that equals the debt is fine. Obviously the shares and price have to have different signs to produce a negative [Holding Value](#holding-value). Another way to do this is give the [Holding Value](#holding-value) an explicit, negative entry. Breaking a debt account (like a credit card balance) into non-balanceable tickers is a convenient way to subdivide the debt for accounting purposes. Keep in mind that a [Ticker Symbol](#ticker-symbol) need not necessarily be a well-known mnemonic on a trading exchange. It can be something that the user makes up.
 
-Another way to report debts is to simply log a negative [Holding Value](#holding-value) for an account row in the [Holding File](#holding-file), and not break down the account by ticker. Since there are no tickers in the account, there is nothing for the software to rebalance. Either way the user does it, the software will report debts in both the [Report File](#report-file) and the [Proposed File](#proposed-file) as negative-valued, unbalanceable assets. If a negative-valued account has tickers, the software will report the individual tickers. If the account has no tickers, the software will simply report the account. Either way, the total debt is subtracted from the net worth calculation for the investor.
+Another way to report debts is to simply log a negative [Holding Value](#holding-value) for an account row in the [Holding File](#holding-file), and not break down the account by ticker. Since there are no tickers in the account, there is nothing for the software to rebalance. Either way the user does it, the software will report debts in both the [Report File](#report-file) and the [Proposed File](#proposed-file) as negative-valued, unbalanceable assets. If a negative-valued account has tickers, the software will report the individual tickers. If the account has no tickers, the software will simply report the account. Either way, the software subtracts the debts from the net worth calculation for the investor.
 
 ## Room for Enhancement
 
@@ -947,7 +947,8 @@ I am proud of my work on this project, but frankly I am tired of working on it. 
 
 1. I have mentioned the [Basis File](#basis-file), [Gains Files](#gains-files) and [Income Files](#income-files), but what does the software do with this tax-applicable information? Currently, nothing. It reads the information into libraries, but does nothing with it. My intention was to create account value synthesizers that produce capital-gains tax. These would be unbalanceable, negative values to count against the net worth of the investor. Investor income, and tax brackets are required for these calculations. The software would then subtract the result from the value of certain holdings, such as a house, or investments outside tax-deferred accounts. The user can currently create negative-valued accounts (or tickers) to account for tax, but he/she would have to calculate the amount of tax by hand. An enhancement would be to create one or more tax value synthesizers of this type.
 2. The CSV files are a bit unwieldy, and hard to edit. I have tried to ameliorate this by structuring the files such that columns have fixed-lengths, no matter what their content. Really, the software does not require this. It trims leading and trailing whitespace from field entries before interpreting it. An enhancement would be to transition the software to use a SQL database for all the input data. There would be a SQL table corresponding to each existing CSV file. The primary key of each table would be the existing key of the CSV file, but prepended with the date that is currently encoded in the name of a CSV file (the 'yyyymmdd' suffix).
-3. A somewhat necessary enhancement that goes along with the last one would include a graphic user (GUI) interface to edit the SQL tables, and make insertions. In truth, this enhancement can occur before the creation of SQL tables, with the edits and insertions occurring in the existing CSV files. Currently, I am using a text editor to make changes to the CSV files, and create new ones. Once a developer transitions the software input to SQL, a user of the software would need to make edits with a generic SQL editor, or a custom GUI for the purpose. 
+3. A somewhat necessary enhancement that goes along with the last one would include a graphic user (GUI) interface to edit the SQL tables, and make insertions. In truth, this enhancement can occur before the creation of SQL tables, with the edits and insertions occurring in the existing CSV files. Currently, I am using a text editor to make changes to the CSV files, and create new ones. Once a developer transitions the software input to SQL, a user of the software would need to make edits with a generic SQL editor, or a custom GUI for the purpose.
+4. See [An Example](#an-example) section. I think it would be helpful to have graphic examples of how the software creates a tree of investment weight-types. This is documentation-only todo.
 
 If you have any other ideas for enhancements, please feel free to let me know!
 
@@ -957,7 +958,7 @@ I selfishly credit only myself with the design, coding and documentation of this
 
 ## Warranty
 
-I give no warranty of this product for its stated purpose, either explicitly or implicitly, nor of its correctness when used for this purpose. I have successfully used the software for myself. It has been throughly, but not <b>exhaustively</b> tested. Use at your own risk. Feedback and bug reports are welcome!
+I give no warranty of this product for its stated purpose, either explicitly or implicitly, nor of its correctness when used for this purpose. I have successfully used the software for myself. It has been thoroughly, but not <b>exhaustively</b> tested. Use at your own risk. Feedback and bug reports are welcome!
 
 ## License
 
