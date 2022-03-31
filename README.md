@@ -138,7 +138,7 @@ The software also uses the jetbrains annotations jar, version 20.1.0. To build t
 
 ## Usage
 
-The software uses Java preferences to maintain persistent settings. Currently, settings are not user-specific. If a user has not previously set the preferences, you will see something similar to the following terminal window when running the software with the 'p' option: 
+The software uses Java preferences to maintain persistent settings. Currently, settings are not user-specific. If a user has not previously set the preferences, you will see something similar to the following terminal window when running the software with the [-p](#-preference) option: 
 
 ![alt text](assets/images/preferences_reset.png)
 
@@ -168,7 +168,7 @@ You may set current and historical valuations for the Standard and Poor 500 (S&P
 
 <sub><sup>Figure 5: software preferences after setting explicit values for S&P 500 last close, high, and today values</sup></sub>
 
-A screen snap is omitted here for the [-b bpth](#-backup-bpth) option, which backs up the current source directory to the current destination directory. As well, a screen snap is omitted here for running the software with no option, which causes the software to rebalance investor portfolios given the current CSV input files.
+A screen snap is omitted here for the [-b \[bpth\]](#-backup-bpth) option, which backs up the current source directory to the argument-specified, or current default destination directory. As well, a screen snap is omitted here for running the software with no option, which causes the software to rebalance investor portfolios given the current CSV input files.
 
 ## Command Line Options
 
@@ -192,47 +192,47 @@ Sets the minimum level at which messages appear in the log file. Messages genera
 
 ### -ordinary rdnr
 
-The logging level for messages the software deems to be "ordinary". The <i>rdnr</i> argument may be one of ALL, CONFIG, FINE, FINER, FINEST, INFO or OFF. The software requires the argument.
+Sets the logging level for messages the software deems to be "ordinary". The <i>rdnr</i> argument may be one of ALL, CONFIG, FINE, FINER, FINEST, INFO or OFF. The software requires the argument.
 
 ### -extraordinary xtrd
 
-The logging level for messages the software deems to be "extraordinary". The <i>xtrd</i> argument may be one of ALL, CONFIG, FINE, FINER, FINEST, INFO or OFF. The software requires the argument.
+Sets the logging level for messages the software deems to be "extraordinary". The <i>xtrd</i> argument may be one of ALL, CONFIG, FINE, FINER, FINEST, INFO or OFF. The software requires the argument.
 
 ### -inflation fltn
 
-The annual expected rate of inflation, expressed as a percentage. The <i>fltn</i> argument must be a number, possibly with a decimal point, and the software requires it. Among other possible uses, the software uses this value to compute the accumulated value of pensions that have no cost-of-living increase. For this purpose, the software assumes no inflation if this preference has not been set. 
+Sets the annual expected rate of inflation, expressed as a percentage. The <i>fltn</i> argument must be a number, possibly with a decimal point, and the software requires it. Among other possible uses, the software uses this value to compute the accumulated value of pensions that have no cost-of-living increase. For this purpose, the software assumes no inflation if this preference has not been set. 
 
 ### -high sphg
 
-The record high of the S&P 500. The <i>sphg</i> argument must be a non-negative number, possibly with a decimal point, and the software requires it. The software will use this value, if set, and the [-t sptd](#-today-sptd) option to upward-adjust the percentage of a portfolio allocated to equity investments. It will only do this for portfolios that so specify in the [Portfolio File](#portfolio-file).
+Sets the record high of the S&P 500. The <i>sphg</i> argument must be a non-negative number, possibly with a decimal point, and the software requires it. The software will use this value, if set, and the [-t sptd](#-today-sptd) option to upward-adjust the percentage of a portfolio allocated to equity investments. It will only do this for portfolios that so specify in the [Portfolio File](#portfolio-file).
 
 ### -close spcl
 
-The last close of the S&P 500. The <i>spcl</i> argument must be a non-negative number, possibly with a decimal point, and the software requires it. The software will use this value, if set, and the value of the [-t sptd](#-today-sptd) option to adjust the percentage of equity investment allocations in all portfolios. To skip this adjustment, the user may leave this preference unset.
+Sets the last close of the S&P 500. The <i>spcl</i> argument must be a non-negative number, possibly with a decimal point, and the software requires it. The software will use this value, if set, and the value of the [-t sptd](#-today-sptd) option to adjust the percentage of equity investment allocations in all portfolios. To skip this adjustment, the user may leave this preference unset.
 
 ### -today sptd
 
-The value of the S&P 500 on the day the software is run. The <i>sptd</i> argument must be a non-negative number, possibly with a decimal point, and the software requires it. The software will use this value, if set, to perform adjustments to the equity investment allocations in all portfolios. It does this in conjunction with the [-h sphg](#-high-sphg), and [-c spcl](#-close-spcl) preferences previously discussed. Note that if a user does not set this preference, the software will rely  on per-portfolio specifications for equity weight, and will perform no adjustments. 
+Sets the value of the S&P 500 on the day the software is run. The <i>sptd</i> argument must be a non-negative number, possibly with a decimal point, and the software requires it. The software will use this value, if set, to perform adjustments to the equity investment allocations in all portfolios. It does this in conjunction with the [-h sphg](#-high-sphg), and [-c spcl](#-close-spcl) preferences previously discussed. Note that if a user does not set this preference, the software will rely  on per-portfolio specifications for equity weight, and will perform no adjustments. 
 
 ### -x ncnt
 
-The <i>ncnt</i> argument must be a non-negative integer, and the software requires it. It is the quit level of same-type investments per account. This takes a little explanation: When a currency value is allocated to a certain "type" of investment (e.g., small capitalization value stocks), the software may not be able to perfectly distribute the amount to the investments in that category. A "perfect" distribution is one that exactly matches - to the penny - the known weight preferences for investments of that type. If the software cannot accomplish a perfect allocation, it will attempt to redistribute the residual to a subset of the investments. It will do this for each possible subset, looking for a subset that minimizes the residual. For minimum residuals, the software will choose an allocation that minimizes the standard deviation from an allocation that perfectly matches the desired weights for the investments in that category. Make sense?  
+Sets the <i>ncnt</i> argument must be a non-negative integer, and the software requires it. It is the quit level of same-type investments per account. This takes a little explanation: When a currency value is allocated to a certain weight-type of investment (e.g., small capitalization value stocks), the software may not be able to perfectly distribute the amount to the investments in that category. A "perfect" distribution is one that exactly matches - to the penny - the known weight preferences for investments of that type. If the software cannot accomplish a perfect allocation, it will attempt to redistribute the residual to a subset of the investments. It will do this for each possible subset, looking for a subset that minimizes the residual. For minimum residuals, the software will choose an allocation that minimizes the standard deviation from an allocation that perfectly matches the desired weights for the investments in that category. Make sense?  
 
-Why would an allocation not be able to exactly match the specified weights? At the level of individual funds in the account, there are two reasons. First, the fund may have a minimum investment which may not be met with a certain weight allocation. Second, for an ETF or stock, an investment may have a requirement, or preference for some whole, or round number of shares that may not be met with a certain weight allocation.
+Why would an allocation not be able to exactly match the specified weights? At the level of individual funds in the account, there are two reasons. First, the fund may have a minimum investment which may not be met with a certain weight allocation. Second, for an ETF or stock, an investment may have a requirement, or preference for some whole, or round number of shares that may not be met with a certain weight allocation. See the [Minimum Investment](#minimum-investment) and [Preferred Rounding](#preferred-rounding) fields in the [Ticker File](#ticker-file).
 
 The thing is, checking all the subsets of an investment category in an account requires a runtime that is two to the power of the number of investments in the category. This is prohibitively expensive for even a modest number of investments. A situation where this would come into play would be when an account contains, for example, twenty small cap value stock ETFs, all with a different preferred round number of shares. You can see that it will take no small amount of runtime to examine two to the twentieth power of investment subsets. If the number of investments of a certain weight type reaches this preference, the software will not even try to rebalance them. The alternative is a program that appears to hang indefinitely when run. Note that the software applies this same limit as it works down the tree of weight-type investments (see [How Does Rebalancing Work](#how-does-rebalancing-work)). At the coarsest level - <b>Level 1</b> - the software needs a minimum of five in this setting to rebalance stocks, bonds, cash and real-estate (four coarse <b>Level 1</b> categories less than the setting of five, see?). You may wish to leave this preference set to its reasonable default.
 
 ### -source spth
 
-The source directory for the CSV files that this software reads. The source directory must contain the following subdirectories: account, basis, code, detailed, distinguished, gains_head, gains_joint, gains_separate, gains_single, holding, income_head, income_joint, income_separate, income_single, portfolio and ticker. The <i>spth</i> argument may be any valid absolute path, or valid path relative to the current directory. The software requires the argument.
+Sets the source directory for the CSV files that this software reads. The source directory must contain the following subdirectories: account, basis, code, detailed, distinguished, gains_head, gains_joint, gains_separate, gains_single, holding, income_head, income_joint, income_separate, income_single, portfolio and ticker. The <i>spth</i> argument may be any valid absolute path, or valid path relative to the current directory. The software requires the argument.
 
 ### -destination dpth
 
-The default destination used by the backup command. See the backup command below. The software requires the <i>dpth</i> argument.
+Sets the default destination used by the backup command. See the [-b \[bpth\]](#-backup-bpth) option. The software requires the <i>dpth</i> argument. Note that the [-u link](#-use-link) option also sets the default destination, but modifies, and makes certain assumptions about the absolute path it constructs. 
 
 ### -use link
 
-Sets the destination directory to a concatenation of the home directory of the user, followed by the argument, followed by the final element of the existing source path. The software requires the <i>link</i> argument.
+Sets the default destination directory to a concatenation of the home directory of the user, followed by the argument, followed by the final element of the existing source path. See the [-b \[bpth\]](#-backup-bpth) option. The software requires the <i>link</i> argument. The [-d dpth](#-destination-dpth) option also sets default destination, but it accepts its argument as an unmodified absolute or relative path.
 
 ### -backup [bpth]
 
@@ -290,7 +290,7 @@ The weight real estate begins at column 134, and may be up to 6 characters long.
 
 The synthesizer type begins at column 141, and may be up to 16 characters long. The field is typically not specified for accounts where the value does not need to be synthesized. Accounts whose value may need to be synthesized include annuities, social security, or pensions. If specified, the content is constrained to one of the following strings: "Averaging", "CPI_Annuity", "Negation", "No_CPI_Annuity", or "Social_Security". Case is not important.
 
-Monthly annuitized payments for CPI-adjusted, Non-CPI-adjusted and Social Security are given per-investor in the [Portfolio File](#portfolio-file). If the value of the account is not explicitly specified in the [Holding File](#holding-file), then the software will attempt to synthesize the value of the account using the indicated synthesizer. It will do this based on the monthly payment, the life expectancy of the investor (also given in the [Portfolio File](#portfolio-file), and the expected rate of inflation (for non-CPI adjusted annuities).
+Monthly annuitized payments for CPI-adjusted, Non-CPI-adjusted and Social Security are given per-investor in the [Portfolio File](#portfolio-file). If the value of the account is not explicitly specified in the [Holding File](#holding-file), then the software will attempt to synthesize the value of the account using the indicated synthesizer. It will do this based on the relevant monthly payment, the life expectancy of the investor (also given in the [Portfolio File](#portfolio-file), and the expected rate of inflation (for non-CPI adjusted annuities).
 
 For accounts that estimate valuations of real estate, the user may create a synthesized account that is the negated sum of the estimates, plus their average. The sum of the synthesized account and all the estimates will produce a single, positive average. This valuation of this type of account is the work of an averaging synthesizer. See the [Referenced Accounts](#referenced-accounts) field.  
 
@@ -329,7 +329,7 @@ The foreign key begins in column 3, and may be 16 characters long. Its content i
 
 ### Basis Name
 
-The basis name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the portfolio name for rows with a 'P' [Basis Type](#basis-type), an account name for rows with an 'A' [Basis Type](#basis-type), or the ticker symbol for rows with an 'F, 'J', 'Q', or 'X' [Basis Type](#basis-type). Institution names (rows with an 'I' [Basis Type](#basis-type)) are specified in this file, and nowhere else. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the [Holding File](#holding-file). The software only uses this field for readability in its reports.
+The basis name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the [Portfolio Mnemonic](#portfolio-mnemonic) for rows with a 'P' [Basis Type](#basis-type), an [Account Name](#account-name) for rows with an 'A' [Basis Type](#basis-type), or the [Ticker Symbol](#ticker-symbol) for rows with an 'F, 'J', 'Q', or 'X' [Basis Type](#basis-type). Institution names (rows with an 'I' [Basis Type](#basis-type)) are specified in this file or the [Holding File](#holding-file) only. The software only uses this field for readability in its reports.
 
 ### Basis Shares
 
@@ -398,7 +398,7 @@ The code description begins column 36, and may be 80 characters long. Its conten
 
 The detailed file is one of sixteen CSV files that act as input to the software. Files in this format are located in a subdirectory named "detailed" located in the directory identified in the source preference. Files of this type have the prefix "detailed_" followed by a date designation in the format "yyyymmdd", and a file type of ".csv". When run with no command line options, the software will read, and use the detailed file that has the latest date that is not later than the date of the latest [Holding File](#holding-file). The detailed file contains fine-grained investment category weights for rebalancing accounts. The combination of institution mnemonic and account number should match a row in the account file. The account name should match that in the account file, but this is not required. The account name is a field in this file only for fast visual identification of the account. It is not used by the software for any purpose.
 
-The level 1 category weights specified in the detailed file - stock, bond, cash, and real-estate - replace these course-grained weights specified in the [Account File](#account-file). The user of the software may override these course-grained weights for any number of accounts, and at the same time specify finer-grained category <b>Levels 2 through 6</b> using a row in the detailed file (see [How Does Rebalancing Work](#how-does-rebalancing-work)). The user may override the weights for any number of rows: no rows, one row, or all the account rows. The software reads rows in the detailed file that match no row in the [Account File](#account-file), but ignores them. If the software seems to be ignoring course-grained weight settings in the [Account File](#account-file), the user might first check whether there exists an overriding row in the detailed file. If the software seems to be ignoring fine-grained weight settings in the detailed file, the user might first check whether the institution mnemonic and account number precisely match the target account in the [Account File](#account-file). The key for rows in the detailed file is a concatenation of institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of a detailed file row.
+The level 1 category weights specified in the detailed file - stock, bond, cash, and real-estate - replace these course-grained weights specified in the [Account File](#account-file). The user of the software may override these course-grained weights for any number of accounts, and at the same time specify finer-grained category <b>Levels 2 through 6</b> using a row in the detailed file (see [How Does Rebalancing Work](#how-does-rebalancing-work)). The user may override the weights for any number of rows: no rows, one row, or all the account rows. The software reads rows in the detailed file that match no row in the [Account File](#account-file), but ignores them. If the software seems to be ignoring course-grained weight settings in the [Account File](#account-file), the user might first check whether there exists an overriding row in the detailed file. If the software seems to be ignoring fine-grained weight settings in the detailed file, the user might first check whether the [Detailed Institution](#detailed-institution) and [Detailed Number](#detailed-number) precisely match the corresponding fields in the [Account File](#account-file). The key for rows in the detailed file is a concatenation of institution mnemonic and account number, and the combination of the two should be unique. The following are the fields of a detailed file row.
 
 ### Detailed Institution
 
@@ -589,7 +589,7 @@ The foreign key begins in column 3, and may be 16 characters long. Its content i
 
 ### Holding Name
 
-The holding name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the portfolio name for rows with a 'P' [Holding Type](#holding-type), an account name for rows with an 'A' [Holding Type](#holding-type), or the ticker symbol for rows with an 'F, 'J', 'Q', or 'X' [Holding Type](#holding-type). Institution names (rows with an 'I' [Holding Type](#holding-type)) are specified in this file, and nowhere else. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the [Basis File](#basis-file). The software only uses this field for readability in its reports. 
+The holding name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the [Portfolio Mnemonic](#portfolio-mnemonic) for rows with a 'P' [Holding Type](#holding-type), an [Account Name](#account-name) for rows with an 'A' [Holding Type](#holding-type), or the [Ticker Symbol](#ticker-symbol) for rows with an 'F, 'J', 'Q', or 'X' [Holding Type](#holding-type). Institution names (rows with an 'I' [Holding Type](#holding-type)) are specified in this file or the [Basis File](#basis-file) only. These are therefore completely unconstrained, even if they are inconsistent between multiple occurrences in this same file, or the [Basis File](#basis-file). The software only uses this field for readability in its reports.
 
 ### Holding Shares
 
@@ -725,7 +725,7 @@ The equity adjustment that the software makes with regard to the S&P 500 today v
 
 <sub><sup>Table 1: preference controls for equity weight adjustments</sup></sub>
 
-The software comes with all S&P 500 valuation preferences clear. Currently, once the user sets any of the S&P 500 preferences, it is not possible to clear that same setting. What the user can do, however, is set the value equal to one of the other preferences. For example, setting <b>spcl</b> equal <b>sptd</b> has the effect of preventing an adjustment for the current day's market action. If the user desires both equity adjustments, he should know that the software performs the today-vs-close adjustment before the today-vs-high adjustment.
+The software comes with all S&P 500 valuation preferences clear. Currently, once the user sets any of the S&P 500 preferences, the only way to clear them is for a user to reset all the preferences with the [-r](#-reset) option. What a user can do instead is set an S&P value preference equal to one of the other preferences. For example, setting <b>spcl</b> equal <b>sptd</b> has the effect of preventing an adjustment for the current day's market action. If the user desires both equity adjustments, he should know that the software performs the today-vs-close adjustment before the today-vs-high adjustment.
 
 ## Ticker File
 
