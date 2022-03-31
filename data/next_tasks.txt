@@ -1,12 +1,12 @@
 Things to do:
 
-1. Create graphics for How Does Rebalancing Work section in README.md using
-   Dia. (Wednesday)
+I had used this file to track my next tasks from day-to-day while working on
+this project from February 2021 through March 2022. I have now summarized
+possible enhancements for major version 2 of the software, but they are not
+included here. I have written them in the section entitled "Room for
+Enhancement" in the README.md file. Reference that document.
 
-2. Fill out an example using the graphics created in step 1 for the section of
-   How Does Rebalancing Work in the README.md. (Wednesday)
-
-3. Do one final proofread. (Thursday)
+Below are other notes that I had kept here as I worked...
 
 For your information:
 
