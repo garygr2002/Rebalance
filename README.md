@@ -75,7 +75,7 @@ And I used the following software. All software versions here specified were tho
 
 ### Code Metrics
 
-As of version v1.1.4 (31 March, 2022), the software consists of the following:
+As of version v1.1.4 (31 March 2022), the software consists of the following:
 
 * 208 Java code files organized into 16 packages
 * 4,975 blank lines inserted for code readability
