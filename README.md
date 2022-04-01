@@ -572,7 +572,7 @@ The portfolio mnemonic specified in a holding row must match a [Portfolio File](
 
 ### Holding Type
 
-The holding type begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'A' (an account row), 'F' (a row for a fund available for rebalance), 'I' (an institution row), 'J' (a row for a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio row), 'Q', (a row for a single bond or stock), 'X' (a row for an exchange-trade fund). I hope the use of the [Holding Type](#holding-type) is self-explanatory.
+The holding type begins in column 1, and is 1 character. Its content is constrained to one of the following characters: 'A' (an account row), 'F' (a row for a fund available for rebalance), 'I' (an institution row), 'J' (a row for a fund <b><i>not</i>,</b> available for rebalance), 'P' (a portfolio row), 'Q', (a row for a single bond or stock), 'X' (a row for an exchange-trade fund). I hope the use of the holding type is self-explanatory.
 
 ### Holding Foreign
 
@@ -607,7 +607,7 @@ The holding value begins in column 101, and may be 18 characters long. Its conte
 
 The holding weight begins in column 120, and may be 8 characters if specified. Its content is a non-negative number, possibly with a decimal point. The holding weight is the value that the software will use when rebalancing the holding identified by the current row with other holdings of exactly the same type in the same account. The software assumes a default weight of one, meaning the software will equally distribute value to same-type holdings in the same account if the weight is not explicitly specified for any. A convenient way to withhold value from any holding during rebalance is to here set its weight to zero.
 
-It is possible to bypass investment-type weight rebalancing, and rely on the [Holding Weight](#holding-weight) alone. How?
+It is possible to bypass investment-type weight rebalancing, and rely on the holding weight alone. How?
 
 * For all but the last rebalanced account in a portfolio (see [Rebalance Order](#rebalance-order)), set to zero all weights for the account in the [Account File](#account-file), assuming there is no row for the account in the [Detailed File](#detailed-file). If there is a row for the account in the [Detailed File](#detailed-file), set to zero the <b>Level 1</b> weights in that row (only [Detailed Weight Stock](#detailed-weight-stock), [Detailed Weight Bonds](#detailed-weight-bond), [Detailed Weight Cash](#detailed-weight-cash), and [Detailed Weight Real-Estate](#detailed-weight-real-estate) need to be set)
 * For the last rebalanced account in a portfolio, set to zero all weights for the portfolio in the [Portfolio File](#portfolio-file)
@@ -702,9 +702,9 @@ The adjust-from-high flag begins at column 136, and may be up to 6 characters lo
 
 The formula by which the software adjusts equity weight for S&P 500 today versus S&P 500 high is not currently variable. For individual accounts, there is no adjustment at all. The adjustment comes into play only when the software rebalances the last account in a portfolio, and attempts to match portfolio equity preferences as specified in this file. See the difference between a [Weight Rebalancer](#weight-rebalancer) vs. [Closure Rebalancer](#closure-rebalancer).
 
-The current adjustment formula is: <b>(5 * ((sphg - sptd) / sphg) / 8) + ew</b>, where:
+The current adjustment formula is: <b>(5 * ((sphg - sptd) / sphg) / 8) + ep</b>, where:
 
-* <b>ew</b> is the existing, declared weight of equities in this file
+* <b>ep</b> (equity percentage) is derived from the existing, declared weight of equities in this file, i.e., [Portfolio Weight Stock](#portfolio-weight-stock) divided by the sum of <b>Level 1</b> investment categories, i.e., [Portfolio Weight Stock](#portfolio-weight-stock), [Portfolio Weight Bond](#portfolio-weight-bond), [Portfolio Weight Cash](#portfolio-weight-cash) and [Portfolio Weight Real-Estate](#portfolio-weight-real-estate)
 * <b>sphg</b> is the preference set for the S&P 500 high ([-h sphg](#-high-sphg) option)
 * <b>sptd</b> is the preference set for the S&P 500 today ([-t sptd](#-today-sptd) option)
 
@@ -913,7 +913,7 @@ When rebalancing any currency value passed to it, a weight-type node does the fo
 
 The weight assigned to the <b>Level 0</b> root weight-type node is arbitrary. I have assigned 100 (see the table) to be evocative of 100%. Since the software compares the weight of the root node against nothing else, it can be any positive value.
 
-The way a weight-type node determines if it has children is to ask if any child has weight. If the answer is no, it may mean there are no children, or it may mean existing children have no weight. In this way, a user can ask the software to disregard weight rebalancing in favor of the [Holding Weight](#holding-weight) of the tickers by setting all <b>Level 1</b> weights to zero. This forces the root node to allocate any received currency directly to its contained tickers, and not to any weight-type child node. See the discussion in [Holding Weight](#holding-weight). For a [Weight Rebalancer](#weight-rebalancer) that is not a [Closure Rebalancer](#closure-rebalancer), the user would zero all the weights in the [Account File](#account-file), or all <b>Level 1</b> weights in the [Detailed File](#detailed-file), but only if a detailed entry exists for the account.   
+The way a weight-type node determines if it has children is to ask if any child has weight. If the answer is no, it may mean there are no children, or it may mean existing children have no weight. In this way, a user can ask the software to disregard weight rebalancing in favor of the [Holding Weight](#holding-weight) of the tickers by setting all <b>Level 1</b> weights to zero. This forces the root node to allocate any received currency directly to its contained tickers, and not to any weight-type child node. See the discussion in [Holding Weight](#holding-weight). For a weight rebalancer that is not a [Closure Rebalancer](#closure-rebalancer), the user would zero all the weights in the [Account File](#account-file), or all <b>Level 1</b> weights in the [Detailed File](#detailed-file), but only if a detailed entry exists for the account.   
 
 Back to the table of weights in the weight rebalancer: Before rebalancing any account, the software overlays the <b>Level 1</b> weights in the table with the weights it read for the account in the [Account File](#account-file). If the account has an entry in the [Detailed File](#detailed-file), the software overlays the table weights a second time. This time, however, it overlays <i>all</i> of the weights in the table. It can do this since the [Detailed File](#detailed-file) contains an explicit entry for each. After both weight overlays, the software applies an equity (stock) weight adjustment using the S&P 500 today preference setting (see [-t sptd](#-today-sptd)) versus the S&P 500 last-close (see [-c spcl](#-close-spcl)) preference setting. Each weight-type node then references this table when it decides how to allocate currency to its children.  
 
