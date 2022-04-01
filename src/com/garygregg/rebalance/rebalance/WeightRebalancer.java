@@ -4,6 +4,7 @@ import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Ticker;
 import com.garygregg.rebalance.portfolio.PortfolioDescription;
+import com.garygregg.rebalance.ticker.TickerDescription;
 import com.garygregg.rebalance.toolkit.WeightType;
 import org.jetbrains.annotations.NotNull;
 
@@ -201,6 +202,19 @@ class WeightRebalancer extends AccountRebalancer
 
     @Override
     public void stop() {
-        currentNode.addLeaf(currentTicker);
+
+        /*
+         * Get the description from the current ticker. Is the description not
+         * null, and is it considered?
+         */
+        final TickerDescription description = currentTicker.getDescription();
+        if ((null != description) && description.isConsidered()) {
+
+            /*
+             * The description is not null, and it is considered. Add the
+             * current ticker as a leaf of the current node.
+             */
+            currentNode.addLeaf(currentTicker);
+        }
     }
 }
