@@ -36,6 +36,23 @@ class WeightRebalancer extends AccountRebalancer
     }
 
     /**
+     * Determines if a ticker is considered for rebalance.
+     *
+     * @param ticker Any ticker
+     * @return True if the ticker is considered for rebalance, false otherwise
+     */
+    private static boolean isConsidered(@NotNull Ticker ticker) {
+
+        /*
+         * Get the description from the current ticker. Return true if the
+         * description is not null, and it shows that the ticker is considered
+         * for rebalance.
+         */
+        final TickerDescription description = ticker.getDescription();
+        return (null != description) && description.isConsidered();
+    }
+
+    /**
      * Determines whether an account should have an equity weight adjustment.
      *
      * @param account An account
@@ -177,13 +194,18 @@ class WeightRebalancer extends AccountRebalancer
     @Override
     public void receive(@NotNull WeightType type) {
 
-        /*
-         * Get a rebalance node for the incoming weight type, and add the
-         * current ticker to the node.
-         */
-        final RebalanceNode node = checkRoot(type) ? root :
-                adjustCurrent(type);
-        node.addTicker(currentTicker);
+        // Is the current ticker considered for rebalance?
+        if (isConsidered(currentTicker)) {
+
+            /*
+             * The current ticker is considered for rebalance. Get a rebalance
+             * node for the incoming weight type, and add the current ticker to
+             * the node.
+             */
+            final RebalanceNode node = checkRoot(type) ? root :
+                    adjustCurrent(type);
+            node.addTicker(currentTicker);
+        }
     }
 
     /**
@@ -204,16 +226,10 @@ class WeightRebalancer extends AccountRebalancer
     public void stop() {
 
         /*
-         * Get the description from the current ticker. Is the description not
-         * null, and is it considered?
+         * Add the current ticker as a leaf of the current node if the ticker
+         * is considered for rebalance.
          */
-        final TickerDescription description = currentTicker.getDescription();
-        if ((null != description) && description.isConsidered()) {
-
-            /*
-             * The description is not null, and it is considered. Add the
-             * current ticker as a leaf of the current node.
-             */
+        if (isConsidered(currentTicker)) {
             currentNode.addLeaf(currentTicker);
         }
     }
