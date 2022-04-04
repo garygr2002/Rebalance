@@ -75,12 +75,12 @@ And I used the following software. All software versions here specified were tho
 
 ### Code Metrics
 
-As of version v1.1.5 (1 April 2022), the software consists of the following:
+As of version v1.1.6 (4 April 2022), the software consists of the following:
 
 * 208 Java code files organized into 16 packages
-* 4,977 blank lines inserted for code readability
-* 12,332 comment lines written for code understandability (take a look and tell me if I succeeded)
-* 13,431 Java code lines
+* 4,976 blank lines inserted for code readability
+* 12,327 comment lines written for code understandability (take a look and tell me if I succeeded)
+* 13,429 Java code lines
 
 Thanks to [Cloc](http://cloc.sourceforge.net/) for bringing us the metrics for blank, comment, and code line counts. I arrived at the package count by hand (or more precisely, eyeball) using the Project View in the [IntelliJ IDEA Community Edition](https://www.jetbrains.com/idea/).   
 
