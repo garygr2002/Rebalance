@@ -128,12 +128,16 @@ class WeightRebalancer extends AccountRebalancer
         setWeightMap(getWeights(account, shouldAdjust(account)));
         for (Ticker ticker : account.getChildren()) {
 
-            /*
-             * Set the current ticker, and enumerate the weight types of the
-             * ticker.
-             */
-            currentTicker = ticker;
-            ticker.enumerate(this);
+            // Is the first/next ticker considered?
+            if (isConsidered(ticker)) {
+
+                /*
+                 * The ticker is considered. Set the current ticker, and
+                 * enumerate the weight types of the ticker.
+                 */
+                currentTicker = ticker;
+                ticker.enumerate(this);
+            }
         }
 
         /*
@@ -194,18 +198,13 @@ class WeightRebalancer extends AccountRebalancer
     @Override
     public void receive(@NotNull WeightType type) {
 
-        // Is the current ticker considered for rebalance?
-        if (isConsidered(currentTicker)) {
-
-            /*
-             * The current ticker is considered for rebalance. Get a rebalance
-             * node for the incoming weight type, and add the current ticker to
-             * the node.
-             */
-            final RebalanceNode node = checkRoot(type) ? root :
-                    adjustCurrent(type);
-            node.addTicker(currentTicker);
-        }
+        /*
+         * Get a rebalance node for the incoming weight type, and add the
+         * current ticker to the node.
+         */
+        final RebalanceNode node = checkRoot(type) ? root :
+                adjustCurrent(type);
+        node.addTicker(currentTicker);
     }
 
     /**
@@ -224,13 +223,6 @@ class WeightRebalancer extends AccountRebalancer
 
     @Override
     public void stop() {
-
-        /*
-         * Add the current ticker as a leaf of the current node if the ticker
-         * is considered for rebalance.
-         */
-        if (isConsidered(currentTicker)) {
-            currentNode.addLeaf(currentTicker);
-        }
+        currentNode.addLeaf(currentTicker);
     }
 }
