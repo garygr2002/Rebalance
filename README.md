@@ -607,7 +607,7 @@ The holding value begins in column 101, and may be 18 characters long. Its conte
 
 The holding weight begins in column 120, and may be 8 characters if specified. Its content is a non-negative number, possibly with a decimal point. The holding weight is the value that the software will use when rebalancing the holding identified by the current row with other holdings of exactly the same type in the same account. The software assumes a default weight of one, meaning the software will equally distribute value to same-type holdings in the same account if the weight is not explicitly specified for any. A convenient way to withhold value from any holding during rebalance is to here set its weight to zero.
 
-It is possible to bypass investment-type weight rebalancing, and rely on the holding weight alone. How?
+It is possible to bypass investment-type [Weight Rebalancing](#weight-rebalancer), and rely on the holding weight alone. How?
 
 * For all but the last rebalanced account in a portfolio (see [Rebalance Order](#rebalance-order)), set to zero all weights for the account in the [Account File](#account-file), assuming there is no row for the account in the [Detailed File](#detailed-file). If there is a row for the account in the [Detailed File](#detailed-file), set to zero the <b>Level 1</b> weights in that row (only [Detailed Weight Stock](#detailed-weight-stock), [Detailed Weight Bonds](#detailed-weight-bond), [Detailed Weight Cash](#detailed-weight-cash), and [Detailed Weight Real-Estate](#detailed-weight-real-estate) need to be set)
 * For the last rebalanced account in a portfolio, set to zero all weights for the portfolio in the [Portfolio File](#portfolio-file)
@@ -712,12 +712,13 @@ Note that in this equation, the <b>Level 1</b> category weight for stocks has be
 
 The equity adjustment that the software makes with regard to the S&P 500 today versus last close is a different beast. The software will make this adjustment for all accounts in all portfolios, and the adjustment is not affected by the setting of the adjust-from-high flag for any portfolio. The software assumes that the user has declared valuations of all accounts and portfolios in the [Holding File](#holding-file) as of S&P 500 last close. It therefore assumes - perhaps in a naive way - that the stated valuations will decrease, or increase in proportion to the change reflected in the S&P 500 today. The way the user turns off this adjustment is not to set the value of the S&P 500 last close or S&P 500 today. If the user wants to preserve the ability to adjust the portfolio versus last high, however, the only option is not to set the S&P 500 last close. Let us summarize what can be done in a table by clearing or setting the proper preference:
 
-| User Wants            | S&P 500 Today     | S&P 500 Last Close       | S&P 500 High             |
-|-----------------------|-------------------|--------------------------|--------------------------|
-| No Adjustment         | Clear <b>sptd</b> | Clear or set <b>spcl</b> | Clear or set <b>sphg</b> |
-| Only Today vs Close   | Set <b>sptd</b>   | Set <b>spcl</b>          | Clear <b>sphg</b>        |
-| Only Today vs High    | Set <b>sptd</b>   | Clear <b>spcl</b>        | Set <b>sphg</b>          |
-| Both Adjustments      | Set <b>sptd</b>   | Set <b>spcl</b>          | Set <b>sphg</b>          |
+| User Wants                | S&P 500 Today            | S&P 500 Last Close       | S&P 500 High                         |
+|---------------------------|--------------------------|--------------------------|--------------------------------------|
+| No Adjustment             | Clear <b>sptd</b>        | Clear or set <b>spcl</b> | Clear or set <b>sphg</b>             |
+| No Adjustment (alternate) | Clear or set <b>sptd</b> | Clear <b>spcl</b>        | Clear <b>sphg</b>                    | 
+| Only Today vs Close       | Set <b>sptd</b>          | Set <b>spcl</b>          | Clear <b>sphg</b>                    |
+| Only Today vs High        | Set <b>sptd</b>          | Clear <b>spcl</b>        | Set <b>sphg</b>                      |
+| Both Adjustments          | Set <b>sptd</b>          | Set <b>spcl</b>          | Set <b>sphg</b>                      |
 
 <sub><sup>Table 1: preference controls for equity weight adjustments</sup></sub>
 
@@ -777,9 +778,9 @@ The first subcode field begins in column 78, and is one character. Its content i
 20. 'Y' (high-yield bonds)
 21. 'Z' (short-term bonds)
 
-The first subcode, in conjunction with the subcodes two, three and four determine the characteristics of the security holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds. The use of the 'S' and 'T' codes together is therefore not consistent, and the software will tell the user as much if these codes are used for the same ticker.  
+The first subcode, in conjunction with [Ticker Subcode 2](#ticker-subcode-2), [Ticker Subcode 3](#ticker-subcode-3), and [Ticker Subcode 4](#ticker-subcode-4) determine the characteristics of the security holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds. The use of the 'S' and 'T' codes together is therefore not consistent, and the software will tell the user as much if these codes are used for the same ticker.  
 
-Currently, the software does not have the capability to specify blended, or multi-assets funds. If a ticker falls in this category, it is possible to give the ticker no entries in any subcode field ('_' for all five subcodes). The software would then assign to the ticker a value apportionment equal to 1 / n, where 'n' is the number of tickers in the account.  
+Currently, the software does not have the capability to specify blended, or multi-assets funds. If a ticker falls in this category, it is possible to give the ticker no entries in any subcode field ('_' for all five subcodes). The software would then assign to the ticker a value apportionment equal to 1 / n, where 'n' is the number of tickers in the account. This assumes that each ticker has the default [Holding Weight](#holding-weight) of 1.00.  
 
 A use of subcodes one through four may be demonstrated as follows: A large cap growth fund - holding domestic securities - may be specified with the subcodes 'S', 'D', 'L' and 'G'. This completely specifies the balanceable characteristics of the ticker in a way that is possible, and consistent. Currently, the software requires no more than four subcodes to completely characterize a ticker for its rebalancing effort.
 
