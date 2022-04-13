@@ -11,6 +11,9 @@ class Patterns implements Iterator<Integer> {
     // The slots that bubbles are currently occupying
     private final ArrayList<Integer> slots = new ArrayList<>();
 
+    // The current number of bubbles (or zeros)
+    private int bubbleCount;
+
     // The initial 'next()' (based on the number of slots)
     private int initialNext;
 
@@ -25,6 +28,9 @@ class Patterns implements Iterator<Integer> {
      * 'setNextLimit(int)' was last called
      */
     private Integer nextLimit;
+
+    // The current number of slots
+    private int slotCount;
 
     /**
      * Constructs the patterns object.
@@ -45,17 +51,77 @@ class Patterns implements Iterator<Integer> {
      */
     private static void check(int bubbleCount, int slotCount) {
 
+        // Is the bubble count too low?
+        final int lowEndLimit = 0;
+        if (bubbleCount < lowEndLimit) {
+
+            /*
+             * The bubble count is too low. Throw an IllegalArgumentException
+             * describing the problem.
+             */
+            throw new IllegalArgumentException(String.format("The bubble " +
+                            "count, %d, may not be less than %d", bubbleCount,
+                    lowEndLimit));
+        }
+
+        // Is the slot count too low?
+        if (slotCount < lowEndLimit) {
+
+            /*
+             * The slot count is too low. Throw an IllegalArgumentException
+             * describing the problem.
+             */
+            throw new IllegalArgumentException(String.format("The slot " +
+                            "count, %d, may not be less than %d", bubbleCount,
+                    lowEndLimit));
+        }
+
+        // Is the slot count too high?
+        if (Integer.SIZE <= slotCount) {
+
+            /*
+             * The slot count is too high. Throw an IllegalArgumentException
+             * describing the problem.
+             */
+            throw new IllegalArgumentException(String.format("The slot " +
+                            "count, %d, may not be greater than or equal to %d",
+                    slotCount, Integer.SIZE));
+        }
+
         // Is the slot count less than the bubble count?
         if (slotCount < bubbleCount) {
 
             /*
-             * The slot count is less than the bubble count. This is
-             * impermissible. Throw an IllegalArgumentException describing the
-             * problem.
+             * The slot count is less than the bubble count. Throw an
+             * IllegalArgumentException describing the problem.
              */
             throw new IllegalArgumentException(String.format("Requested " +
                     "slot count %d is smaller than current bubble " +
                     "count %d", slotCount, bubbleCount));
+        }
+    }
+
+    /**
+     * Tests this class.
+     *
+     * @param arguments Command line arguments
+     */
+    public static void main(@NotNull String[] arguments) {
+
+        // Initialize the slot count and the output format.
+        final int slotCount = 6;
+        final String format = String.format("%%%ds", slotCount);
+
+        /*
+         * Declare a new patterns object, and cycle while 'hasNext()'
+         * returns true.
+         */
+        final Patterns patterns = new Patterns(slotCount);
+        while (patterns.hasNext()) {
+
+            // Format and print the first/next integer.
+            System.out.println(String.format(format,
+                    Integer.toBinaryString(patterns.next())).replace(' ', '0'));
         }
     }
 
