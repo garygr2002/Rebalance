@@ -1,31 +1,28 @@
 package com.garygregg.rebalance.rebalance;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 class Patterns implements Iterator<Integer> {
 
-    // The slots that bubbles are currently occupying
-    private final ArrayList<Integer> slots = new ArrayList<>();
-
-    // The current number of bubbles (or zeros)
+    // The current number of bubbles (or zeros, as they are usually known)
     private int bubbleCount;
 
-    // The initial 'next()' (based on the number of slots)
+    // The initial 'next()' (based on the current number of slots)
     private int initialNext;
 
-    // The value returned by 'next()'
+    /*
+     * The next value returned by 'next()'; with this class there is always at
+     * least one 'next()'
+     */
     private Integer next;
 
     // The number of calls after 'setNextLimit(int)' was last called
     private int nextCalls;
 
     /*
-     * The limit to the number of permissible 'next()' calls after
-     * 'setNextLimit(int)' was last called
+     * The limit of the number of permissible 'next()' calls after
+     * 'setNextLimit(int)' was last called (null means no limit)
      */
     private Integer nextLimit;
 
@@ -46,8 +43,6 @@ class Patterns implements Iterator<Integer> {
      *
      * @param bubbleCount A bubble count
      * @param slotCount   A slot count
-     * @throws IllegalArgumentException Indicates that the bubble count/slot
-     *                                  count pair is inconsistent
      */
     private static void check(int bubbleCount, int slotCount) {
 
@@ -72,7 +67,7 @@ class Patterns implements Iterator<Integer> {
              * describing the problem.
              */
             throw new IllegalArgumentException(String.format("The slot " +
-                            "count, %d, may not be less than %d", bubbleCount,
+                            "count, %d, may not be less than %d", slotCount,
                     lowEndLimit));
         }
 
@@ -102,30 +97,6 @@ class Patterns implements Iterator<Integer> {
     }
 
     /**
-     * Tests this class.
-     *
-     * @param arguments Command line arguments
-     */
-    public static void main(@NotNull String[] arguments) {
-
-        // Initialize the slot count and the output format.
-        final int slotCount = 6;
-        final String format = String.format("%%%ds", slotCount);
-
-        /*
-         * Declare a new patterns object, and cycle while 'hasNext()'
-         * returns true.
-         */
-        final Patterns patterns = new Patterns(slotCount);
-        while (patterns.hasNext()) {
-
-            // Format and print the first/next integer.
-            System.out.println(String.format(format,
-                    Integer.toBinaryString(patterns.next())).replace(' ', '0'));
-        }
-    }
-
-    /**
      * Pushes up a bubble.
      *
      * @return True if a bubble could be pushed up; false otherwise
@@ -133,42 +104,64 @@ class Patterns implements Iterator<Integer> {
     private boolean bubble() {
 
         /*
-         * Declare local variables, and initialize them as needed. Declare and
-         * initialize the return value.
+         * This is the most complicated method in this class. I had a devil of
+         * a time debugging it. Declare and initialize immutable parameters.
          */
-        int ceiling, lastSlot = getSlotCount();
+        final int initialNext = getInitialNext();
+        final int shift = 1;
+
+        // Declare local variables, and initialize them as necessary.
         boolean result = false;
+        int candidate, emptySlots = 0;
+        int desiredPattern = 0x1, patternMask = 0x3;
 
         /*
-         * Get the bubble count, and declare a variable to receive the current
-         * bubble.
+         * Cycle for the number of slots where a movable bubble might exist, or
+         * until we locate a movable bubble.
          */
-        final int bubbleCount = getBubbleCount();
-        int currentBubble;
-
-        // Cycle for each bubble, or until we locate a bubble that can move up.
-        for (currentBubble = 0; (currentBubble < bubbleCount) && (!result);
-             ++currentBubble) {
+        final int limit = getSlotCount() - 1;
+        for (int i = 0; (i < limit) && (!result); ++i) {
 
             /*
-             * The slot of the current bubble represents a ceiling for the
-             * previous bubble, if any. Push up the previous bubble, if
-             * possible, and adjust the last slot.
+             * Calculate a candidate by flipping two adjacent bits using the
+             * mask. Was the flip a '10' to an '01'? If so, it means a bubble
+             * moved.
              */
-            ceiling = slots.get(currentBubble);
-            result = setSlot(lastSlot, ceiling, currentBubble - 1);
-            lastSlot = ceiling;
+            candidate = next ^ patternMask;
+            //noinspection AssignmentUsedAsCondition
+            if (result = (desiredPattern == (candidate & patternMask))) {
+
+                /*
+                 * Okay, a bubble moved. Prepare the candidate by setting all
+                 * its bits that are lower than the flipped bits. This clears
+                 * all immovable bubbles. Then clear a number of low-end bits
+                 * in the candidate equal to the number of bubbles that we had
+                 * seen, but could not move. This has the effect of pushing the
+                 * "immovable" bubbles back down to the bottom. Note: Our
+                 * current iteration counter minus the number of empty slots is
+                 * the number of immovable bubbles.
+                 */
+                candidate |= (desiredPattern - 1);
+                next = candidate & (initialNext << (i - emptySlots));
+            }
+
+            /*
+             * Okay, a bubble did not move, but did we locate a slot with no
+             * bubble? If so, increment the empty slot count.
+             */
+            else if (0 != (next & desiredPattern)) {
+                ++emptySlots;
+            }
+
+            /*
+             * Right-shift the desired pattern and the pattern mask in
+             * preparation for the next iteration.
+             */
+            desiredPattern <<= shift;
+            patternMask <<= shift;
         }
 
-        /*
-         * Try to push up the last bubble if no previous bubble could be pushed
-         * up.
-         */
-        if (!result) {
-            result = setSlot(lastSlot, getSlotCount(), currentBubble - 1);
-        }
-
-        // Return the result
+        // Return the result to our caller.
         return result;
     }
 
@@ -221,12 +214,9 @@ class Patterns implements Iterator<Integer> {
      */
     private void clearBubbles() {
 
-        /*
-         * Clear the slots, and add one back that re-initializes the slot count
-         * to zero.
-         */
-        slots.clear();
-        slots.add(0);
+        // Clear the bubbles and the bubble count.
+        next = getInitialNext();
+        bubbleCount = 0;
     }
 
     /**
@@ -242,40 +232,9 @@ class Patterns implements Iterator<Integer> {
     @SuppressWarnings("unused")
     public void clearNextLimit() {
 
-        // Clear the next limit, and clear the number of calls to 'next()'.
-        nextLimit = null;
+        // Clear the number of calls to 'next()', then clear the next limit.
         clearNextCalls();
-    }
-
-    /**
-     * Constructs the value to be returned by <pre>next()</pre>.
-     *
-     * @return The value to be returned by <pre>next<</pre>
-     */
-    private @NotNull Integer constructNext() {
-
-        // Declare local variables, and initialize them as necessary.
-        int cumulativeShifts = 0, mask = 0x1, result = getInitialNext(),
-                shifts;
-
-        // Get the bubble count, and cycle for each bubble.
-        final int bubbleCount = getBubbleCount();
-        for (int bubble = 0; bubble < bubbleCount; ++bubble) {
-
-            // Get the shift differential, and move the mask.
-            shifts = slots.get(bubble) - cumulativeShifts;
-            mask <<= shifts;
-
-            /*
-             * Clear bits in the result, and update the cumulative shifts with
-             * the shift differential.
-             */
-            result ^= mask;
-            cumulativeShifts += shifts;
-        }
-
-        // Return the result.
-        return result;
+        nextLimit = null;
     }
 
     /**
@@ -284,7 +243,7 @@ class Patterns implements Iterator<Integer> {
      * @return The bubble count
      */
     private int getBubbleCount() {
-        return slots.size() - 1;
+        return bubbleCount;
     }
 
     /**
@@ -301,8 +260,8 @@ class Patterns implements Iterator<Integer> {
      *
      * @return The slot count
      */
-    private int getSlotCount() {
-        return slots.get(getBubbleCount());
+    public int getSlotCount() {
+        return slotCount;
     }
 
     @Override
@@ -316,39 +275,16 @@ class Patterns implements Iterator<Integer> {
     private void incrementBubbles() {
 
         /*
-         * Get the current bubble count and slot count, and check to be sure it
-         * would be okay to increment the number of bubbles.
+         * Calculate the new bubble count, and check to make sure that it is
+         * okay with the existing slot count.
          */
-        final int bubbleCount = getBubbleCount();
-        final int slotCount = getSlotCount();
-        check(bubbleCount + 1, slotCount);
+        final int newBubbleCount = getBubbleCount() + 1;
+        check(newBubbleCount, getSlotCount());
 
-        /*
-         * Add a slot for the new bubble. Re-initialize the bubbles, and reset
-         * the slot count.
-         */
-        slots.add(0);
-        initialize(bubbleCount);
-        setSlotCount(slotCount);
-    }
-
-    /**
-     * Initializes the slot of a bubble.
-     *
-     * @param bubble The number of the bubble
-     */
-    private void initialize(int bubble) {
-
-        // Is the bubble greater than zero?
-        if (0 <= bubble) {
-
-            /*
-             * The bubble is greater than zero. Set the slot of the bubble
-             * to its own ordinal number. Initialize any previous bubbles.
-             */
-            slots.set(bubble, bubble);
-            initialize(bubble - 1);
-        }
+        // Calculate the new 'next()', and set the new bubble count.
+        final int initialNext = getInitialNext();
+        next = (initialNext << newBubbleCount) & initialNext;
+        bubbleCount = newBubbleCount;
     }
 
     @Override
@@ -388,22 +324,23 @@ class Patterns implements Iterator<Integer> {
             }
         }
 
-        /*
-         * Construct the next number to return, if possible. Return the
-         * existing next number.
-         */
-        next = hasNext ? constructNext() : null;
+        // Set the next number to null if there is no next number.
+        if (!hasNext) {
+            next = null;
+        }
+
+        // Return the saved next number.
         return result;
     }
 
     /**
-     * Resets the slot count.
+     * Resets with a new slot count.
      *
      * @param slotCount The new slot count
      */
     public void reset(int slotCount) {
 
-        // Clear the bubble and set the slot count.
+        // Clear the bubbles and set the slot count.
         clearBubbles();
         setSlotCount(slotCount);
 
@@ -416,7 +353,7 @@ class Patterns implements Iterator<Integer> {
     }
 
     /**
-     * Resets the patterns.
+     * Resets with the existing slot count.
      */
     public void reset() {
         reset(getSlotCount());
@@ -449,51 +386,15 @@ class Patterns implements Iterator<Integer> {
     }
 
     /**
-     * Sets the slot for a bubble if the slot will be less than a ceiling after
-     * the slot is incremented.
-     *
-     * @param candidate The candidate slot
-     * @param ceiling   The ceiling
-     * @param bubble    The bubble receiving a new slot
-     * @return True if the candidate will be less than the ceiling after being
-     * incremented; false otherwise
-     */
-    private boolean setSlot(int candidate, int ceiling, int bubble) {
-
-        // Will the slot be less than the ceiling after being incremented?
-        ++candidate;
-        final boolean result = candidate < ceiling;
-        if (result) {
-
-            /*
-             * The slot will be less than the ceiling after being incremented.
-             * Set the slot of the bubble, and re-initialize all previous
-             * bubbles.
-             */
-            slots.set(bubble, candidate);
-            initialize(bubble - 1);
-        }
-
-        // Return the result.
-        return result;
-    }
-
-    /**
      * Sets the slot count.
      *
      * @param slotCount The new slot count
      */
     private void setSlotCount(int slotCount) {
 
-        /*
-         * Get the existing bubble count, and ensure that the new slot count is
-         * consistent with the existing bubble count.
-         */
-        final int bubbleCount = getBubbleCount();
-        check(bubbleCount, slotCount);
-
-        // Set the slot count, and set the initial next.
-        slots.set(bubbleCount, slotCount);
+        // Check the new slot count before setting it. Set the initial next.
+        check(getBubbleCount(), slotCount);
+        this.slotCount = slotCount;
         setInitialNext();
     }
 }
