@@ -8,6 +8,9 @@ class Patterns implements Iterator<Integer> {
     // The current number of bubbles (or zeros, as they are usually known)
     private int bubbleCount;
 
+    // True if the user wants to see zero; false otherwise
+    private boolean iWantToSeeZero;
+
     // The initial 'next()' (based on the current number of slots)
     private int initialNext;
 
@@ -28,6 +31,7 @@ class Patterns implements Iterator<Integer> {
 
     // The current number of slots
     private int slotCount;
+
 
     /**
      * Constructs the patterns object.
@@ -270,6 +274,15 @@ class Patterns implements Iterator<Integer> {
     }
 
     /**
+     * Gets I-want-to-see-zero.
+     *
+     * @return True if the user wants to see zero; false otherwise
+     */
+    public boolean iWantToSeeZero() {
+        return iWantToSeeZero;
+    }
+
+    /**
      * Increments the number of bubbles.
      */
     private void incrementBubbles() {
@@ -324,8 +337,11 @@ class Patterns implements Iterator<Integer> {
             }
         }
 
-        // Set the next number to null if there is no next number.
-        if (!hasNext) {
+        /*
+         * Set the next number to null if: 1) there is no next number, or; 2)
+         * the caller does not want to see zero and the next number is zero.
+         */
+        if (!(hasNext && (iWantToSeeZero() || (0 != next)))) {
             next = null;
         }
 
@@ -357,6 +373,16 @@ class Patterns implements Iterator<Integer> {
      */
     public void reset() {
         reset(getSlotCount());
+    }
+
+    /**
+     * Sets I want-to-see-zero
+     *
+     * @param iWantToSeeZero True if the user wants to see zero; false
+     *                       otherwise
+     */
+    public void setIWantToSeeZero(boolean iWantToSeeZero) {
+        this.iWantToSeeZero = iWantToSeeZero;
     }
 
     /**
