@@ -97,6 +97,9 @@ class RebalanceNode implements CurrencyReceiver {
     private final Collection<Ticker> leaves =
             new TreeSet<>(Comparator.comparing(ticker -> ticker.getKey()));
 
+    // An object to generate investment group subset patterns
+    private final Patterns patterns = new Patterns(0);
+
     // A map of snapshot keys to the value of the snapshot
     private final Map<SnapshotKey, Currency> snapshotMap = new HashMap<>();
 
@@ -136,7 +139,11 @@ class RebalanceNode implements CurrencyReceiver {
      */
     public RebalanceNode(@NotNull WeightType type, double weight) {
 
-        // Set the weight type and weight.
+        /*
+         * Set the 'next()' limit of the patterns object. Set the weight type
+         * and weight.
+         */
+        this.patterns.setNextLimit(1000);
         this.type = type;
         this.weight = weight;
 
@@ -318,10 +325,13 @@ class RebalanceNode implements CurrencyReceiver {
 
     /**
      * Produces a list of integers sorted by descending count of set bits.
+     * Note: this method is not currently used because it can produce an
+     * enormous collection of integers for large 'n'.
      *
      * @param n Integers in the resulting list will be less than 2 ^ (n - 1)
      * @return A list of integers sorted by descending count of set bits
      */
+    @SuppressWarnings("unused")
     @Contract(pure = true)
     private static @NotNull @UnmodifiableView List<Integer> produce(int n) {
 
@@ -864,10 +874,10 @@ class RebalanceNode implements CurrencyReceiver {
         try {
 
             /*
-             * Get a list of consideration patterns. Initialize the value of
-             * the 'relative' flag in the value setter action.
+             * Reset the patterns object with the number of delegates.
+             * Initialize the 'relative' flag in the value setter action.
              */
-            final List<Integer> patterns = produce(delegates.size());
+            patterns.reset(delegates.size());
             valueSetterAction.setRelative(isRelative);
 
             /*
@@ -879,7 +889,7 @@ class RebalanceNode implements CurrencyReceiver {
              * on the pattern iterator at least once without checking for a
              * true 'hasNext'. Get the residual from the first score.
              */
-            final Iterator<Integer> iterator = patterns.iterator();
+            final Iterator<Integer> iterator = patterns;
             bestScore = rebalance(delegates, proposed, iterator.next());
             final Currency residual = bestScore.getResidual();
 

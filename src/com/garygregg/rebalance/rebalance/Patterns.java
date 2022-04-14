@@ -381,6 +381,7 @@ class Patterns implements Iterator<Integer> {
      * @param iWantToSeeZero True if the user wants to see zero; false
      *                       otherwise
      */
+    @SuppressWarnings("unused")
     public void setIWantToSeeZero(boolean iWantToSeeZero) {
         this.iWantToSeeZero = iWantToSeeZero;
     }
@@ -403,7 +404,6 @@ class Patterns implements Iterator<Integer> {
      *
      * @param nextLimit The new limit of calls to <pre>next()</pre>
      */
-    @SuppressWarnings("unused")
     public void setNextLimit(int nextLimit) {
 
         // Clear the number of calls to 'next()' after setting the limit.
