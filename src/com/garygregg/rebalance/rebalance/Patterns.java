@@ -5,33 +5,51 @@ import java.util.NoSuchElementException;
 
 class Patterns implements Iterator<Integer> {
 
-    // The current number of bubbles (or zeros, as they are usually known)
+    /*
+     * The current number of bubbles (or zeros, as they are usually known;
+     * changes by necessity on reset)
+     */
     private int bubbleCount;
 
-    // True if the user wants to see zero; false otherwise
+    /*
+     * True if the patterns will fast-forward when the count of 'next()' calls
+     * reaches its limit; false if not (state preserved on reset)
+     */
+    private boolean fastForwardEnabled;
+
+    /*
+     * True if the user wants to see zero; false otherwise (state preserved
+     * on reset)
+     */
     private boolean iWantToSeeZero;
 
-    // The initial 'next()' (based on the current number of slots)
+    /*
+     * The initial 'next()' (based on the current number of slots; changes on
+     * reset, but only when the slot count changes)
+     */
     private int initialNext;
 
     /*
      * The next value returned by 'next()'; with this class there is always at
-     * least one 'next()'
+     * least one 'next()' (changes by necessity on reset)
      */
     private Integer next;
 
-    // The number of calls after 'setNextLimit(int)' was last called
+    /*
+     * The number of calls after 'setNextLimit(int)' was last called (changes
+     * on reset, or when the next limit is cleared or set
+     */
     private int nextCalls;
 
     /*
      * The limit of the number of permissible 'next()' calls after
-     * 'setNextLimit(int)' was last called (null means no limit)
+     * 'setNextLimit(int)' was last called (null means no limit; state
+     * preserved on reset)
      */
     private Integer nextLimit;
 
-    // The current number of slots
+    // The current number of slots (can change on reset)
     private int slotCount;
-
 
     /**
      * Constructs the patterns object.
@@ -40,6 +58,16 @@ class Patterns implements Iterator<Integer> {
      */
     public Patterns(int slotCount) {
         reset(slotCount);
+    }
+
+    /**
+     * Calculates the initial next.
+     *
+     * @param slotCount The slot count
+     * @return The initial next
+     */
+    private static int calculateInitialNext(int slotCount) {
+        return (int) ((1L << slotCount) - 1);
     }
 
     /**
@@ -183,7 +211,20 @@ class Patterns implements Iterator<Integer> {
         final boolean result = checkLimit();
         if (result) {
 
-            // The check succeeded. Increment the number of 'next()' calls.
+            /*
+             * The check succeeded. Is fast-forward enabled, and has the count
+             * of 'next()' calls reached its limit?
+             */
+            if (isFastForwardEnabled() && limitReached()) {
+
+                /*
+                 * Fast-forward is enabled, and the count of 'next()' calls has
+                 * reached its limit. So do the fast-forward.
+                 */
+                fastForward();
+            }
+
+            // Increment the count of 'next()' calls.
             ++nextCalls;
         }
 
@@ -204,9 +245,10 @@ class Patterns implements Iterator<Integer> {
 
             /*
              * The next limit has been set. Reinitialize the result to the
-             * test of the number of 'next()' calls being below the limit.
+             * state of the fast-forward setting, or a test of the number of
+             * 'next()' calls being below the limit.
              */
-            result = (nextCalls < nextLimit);
+            result = isFastForwardEnabled() || !limitReached();
         }
 
         // Return the result.
@@ -242,6 +284,26 @@ class Patterns implements Iterator<Integer> {
     }
 
     /**
+     * Fast-forwards the patterns.
+     */
+    private void fastForward() {
+
+        /*
+         * Determine if a fast-forward is required, considering the current
+         * state of the slot and bubble counts.
+         */
+        final int slotCount = getSlotCount();
+        final int desiredBubbles = slotCount - 2;
+        if (getBubbleCount() < desiredBubbles) {
+
+            // A fast-forward is required, so do it.
+            bubbleCount = desiredBubbles;
+            next = calculateInitialNext(slotCount - desiredBubbles)
+                    << desiredBubbles;
+        }
+    }
+
+    /**
      * Gets the bubble count.
      *
      * @return The bubble count
@@ -260,6 +322,16 @@ class Patterns implements Iterator<Integer> {
     }
 
     /**
+     * Gets the limit of calls to <pre>next()</pre>. Does not change on reset.
+     *
+     * @return The limit of calls to <pre>next()</pre>
+     */
+    @SuppressWarnings("unused")
+    public Integer getNextLimit() {
+        return nextLimit;
+    }
+
+    /**
      * Gets the slot count.
      *
      * @return The slot count
@@ -274,7 +346,7 @@ class Patterns implements Iterator<Integer> {
     }
 
     /**
-     * Gets I-want-to-see-zero.
+     * Gets I-want-to-see-zero. Does not change on reset.
      *
      * @return True if the user wants to see zero; false otherwise
      */
@@ -298,6 +370,27 @@ class Patterns implements Iterator<Integer> {
         final int initialNext = getInitialNext();
         next = (initialNext << newBubbleCount) & initialNext;
         bubbleCount = newBubbleCount;
+    }
+
+    /**
+     * Determines if fast-forward is enabled. Does not change on reset.
+     *
+     * @return True if the patterns will fast-forward when the count of
+     * <pre>next()</pre> calls reaches the limit; false if not
+     */
+    public boolean isFastForwardEnabled() {
+        return fastForwardEnabled;
+    }
+
+    /**
+     * Determines if the count of <pre>next()</pre> calls has reached the
+     * limit.
+     *
+     * @return True if the count of <pre>next()</pre> calls has reached the
+     * limit; false otherwise
+     */
+    private boolean limitReached() {
+        return !(nextCalls < nextLimit);
     }
 
     @Override
@@ -376,7 +469,18 @@ class Patterns implements Iterator<Integer> {
     }
 
     /**
-     * Sets I want-to-see-zero
+     * Sets or clears the fast-forward setting. Does not change on reset.
+     *
+     * @param fastForwardEnabled True if the patterns will fast-forward when
+     *                           the count of <pre>next()</pre> calls reaches
+     *                           the limit false if not
+     */
+    public void setFastForwardEnabled(boolean fastForwardEnabled) {
+        this.fastForwardEnabled = fastForwardEnabled;
+    }
+
+    /**
+     * Sets I want-to-see-zero. Does not change on reset.
      *
      * @param iWantToSeeZero True if the user wants to see zero; false
      *                       otherwise
@@ -390,17 +494,11 @@ class Patterns implements Iterator<Integer> {
      * Sets the initial next number.
      */
     private void setInitialNext() {
-
-        /*
-         * Set the initial next to a number of set bits equal to the slot
-         * count.
-         */
-        final long result = 1L << getSlotCount();
-        initialNext = (int) (result - 1);
+        initialNext = calculateInitialNext(getSlotCount());
     }
 
     /**
-     * Sets the limit of calls to <pre>next().</pre>
+     * Sets the limit of calls to <pre>next()</pre>. Doest not change on reset.
      *
      * @param nextLimit The new limit of calls to <pre>next()</pre>
      */
