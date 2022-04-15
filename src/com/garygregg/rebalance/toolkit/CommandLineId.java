@@ -53,9 +53,9 @@ public enum CommandLineId {
     @SuppressWarnings("SpellCheckingInspection")
     TODAY("S&P 500 today", "sptd", true),
 
-    // The limit of allowed receiver delegates
+    // The limit of reallocation iterations
     @SuppressWarnings("SpellCheckingInspection")
-    X("rebalance limit of same fund type per account", "ncnt", true),
+    X("reallocation iteration limit per account", "ncnt", true),
 
     // Source data directory (string path)
     @SuppressWarnings("SpellCheckingInspection")

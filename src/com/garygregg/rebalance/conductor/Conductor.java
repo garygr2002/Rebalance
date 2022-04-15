@@ -332,9 +332,9 @@ public class Conductor implements Dispatch<CommandLineId> {
     }
 
     /**
-     * Conducts the rebalancer.
+     * Conducts the program.
      *
-     * @param arguments An array of arguments
+     * @param arguments An array of command-line arguments
      */
     public static void conduct(@NotNull String[] arguments) {
 
@@ -402,7 +402,7 @@ public class Conductor implements Dispatch<CommandLineId> {
             }
         });
 
-        // Add a preference dispatch for limit of allowed receiver delegates.
+        // Add a preference dispatch for limit of reallocation iterations.
         dispatchList.add(new IntPreferenceDispatch<>(CommandLineId.X,
                 preferences, outputStream, false));
 
@@ -661,9 +661,9 @@ public class Conductor implements Dispatch<CommandLineId> {
     }
 
     /**
-     * Conducts the rebalancer from a command line.
+     * Conducts the program from a command line.
      *
-     * @param arguments Command line arguments.
+     * @param arguments Command line arguments
      */
     public static void main(@NotNull String[] arguments) {
 

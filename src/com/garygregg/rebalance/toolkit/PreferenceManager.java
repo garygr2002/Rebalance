@@ -308,9 +308,11 @@ public class PreferenceManager {
     }
 
     /**
-     * Gets the limit of allowed receiver delegates
+     * Gets the limit of iterations that the software will make to find an
+     * optimal account reallocation.
      *
-     * @return The limit of allowed receiver delegates
+     * @return The limit of iterations that the software will make to find an
+     * optimal account reallocation
      */
     public @Nullable Integer getLimit() {
         return getInt(CommandLineId.X);
@@ -505,9 +507,11 @@ public class PreferenceManager {
     }
 
     /**
-     * Sets the limit of allowed receiver delegates
+     * Sets the limit of iterations that the software will make to find an
+     * optimal account reallocation.
      *
-     * @param limit The limit of allowed receiver delegates
+     * @param limit The limit of iterations that the software will make to find
+     *              an optimal account reallocation
      */
     public void setLimit(Integer limit) {
         setInt(CommandLineId.X, limit);
@@ -619,17 +623,14 @@ public class PreferenceManager {
         final Double high = getHigh();
         final Double today = getToday();
 
-        /*
-         * Determine if there is a problem that needs to be fixed. Does a
-         * problem need to be fixed?
-         */
+        // Determine if there is a problem that needs to be fixed.
         final boolean fixed = (!((null == high) || (null == today))) &&
                 (high < today);
         if (fixed) {
 
             /*
-             * A problem needs to be fixed. Fix the problem, and recalculate
-             * the S&P 500 high versus today.
+             * A problem needs to be fixed. Fix it, and recalculate the S&P 500
+             * high versus today.
              */
             fixer.fixIt(high, today);
             recalculateHighVersusToday();

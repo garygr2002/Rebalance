@@ -4,9 +4,7 @@ import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.MutableCurrency;
 import com.garygregg.rebalance.hierarchy.Ticker;
 import com.garygregg.rebalance.toolkit.*;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.UnmodifiableView;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -47,9 +45,6 @@ class RebalanceNode implements CurrencyReceiver {
     // The preference manager
     private static final PreferenceManager manager =
             PreferenceManager.getInstance();
-
-    // The limit of allowed receiver delegates
-    private static final int limit = calculateLimit();
 
     // Our local message logger
     private static final MessageLogger messageLogger = new MessageLogger();
@@ -143,42 +138,13 @@ class RebalanceNode implements CurrencyReceiver {
          * Set the 'next()' limit of the patterns object. Set the weight type
          * and weight.
          */
-        this.patterns.setNextLimit(1000);
+        this.patterns.setNextLimit(getLimit());
         this.type = type;
         this.weight = weight;
 
         // Set the logger inside the message logger.
         getLogger().setLogger(Logger.getLogger(
                 RebalanceNode.class.getCanonicalName()));
-    }
-
-    /**
-     * Calculates the limit of allowed receiver delegates.
-     *
-     * @return The limit of allowed receiver delegates
-     */
-    private static int calculateLimit() {
-
-        /*
-         * Get the limit of allowed receiver delegates from the preference
-         * manager. Is the preference null?
-         */
-        Integer limit = manager.getLimit();
-        if (null == limit) {
-
-            /*
-             * The preference is null. As a default, use one more than the
-             * number of children of the weight type that has the most
-             * children.
-             */
-            limit = WeightType.getMaxChildren() + 1;
-        }
-
-        /*
-         * Return the limit as the smallest of the calculated limit and the
-         * size of an integer.
-         */
-        return Integer.min(limit, Integer.SIZE);
     }
 
     /**
@@ -239,11 +205,24 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
-     * Gets the limit of allowed receiver delegates.
+     * Gets the limit of reallocation iterations.
      *
-     * @return The limit of allowed receiver delegates
+     * @return The limit of reallocation iterations
      */
     private static int getLimit() {
+
+        /*
+         * Get the limit of reallocation iterations from the preference
+         * manager. Is the preference null?
+         */
+        Integer limit = manager.getLimit();
+        if (null == limit) {
+
+            // The preference is null. Use a default.
+            limit = (1 << WeightType.getMaxChildren());
+        }
+
+        // Return the limit.
         return limit;
     }
 
@@ -321,64 +300,6 @@ class RebalanceNode implements CurrencyReceiver {
 
         // Return the result.
         return result;
-    }
-
-    /**
-     * Produces a list of integers sorted by descending count of set bits.
-     * Note: this method is not currently used because it can produce an
-     * enormous collection of integers for large 'n'.
-     *
-     * @param n Integers in the resulting list will be less than 2 ^ (n - 1)
-     * @return A list of integers sorted by descending count of set bits
-     */
-    @SuppressWarnings("unused")
-    @Contract(pure = true)
-    private static @NotNull @UnmodifiableView List<Integer> produce(int n) {
-
-        // The argument cannot be negative.
-        if (0 > n) {
-            throw new IllegalArgumentException(
-                    String.format("Negative argument %d not allowed", n));
-        }
-
-        /*
-         * The argument cannot be larger than the limit of allowed receiver
-         * delegates.
-         */
-        else if (getLimit() <= n) {
-            throw new IllegalArgumentException(
-                    String.format("Argument %d is too big", n));
-        }
-
-        /*
-         * Create the list. Calculate the count of integers, and cycle for
-         * each.
-         */
-        final List<Integer> list = new ArrayList<>();
-        final long count = 1L << n;
-        for (long i = 1; i < count; ++i) {
-
-            // Add the first/next integer to the list.
-            list.add((int) i);
-        }
-
-        // Sort the list.
-        list.sort((first, second) -> {
-
-            // Calculate the bit count difference.
-            final int bitCountDifference = Integer.bitCount(second) -
-                    Integer.bitCount(first);
-
-            /*
-             * Return the difference of the integers if their bit counts are
-             * the same. Otherwise, return the difference in their bit counts.
-             */
-            return (0 == bitCountDifference) ? second - first :
-                    bitCountDifference;
-        });
-
-        // Return an unmodifiable copy of the sorted list.
-        return Collections.unmodifiableList(list);
     }
 
     /**
@@ -874,20 +795,23 @@ class RebalanceNode implements CurrencyReceiver {
         try {
 
             /*
-             * Reset the patterns object with the number of delegates.
-             * Initialize the 'relative' flag in the value setter action.
+             * Reset the patterns object with the number of delegates. Enable
+             * fast-forward in the patterns object until the residual of the
+             * best reallocation score goes to zero. Initialize the 'relative'
+             * flag in the value setter action.
              */
             patterns.reset(delegates.size());
+            patterns.setFastForwardEnabled(true);
             valueSetterAction.setRelative(isRelative);
 
             /*
              * Get an iterator for the consideration patterns. Try an initial
-             * rebalance using the first pattern, which uses all delegates.
+             * reallocation using the first pattern, which uses all delegates.
              * A precondition for calling this method is that the delegate
              * collection passed to it has non-zero weight. Non-zero weight
              * implies at least one delegate, so it will be okay to call 'next'
              * on the pattern iterator at least once without checking for a
-             * true 'hasNext'. Get the residual from the first score.
+             * true 'hasNext()'. Get the residual from the first score.
              */
             final Iterator<Integer> iterator = patterns;
             bestScore = rebalance(delegates, proposed, iterator.next());
@@ -895,7 +819,7 @@ class RebalanceNode implements CurrencyReceiver {
 
             /*
              * Initially, the best snapshot is the first snapshot. Initialize
-             * both best and first snapshots to the current rebalance.
+             * both best and first snapshots to the current reallocation.
              */
             takeSnapshot(bestKey);
             takeSnapshot(firstKey);
@@ -911,14 +835,14 @@ class RebalanceNode implements CurrencyReceiver {
             /*
              * Cycle while there continue to be consideration patterns, and
              * while the ideal score is less than the best score. If *all*
-             * delegates had no residual on first rebalance, then the best
+             * delegates had no residual on first reallocation, then the best
              * score will be ideal without any iterations of the following
-             * loop. Our rebalancing problem will have been equivalent to a
+             * loop. Our reallocation problem will have been equivalent to a
              * fractional knapsack problem. If we do enter the loop, however,
              * I postulate that the following loop will never exit due to the
              * best score becoming ideal. Why? Even if the residual component
              * of the best score reaches zero, there will always be a non-zero
-             * deviation from an ideal rebalance. It cannot be helped.
+             * deviation from an ideal reallocation. It cannot be helped.
              */
             while (iterator.hasNext() &&
                     (0 > idealScore.compareTo(bestScore))) {
@@ -926,15 +850,11 @@ class RebalanceNode implements CurrencyReceiver {
                 /*
                  * Okay, we are inside the loop. This means two things: 1)
                  * there are two or more delegates, and; 2) and at least one of
-                 * the delegates had a residual. Our rebalancing problem is now
-                 * a 0/1 knapsack problem. Rebalance again, using the next
+                 * the delegates had a residual. Our reallocation problem is now
+                 * a 0/1 knapsack problem. Reallocate again, using the next
                  * consideration pattern and the residual from the first
-                 * rebalance attempt. Receive the current score. Is the current
-                 * score better than the best score?
-                 *
-                 * (Note: We are not currently performing the most efficient
-                 * algorithm to find an exact solution to 0/1 knapsack problem,
-                 * which involves dynamic programming. Fix it later.)
+                 * reallocation attempt. Receive the current score. Is the
+                 * current score better than the best score?
                  */
                 currentScore = rebalance(delegates, residual, iterator.next());
                 if (0 > currentScore.compareTo(bestScore)) {
@@ -946,11 +866,20 @@ class RebalanceNode implements CurrencyReceiver {
                      */
                     takeSnapshot(bestKey);
                     bestScore = currentScore;
+
+                    /*
+                     * Disable fast-forward in the patterns object if the
+                     * residual in the best score has reached zero. If this
+                     * setting is disabled, the patterns object will return no
+                     * more patterns if the iteration limit has been reached.
+                     */
+                    patterns.setFastForwardEnabled(
+                            bestScore.getResidual().equals(zero));
                 }
 
                 /*
                  * Recover the first snapshot in case we require any further
-                 * rebalance attempts.
+                 * reallocation attempts.
                  */
                 recoverSnapshot(firstKey);
             }

@@ -78,7 +78,7 @@ class Preference extends Informer implements Dispatch<CommandLineId> {
                 formatPreference(manager.getToday()));
 
         /*
-         * Display the preference for the limit of allowed receiver delegates.
+         * Display the preference for the limit of reallocation iterations.
          * Display the preferences for source and destination.
          */
         displayPreference(CommandLineId.X, manager.getLimit());

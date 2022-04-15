@@ -43,10 +43,10 @@ class Minimum extends Informer implements Dispatch<CommandLineId> {
         manager.setLevel(Level.INFO);
 
         /*
-         * Set the limit of allowed receiver delegates, the logging level for
+         * Set the limit of reallocation iterations, the logging level for
          * ordinary informational messages, and the path for the data files.
          */
-        manager.setLimit(WeightType.getMaxChildren());
+        manager.setLimit(1 << WeightType.getMaxChildren());
         manager.setOrdinary(Level.FINE);
         manager.setSource(Paths.get("data"));
     }
