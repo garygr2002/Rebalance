@@ -17,7 +17,8 @@ class WeightRebalancer extends AccountRebalancer
     private static final Currency zero = Currency.getZero();
 
     // The root rebalance node
-    private final RebalanceNode root = new RebalanceNode(WeightType.ALL, 1.);
+    private final RebalanceNode root =
+            new RebalanceNode(WeightType.ALL, 0, 1.);
 
     // The current rebalance node
     private RebalanceNode currentNode;
@@ -88,12 +89,14 @@ class WeightRebalancer extends AccountRebalancer
 
             /*
              * There is no existing child for the incoming weight type. Get the
-             * weight map. Create a new child with the weight type and weight
-             * from the weight map if the weight map is not null. Otherwise,
-             * use a default weight.
+             * weight map. Create a new child for the current node using the
+             * incoming weight type. Use one higher level than the current
+             * node, and a weight from the map if the map is not null.
+             * Otherwise, use a default weight.
              */
             final Map<WeightType, Double> weightMap = getWeightMap();
             currentNode.addChild(node = new RebalanceNode(type,
+                    currentNode.getLevel() + 1,
                     (null == weightMap) ? 1. : weightMap.get(type)));
         }
 

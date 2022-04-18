@@ -319,6 +319,15 @@ public class PreferenceManager {
     }
 
     /**
+     * Gets the maximum level that is allowed reallocation iterations.
+     *
+     * @return The maximum level that is allowed reallocation iterations
+     */
+    public @Nullable Integer getMaxLevel() {
+        return getInt(CommandLineId.Y);
+    }
+
+    /**
      * Gets the logging level for ordinary informational messages.
      *
      * @return The logging level for ordinary information messages
@@ -515,6 +524,16 @@ public class PreferenceManager {
      */
     public void setLimit(Integer limit) {
         setInt(CommandLineId.X, limit);
+    }
+
+    /**
+     * Sets the maximum level that is allowed reallocation iterations.
+     *
+     * @param maxLevel The maximum level that is allowed reallocation
+     *                 iterations
+     */
+    public void setMaxLevel(Integer maxLevel) {
+        setInt(CommandLineId.Y, maxLevel);
     }
 
     /**

@@ -41,11 +41,13 @@ class Reset extends Informer implements Dispatch<CommandLineId> {
         manager.setInflation(null);
 
         /*
-         * Set the desired logging level and the limit of per-account
+         * Set the desired logging level. Set the limit of per-account
+         * reallocation iterations, and the maximum level that is allowed
          * reallocation iterations.
          */
         manager.setLevel(null);
         manager.setLimit(null);
+        manager.setMaxLevel(null);
 
         /*
          * Set the logging level for ordinary informational messages, the path

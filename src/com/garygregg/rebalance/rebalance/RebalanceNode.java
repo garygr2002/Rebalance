@@ -92,6 +92,15 @@ class RebalanceNode implements CurrencyReceiver {
     private final Collection<Ticker> leaves =
             new TreeSet<>(Comparator.comparing(ticker -> ticker.getKey()));
 
+    // The level of this node
+    private final int level;
+
+    /*
+     * True if it is okay for this node to iterate to find an optimal
+     * reallocation; false otherwise
+     */
+    private final boolean okayToIterate;
+
     // An object to generate investment group subset patterns
     private final Patterns patterns = new Patterns(0);
 
@@ -130,15 +139,21 @@ class RebalanceNode implements CurrencyReceiver {
      * Constructs a rebalance node.
      *
      * @param type   The weight type assigned to the node
+     * @param level  The level of the node
      * @param weight The weight of the node
      */
-    public RebalanceNode(@NotNull WeightType type, double weight) {
+    public RebalanceNode(@NotNull WeightType type, int level, double weight) {
 
         /*
-         * Set the 'next()' limit of the patterns object. Set the weight type
-         * and weight.
+         * Set the level of the node. Set the okay-to-iterate flag if the
+         * incoming level is less than, or equal to the incoming level. Set the
+         * 'next()' limit of the patterns object.
          */
+        this.level = level;
+        this.okayToIterate = (getLevel() <= getMaxLevel());
         this.patterns.setNextLimit(getLimit());
+
+        // Set the weight type and weight.
         this.type = type;
         this.weight = weight;
 
@@ -233,6 +248,28 @@ class RebalanceNode implements CurrencyReceiver {
      */
     private static @NotNull MessageLogger getLogger() {
         return messageLogger;
+    }
+
+    /**
+     * Gets the maximum level for reallocation iterations.
+     *
+     * @return The maximum level for reallocation iterations
+     */
+    private static int getMaxLevel() {
+
+        /*
+         * Get the maximum level for reallocation iterations from the
+         * preference manager. Is the preference null?
+         */
+        Integer maxLevel = manager.getMaxLevel();
+        if (null == maxLevel) {
+
+            // The preference is null. Use a default.
+            maxLevel = 8;
+        }
+
+        // Return the maximum level.
+        return maxLevel;
     }
 
     /**
@@ -376,16 +413,18 @@ class RebalanceNode implements CurrencyReceiver {
                     Integer.MAX_VALUE);
 
             /*
-             * Create a new child node of the same weight type as this node.
-             * For the weight of the new child, use the sum of the weight of
-             * the existing children, multiplied by the number of leaves, and
-             * divided by the number of existing children. The weight sum,
-             * number of leaves, and number of existing children will all be
-             * positive, or we would not be here performing this calculation.
-             * Because of this, it is not necessary to check if the number of
-             * existing children is zero before using that number as a divisor.
+             * Create a new child node with one higher level, and the same
+             * weight type as this node. For the weight of the new child, use
+             * the sum of the weight of the existing children, multiplied by
+             * the number of leaves, and divided by the number of existing
+             * children. The weight sum, number of leaves, and number of
+             * existing children will all be positive, or we would not be here
+             * performing this calculation. Because of this, it is not
+             * necessary to check that the number of existing children is zero
+             * before using that number as a divisor.
              */
             final RebalanceNode newChild = new RebalanceNode(getType(),
+                    getLevel() + 1,
                     new Reallocator(weightList).getWeightSum() * leafCount /
                             weightList.size());
 
@@ -577,6 +616,15 @@ class RebalanceNode implements CurrencyReceiver {
     }
 
     /**
+     * Gets the level of this node.
+     *
+     * @return The level of this node
+     */
+    public int getLevel() {
+        return level;
+    }
+
+    /**
      * Gets the proposed value of the node, with an optional extra added in.
      *
      * @return The proposed value of the node, with the extra added in if it
@@ -677,6 +725,17 @@ class RebalanceNode implements CurrencyReceiver {
 
         // Return the result.
         return result;
+    }
+
+    /**
+     * Determines if it is okay for this node to iterate to find an optimal
+     * reallocation.
+     *
+     * @return True if it is okay for this node to iterate to find an optimal
+     * reallocation; false otherwise
+     */
+    public boolean isOkayToIterate() {
+        return okayToIterate;
     }
 
     /**
@@ -809,9 +868,9 @@ class RebalanceNode implements CurrencyReceiver {
              * reallocation using the first pattern, which uses all delegates.
              * A precondition for calling this method is that the delegate
              * collection passed to it has non-zero weight. Non-zero weight
-             * implies at least one delegate, so it will be okay to call 'next'
-             * on the pattern iterator at least once without checking for a
-             * true 'hasNext()'. Get the residual from the first score.
+             * implies at least one delegate, so it will be okay to call
+             * 'next()' on the pattern iterator at least once without checking
+             * for a true 'hasNext()'. Get the residual from the first score.
              */
             final Iterator<Integer> iterator = patterns;
             bestScore = rebalance(delegates, proposed, iterator.next());
@@ -834,15 +893,17 @@ class RebalanceNode implements CurrencyReceiver {
 
             /*
              * Cycle while there continue to be consideration patterns, and
-             * while the ideal score is less than the best score. If *all*
+             * while the ideal score is less than the best score. If *all* the
              * delegates had no residual on first reallocation, then the best
              * score will be ideal without any iterations of the following
              * loop. Our reallocation problem will have been equivalent to a
-             * fractional knapsack problem. If we do enter the loop, however,
-             * I postulate that the following loop will never exit due to the
+             * fractional knapsack problem. If we do enter the loop, however, I
+             * postulate that the following loop will never exit due to the
              * best score becoming ideal. Why? Even if the residual component
              * of the best score reaches zero, there will always be a non-zero
-             * deviation from an ideal reallocation. It cannot be helped.
+             * deviation from an ideal reallocation. It cannot be helped. So
+             * keep trying to minimize the non-zero standard deviation after
+             * the residual reaches zero!
              */
             while (iterator.hasNext() &&
                     (0 > idealScore.compareTo(bestScore))) {
@@ -888,7 +949,7 @@ class RebalanceNode implements CurrencyReceiver {
             recoverSnapshot(bestKey);
         }
 
-        // Catch illegal argument exceptions.
+        // Catch any illegal argument exception.
         catch (@NotNull IllegalArgumentException exception) {
 
             // Log a warning saying a rebalance cannot be accomplished.
@@ -948,6 +1009,84 @@ class RebalanceNode implements CurrencyReceiver {
         return residual;
     }
 
+    /**
+     * Rebalances a collection of receiver delegates only once.
+     *
+     * @param delegates  A collection of receiver delegates
+     * @param proposed   A value with which to adjust the proposed value of
+     *                   this node
+     * @param isRelative True if the incoming value is relative to the value
+     *                   already set in the node; false if it is absolute
+     * @param <T>        A receiver delegate type
+     * @return The difference between proposed value and the value that this
+     * node set (the "residual")
+     */
+    private <T extends ReceiverDelegate<?>> @NotNull Currency rebalanceOnce(
+            @NotNull Collection<T> delegates, @NotNull Currency proposed,
+            boolean isRelative) {
+
+        /*
+         * Get the message logger. Determine the proposed holdings prior to
+         * any rebalance.
+         */
+        final MessageLogger logger = getLogger();
+        final Currency beforeRebalance = getProposed(proposed);
+
+        /*
+         * Reset the patterns object with the number of delegates. Disable the
+         * fast-forward flag. We will only be calling 'next()' once, so it does
+         * not really make a difference. Initialize the 'relative' flag in the
+         * value setter action.
+         */
+        patterns.reset(delegates.size());
+        patterns.setFastForwardEnabled(false);
+        valueSetterAction.setRelative(isRelative);
+
+        /*
+         * Perform the reallocation using only the first pattern, which uses
+         * all the delegates. A precondition for calling this method is that
+         * the delegate collection has non-zero weight. Non-zero weight implies
+         * at least one delegate, so it will be okay to call 'next()' on the
+         * patterns object at least once without checking for a true
+         * 'hasNext()'. Get the residual from the score.
+         */
+        final ReallocationScore score = rebalance(delegates, proposed,
+                patterns.next());
+        final Currency residual = score.getResidual();
+
+        // Log a message identifying the reallocation score characteristics.
+        logger.log(extraordinary, String.format("For account key %s and " +
+                        "weight type %s: I have identified a residual of " +
+                        "%s (deviation of %s) when trying to set %s " +
+                        "proposed value %s.",
+                getAccountKey(), getType(), residual,
+                deviationFormat.format(score.getDeviation()),
+                isRelative ? "relative" : "absolute", proposed));
+
+        /*
+         * Get the proposed value of this node with the residual added in. As
+         * a post-condition, the resulting sum should be equal to that taken
+         * prior to any rebalance. Does the post-condition not hold?
+         */
+        final Currency afterRebalance = getProposed(residual);
+        if (!afterRebalance.isEqual(beforeRebalance)) {
+
+            /*
+             * The resulting sum after rebalance is not equal to the sum before
+             * rebalance. Log a message.
+             */
+            logger.streamAndLog(Level.WARNING, String.format("For account " +
+                            "key %s and weight type %s: The after-rebalance " +
+                            "sum of %s does not equal the before-rebalance " +
+                            "sum of %s.", getAccountKey(), getType(),
+                    afterRebalance, beforeRebalance));
+        }
+
+        // Set the current value of this node and return the residual.
+        setValue(sumProposedAction.getSum());
+        return residual;
+    }
+
     @Override
     public void recoverSnapshot(@NotNull SnapshotKey key) {
 
@@ -982,7 +1121,9 @@ class RebalanceNode implements CurrencyReceiver {
         if (hasAnyWeight(delegates)) {
 
             // The delegates have weight. Rebalance them.
-            residual = rebalance(delegates, currency, isRelative);
+            residual = isOkayToIterate() ?
+                    rebalance(delegates, currency, isRelative) :
+                    rebalanceOnce(delegates, currency, isRelative);
         }
 
         // Return the residual.

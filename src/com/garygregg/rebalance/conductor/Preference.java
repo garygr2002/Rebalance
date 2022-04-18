@@ -78,10 +78,13 @@ class Preference extends Informer implements Dispatch<CommandLineId> {
                 formatPreference(manager.getToday()));
 
         /*
-         * Display the preference for the limit of reallocation iterations.
-         * Display the preferences for source and destination.
+         * Display the preference for the limit of reallocation iterations, and
+         * the maximum level allowed reallocation iterations.
          */
         displayPreference(CommandLineId.X, manager.getLimit());
+        displayPreference(CommandLineId.Y, manager.getMaxLevel());
+
+        // Display the preferences for source and destination.
         displayPreference(CommandLineId.SOURCE, manager.getSource());
         displayPreference(CommandLineId.DESTINATION, manager.getDestination());
     }

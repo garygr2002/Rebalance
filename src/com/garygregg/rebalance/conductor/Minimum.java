@@ -43,10 +43,16 @@ class Minimum extends Informer implements Dispatch<CommandLineId> {
         manager.setLevel(Level.INFO);
 
         /*
-         * Set the limit of reallocation iterations, the logging level for
-         * ordinary informational messages, and the path for the data files.
+         * Set the limit of reallocation iterations, and the maximum level
+         * that is allowed reallocation iterations.
          */
         manager.setLimit(1 << WeightType.getMaxChildren());
+        manager.setMaxLevel(8);
+
+        /*
+         * Set the logging level for ordinary informational messages, and the
+         * path for the data files.
+         */
         manager.setOrdinary(Level.FINE);
         manager.setSource(Paths.get("data"));
     }

@@ -407,6 +407,13 @@ public class Conductor implements Dispatch<CommandLineId> {
                 preferences, outputStream, false));
 
         /*
+         * Add a preference dispatch for the maximum rebalance level that is
+         * allowed reallocation iterations.
+         */
+        dispatchList.add(new IntPreferenceDispatch<>(CommandLineId.Y,
+                preferences, outputStream, false));
+
+        /*
          * Add preference dispatches for: 1) backup; 2) set minimum settings,
          * and; 3) preferences.
          */

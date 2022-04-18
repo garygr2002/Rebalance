@@ -57,6 +57,10 @@ public enum CommandLineId {
     @SuppressWarnings("SpellCheckingInspection")
     X("reallocation iteration limit per account", "ncnt", true),
 
+    // The maximum rebalance level allowed reallocation iterations
+    @SuppressWarnings("SpellCheckingInspection")
+    Y("maximum level for reallocation iterations", "mxrt", true),
+
     // Source data directory (string path)
     @SuppressWarnings("SpellCheckingInspection")
     SOURCE("data source", "spth", true),
