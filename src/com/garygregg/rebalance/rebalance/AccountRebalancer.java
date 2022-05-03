@@ -73,28 +73,7 @@ abstract class AccountRebalancer extends Rebalancer {
                 @Override
                 public void overlay(@NotNull Map<WeightType, Double> weightMap,
                                     @NotNull Account account) {
-
-                    /*
-                     * Set the descriptions in the account collection, and
-                     * overlay the weight map if the description is not null.
-                     */
-                    if (setDescription(accountCollection,
-                            account.getDescription())) {
-                        AccountRebalancer.overlay(weightMap,
-                                accountCollection);
-                    }
-
-                    /*
-                     * Set the descriptions in the detailed collection, and
-                     * overlay the weight map a second time if the description
-                     * is not null.
-                     */
-                    if (setDescription(detailedCollection,
-                            DetailedLibrary.getInstance().
-                                    getDescription(account.getKey()))) {
-                        AccountRebalancer.overlay(weightMap,
-                                detailedCollection);
-                    }
+                    AccountRebalancer.overlay(weightMap, account);
                 }
             };
 
@@ -116,11 +95,19 @@ abstract class AccountRebalancer extends Rebalancer {
                                     @NotNull Account account) {
 
                     /*
-                     * Set the descriptions in the portfolio list, and
-                     * overlay the weight map if the description is not null.
+                     * Overlay the weight map with weights from the account,
+                     * including detailed weights as necessary. Set the
+                     * description in the portfolio list. Is the description
+                     * not null?
                      */
+                    AccountRebalancer.overlay(weightMap, account);
                     if (setDescription(portfolioList,
                             account.getPortfolioDescription())) {
+
+                        /*
+                         * The description is not null. Overlay the weight map
+                         * with portfolio weights.
+                         */
                         AccountRebalancer.overlay(weightMap, portfolioList);
                     }
                 }
@@ -610,6 +597,38 @@ abstract class AccountRebalancer extends Rebalancer {
         weightMap.put(WeightType.STOCK_NOT_LARGE, 40.);
         weightMap.put(WeightType.STOCK_SMALL, 50.);
         weightMap.put(WeightType.STOCK_VALUE, 60.);
+    }
+
+    /**
+     * Overlays a weight map, first with weights specified in an account
+     * description, second with weights specified in a detailed description.
+     *
+     * @param weightMap The weight map receiving overlays
+     * @param account   An account object
+     */
+    private static void overlay(@NotNull Map<WeightType, Double> weightMap,
+                                @NotNull Account account) {
+
+        /*
+         * Set the description in the account collection and overlay the weight
+         * map if the description is not null.
+         */
+        if (setDescription(accountCollection,
+                account.getDescription())) {
+            AccountRebalancer.overlay(weightMap,
+                    accountCollection);
+        }
+
+        /*
+         * Set the description in the detailed collection, and overlay the
+         * weight map a second time if the description is not null.
+         */
+        if (setDescription(detailedCollection,
+                DetailedLibrary.getInstance().
+                        getDescription(account.getKey()))) {
+            AccountRebalancer.overlay(weightMap,
+                    detailedCollection);
+        }
     }
 
     /**
