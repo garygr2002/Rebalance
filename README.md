@@ -454,7 +454,7 @@ The small stock weight begins in column 116, and may be 6 characters long. Its c
 
 The growth-and-value stock weight begins in column 123, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to growth-and-value stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to growth-and-value stocks. The growth-and-value stock weight is a <b>Level 4</b> weight category under: 1) large cap stock investments, and; 2) not-large cap stock investments. Alternatively, it is a <b>Level 5</b> weight category under: 1) medium cap stock investments, and; 2) small cap stock investments.
 
-### Weight Stock or Value
+### Weight Growth or Value
 
 The growth-or-value stock weight begins in column 130, and may be 6 characters long. Its content is a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to growth-or-value (one or the other <i>only</i>) stocks. If this field, and that for other weights in the same rebalance level sum to 100, then the specified weight is actually a percent assigned to growth-or-value stocks. The growth-or-value stock weight is a <b>Level 4</b> weight category under: 1) large cap stock investments, and; 2) not-large cap stock investments. Alternatively, it is a <b>Level 5</b> weight category under: 1) medium cap stock investments, and; 2) small cap stock investments.
 
