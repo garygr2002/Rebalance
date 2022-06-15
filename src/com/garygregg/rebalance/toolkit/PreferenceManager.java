@@ -12,6 +12,12 @@ import java.util.prefs.Preferences;
 
 public class PreferenceManager {
 
+    // The bear market ratio
+    private static final double bearRatio = 0.8;
+
+    // The bear market fraction
+    private static final double bearFraction = calculateFraction(bearRatio);
+
     // A single instance of the preference manager
     private static final PreferenceManager instance = new PreferenceManager();
 
@@ -19,6 +25,7 @@ public class PreferenceManager {
     private final Preferences preferences =
             Preferences.userRoot().node(
                     PreferenceManager.class.getName());
+
     /*
      * A fixer for S&P 500 high less than S&P 500 today when today has been
      * most recently set
@@ -85,6 +92,24 @@ public class PreferenceManager {
 
         // Return the result.
         return result;
+    }
+
+    /**
+     * Gets the fraction that characterizes a bear market.
+     *
+     * @return The fraction that characterizes a bear market
+     */
+    public static double getBearFraction() {
+        return bearFraction;
+    }
+
+    /**
+     * Gets the ratio that characterizes a bear market.
+     *
+     * @return The ratio that characterizes a bear market
+     */
+    public static double getBearRatio() {
+        return bearRatio;
     }
 
     /**
