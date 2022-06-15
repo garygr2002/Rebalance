@@ -265,6 +265,30 @@ public enum WeightType {
     }
 
     /**
+     * Calculates the sum of the level one weight types.
+     *
+     * @param weightMap A weight map
+     * @return The sum of the level one weight types
+     */
+    public static double sumWeights(@NotNull Map<? super WeightType, Double>
+                                            weightMap) {
+
+        /*
+         * Declare and initialize a sum for all the level one weight types.
+         * Cycle for each level one weight type.
+         */
+        double all = 0.;
+        for (WeightType type : getLevelOne()) {
+
+            // Add the first/next weight type to the sum.
+            all += weightMap.get(type);
+        }
+
+        // Return the sum of the level one weight types.
+        return all;
+    }
+
+    /**
      * Tests a weight type to determine if it is a level one weight type.
      *
      * @param type A weight type to test

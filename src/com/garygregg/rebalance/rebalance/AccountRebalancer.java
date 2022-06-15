@@ -166,7 +166,7 @@ abstract class AccountRebalancer extends Rebalancer {
          * Declare and initialize a variable to receive a weight type, and
          * initialize it to stock.
          */
-        final double all = sumWeights(weightMap);
+        final double all = WeightType.sumWeights(weightMap);
         WeightType type = WeightType.STOCK;
 
         /*
@@ -245,7 +245,7 @@ abstract class AccountRebalancer extends Rebalancer {
              * the do-nothing constant?
              */
             final double doNothingConstant = 0.;
-            final double weightSum = sumWeights(weightMap);
+            final double weightSum = WeightType.sumWeights(weightMap);
             if (doNothingConstant != weightSum) {
 
                 /*
@@ -696,30 +696,6 @@ abstract class AccountRebalancer extends Rebalancer {
 
         // Return if the description was not null.
         return (null != description);
-    }
-
-    /**
-     * Calculates the sum of the level one weight types.
-     *
-     * @param weightMap A weight map
-     * @return The sum of the level one weight types
-     */
-    private static double sumWeights(@NotNull Map<? super WeightType, Double>
-                                             weightMap) {
-
-        /*
-         * Declare and initialize a sum for all the level zero weight types.
-         * Cycle for each level one weight type.
-         */
-        double all = 0.;
-        for (WeightType type : getLevelOne()) {
-
-            // Add the first/next weight type to the sum.
-            all += weightMap.get(type);
-        }
-
-        // Return the sum of the level one weight types.
-        return all;
     }
 
     /**
