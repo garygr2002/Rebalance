@@ -61,6 +61,7 @@ public class MutableCurrency extends MutableCountable
      * @param currency A currency
      * @return The value that was set
      */
+    @SuppressWarnings("UnusedReturnValue")
     public double add(@NotNull Currency currency) {
 
         // Add the value, and return the result.
@@ -74,6 +75,7 @@ public class MutableCurrency extends MutableCountable
      * @param currency A mutable currency
      * @return The value that was set
      */
+    @SuppressWarnings("UnusedReturnValue")
     public double add(@NotNull MutableCurrency currency) {
 
         // Add the value, and return the result.
@@ -227,6 +229,7 @@ public class MutableCurrency extends MutableCountable
      * @param currency A currency
      * @return The value that was set
      */
+    @SuppressWarnings("UnusedReturnValue")
     public double set(@NotNull Currency currency) {
 
         // Set the value, and return the result.
@@ -253,6 +256,7 @@ public class MutableCurrency extends MutableCountable
      * @param currency A currency
      * @return The value that was set
      */
+    @SuppressWarnings("UnusedReturnValue")
     public double subtract(@NotNull Currency currency) {
 
         // Subtract the value, and return the result.
