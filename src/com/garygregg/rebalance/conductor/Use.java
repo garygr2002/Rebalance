@@ -39,7 +39,7 @@ class Use extends PreferenceDispatch<CommandLineId> {
             @NotNull String @NotNull [] elements) {
 
         /*
-         * Isolate the last element. Return the last element as a single-
+         * Isolate the last element. Return the last element as a single
          * element array if any element exists. Return an empty string if no
          * element exists. Note: Formerly this class operated by using all the
          * elements, i.e., simply returning the argument to this method.
