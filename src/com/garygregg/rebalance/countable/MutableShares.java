@@ -180,6 +180,7 @@ public class MutableShares extends MutableCountable
      * @param shares A shares
      * @return The value that was set
      */
+    @SuppressWarnings("UnusedReturnValue")
     public double set(@NotNull Shares shares) {
 
         // Set the value, and return the result.
@@ -193,6 +194,7 @@ public class MutableShares extends MutableCountable
      * @param shares A shares
      * @return The value that was set
      */
+    @SuppressWarnings("UnusedReturnValue")
     public double subtract(@NotNull Shares shares) {
 
         // Subtract the value, and return the result.
