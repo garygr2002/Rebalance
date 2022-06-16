@@ -12,14 +12,24 @@ import java.util.prefs.Preferences;
 
 public class PreferenceManager {
 
+    /*
+     * Definitions: A 'ratio' is today's value of the S&P 500 divided either by
+     * the value of the index at last close, or high. A 'fraction' is the
+     * fraction of decline from close, or market high, i.e., 1 minus the
+     * corresponding ratio.
+     */
+
     // The bear market ratio
     private static final double bearRatio = 0.8;
 
-    // The bear market fraction
+    // The bear market fraction (this should be 0.2)
     private static final double bearFraction = calculateFraction(bearRatio);
 
     // A single instance of the preference manager
     private static final PreferenceManager instance = new PreferenceManager();
+
+    // The adjuster
+    private final HyperbolicAdjuster adjuster = new HyperbolicAdjuster();
 
     // A preferences object for this manager
     private final Preferences preferences =
@@ -50,12 +60,15 @@ public class PreferenceManager {
 
     // The ratio of the S&P 500 'today' of the S&P 500 high
     private double ratioTodayToHigh = calculateRatio(getHigh());
-
     /*
      * The difference between the S&P 500 high and the S&P 500 today divided by
      * the S&P 500 last high
      */
     private double fractionTodayOfHigh = calculateFraction(ratioTodayToHigh);
+
+    {
+        adjuster.setX(1., getBearRatio(), 0.);
+    }
 
     /**
      * Calculates a fraction from a ratio.
@@ -197,6 +210,15 @@ public class PreferenceManager {
     }
 
     /**
+     * Gets the adjuster.
+     *
+     * @return The adjuster
+     */
+    public @NotNull Adjuster getAdjuster() {
+        return adjuster;
+    }
+
+    /**
      * Gets the last close of the S&P 500.
      *
      * @return The last close of the S&P 500
@@ -264,6 +286,7 @@ public class PreferenceManager {
      * Otherwise, positive or negative infinity depending on the sign of the
      * S&P 500 today
      */
+    @SuppressWarnings("unused")
     public double getFractionHigh() {
         return fractionTodayOfHigh;
     }
