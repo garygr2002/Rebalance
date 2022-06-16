@@ -3,7 +3,7 @@ package com.garygregg.rebalance.portfolio;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.interpreter.BooleanInterpreter;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
-import com.garygregg.rebalance.interpreter.PositiveInterpreter;
+import com.garygregg.rebalance.interpreter.NonNegativeInterpreter;
 import com.garygregg.rebalance.toolkit.DateInterpreter;
 import com.garygregg.rebalance.toolkit.ElementReader;
 import com.garygregg.rebalance.toolkit.FilingStatus;
@@ -484,7 +484,7 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
 
         // Our allocation interpreter
         private final DoubleInterpreter interpreter =
-                new PositiveInterpreter() {
+                new NonNegativeInterpreter() {
 
                     @Override
                     protected void receiveException(@NotNull Exception exception,
