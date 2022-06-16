@@ -2,7 +2,7 @@ package com.garygregg.rebalance.interpreter;
 
 import org.jetbrains.annotations.NotNull;
 
-public class PositiveInterpreter extends DoubleInterpreter {
+public class NonNegativeInterpreter extends DoubleInterpreter {
 
     @Override
     protected @NotNull Double doInterpret(@NotNull String string) {

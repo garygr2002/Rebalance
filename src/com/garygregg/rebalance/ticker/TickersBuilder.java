@@ -252,7 +252,7 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
 
     // Our balance rounding interpreter
     private final DoubleInterpreter roundingInterpreter =
-            new PositiveInterpreter() {
+            new NonNegativeInterpreter() {
 
                 @Override
                 public Double interpret(@NotNull String string,

@@ -3,7 +3,7 @@ package com.garygregg.rebalance.tax;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.countable.Percent;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
-import com.garygregg.rebalance.interpreter.PositiveInterpreter;
+import com.garygregg.rebalance.interpreter.NonNegativeInterpreter;
 import com.garygregg.rebalance.toolkit.ElementReader;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +19,7 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
 
     // Our rate interpreter
     private final DoubleInterpreter rateInterpreter =
-            new PositiveInterpreter() {
+            new NonNegativeInterpreter() {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
@@ -35,7 +35,7 @@ abstract class TaxesBuilder extends ElementReader<TaxDescription> {
 
     // Our threshold interpreter
     private final DoubleInterpreter thresholdInterpreter =
-            new PositiveInterpreter() {
+            new NonNegativeInterpreter() {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,

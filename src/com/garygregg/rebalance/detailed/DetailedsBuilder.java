@@ -2,7 +2,7 @@ package com.garygregg.rebalance.detailed;
 
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import com.garygregg.rebalance.interpreter.LongInterpreter;
-import com.garygregg.rebalance.interpreter.PositiveInterpreter;
+import com.garygregg.rebalance.interpreter.NonNegativeInterpreter;
 import com.garygregg.rebalance.toolkit.AccountKeyLibrary;
 import com.garygregg.rebalance.toolkit.ElementReader;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +31,7 @@ public class DetailedsBuilder extends ElementReader<DetailedDescription> {
 
     // Our allocation interpreter
     private final DoubleInterpreter allocationInterpreter =
-            new PositiveInterpreter() {
+            new NonNegativeInterpreter() {
 
                 @Override
                 protected void receiveException(@NotNull Exception exception,
