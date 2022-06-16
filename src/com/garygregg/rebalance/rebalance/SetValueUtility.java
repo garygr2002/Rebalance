@@ -19,7 +19,7 @@ class SetValueUtility {
     private int index;
 
     // A currency list
-    private @NotNull List<? extends MutableCurrency> list;
+    private List<? extends MutableCurrency> list;
 
     /*
      * True if the values in the currency list are to be interpreted as
