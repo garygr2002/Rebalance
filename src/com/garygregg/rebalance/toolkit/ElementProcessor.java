@@ -91,6 +91,7 @@ public abstract class ElementProcessor {
      * @param message The message to log
      * @return True if the level for this message flags it as a problem
      */
+    @SuppressWarnings("UnusedReturnValue")
     protected boolean logMessage(@NotNull Level level,
                                  @NotNull String message) {
         return messageLogger.log(level, message);
