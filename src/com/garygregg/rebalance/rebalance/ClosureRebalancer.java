@@ -3,15 +3,18 @@ package com.garygregg.rebalance.rebalance;
 import com.garygregg.rebalance.countable.Currency;
 import com.garygregg.rebalance.hierarchy.Account;
 import com.garygregg.rebalance.hierarchy.Portfolio;
-import com.garygregg.rebalance.toolkit.BreakdownType;
-import com.garygregg.rebalance.toolkit.MessageLogger;
-import com.garygregg.rebalance.toolkit.WeightType;
+import com.garygregg.rebalance.portfolio.PortfolioDescription;
+import com.garygregg.rebalance.toolkit.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.logging.Logger;
 
 class ClosureRebalancer extends WeightRebalancer {
+
+    // An adjuster instance
+    private static final Adjuster adjuster =
+            PreferenceManager.getInstance().getAdjuster();
 
     // Zero currency
     private static final Currency zero = Currency.getZero();
@@ -48,7 +51,7 @@ class ClosureRebalancer extends WeightRebalancer {
          * sum of the level one weights against zero prevents the level zero
          * weight from receiving a NaN caused by divide-by-zero.
          */
-        final double sum = sum(weightMap);
+        final double sum = WeightType.sumWeights(weightMap);
         final double levelZeroWeight = (0. < sum) ? (considered / sum) : 0.;
 
         /*
@@ -70,32 +73,137 @@ class ClosureRebalancer extends WeightRebalancer {
     }
 
     /**
-     * Sums the level one weights in a weight map.
+     * Checks for a non-null stock allocation on the path to setting the
+     * y-values of the adjuster.
      *
-     * @param weightMap The weight map
-     * @return The sum of the level one weights in the map
+     * @param description             A portfolio description
+     * @param positiveLevelZeroWeight A level zero weight that is known to be
+     *                                positive
      */
-    private static double sum(@NotNull Map<WeightType, Double> weightMap) {
+    private static void checkAllocation(
+            @NotNull PortfolioDescription description,
+            double positiveLevelZeroWeight) {
+
+        // Get the allocation of weight to stock. Is the allocation not null?
+        final Double stockAllocation =
+                description.getAllocation(WeightType.STOCK);
+        if (null != stockAllocation) {
+
+            /*
+             * The allocation of weight to stock is not null. Calculate the
+             * fraction of stock desired when the market is at high, and check
+             * that the market-zero stock adjustment is not null.
+             */
+            checkZero(description, stockAllocation / positiveLevelZeroWeight);
+        }
+    }
+
+    /**
+     * Checks for a non-null portfolio description on the path to setting
+     * y-values of the adjuster.
+     *
+     * @param description A portfolio description
+     */
+    private static void checkDescription(PortfolioDescription description) {
 
         /*
-         * Declare and initialize the sum. Declare a variable to receive a
-         * weight. Cycle for each level one weight type.
+         * Check for positive level zero weight if the portfolio description is
+         * not null.
          */
-        double sum = 0.;
-        Double weight;
-        for (WeightType type : getLevelOne()) {
+        if (null != description) {
+            checkPositiveWeight(description, description.sumWeights());
+        }
+    }
 
-            // Get the weight for the first/next type. Is the weight not null?
-            weight = weightMap.get(type);
-            if (null != weight) {
+    /**
+     * Checks for positive level zero weight on the path to setting the
+     * y-values of the adjuster.
+     *
+     * @param description     A portfolio description
+     * @param levelZeroWeight The summed level zero weight
+     */
+    private static void checkPositiveWeight(
+            @NotNull PortfolioDescription description,
+            double levelZeroWeight) {
 
-                // The weight is not null. Add it to the sum.
-                sum += weight;
-            }
+        /*
+         * Check the stock allocation if the level zero weight is greater than
+         * zero.
+         */
+        if (0. < levelZeroWeight) {
+            checkAllocation(description, levelZeroWeight);
+        }
+    }
+
+    /**
+     * Checks for a non-null market-zero stock adjustment on the path to
+     * setting the y-values of the adjuster.
+     *
+     * @param description A portfolio description
+     * @param high        The desired allocation to stock at market high
+     */
+    private static void checkZero(@NotNull PortfolioDescription description,
+                                  double high) {
+
+        /*
+         * Get the desired increase at market-zero. Is the desired increase at
+         * market-zero not null?
+         */
+        final Double zero = description.getIncreaseAtZero();
+        if (null != zero) {
+
+            /*
+             * The desired increase at market zero is not null. Set the
+             * y-values of the adjuster.
+             */
+            setAdjuster(description, high, zero);
+        }
+    }
+
+    /**
+     * Sets the y-values of the adjuster.
+     *
+     * @param description A portfolio description
+     * @param high        The desired allocation to stocks at market high
+     * @param zero        The desired adjustment to stocks at market zero
+     */
+    private static void setAdjuster(@NotNull PortfolioDescription description,
+                                    double high, double zero) {
+
+        /*
+         * Get the desired adjustment to stocks at the bear market threshold.
+         * Is the desired adjustment to stocks at the bear market threshold
+         * null?
+         */
+        Double bear = description.getIncreaseAtBear();
+        if (null == bear) {
+
+            /*
+             * The desired adjustment to stocks at the bear market threshold is
+             * null. Use a default of half the adjustment to market zero.
+             */
+            bear = high / 2.;
         }
 
-        // Return the sum.
-        return sum;
+        /*
+         * Add the desired adjustment for bear market, and market zero to high
+         * to get the total desired allocations for these circumstances. Set
+         * the y-values of the adjuster.
+         */
+        final double percentToFraction = 100.;
+        adjuster.setY(high, bear / percentToFraction + high,
+                zero / percentToFraction + high);
+    }
+
+    @Override
+    protected Currency doRebalance(@NotNull Account account) {
+
+        /*
+         * Set the y-values of the adjuster if possible. Call the superclass to
+         * do the rebalance.
+         */
+        checkDescription(account.getPortfolioDescription());
+        return super.doRebalance(account);
     }
 
     /**

@@ -75,12 +75,12 @@ And I used the following software. All software versions here specified were tho
 
 ### Code Metrics
 
-As of version v1.3.1 (2 May 2022), the software consists of the following:
+As of version v1.4.0 (15 June 2022), the software consists of the following:
 
-* 209 Java code files organized into 16 packages
-* 5,069 blank lines inserted for code readability
-* 12,672 comment lines written for code understandability (take a look and tell me if I succeeded)
-* 13,659 Java code lines
+* 212 Java code files organized into 16 packages
+* 5,158 blank lines inserted for code readability
+* 12,940 comment lines written for code understandability (take a look and tell me if I succeeded)
+* 13,882 Java code lines
 
 Thanks to [Cloc](http://cloc.sourceforge.net/) for bringing us the metrics for blank, comment, and code line counts. I arrived at the package count by hand (or more precisely, eyeball) using the Project View in the [IntelliJ IDEA Community Edition](https://www.jetbrains.com/idea/).   
 
@@ -705,21 +705,13 @@ The weight cash begins at column 122, and may be up to 6 characters long. Its co
 
 The weight real estate begins at column 129, and may be up to 6 characters long. Its content is constrained to a non-negative number, possibly with a decimal point. Although conveniently specified as a percent, the value is actually a weight assigned to real estate investments (e.g. real property or shares in a trust). If this field, and that for stocks, bonds and cash sum to 100, then the specified weight is actually a percent assigned to real estate.
 
-### Adjust from High
+### Increase at Zero
 
-The adjust-from-high flag begins at column 136, and may be up to 6 characters long. Its content is constrained to one of the following strings: "False", or "True". Case is not important. The adjust-from-high flag indicates to the software whether it should make an upward-revision of the preferred equity weight of the portfolio based on a ratio of today's value of the S&P 500 versus the high for the index. We assume by definition that the value of the S&P 500 today cannot be higher than its high. While the software will always make an equity weight adjustment for the ratio of the S&P 500 today versus its last close (assuming these preferences are both set), it will skip an additional today-versus-high adjustment on a per-portfolio basis if the S&P 500 high is not set (see the [-h sphg](#-high-sphg) command line option), or this flag is not set. Note that the user may skip all equity adjustments by simply not setting the preference for S&P 500 today. See the [-t sptd](#-today-sptd) command line option.   
+The percent increase-at-zero begins at column 136, and may be up to 6 characters long if specified. Its content is constrained to a positive number, possibly with a decimal point. This number is a percent delta, not a weight. A specification for this field indicates to the software that it should make an upward-revision of the preferred equity weight of the portfolio based on a ratio of today's value of the S&P 500 versus the high for the index. We assume by definition that the value of the S&P 500 today cannot be higher than its high. While the software will always make an equity weight adjustment for the ratio of the S&P 500 today versus its last close (assuming these preferences are both set), it will skip an additional today-versus-high adjustment on a per-portfolio basis if the S&P 500 high is not set (see the [-h sphg](#-high-sphg) command line option), or this value is not specified. Note that the user may skip all equity adjustments by simply not setting the preference for the S&P 500 today. See the [-t sptd](#-today-sptd) command line option. 
 
-The formula by which the software adjusts equity weight for S&P 500 today versus S&P 500 high is not currently variable. For individual accounts, there is no adjustment at all. The adjustment comes into play only when the software rebalances the last account in a portfolio, and attempts to match portfolio equity preferences as specified in this file. See the difference between a [Weight Rebalancer](#weight-rebalancer) vs. [Closure Rebalancer](#closure-rebalancer).
+We calculate the portfolio percent stock as [Portfolio Weight Stock](#portfolio-weight-stock) divided by the sum of all level one weights. For the purposes of a discussion of a today-versus-high adjustment, the portfolio percent stock applies to the equity target the software will use when the market is at its high. If the market is off its high, the software will make an adjustment. It uses the portfolio percent stock, the percent increase-at-zero, and the [Increase at Bear](#increase-at-bear) to construct a hyperbolic curve with a decreasing slope from market high to a hypothetical market zero. Note that we say "hypothetical market zero" since stocks would presumably be worth nothing at a market valuation of zero. They thus could not make a positive contribution to the value of a portfolio. The percent increase-at-zero is a delta that is added to the portfolio percent stock at market zero, and caps the maximum percent of equities the software will attempt to target.   
 
-The current adjustment formula is: <b>(5 * ((sphg - sptd) / sphg) / 8) + ep</b>, where:
-
-* <b>ep</b> (equity percentage) is derived from the existing, declared weight of equities in this file, i.e., [Portfolio Weight Stock](#portfolio-weight-stock) divided by the sum of <b>Level 1</b> investment categories, i.e., [Portfolio Weight Stock](#portfolio-weight-stock), [Portfolio Weight Bond](#portfolio-weight-bond), [Portfolio Weight Cash](#portfolio-weight-cash) and [Portfolio Weight Real-Estate](#portfolio-weight-real-estate)
-* <b>sphg</b> is the preference set for the S&P 500 high ([-h sphg](#-high-sphg) option)
-* <b>sptd</b> is the preference set for the S&P 500 today ([-t sptd](#-today-sptd) option)
-
-Note that in this equation, the <b>Level 1</b> category weight for stocks has been converted from a weight to a percentage, and this necessitates that the software also modify the other <b>Level 1</b> category weights (bonds, cash, and real estate) to convert these to percentages as well. It does this in proportion to the original weight preferences that the user had set for these categories.
-
-The equity adjustment that the software makes with regard to the S&P 500 today versus last close is a different beast. The software will make this adjustment for all accounts in all portfolios, and the adjustment is not affected by the setting of the adjust-from-high flag for any portfolio. The software assumes that the user has declared valuations of all accounts and portfolios in the [Holding File](#holding-file) as of S&P 500 last close. It therefore assumes - perhaps in a naive way - that the stated valuations will decrease, or increase in proportion to the change reflected in the S&P 500 today. The way the user turns off this adjustment is not to set the value of the S&P 500 last close or S&P 500 today. If the user wants to preserve the ability to adjust the portfolio versus last high, however, the only option is not to set the S&P 500 last close. Let us summarize what can be done in a table by clearing or setting the proper preference:
+The equity adjustment that the software makes with regard to the S&P 500 today versus last close is a different beast. The software will make this adjustment for all accounts in all portfolios, and the adjustment is not affected by the setting of increase-at-zero for any portfolio. The software assumes that the user has declared valuations of all accounts and portfolios in the [Holding File](#holding-file) as of S&P 500 last close. It therefore assumes - perhaps in a naive way - that the stated valuations will decrease, or increase in proportion to the change reflected in the S&P 500 today. The way the user turns off this adjustment is not to set the value of the S&P 500 last close or S&P 500 today. If the user wants to preserve the ability to adjust the portfolio versus last high, however, the only option is not to set the S&P 500 last close. Let us summarize what can be done in a table by clearing or setting the proper preference:
 
 | User Wants                | S&P 500 Today            | S&P 500 Last Close       | S&P 500 High                         |
 |---------------------------|--------------------------|--------------------------|--------------------------------------|
@@ -732,6 +724,10 @@ The equity adjustment that the software makes with regard to the S&P 500 today v
 <sub><sup>Table 1: preference controls for equity weight adjustments</sup></sub>
 
 The software comes with all S&P 500 valuation preferences clear. Currently, once the user sets any of the S&P 500 preferences, the only way to clear them is for a user to reset all the preferences with the [-r](#-reset) option. What a user can do instead is set an S&P value preference equal to one of the other preferences. For example, setting <b>spcl</b> equal <b>sptd</b> has the effect of preventing an adjustment for the current day's market action. If the user desires both equity adjustments, he should know that the software performs the today-vs-close adjustment before the today-vs-high adjustment.
+
+### Increase at Bear
+
+The percent increase-at-bear begins at column 143, and may be up to 6 characters long if specified. Its content is constrained to a positive number, possibly with a decimal point. The number is a percent delta, not a weight. The software uses a specification for this field in conjunction with the [Increase at Zero](#increase-at-zero) setting to construct the aforementioned hyperbolic curve. If the user specifies [Increase at Zero](#increase-at-zero) but not the percent increase-at-bear, the software will use a default percent increase-at-bear that is one half [Increase at Zero](#increase-at-zero). The percent increase-at-bear is a delta that is added to the portfolio percent stock at the bear market threshold (20% drop off market high). A sane value for the percent increase-at-bear is greater than one-fifth [Increase at Zero](#increase-at-zero). If this is not the case, the aforementioned slope from market high to market zero will not be decreasing. You may not like the result.    
 
 ## Ticker File
 
@@ -931,7 +927,7 @@ Back to the table of weights in the weight rebalancer: Before rebalancing any ac
 
 A closure rebalancer is a specialized [Weight Rebalancer](#weight-rebalancer), and the software uses it for the last rebalanced account in any portfolio. In the section under [Weight Rebalancer](#weight-rebalancer), I discussed how the rebalancer overlays its weight table twice, once for the <b>Level 1</b> weights in the [Account File](#account-file), and a second time for all the weights in the [Detailed File](#detailed-file). Before making equity (stock) weight adjustments based on the high, last close, and today's values of the S&P 500, a closure rebalancer overlays the <b>Level 1</b> weights a third time. It does this by summing the <b>Level 1</b> weights that the user specified in the [Portfolio File](#portfolio-file). It multiplies each <b>Level 1</b> weight by the total balanceable value of the portfolio, then divides by the sum of the weights. Finally, the closure rebalancer subtracts the existing balances that ordinary [Weight Rebalancers](#weight-rebalancer) have already assigned to previous investment <b>Level 1</b> investment categories. Non-negative values become the new weights for the corresponding category. Negative values mean that the software has already assigned too much value to the category. The software enters zero for the weight instead, and writes information about the condition to its log file. 
 
-After making the S&P 500 today versus S&P 500 last-close adjustment, the closure rebalancer performs the S&P 500 today versus S&P 500 high (see [-h sphg](#-high-sphg)) adjustment if the user has set the [Adjust from High](#adjust-from-high) flag in the corresponding row of the [Portfolio File](#portfolio-file).
+After making the S&P 500 today versus S&P 500 last-close adjustment, the closure rebalancer performs the S&P 500 today versus S&P 500 high (see [-h sphg](#-high-sphg)) adjustment if the user has set the [Increase at Zero](#increase-at-zero) percent delta in the corresponding row of the [Portfolio File](#portfolio-file).
 
 ### An Example
 

@@ -46,9 +46,12 @@ abstract class AccountRebalancer extends Rebalancer {
     private static final List<WeightType> levelOne =
             WeightType.getLevelOne();
 
-    // The preference manager
+    // A preference manager instance
     private static final PreferenceManager manager =
             PreferenceManager.getInstance();
+
+    // An adjuster instance
+    private static final Adjuster adjuster = manager.getAdjuster();
 
     // The distinguished value for nothing
     private static final double nothing = Percent.getZero().getValue();
@@ -62,10 +65,6 @@ abstract class AccountRebalancer extends Rebalancer {
 
                     /*
                      * Currently, we perform no adjustment at all here.
-                     * Consider changing as follows (1 percent higher for every
-                     * 4 percent drop in equities):
-                     *
-                     * return ratio / 4.;
                      */
                     return 0.;
                 }
@@ -87,7 +86,7 @@ abstract class AccountRebalancer extends Rebalancer {
 
                 @Override
                 public double adjustEquity(double ratio) {
-                    return ratio * 5. / 8.;
+                    return adjuster.f(ratio) - adjuster.getYHigh();
                 }
 
                 @Override
@@ -508,12 +507,12 @@ abstract class AccountRebalancer extends Rebalancer {
 
             /*
              * The weight map should be adjusted again for its valuation today
-             * versus market high. Get the fraction of the market today versus
-             * high. Is the fraction infinite (meaning: The value of equities
-             * at market high was zero)?
+             * versus market high. Get the ratio of the market today versus
+             * high. Is the ratio infinite (meaning: The value of equities at
+             * market high was zero)?
              */
-            final double fraction = manager.getFractionHigh();
-            if (Double.isInfinite(fraction)) {
+            final double ratio = manager.getRatioVersusHigh();
+            if (Double.isInfinite(ratio)) {
 
                 /*
                  * The value of equities at market high was zero. Set the
@@ -528,8 +527,8 @@ abstract class AccountRebalancer extends Rebalancer {
              * of equities at market high, do the following: Call the equity
              * adjustment procedure, and apply its results to the weight map.
              */
-            else if (0. != fraction) {
-                adjust(weightMap, procedure.adjustEquity(fraction));
+            else if (0. != ratio) {
+                adjust(weightMap, procedure.adjustEquity(ratio));
             }
         }
 

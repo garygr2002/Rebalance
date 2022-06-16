@@ -1,9 +1,9 @@
 package com.garygregg.rebalance.portfolio;
 
 import com.garygregg.rebalance.countable.Currency;
-import com.garygregg.rebalance.interpreter.BooleanInterpreter;
 import com.garygregg.rebalance.interpreter.DoubleInterpreter;
 import com.garygregg.rebalance.interpreter.NonNegativeInterpreter;
+import com.garygregg.rebalance.interpreter.PositiveInterpreter;
 import com.garygregg.rebalance.toolkit.DateInterpreter;
 import com.garygregg.rebalance.toolkit.ElementReader;
 import com.garygregg.rebalance.toolkit.FilingStatus;
@@ -17,32 +17,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
-
-    // Our adjustment interpreter
-    private final BooleanInterpreter adjustmentInterpreter =
-            new BooleanInterpreter() {
-
-                @Override
-                protected void receiveException(@NotNull Exception exception,
-                                                @NotNull String string,
-                                                Boolean defaultValue) {
-                    logMessage(Level.WARNING, String.format("Adjustment " +
-                                    "flag '%s' at line number %d in " +
-                                    "portfolio file cannot be parsed; using " +
-                                    "%s.", string, getRow(), defaultValue));
-                }
-            };
-
-    // The adjustment processor
-    private final FieldProcessor<PortfolioDescription> adjustmentProcessor =
-            new FieldProcessor<>() {
-
-                @Override
-                public void processField(@NotNull String field) {
-                    getTarget().setAdjust(adjustmentInterpreter.interpret(
-                            field));
-                }
-            };
 
     // The allocation processors
     private final PortfoliosBuilder.MyAllocationProcessor[]
@@ -114,8 +88,8 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                                                 @NotNull String string,
                                                 FilingStatus defaultValue) {
                     logMessage(Level.WARNING, String.format("Filing status " +
-                            "'%s' at line number %d in portfolio file " +
-                            "cannot be parsed; using %s.", string, getRow(),
+                                    "'%s' at line number %d in portfolio file " +
+                                    "cannot be parsed; using %s.", string, getRow(),
                             defaultValue));
                 }
             };
@@ -130,6 +104,60 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
                             filingStatusInterpreter.interpret(field));
                 }
             };
+
+    // Our increase-at-bear interpreter
+    private final DoubleInterpreter increaseAtBearInterpreter =
+            new PositiveInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Double defaultValue) {
+                    logMessage(Level.WARNING, String.format("Equity " +
+                                    "increase percentage for bear market " +
+                                    "'%s' at line number %d in portfolio " +
+                                    "file cannot be parsed; using %s.", string,
+                            getRow(), defaultValue));
+                }
+            };
+
+    // The increase-at-bear processor
+    private final FieldProcessor<PortfolioDescription>
+            increaseAtBearProcessor = new FieldProcessor<>() {
+
+        @Override
+        public void processField(@NotNull String field) {
+            getTarget().setIncreaseAtBear(
+                    increaseAtBearInterpreter.interpret(field));
+        }
+    };
+
+    // Our increase-at-zero interpreter
+    private final DoubleInterpreter increaseAtZeroInterpreter =
+            new PositiveInterpreter() {
+
+                @Override
+                protected void receiveException(@NotNull Exception exception,
+                                                @NotNull String string,
+                                                Double defaultValue) {
+                    logMessage(Level.WARNING, String.format("Equity " +
+                                    "increase percentage for zero market " +
+                                    "'%s' at line number %d in portfolio " +
+                                    "file cannot be parsed; using %s.", string,
+                            getRow(), defaultValue));
+                }
+            };
+
+    // The increase-at-zero processor
+    private final FieldProcessor<PortfolioDescription>
+            increaseAtZeroProcessor = new FieldProcessor<>() {
+
+        @Override
+        public void processField(@NotNull String field) {
+            getTarget().setIncreaseAtZero(
+                    increaseAtZeroInterpreter.interpret(field));
+        }
+    };
 
     // The portfolio library instance
     private final PortfolioLibrary library = PortfolioLibrary.getInstance();
@@ -292,8 +320,9 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
             addFieldProcessor(fieldIndex, processor);
         }
 
-        // Add the adjustment processor.
-        addFieldProcessor(++fieldIndex, adjustmentProcessor);
+        // Add the adjustment processors.
+        addFieldProcessor(++fieldIndex, increaseAtZeroProcessor);
+        addFieldProcessor(++fieldIndex, increaseAtBearProcessor);
     }
 
     @Override
@@ -368,9 +397,10 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
 
         /*
          * Or log a different warning if the fields-to-process is less than the
-         * number of portfolio fields.
+         * number of portfolio fields (minus the optional equity increase
+         * fields).
          */
-        else if (fieldsToProcess < numberOfPortfolioFields) {
+        else if (fieldsToProcess < numberOfPortfolioFields - 2) {
             logMessage(Level.WARNING, String.format("There are %d portfolio " +
                             "fields but only %d portfolio line elements at " +
                             "line number %d; you might want to check that.",
@@ -424,21 +454,23 @@ public class PortfoliosBuilder extends ElementReader<PortfolioDescription> {
             processor.setRow(lineNumber);
         }
 
-        // Set the line number as the row in the adjustment interpreter.
-        adjustmentInterpreter.setRow(lineNumber);
+        // Set the line number as the row in the increase interpreters.
+        increaseAtZeroInterpreter.setRow(lineNumber);
+        increaseAtBearInterpreter.setRow(lineNumber);
     }
 
     @Override
     protected void setTarget(@NotNull PortfolioDescription description) {
 
-        /*
-         * Set the target for the adjustment processor. Cycle for each
-         * allocation processor.
-         */
-        adjustmentProcessor.setTarget(description);
-        for (MyAllocationProcessor processor : allocationProcessors) {
+        // Set the target for the increase processors.
+        increaseAtBearProcessor.setTarget(description);
+        increaseAtZeroProcessor.setTarget(description);
 
-            // Set the target for the first/next allocation processor.
+        /*
+         * Cycle for each allocation processor, and set the target for the
+         * first/next allocation processor.
+         */
+        for (MyAllocationProcessor processor : allocationProcessors) {
             processor.setTarget(description);
         }
 

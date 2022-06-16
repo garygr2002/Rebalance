@@ -1,0 +1,44 @@
+P,JohnDoe,         John Thomas Doe,                                 1,176,212.84,      1,176,212.84,              0.00
+I,Fidelity,        Fidelity Investments,                               35,419.98,         35,419.98,              0.00
+A,0000000000039596,Contract Employer Contributory IRA,                 35,419.98,         35,419.98,              0.00
+F,FCPEX,           Sm Cap ENH Index,                                    2,550.24,          3,829.12,         -1,278.88
+F,FMEIX,           Mid Cap ENH Index,                                   2,550.24,          4,178.19,         -1,627.95
+F,FSPSX,           International Index,                                 8,500.80,         13,919.75,         -5,418.95
+F,FXAIX,           500 Index,                                           7,650.71,         13,492.92,         -5,842.21
+F,SPAXX,           Govt Mmkt,                                           3,542.00,              0.00,          3,542.00
+F,VBTLX,           Total Bond Market Index Admiral,                    10,625.99,              0.00,         10,625.99
+I,JPMorgan,        JPMorgan Chase,                                      1,956.18,          1,956.18,              0.00
+A,0000002162530900,Checking,                                              633.27,            633.27,              0.00
+F,JPCHK,           Checking,                                              633.27,            633.27,              0.00
+A,0000008430471042,Savings,                                             1,322.91,          1,322.91,              0.00
+F,JPSVG,           Savings,                                             1,322.91,          1,322.91,              0.00
+I,Vanguard,        The Vanguard Group,                              1,138,836.68,      1,138,836.68,              0.00
+A,0000000034186200,Brokerage,                                             500.76,            500.76,              0.00
+F,VMFXX,           Federal Money Market,                                  500.76,            500.76,              0.00
+A,0000000047459213,FT Employer Contributory IRA,                      144,097.05,        144,097.05,              0.00
+X,BSV  ,           Short Term Bond,                                    43,262.10,         40,880.70,          2,381.40
+F,VFIAX,           500 Index Admiral,                                  31,114.78,         38,760.99,         -7,646.21
+F,VIMAX,           Mid-Cap Index Fund Admiral,                         10,371.60,         12,304.88,         -1,933.28
+F,VMFXX,           Federal Money Market,                               14,404.99,          1,020.19,         13,384.80
+F,VSMAX,           Small-Cap Index Admiral,                            10,371.60,         11,549.01,         -1,177.41
+F,VTIAX,           Total International Stock Index Admiral,            34,571.98,         39,581.28,         -5,009.30
+A,0000000093033252,Contributory & Mature Roth IRA,                    994,238.87,        994,238.87,              0.00
+F,VBTLX,           Total Bond Market Index Admiral,                    20,184.42,         52,872.19,        -32,687.77
+X,VCIT ,           Intermediate Term Corp Bond,                        25,676.60,         51,353.20,        -25,676.60
+F,VEMAX,           Emerging Markets Stock Index Admiral,               25,656.38,         10,008.43,         15,647.95
+F,VGSLX,           Real Estate Index Admiral,                          58,810.64,         96,402.06,        -37,591.42
+F,VIGAX,           Growth Index Admiral,                               60,712.39,         45,131.16,         15,581.23
+X,VMBS ,           Mortgage Backed Securities,                         16,403.20,         33,831.60,        -17,428.40
+F,VMFXX,           Federal Money Market,                              332,459.92,          3,157.68,        329,302.24
+F,VMGMX,           Mid-Cap Growth Index Admiral,                       20,237.46,         14,133.91,          6,103.55
+F,VMVAX,           Mid-Cap Value Index Admiral,                        30,356.19,         32,002.75,         -1,646.56
+F,VSGAX,           Small-Cap Growth Index Admiral,                     20,237.47,         12,768.62,          7,468.85
+F,VSGDX,           Short-Term Federal Admiral,                         82,433.85,        264,565.70,       -182,131.85
+F,VSIAX,           Small-Cap Value Index Admiral,                      30,356.20,         30,503.61,           -147.41
+X,VSS  ,           FTSE All World EX US Small Cap,                     67,284.00,         53,578.00,         13,706.00
+F,VTABX,           Total International Bond Index Admiral,             14,679.58,         73,079.82,        -58,400.24
+F,VTIAX,           Total International Stock Index Admiral,            25,656.37,         32,525.38,         -6,869.01
+X,VTIP ,           Short Term Inflation Protected Securities,          10,967.15,         22,444.40,        -11,477.25
+F,VVIAX,           Value Index Admiral,                                91,068.59,         97,377.75,         -6,309.16
+F,VWEHX,           High-Yield Corporate Investor,                      11,009.68,         32,850.05,        -21,840.37
+F,VWILX,           International Growth Admiral,                       50,048.78,         35,652.56,         14,396.22

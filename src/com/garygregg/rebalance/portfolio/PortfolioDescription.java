@@ -19,9 +19,6 @@ public class PortfolioDescription implements Description<String> {
     // The mnemonic of the portfolio
     private final String mnemonic;
 
-    // Adjust desired investment allocations for relative market valuation
-    private Boolean adjust;
-
     // The birthdate of the portfolio owner
     private Date birthDate;
 
@@ -30,6 +27,15 @@ public class PortfolioDescription implements Description<String> {
 
     // The taxpayer filing status
     private FilingStatus filingStatus;
+
+    /*
+     * The percentage adjustment of the equity allocation at the bear market
+     * threshold
+     */
+    private Double increaseAtBear;
+
+    // The percentage adjustment of the equity allocation at market index zero
+    private Double increaseAtZero;
 
     // The projected mortality date of the portfolio owner
     private Date mortalityDate;
@@ -102,6 +108,28 @@ public class PortfolioDescription implements Description<String> {
         return filingStatus;
     }
 
+    /**
+     * Gets the percentage adjustment of the equity allocation at the bear
+     * market threshold.
+     *
+     * @return The percentage adjustment of the equity allocation at the bear
+     * market threshold
+     */
+    public Double getIncreaseAtBear() {
+        return increaseAtBear;
+    }
+
+    /**
+     * Gets the percentage adjustment of the equity allocation at market index
+     * zero.
+     *
+     * @return The percentage adjustment of the equity allocation at market
+     * index zero
+     */
+    public Double getIncreaseAtZero() {
+        return increaseAtZero;
+    }
+
     @Override
     public @NotNull String getKey() {
         return getMnemonic();
@@ -158,15 +186,6 @@ public class PortfolioDescription implements Description<String> {
     }
 
     /**
-     * Sets the adjustment flag.
-     *
-     * @param adjust The adjustment flag
-     */
-    void setAdjust(Boolean adjust) {
-        this.adjust = adjust;
-    }
-
-    /**
      * Sets the birthdate of the portfolio owner.
      *
      * @param birthDate The birthdate of the portfolio owner
@@ -191,6 +210,28 @@ public class PortfolioDescription implements Description<String> {
      */
     void setFilingStatus(FilingStatus filingStatus) {
         this.filingStatus = filingStatus;
+    }
+
+    /**
+     * Sets the percentage adjustment of the equity allocation at the bear
+     * market threshold.
+     *
+     * @param increaseAtBear The percentage adjustment of the equity allocation
+     *                       at the bear market threshold
+     */
+    void setIncreaseAtBear(Double increaseAtBear) {
+        this.increaseAtBear = increaseAtBear;
+    }
+
+    /**
+     * Sets the percentage adjustment of the equity allocation at market index
+     * zero.
+     *
+     * @param increaseAtZero The percentage adjustment of the equity allocation at
+     *                       market index zero
+     */
+    void setIncreaseAtZero(Double increaseAtZero) {
+        this.increaseAtZero = increaseAtZero;
     }
 
     /**
@@ -247,6 +288,15 @@ public class PortfolioDescription implements Description<String> {
      * relative market valuation; false otherwise
      */
     public boolean shouldAdjust() {
-        return (null != adjust) && adjust;
+        return (null != getIncreaseAtZero());
+    }
+
+    /**
+     * Calculates the sum of the level one weight types.
+     *
+     * @return The sum of the level one weight types
+     */
+    public double sumWeights() {
+        return WeightType.sumWeights(allocation);
     }
 }

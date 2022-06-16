@@ -1,0 +1,110 @@
+Required rebalance actions for portfolio key 'JaneAnybody'
+Name: 'Jane Alice Anybody'
+
+************************************************************************************************************************
+Required rebalance actions for institution key 'BofA'
+Name: 'Bank of America'
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '5137434439329760'
+Name: 'Rewards Mastercard'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+************************************************************************************************************************
+Required rebalance actions for institution key 'JaneAnybody'
+Name: 'Jane Alice Anybody'
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000000000000001'
+Name: 'Social Security Jane Alice Anybody'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+************************************************************************************************************************
+Required rebalance actions for institution key 'TRowePrice'
+Name: 'T. Rowe Price'
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000000741830296'
+Name: 'IRA'
+
+There are no tickers that require rebalance buying or selling shares.
+
+Transfer              7,055.57 to   ticker PRITX ('International Stock'; Number 34)
+Total                 7,055.57 from ticker PRTXX ('U.S. Treasury Money'; Number 12)
+
+Transfer              6,611.69 to   ticker PRITX ('International Stock'; Number 34)
+Total                 6,611.69 from ticker PRHYX ('High Yield'; Number 23)
+
+Transfer              6,298.50 to   ticker PRITX ('International Stock'; Number 34)
+Total                 6,298.50 from ticker PREMX ('Emerging Markets Bond'; Number 59)
+
+Transfer              4,288.62 to   ticker PRITX ('International Stock'; Number 34)
+Total                 4,288.62 from ticker PRGMX ('GNMA'; Number 24)
+
+Transfer              1,286.54 to   ticker PRITX ('International Stock'; Number 34)
+Transfer              1,876.97 to   ticker TRLUX ('Large-Cap Value'; Number 733)
+Total                 3,163.51 from ticker PRIPX ('Inflation Protected Bond'; Number 115)
+
+Transfer              3,086.68 to   ticker TRLUX ('Large-Cap Value'; Number 733)
+Total                 3,086.68 from ticker RPIBX ('International Bond'; Number 20)
+
+Transfer              2,992.44 to   ticker TRLUX ('Large-Cap Value'; Number 733)
+Total                 2,992.44 from ticker OTCFX ('Small-Cap Stock'; Number 48)
+
+Transfer              2,621.26 to   ticker TRLUX ('Large-Cap Value'; Number 733)
+Total                 2,621.26 from ticker PRSVX ('Small-Cap Value'; Number 40)
+
+Transfer              1,495.66 to   ticker TRLUX ('Large-Cap Value'; Number 733)
+Transfer                354.64 to   ticker PRGFX ('Growth Stock'; Number 31)
+Total                 1,850.30 from ticker TRGOX ('Large-Cap Growth'; Number 732)
+
+Transfer              1,772.37 to   ticker PRGFX ('Growth Stock'; Number 31)
+Total                 1,772.37 from ticker PRTIX ('U.S. Treasury Intermediate Index'; Number 28)
+
+Transfer                956.32 to   ticker PRGFX ('Growth Stock'; Number 31)
+Transfer                474.89 to   ticker TRMCX ('Mid-Cap Value'; Number 77)
+Total                 1,431.21 from ticker RPMGX ('Mid-Cap Growth'; Number 47)
+
+Transfer                959.15 to   ticker TRMCX ('Mid-Cap Value'; Number 77)
+Total                   959.15 from ticker PRPIX ('Corporate Income'; Number 17)
+
+Transfer                816.26 to   ticker TRMCX ('Mid-Cap Value'; Number 77)
+Total                   816.26 from ticker PRRXX ('Government Money Market'; Number 11)
+
+Transfer                185.67 to   ticker TRMCX ('Mid-Cap Value'; Number 77)
+Total                   185.67 from ticker PRWBX ('Short-Term Bond'; Number 22)
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000000833570510'
+Name: 'Brokerage'
+
+There are no tickers that require rebalance buying or selling shares.
+
+Transfer                343.45 to   ticker PRTXX ('U.S. Treasury Money'; Number 12)
+Total                   343.45 from ticker PREIX ('Equity Index 500'; Number 44)
+
+************************************************************************************************************************
+Required rebalance actions for institution key 'XYZ Cr Union'
+Name: 'XYZ Credit Union'
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000001638472938'
+Name: 'Savings'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000006231592710'
+Name: 'Checking'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.

@@ -43,8 +43,14 @@ enum PortfolioFields {
     // Desired percentage real estate in the portfolio
     PERCENTAGE_REAL_ESTATE(12, WeightType.REAL_ESTATE),
 
-    // Adjust desired investment allocations for relative market valuation
-    ADJUST(13, null);
+    // Percentage adjustment of the equity allocation at market index zero
+    INCREASE_AT_ZERO(13, null),
+
+    /*
+     * Percentage adjustment of the equity allocation at the bear market
+     * threshold
+     */
+    INCREASE_AT_BEAR(14, null);
 
     // The position of the field in the data file
     private final int position;

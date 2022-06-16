@@ -1,0 +1,176 @@
+Required rebalance actions for portfolio key 'JohnDoe'
+Name: 'John Thomas Doe'
+
+************************************************************************************************************************
+Required rebalance actions for institution key 'Citigroup'
+Name: 'Citigroup'
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '5350910556857113'
+Name: 'Citigroup Mastercard'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+************************************************************************************************************************
+Required rebalance actions for institution key 'Fidelity'
+Name: 'Fidelity Investments'
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000000000039596'
+Name: 'Contract Employer Contributory IRA'
+
+There are no tickers that require rebalance buying or selling shares.
+
+Allocate   7.200% to FCPEX ('Sm Cap ENH Index'; Number 1200)
+Allocate   7.200% to FMEIX ('Mid Cap ENH Index'; Number 1201)
+Allocate  24.000% to FSPSX ('International Index'; Number 1202)
+Allocate  21.600% to FXAIX ('500 Index'; Number 1203)
+Allocate  10.000% to SPAXX ('Govt Mmkt'; Number 1204)
+Allocate  30.000% to VBTLX ('Total Bond Market Index Admiral'; Number 584)
+
+************************************************************************************************************************
+Required rebalance actions for institution key 'JPMorgan'
+Name: 'JPMorgan Chase'
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000002162530900'
+Name: 'Checking'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000008430471042'
+Name: 'Savings'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '4532471323807307'
+Name: 'JPMorgan Visa Card'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+************************************************************************************************************************
+Required rebalance actions for institution key 'JohnDoe'
+Name: 'John Thomas Doe'
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000000000000002'
+Name: 'Home John Doe Redfin'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000000000000003'
+Name: 'Home John Doe Zillow'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000000000000004'
+Name: 'Home John Doe Estimate Averaging'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000000000000005'
+Name: 'Capital Gains Tax on Sale'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000000000000006'
+Name: 'Social Security John Thomas Doe'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+************************************************************************************************************************
+Required rebalance actions for institution key 'Vanguard'
+Name: 'The Vanguard Group'
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000000034186200'
+Name: 'Brokerage'
+
+There are no tickers that require rebalance buying or selling shares.
+
+There are no tickers that require rebalance redistribution of balances.
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000000047459213'
+Name: 'FT Employer Contributory IRA'
+
+Buy        30.00000 shares of ticker BSV   ('Short Term Bond'; Number 2001)
+
+Transfer              7,646.21 to   ticker VMFXX ('Federal Money Market'; Number 33)
+Total                 7,646.21 from ticker VFIAX ('500 Index Admiral'; Number 540)
+
+Transfer              5,009.30 to   ticker VMFXX ('Federal Money Market'; Number 33)
+Total                 5,009.30 from ticker VTIAX ('Total International Stock Index Admiral'; Number 569)
+
+Transfer                729.29 to   ticker VMFXX ('Federal Money Market'; Number 33)
+Total                   729.29 from ticker VIMAX ('Mid-Cap Index Fund Admiral'; Number 5859)
+
+Sell                  1,203.99 of   ticker VIMAX ('Mid-Cap Index Fund Admiral'; Number 5859)
+Sell                  1,177.41 of   ticker VSMAX ('Small-Cap Index Admiral'; Number 548)
+
+------------------------------------------------------------------------------------------------------------------------
+Required rebalance actions for account key '0000000093033252'
+Name: 'Contributory & Mature Roth IRA'
+
+Sell      290.00000 shares of ticker VCIT  ('Intermediate Term Corp Bond'; Number 2002)
+Sell      340.00000 shares of ticker VMBS  ('Mortgage Backed Securities'; Number 2003)
+Buy       110.00000 shares of ticker VSS   ('FTSE All World EX US Small Cap'; Number 2005)
+Sell      225.00000 shares of ticker VTIP  ('Short Term Inflation Protected Securities'; Number 2006)
+
+Transfer            182,131.85 to   ticker VMFXX ('Federal Money Market'; Number 33)
+Total               182,131.85 from ticker VSGDX ('Short-Term Federal Admiral'; Number 549)
+
+Transfer             58,400.24 to   ticker VMFXX ('Federal Money Market'; Number 33)
+Total                58,400.24 from ticker VTABX ('Total International Bond Index Admiral'; Number 511)
+
+Transfer             37,591.42 to   ticker VMFXX ('Federal Money Market'; Number 33)
+Total                37,591.42 from ticker VGSLX ('Real Estate Index Admiral'; Number 5123)
+
+Transfer             32,687.77 to   ticker VMFXX ('Federal Money Market'; Number 33)
+Total                32,687.77 from ticker VBTLX ('Total Bond Market Index Admiral'; Number 584)
+
+Transfer             18,490.96 to   ticker VMFXX ('Federal Money Market'; Number 33)
+Transfer              3,349.41 to   ticker VEMAX ('Emerging Markets Stock Index Admiral'; Number 5533)
+Total                21,840.37 from ticker VWEHX ('High-Yield Corporate Investor'; Number 29)
+
+Transfer              6,869.01 to   ticker VEMAX ('Emerging Markets Stock Index Admiral'; Number 5533)
+Total                 6,869.01 from ticker VTIAX ('Total International Stock Index Admiral'; Number 569)
+
+Transfer              5,429.53 to   ticker VEMAX ('Emerging Markets Stock Index Admiral'; Number 5533)
+Transfer                879.63 to   ticker VIGAX ('Growth Index Admiral'; Number 509)
+Total                 6,309.16 from ticker VVIAX ('Value Index Admiral'; Number 506)
+
+Transfer              1,646.56 to   ticker VIGAX ('Growth Index Admiral'; Number 509)
+Total                 1,646.56 from ticker VMVAX ('Mid-Cap Value Index Admiral'; Number 5835)
+
+Transfer                147.41 to   ticker VIGAX ('Growth Index Admiral'; Number 509)
+Total                   147.41 from ticker VSIAX ('Small-Cap Value Index Admiral'; Number 5860)
+
+Buy                  12,907.63 of   ticker VIGAX ('Growth Index Admiral'; Number 509)
+Buy                  14,396.22 of   ticker VWILX ('International Growth Admiral'; Number 581)
+Buy                   7,468.85 of   ticker VSGAX ('Small-Cap Growth Index Admiral'; Number 5861)
+Buy                   6,103.55 of   ticker VMGMX ('Mid-Cap Growth Index Admiral'; Number 5832)

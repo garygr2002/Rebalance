@@ -76,10 +76,16 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
     Desired weight of real estate (i.e., REITs...can be a percentage if sum of
     all weights is 100)
 
-14. Adjust from High: length - 6, position - 136; type - a boolean value of
-    'false' or 'true' (case-insensitive)
+14. Increase at Zero: length - 6, position - 136; type - two-precision
+    floating
 
-    Adjust desired equity percentage for relative market valuation, true/false;
-    for "relative market valuation," we mean the current value of the S&P 500
-    index versus its record high; the adjustment, if it occurs, is a formula
-    that is hard-coded (column alignment ends here)
+    Desired *percentage* (not weight) increase in the portfolio percent stock
+    when the market reaches a hypothetical zero; if not specified, then there
+    will be no adjustment
+
+15. Increase at Bear: length - 6, position - 143; type - two-precision
+    floating
+
+    Desired *percentage* (not weight) increase in the portfolio percent stock
+    when the market reaches a bear market valuation; if not specified, the
+    adjustment will be half the increase at zero adjustment
