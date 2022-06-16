@@ -16,6 +16,9 @@ class ClosureRebalancer extends WeightRebalancer {
     private static final Adjuster adjuster =
             PreferenceManager.getInstance().getAdjuster();
 
+    // The default stock fraction at market high
+    private static final double defaultStocksAtHigh = 0.45;
+
     // Zero currency
     private static final Currency zero = Currency.getZero();
 
@@ -96,6 +99,14 @@ class ClosureRebalancer extends WeightRebalancer {
              */
             checkZero(description, stockAllocation / positiveLevelZeroWeight);
         }
+
+        /*
+         * The stock allocation is null. Set nearly-a-line characteristics with
+         * the default stock fraction at market high.
+         */
+        else {
+            adjuster.setNearlyALine(defaultStocksAtHigh);
+        }
     }
 
     /**
@@ -112,6 +123,14 @@ class ClosureRebalancer extends WeightRebalancer {
          */
         if (null != description) {
             checkPositiveWeight(description, description.sumWeights());
+        }
+
+        /*
+         * The portfolio description is null. Set nearly-a-line characteristics
+         * with the default stock percentage at market high.
+         */
+        else {
+            adjuster.setNearlyALine(defaultStocksAtHigh);
         }
     }
 
@@ -132,6 +151,15 @@ class ClosureRebalancer extends WeightRebalancer {
          */
         if (0. < levelZeroWeight) {
             checkAllocation(description, levelZeroWeight);
+        }
+
+        /*
+         * The level zero weight is zero or less. How did that happen? Sounds
+         * like a bug. Set nearly-a-line characteristics with the default stock
+         * fraction at market high.
+         */
+        else {
+            adjuster.setNearlyALine(defaultStocksAtHigh);
         }
     }
 
@@ -157,6 +185,14 @@ class ClosureRebalancer extends WeightRebalancer {
              * y-values of the adjuster.
              */
             setAdjuster(description, high, zero);
+        }
+
+        /*
+         * The desired increase at market-zero is null. Set nearly-a-line
+         * characteristics with the given market high.
+         */
+        else {
+            adjuster.setNearlyALine(high);
         }
     }
 
@@ -200,10 +236,14 @@ class ClosureRebalancer extends WeightRebalancer {
 
         /*
          * Set the y-values of the adjuster if possible. Call the superclass to
-         * do the rebalance.
+         * do the rebalance, and receive the result.
          */
         checkDescription(account.getPortfolioDescription());
-        return super.doRebalance(account);
+        final Currency currency = super.doRebalance(account);
+
+        // Reset the adjuster, and return the result of the rebalance.
+        adjuster.setNearlyALine(defaultStocksAtHigh);
+        return currency;
     }
 
     /**
