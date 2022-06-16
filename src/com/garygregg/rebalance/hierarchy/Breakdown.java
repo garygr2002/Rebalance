@@ -62,6 +62,7 @@ abstract class Breakdown<EnumType extends Enum<EnumType>,
      * @param currency The value to insert into the map
      * @return Any previous value that was previously mapped using the same key
      */
+    @SuppressWarnings("UnusedReturnValue")
     protected MutableCurrency put(EnumType type,
                                   @NotNull MutableCurrency currency) {
         return breakdown.put(type, currency);
