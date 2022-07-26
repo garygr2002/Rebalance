@@ -1,18 +1,23 @@
 #
 # Copies any existing source file named by the concatenation of the first two
 # arguments to a file named by the same arguments with the string '_save_'
-# between them, but only does this if the destination file does not already
-# exist.
+# between them, but only does this if the first argument is not 'save', and the
+# destination file does not already exist.
 #
 process_parts() {
-  source=$1_$2
-  if test -f "$source"; then
-    candidate=$1_save_$2
-    if ! test -f "$candidate"; then
-      printf "Copying $source to $candidate.\n"
-      cp "$source" "$candidate"
+  insertion='save'
+  if [ $insertion != $1 ]; then
+    source="$1"_"$2"
+    if test -f "$source"; then
+      candidate="$1"_"$insertion"_"$2"
+      if ! test -f "$candidate"; then
+        printf "Copying '$source' to '$candidate'.\n"
+        cp "$source" "$candidate"
+      else
+        printf "Save file '$candidate' already exists; skipping.\n"
+      fi
     else
-      printf "Save file $candidate already exists; skipping.\n"
+      printf "Indicated source file '$source' does not exist.\n"
     fi
   fi
 }
@@ -21,8 +26,8 @@ process_parts() {
 # least one '_' embedded in it.
 #
 process_file() {
-  IFS='_'
-  printf "Working in $1...\n"
+  local IFS='_'
+  printf "Investor: '$1'...\n"
   pushd $1 >/dev/null
   for file in *
   do
@@ -32,7 +37,6 @@ process_file() {
     fi
   done
   popd >/dev/null>/dev/null
-  IFS=' '
 }
 #
 # Processes the investor named in the argument.
@@ -47,7 +51,7 @@ process_investor() {
 # Processes each output file type.
 #
 process_type() {
-  printf "$1\n"
+  printf "File type: '$1'...\n"
   if [[ -d $1 ]]; then
     pushd $1 >/dev/null
     for investor in *;
@@ -58,7 +62,7 @@ process_type() {
     done
     popd >/dev/null
   else
-    printf "Directory $1 does not exist.\n"
+    printf "Directory '$1' does not exist.\n"
   fi
 }
 #
