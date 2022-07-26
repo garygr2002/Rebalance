@@ -47,6 +47,7 @@ process_investor() {
 # Processes each output file type.
 #
 process_type() {
+  printf "$1\n"
   if [[ -d $1 ]]; then
     pushd $1 >/dev/null
     for investor in *;
@@ -60,6 +61,10 @@ process_type() {
     printf "Directory $1 does not exist.\n"
   fi
 }
+#
+# Runs the shell script.
+#
+code=0
 if [ $# -gt 0 ];
 then
   if [[ -d $1 ]]; then
@@ -69,8 +74,12 @@ then
     process_type proposed
     process_type report
     popd >/dev/null
+  else
+    printf "Directory '$1' does not exist.\n" >&2
+    code=1
   fi
 else
-  printf "No argument supplied.\n"  
+  printf 'Usage: %s data_path\n' "$(basename "$0")" >&2
+  code=2
 fi
-exit 0
+exit $code
