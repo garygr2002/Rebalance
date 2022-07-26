@@ -1,0 +1,76 @@
+#
+# Copies any existing source file named by the concatenation of the first two
+# arguments to a file named by the same arguments with the string '_save_'
+# between them, but only does this if the destination file does not already
+# exist.
+#
+process_parts() {
+  source=$1_$2
+  if test -f "$source"; then
+    candidate=$1_save_$2
+    if ! test -f "$candidate"; then
+      printf "Copying $source to $candidate.\n"
+      cp "$source" "$candidate"
+    else
+      printf "Save file $candidate already exists; skipping.\n"
+    fi
+  fi
+}
+#
+# Processes each file in the subdirectory named in its argument that has at
+# least one '_' embedded in it.
+#
+process_file() {
+  IFS='_'
+  printf "Working in $1...\n"
+  pushd $1 >/dev/null
+  for file in *
+  do
+    read -a array <<< $file;
+    if [[ ${#array[*]} -gt 1 ]]; then
+      process_parts ${array[-2]} ${array[-1]}
+    fi
+  done
+  popd >/dev/null>/dev/null
+  IFS=' '
+}
+#
+# Processes the investor named in the argument.
+#
+process_investor() {
+  for file in $1;
+  do
+    process_file $file
+  done
+}
+#
+# Processes each output file type.
+#
+process_type() {
+  if [[ -d $1 ]]; then
+    pushd $1 >/dev/null
+    for investor in *;
+    do
+      if [[ -d $investor ]]; then
+        process_investor $investor
+      fi
+    done
+    popd >/dev/null
+  else
+    printf "Directory $1 does not exist.\n"
+  fi
+}
+if [ $# -gt 0 ];
+then
+  if [[ -d $1 ]]; then
+    pushd $1 >/dev/null
+    process_type action
+    process_type difference
+    process_type proposed
+    process_type report
+    popd >/dev/null
+  fi
+else
+  printf "No argument supplied.\n"  
+fi
+exit 0
