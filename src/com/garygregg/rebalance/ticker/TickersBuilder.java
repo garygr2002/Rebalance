@@ -27,15 +27,15 @@ public class TickersBuilder extends ElementReader<TickerDescription> {
 
     // A bond ticker may contain one of these bond subtypes
     private static final FundType[] bond = {FundType.CORPORATE,
-            FundType.INFLATION, FundType.MORTGAGE, FundType.FOREIGN,
-            FundType.TREASURY};
+            FundType.INFLATION, FundType.MORTGAGE, FundType.MUNICIPAL,
+            FundType.FOREIGN, FundType.TREASURY};
 
     // A list for bond fund subtypes
     private static final List<FundType> bondList = Arrays.asList(bond);
 
     // Non-bond tickers must not contain these bond subtypes
     private static final FundType[] bondMinusForeign = {FundType.CORPORATE,
-            FundType.INFLATION, FundType.MORTGAGE};
+            FundType.INFLATION, FundType.MORTGAGE, FundType.MUNICIPAL};
 
     // A list for bond-minus-foreign fund subtypes
     private static final List<FundType> bondMinusForeignList =

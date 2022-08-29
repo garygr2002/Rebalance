@@ -333,86 +333,91 @@ abstract class AccountRebalancer extends Rebalancer {
                 valueFromDetailedMap.get(type)));
 
         // 8
-        type = WeightType.BOND_SHORT;
+        type = WeightType.BOND_MUNICIPAL;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 9
-        type = WeightType.BOND_UNCATEGORIZED;
+        type = WeightType.BOND_SHORT;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 10
-        type = WeightType.CASH;
+        type = WeightType.BOND_UNCATEGORIZED;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 11
-        type = WeightType.CASH_GOVERNMENT;
+        type = WeightType.CASH;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 12
-        type = WeightType.CASH_UNCATEGORIZED;
+        type = WeightType.CASH_GOVERNMENT;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 13
-        type = WeightType.REAL_ESTATE;
+        type = WeightType.CASH_UNCATEGORIZED;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 14
-        type = WeightType.STOCK;
+        type = WeightType.REAL_ESTATE;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 15
-        type = WeightType.STOCK_DOMESTIC;
+        type = WeightType.STOCK;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 16
-        type = WeightType.STOCK_FOREIGN;
+        type = WeightType.STOCK_DOMESTIC;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 17
-        type = WeightType.STOCK_LARGE;
+        type = WeightType.STOCK_FOREIGN;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 18
-        type = WeightType.STOCK_GROWTH;
+        type = WeightType.STOCK_LARGE;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 19
-        type = WeightType.STOCK_GROWTH_AND_VALUE;
+        type = WeightType.STOCK_GROWTH;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 20
-        type = WeightType.STOCK_GROWTH_OR_VALUE;
+        type = WeightType.STOCK_GROWTH_AND_VALUE;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 21
-        type = WeightType.STOCK_MEDIUM;
+        type = WeightType.STOCK_GROWTH_OR_VALUE;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 22
-        type = WeightType.STOCK_NOT_LARGE;
+        type = WeightType.STOCK_MEDIUM;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 23
-        type = WeightType.STOCK_SMALL;
+        type = WeightType.STOCK_NOT_LARGE;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
 
         // 24
+        type = WeightType.STOCK_SMALL;
+        detailedCollection.add(new Pair<>(type,
+                valueFromDetailedMap.get(type)));
+
+        // 25
         type = WeightType.STOCK_VALUE;
         detailedCollection.add(new Pair<>(type,
                 valueFromDetailedMap.get(type)));
@@ -579,6 +584,7 @@ abstract class AccountRebalancer extends Rebalancer {
         weightMap.put(WeightType.BOND_HIGH, 5.);
         weightMap.put(WeightType.BOND_INFLATION, 5.);
         weightMap.put(WeightType.BOND_MORTGAGE, 8.);
+        weightMap.put(WeightType.BOND_MUNICIPAL, nothing);
         weightMap.put(WeightType.BOND_UNCATEGORIZED, 12.5);
         weightMap.put(WeightType.BOND_SHORT, 50.);
         weightMap.put(WeightType.CASH, 10.);

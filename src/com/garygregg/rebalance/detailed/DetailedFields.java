@@ -72,23 +72,26 @@ enum DetailedFields {
     // Desired percentage of mortgage-backed bonds
     PERCENTAGE_BOND_MORTGAGE(20, WeightType.BOND_MORTGAGE),
 
+    // Desired percentage of municipal bonds
+    PERCENT_BOND_MUNICIPAL(21, WeightType.BOND_MUNICIPAL),
+
     // Desired percentage of short-term bonds
-    PERCENTAGE_BOND_SHORT(21, WeightType.BOND_SHORT),
+    PERCENTAGE_BOND_SHORT(22, WeightType.BOND_SHORT),
 
     // Desired percentage of uncategorized bonds
-    PERCENTAGE_BOND_UNCATEGORIZED(22, WeightType.BOND_UNCATEGORIZED),
+    PERCENTAGE_BOND_UNCATEGORIZED(23, WeightType.BOND_UNCATEGORIZED),
 
     // Desired percentage of cash
-    PERCENTAGE_CASH(23, WeightType.CASH),
+    PERCENTAGE_CASH(24, WeightType.CASH),
 
     // Desired percentage of cash in government securities
-    PERCENTAGE_CASH_GOVERNMENT(24, WeightType.CASH_GOVERNMENT),
+    PERCENTAGE_CASH_GOVERNMENT(25, WeightType.CASH_GOVERNMENT),
 
     // Desired percentage of cash in uncategorized securities
-    PERCENTAGE_CASH_UNCATEGORIZED(25, WeightType.CASH_UNCATEGORIZED),
+    PERCENTAGE_CASH_UNCATEGORIZED(26, WeightType.CASH_UNCATEGORIZED),
 
     // Desired percentage of real estate
-    PERCENTAGE_REAL_ESTATE(26, WeightType.REAL_ESTATE);
+    PERCENTAGE_REAL_ESTATE(27, WeightType.REAL_ESTATE);
 
     // The position of the field in the data file
     private final int position;

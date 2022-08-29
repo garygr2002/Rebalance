@@ -41,6 +41,9 @@ public enum WeightType {
     // Tickers must contain fund type MORTGAGE.
     BOND_MORTGAGE("Bond mortgage", BOND),
 
+    // Tickers must contain fund type MUNICIPAL.
+    BOND_MUNICIPAL("Bond municipal", BOND),
+
     /*
      * Tickers must contain fund type BOND and fund type DOMESTIC, but no
      * other.

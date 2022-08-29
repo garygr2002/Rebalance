@@ -38,8 +38,11 @@ public enum FundType {
     // Mortgage backed securities
     MORTGAGE('E'),
 
+    // Municipal bonds
+    MUNICIPAL('\u1e3e'),
+
     // The new flair-out growth project
-    NEW_FLAIR_OUT_GROWTH('P'),
+    NEW_FLAIR_OUT_GROWTH('\u1e54'),
 
     // For containers that are not ETFs or funds
     NOT_A_FUND('_'),

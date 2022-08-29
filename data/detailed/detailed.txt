@@ -135,35 +135,40 @@ aligned-right. Unconstrained and enumerated types are left-aligned.
     Desired weight of mortgage-backed bonds (can be a percentage if total in
     level is 100)
 
-22. Weight Bond Short: length - 6, position - 200; type - two-precision
+22. Weight Municipal: length - 6, position - 200; type - two-precision
+
+    Desired weight of municipal bonds (can be a percentage if total in level is
+    100)
+
+23. Weight Bond Short: length - 6, position - 207; type - two-precision
     floating
 
     Desired weight of short-term bonds (can be a percentage if total in level
     is 100)
 
-23. Weight Bond Uncategorized: length - 6, position - 207; type -
+24. Weight Bond Uncategorized: length - 6, position - 214; type -
     two-precision floating
 
     Desired weight of uncategorized bonds (can be a percentage if total in
     level is 100)
 
-24. Detailed Weight Cash: length - 6, position - 214; type - two-precision floating
+25. Detailed Weight Cash: length - 6, position - 221; type - two-precision floating
 
     Desired weight of cash (can be a percentage if total in level is 100)
 
-25. Weight Cash Government: length - 6, position - 221; type -
+26. Weight Cash Government: length - 6, position - 228; type -
     two-precision floating
 
     Desired weight of cash in government securities (can be a percentage if
     total in level is 100)
 
-26. Weight Cash Uncategorized: length - 6, position - 228; type -
+27. Weight Cash Uncategorized: length - 6, position - 235; type -
     two-precision floating
 
     Desired weight of cash in uncategorized securities (can be a percentage if
     total in level is 100)
 
-27. Detailed Weight Real-Estate: length - 6, position - 235; type - two-precision
+28. Detailed Weight Real-Estate: length - 6, position - 242; type - two-precision
     floating (column alignment ends here)
 
     Desired weight of real estate (can be a percentage if total in level is 100)

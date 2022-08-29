@@ -100,8 +100,8 @@ public class Ticker extends
 
         /*
          * Level 2 (Bond): High-yield (make sure high-yield goes before
-         * corporate), corporate, foreign, inflation, mortgage, short,
-         * treasury, and uncategorized.
+         * corporate), corporate, foreign, inflation, mortgage, municipal,
+         * short, treasury, and uncategorized.
          */
         associationMap.put(type = WeightType.BOND, new Activity(type,
                 WeightType.BOND_UNCATEGORIZED,
@@ -110,6 +110,7 @@ public class Ticker extends
                 new Association(FundType.FOREIGN, WeightType.BOND_FOREIGN),
                 new Association(FundType.INFLATION, WeightType.BOND_INFLATION),
                 new Association(FundType.MORTGAGE, WeightType.BOND_MORTGAGE),
+                new Association(FundType.MUNICIPAL, WeightType.BOND_MUNICIPAL),
                 new Association(FundType.SHORT, WeightType.BOND_SHORT),
                 new Association(FundType.TREASURY,
                         WeightType.BOND_GOVERNMENT)));

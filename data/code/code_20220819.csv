@@ -1,0 +1,28 @@
+A,Account,               F,J,Q,X,_,Accounts can contain open-end funds; ETFs; single stocks and not-considered
+B,Bond,                  E,H,O,Y,Z,Bonds may be mortgage; inflation protected; overseas; high-yield or short term
+C,Cash,                  D,_,_,_,_,Cash may be domestic only
+D,Domestic,              B,C,R,S,_,Domestic funds may contain bonds; cash; real-estate or stocks
+E,Mortgage,              D,_,_,_,_,Mortgage backed bonds may be domestic only
+F,Fund,                  B,C,R,S,_,Funds may contains bonds; cash; real estate or stocks
+G,Growth,                D,O,_,_,_,Growth stocks may be domestic or overseas
+H,Inflation Protected,   D,_,_,_,_,Inflation protected securities may be domestic only
+I,Institution,           A,_,_,_,_,Institutions contain accounts
+J,Funds Not Considered,  C,D,_,_,_,Social Security; pensions; and other funds not considered
+K,Both Growth & Value,   D,G,O,V,_,Growth & value funds or ETFs may be both growth and value; domestic or overseas
+L,Large Cap,             G,K,V,_,_,Large cap funds and ETFs may be growth or value stocks; or both
+M,Mid-Cap,               G,K,V,_,_,Mid-cap funds and ETFs may be growth or value stocks; or both
+Ḿ,Municipal,             D,_,_,_,_,Municipal bonds may be domestic only
+N,Not Large,             M,W,_,_,_,Not large cap funds may be mid-cap or small-cap
+O,Overseas,              B,C,R,S,_,Overseas funds may contain bonds; cash; real-estate or stocks
+P,Portfolio,             I,_,_,_,_,Portfolios contain institutions
+Ṕ,New Flair Out Growth,  C,Q,_,_,_,NFOG may contain cash or single stocks
+Q,Single Stock,          D,O,_,_,_,Single stocks may be domestic or overseas
+R,Real Estate,           D,_,_,_,_,Real-estate may be domestic only
+S,Stock,                 D,L,N,O,_,Stocks may be domestic or overseas; large or not-large
+T,Corporate,             D,_,_,_,_,Corporate bonds may be domestic only
+U,Treasury,              D,_,_,_,_,Treasury bonds may be domestic only
+V,Value,                 D,O,_,_,_,Value stocks may be domestic or overseas
+W,Small-Cap,             G,K,V,_,_,Small-cap funds and ETFs may be growth or value stocks; or both
+X,ETF,                   B,C,R,S,_,ETFs may contains bonds; cash; real estate or stocks
+Y,High Yield,            D,_,_,_,_,High-yield bonds may be domestic only
+Z,Short Term,            D,_,_,_,_,Short term bonds may be domestic only
