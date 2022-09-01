@@ -226,9 +226,9 @@ If the count of reallocation iterations reaches this preference setting, the beh
 
 The <i>mxrt</i> argument must be a non-negative integer, and the software requires it. After some thought, I decided that there was a need for a new rebalance turning parameter to prevent the software from getting into a situation where it takes too long to complete an acceptable rebalance. Please read, and understand the use of the [-x ncnt](#-x-ncnt) command line argument. You may - in the interest of an acceptable runtime - set the <b>ncnt</b> parameter to some reasonable value, say 256. However, that limit applies to <i>each</i> weight-type node and ticker collection (review [How Does Rebalancing Work](#how-does-rebalancing-work)). What if, let us say, a rebalance node uses 256 iterations to achieve a near-optimal rebalance, and what if one of its children does the same thing? That would be a total of 2<sup>8</sup> * 2<sup>8</sup> (or 256 * 256) = 2<sup>16</sup> (or 65,536) iterations. The problem becomes compounded if multiple children use 2<sup>8</sup> iterations. Now imagine if more than two generations of weight-type nodes use this same runtime. I hope you live long enough to see your optimal rebalance report!
 
-In what situation would you see this problem manifest itself? If you are an individual that invests across the board in exchange-traded funds (ETFs) <b><i>and</i></b> you have reported that each of these funds has a preferred round number of shares, you will likely have an issue. I devised the <b>mxrt</b> tuning parameter to deal with this. The parameter limits the depth where a weight-type node will perform more than one rebalance iteration. For example, if you set <b>mxrt</b> to zero, no node below the root will attempt more than one rebalance iteration. Only the root node will attempt it. Now the root node handles the most coarse-grained investment categorizations: stocks, bonds, cash & real-estate. If you are completely invested in exchange-traded ETFs, you will likely have a money fund (cash investment) in your brokerage account that has no required round number of shares. That is where the software will place any residual from rebalancing the holdings in your ETFs.
+In what situation would you see this problem manifest itself? If you are an individual that invests across the board in exchange-traded funds (ETFs) <b><i>and</i></b> you have reported that each of these funds has a preferred round number of shares, you will likely have an issue. I devised the <b>mxrt</b> tuning parameter to deal with this. The parameter limits the depth where a weight-type node will perform more than one rebalance iteration. For example, if you set <b>mxrt</b> to zero, no node below the root will attempt more than one rebalance iteration. Only the root node will attempt it. Now the root node handles the most coarse-grained investment categorizations: stocks, bonds, cash & real-estate. If you are completely invested in exchange-traded ETFs, you will likely have a money fund (cash investment) in your brokerage account that has no required round number of shares. That is where the software places any residual from rebalancing the holdings in your ETFs.
 
-If you are like me, I have ETFs mixed in with open-ended mutual funds at each level of investment categorization. These open-ended funds also have no preferred round number of shares. For me, I can set <b>mxrt</b> to something higher than zero, and still have the software resolve any residuals below the root weight-type node. This prevents excessively long runtimes for the software. Here is how I would tune the software for certain situations: for portfolios where ETFs are concentrated in one category (let us say, small cap value), I would limit the [-x ncnt](#-x-ncnt) parameter. But for situations where ETFs are distributed across categories, <i>and</i> there is no investment in the same categories that can receive a residual (like an open-ended fund), I would limit <b>mxrt</b>. Know that setting both <b>ncnt</b> and <b>mxrt</b> to high values lets you acquire a more precise investment rebalance, <b>if</b> you can afford the runtime. If you will grow old waiting for an answer, try limiting one parameter, or the other.    
+If you are like me, I have ETFs mixed in with open-ended mutual funds at each level of investment categorization. These open-ended funds also have no preferred round number of shares. For me, I can set <b>mxrt</b> to something higher than zero, and still have the software resolve any residuals below the root weight-type node. This prevents excessively long runtimes for the software. Here is how I would tune the software for certain situations: for portfolios where ETFs are concentrated in one category (let us say, small cap value), I would limit the [-x ncnt](#-x-ncnt) parameter. But for situations where ETFs are distributed across categories, <i>and</i> there is no investment in the same categories that can receive a residual (like an open-ended fund), I would limit <b>mxrt</b>. Know that setting both <b>ncnt</b> and <b>mxrt</b> to high values lets you acquire a more precise investment rebalance, <b>if</b> you can afford the runtime. If you would grow old waiting for an answer, try limiting one parameter, or the other.    
 
 Since this command-line parameter is new for release v1.3.0, figures 1 through 5 do not show a value for 'y'. I do not have the inclination to take new screen snaps to fix this. 
 
@@ -339,7 +339,7 @@ The foreign key begins in column 3, and may be 16 characters long. Its content i
 
 ### Basis Name
 
-The basis name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the [Investor Name](#investor-name) for rows with a 'P' [Basis Type](#basis-type), an [Account Name](#account-name) for rows with an 'A' [Basis Type](#basis-type), or the [Ticker Name](#ticker-name) for rows with an 'F, 'J', 'Q', or 'X' [Basis Type](#basis-type). Institution names (rows with an 'I' [Basis Type](#basis-type)) are specified in this file or the [Holding File](#holding-file) only. The software only uses this field for readability in its reports.
+The basis name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the [Investor Name](#investor-name) for rows with a 'P' [Basis Type](#basis-type), an [Account Name](#account-name) for rows with an 'A' [Basis Type](#basis-type), or the [Ticker Name](#ticker-name) for rows with an 'F', 'J', 'Q', or 'X' [Basis Type](#basis-type). Institution names (rows with an 'I' [Basis Type](#basis-type)) are specified in this file or the [Holding File](#holding-file) only. The software only uses this field for readability in its reports.
 
 ### Basis Shares
 
@@ -605,7 +605,7 @@ The foreign key begins in column 3, and may be 16 characters long. Its content i
 
 ### Holding Name
 
-The holding name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the [Investor Name](#investor-name) for rows with a 'P' [Holding Type](#holding-type), an [Account Name](#account-name) for rows with an 'A' [Holding Type](#holding-type), or the [Ticker Name](#ticker-name) for rows with an 'F, 'J', 'Q', or 'X' [Holding Type](#holding-type). Institution names (rows with an 'I' [Holding Type](#holding-type)) are specified in this file or the [Basis File](#basis-file) only. The software only uses this field for readability in its reports.
+The holding name begins in column 20, and may be 42 characters long. Its content is unconstrained, but must match the [Investor Name](#investor-name) for rows with a 'P' [Holding Type](#holding-type), an [Account Name](#account-name) for rows with an 'A' [Holding Type](#holding-type), or the [Ticker Name](#ticker-name) for rows with an 'F', 'J', 'Q', or 'X' [Holding Type](#holding-type). Institution names (rows with an 'I' [Holding Type](#holding-type)) are specified in this file or the [Basis File](#basis-file) only. The software only uses this field for readability in its reports.
 
 ### Holding Shares
 
@@ -777,17 +777,18 @@ The first subcode field begins in column 78, and is one character. Its content i
 8. 'K' (both growth and value stocks)
 9. 'L' (large cap stocks)
 10. 'M' (medium cap stocks)
-11. 'N' (medium and small cap stocks)
-12. 'O' (foreign securities)
-13. 'P' (investor-specific non-balanceable investment project)
-14. 'R' (all real estate)
-15. 'S' (all stocks)
-16. 'T' (corporate bonds)
-17. 'U' (treasury securities)
-18. 'V' (value stocks)
-19. 'W' (small cap stocks)
-20. 'Y' (high-yield bonds)
-21. 'Z' (short-term bonds)
+11. 'Ḿ' (for municipal bonds - note accent mark)
+12. 'N' (medium and small cap stocks)
+13. 'O' (foreign securities)
+14. 'Ṕ' (investor-specific non-balanceable investment project - note accent mark)
+15. 'R' (all real estate)
+16. 'S' (all stocks)
+17. 'T' (corporate bonds)
+18. 'U' (treasury securities)
+19. 'V' (value stocks)
+20. 'W' (small cap stocks)
+21. 'Y' (high-yield bonds)
+22. 'Z' (short-term bonds)
 
 The first subcode, in conjunction with [Ticker Subcode 2](#ticker-subcode-2), [Ticker Subcode 3](#ticker-subcode-3), and [Ticker Subcode 4](#ticker-subcode-4) determine the characteristics of the security holding(s) of the ticker. The software checks for inconsistencies between the various subcodes, and reports an error in its log if inconsistencies exist. For example, a stock ticker cannot hold corporate bonds. The use of the 'S' and 'T' codes together is therefore not consistent, and the software will tell the user as much if these codes are used for the same ticker.  
 
@@ -887,6 +888,7 @@ The weight rebalancer begins with a table whose elements correspond in meaning t
 | Bond High Yield           | 2            | 5.0           |
 | Bond Inflation Protected  | 2            | 5.0           |
 | Bond Mortgage Instruments | 2            | 8.0           |
+| Bond Municipal            | 2            | 0.0           |
 | Bond Uncategorized        | 2            | 12.5          |
 | Bond Short                | 2            | 50.0          |
 | Cash                      | 1            | 10.0          |
