@@ -578,7 +578,7 @@ public class ActionReportWriter extends HierarchyWriter {
          * is not positive (i.e., it is zero).
          */
         else {
-            writer.write("Rebalance impossible; there is no value to " +
+            writer.write("\nRebalance impossible; there is no value to " +
                     "rebalance!\n");
         }
     }
