@@ -302,7 +302,7 @@ The synthesizer type begins at column 141, and may be up to 16 characters long. 
 
 Monthly annuitized payments for CPI-adjusted, Non-CPI-adjusted and Social Security are given per-investor in the [Portfolio File](#portfolio-file). If the value of the account is not explicitly specified in the [Holding File](#holding-file), then the software will attempt to synthesize the value of the account using the indicated synthesizer. It will do this based on the relevant monthly payment, the life expectancy of the investor (also given in the [Portfolio File](#portfolio-file)), and the expected rate of inflation (for non-CPI adjusted annuities).
 
-For accounts that estimate valuations of real estate, the user may create a synthesized account that is the negated sum of the estimates, plus their average. The sum of the synthesized account and all the estimates will produce a single, positive average. This valuation of this type of account is the work of an averaging synthesizer. See the [Referenced Accounts](#referenced-accounts) field.  
+For accounts that estimate valuations of real estate, the user may create a synthesized account that is the negated sum of the estimates, plus their average. The sum of the synthesized account and all the estimates will produce a single, positive average. The valuation of this type of account is the work of an averaging synthesizer. See the [Referenced Accounts](#referenced-accounts) field.  
 
 ### Referenced Accounts
 
