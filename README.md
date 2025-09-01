@@ -376,7 +376,7 @@ The software uses the code library for no programmatic purpose, however, it rema
 
 ### Code Character
 
-The code character begins in column 1, and is 1 character. Its content is unconstrained, but the existing codes are currently all uppercase Latin characters.
+The code character begins in column 1, and is 1 character. Its content is unconstrained, but the existing codes are currently all uppercase Latin characters, possibly with diacritics to distinguish between codes using the same Latin letter.
 
 ### Code Name
 
