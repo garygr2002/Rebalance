@@ -384,23 +384,23 @@ The code name begin in column 3, and may be up to 22 characters long. Its conten
 
 ### Code Subcode 1
 
-The first subcode begins in column 26, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+The first subcode begins in column 26, and is 1 character. Its content is unconstrained, but should reference a related code in this code file.
 
 ### Code Subcode 2
 
-The second subcode begins in column 28, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+The second subcode begins in column 28, and is 1 character. Its content is unconstrained, but should reference a related code in this code file.
 
 ### Code Subcode 3
 
-The third subcode begins in column 30, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+The third subcode begins in column 30, and is 1 character. Its content is unconstrained, but should reference a related code in this code file.
 
 ### Code Subcode 4
 
-The fourth subcode begins in column 32, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+The fourth subcode begins in column 32, and is 1 character. Its content is unconstrained, but should reference a related code in this code file.
 
 ### Code Subcode 5
 
-The fifth subcode begins in column 34, is 1 character. Its content is unconstrained, but should reference a related code in this code file.
+The fifth subcode begins in column 34, and is 1 character. Its content is unconstrained, but should reference a related code in this code file.
 
 ### Code Description
 
